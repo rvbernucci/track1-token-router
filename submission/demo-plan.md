@@ -55,15 +55,45 @@ Expected readiness:
 
 ## Visual demo optional
 
-- Use Native.Builder only to show architecture and reports visually.
-- Do not use it as runtime.
-- Do not upload secrets, private IPs or sensitive logs.
+- Use `demo-site/index.html` as the default public explanation layer.
+- Use Native.Builder only as an optional visual companion for architecture and reports.
+- Do not use any visual layer as runtime.
+- Do not upload secrets, private IPs, raw traces, long prompts or sensitive logs.
+
+## Static public demo
+
+1. Export safe public reports:
+
+```bash
+python3 scripts/export_public_report.py --check
+```
+
+2. Serve locally:
+
+```bash
+cd demo-site
+python3 -m http.server 8080
+```
+
+3. Show the first-scroll story:
+
+- thesis: accuracy first, remote tokens only when needed;
+- architecture: deterministic solver, local candidate, local verifier, compact remote audit;
+- proof: public battle, fuzz and submission readiness reports;
+- reproduction: `scripts/offline_release_check.sh`.
+
+Expected public links:
+
+- `demo-site/public-reports/battle-report.md`;
+- `demo-site/public-reports/fuzz-report.md`;
+- `demo-site/public-reports/submission-readiness.md`.
 
 ## Demo URL checklist
 
 - Public GitHub repository URL.
 - Optional video URL.
 - Optional slide/PDF URL.
+- Optional GitHub Pages URL pointing at `demo-site/`.
 - Optional Native.Builder demo URL.
 - No private dashboards or credential-bearing links.
 
@@ -73,6 +103,8 @@ Expected readiness:
 - `SUBMISSION.md` explains pitch and reproduction.
 - `CREDIT_ACTIVATION.md` explains paid activation.
 - CI is visible and passing.
+- `docs/PUBLIC_DEMO_RUNBOOK.md` explains the publication path.
+- `reports/public/` contains only sanitized shareable reports.
 
 ## Docker/CI checklist
 

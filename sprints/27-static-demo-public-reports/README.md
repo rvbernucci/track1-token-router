@@ -39,24 +39,24 @@ O demo site deve responder quatro perguntas:
 
 ## Checklist
 
-- [ ] Criar estrutura `demo-site/`.
-- [ ] Criar HTML estatico sem dependencia de build tool.
-- [ ] Incluir pitch em 90 segundos.
-- [ ] Incluir diagrama do fluxo competitivo.
-- [ ] Incluir exemplo `solver_arithmetic` com zero tokens remotos.
-- [ ] Incluir exemplo de remote audit dry-run.
-- [ ] Incluir links para README, SUBMISSION e reports publicos.
-- [ ] Criar `scripts/export_public_report.py`.
-- [ ] Exportar battle report publico.
-- [ ] Exportar fuzz report publico.
-- [ ] Exportar submission readiness publico.
-- [ ] Redigir prompts longos antes de publicar.
-- [ ] Mascarar paths locais absolutos.
-- [ ] Bloquear IPs privados, hostnames privados e tokens.
-- [ ] Criar teste que injeta segredo sintetico e espera bloqueio.
-- [ ] Criar comando local para servir demo com `python3 -m http.server`.
-- [ ] Criar checklist de GitHub Pages.
-- [ ] Integrar export publico ao release check ou a um check dedicado.
+- [x] Criar estrutura `demo-site/`.
+- [x] Criar HTML estatico sem dependencia de build tool.
+- [x] Incluir pitch em 90 segundos.
+- [x] Incluir diagrama do fluxo competitivo.
+- [x] Incluir exemplo `solver_arithmetic` com zero tokens remotos.
+- [x] Incluir exemplo de remote audit dry-run.
+- [x] Incluir links para README, SUBMISSION e reports publicos.
+- [x] Criar `scripts/export_public_report.py`.
+- [x] Exportar battle report publico.
+- [x] Exportar fuzz report publico.
+- [x] Exportar submission readiness publico.
+- [x] Redigir prompts longos antes de publicar.
+- [x] Mascarar paths locais absolutos.
+- [x] Bloquear IPs privados, hostnames privados e tokens.
+- [x] Criar teste que injeta segredo sintetico e espera bloqueio.
+- [x] Criar comando local para servir demo com `python3 -m http.server`.
+- [x] Criar checklist de GitHub Pages.
+- [x] Integrar export publico ao release check ou a um check dedicado.
 
 ## Criterios de aceite
 
@@ -98,3 +98,11 @@ O demo deve ser estatico, pequeno e auditavel. Se uma melhoria exigir backend, a
 - Secret scan cobre os artefatos compartilhaveis.
 - Submission demo checklist aponta para o novo fluxo.
 - Documentacao explica como publicar no GitHub Pages ou equivalente.
+
+## Evidencias
+
+- `demo-site/index.html` criado como pagina estatica sem build.
+- `docs/PUBLIC_DEMO_RUNBOOK.md` criado com fluxo local, roteiro de 90 segundos e checklist de GitHub Pages.
+- `scripts/export_public_report.py --check` exporta reports sanitizados para `reports/public/` e `demo-site/public-reports/`.
+- `tests/test_public_reports.py` cobre export real, redacao de paths/IPs, bloqueio de segredo sintetico e links do demo.
+- `scripts/offline_release_check.sh` executa o export publico antes do secret scan.

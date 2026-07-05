@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Track 1 Token Router</title>
+  <style>
+    :root {
+      --ink: #201713;
+      --muted: #6d625c;
+      --paper: #fff8ed;
+      --ember: #e9572f;
+      --sun: #f5b84b;
+      --moss: #61755b;
+      --line: rgba(32, 23, 19, 0.16);
+      --card: rgba(255, 252, 245, 0.82);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(245, 184, 75, 0.34), transparent 28rem),
+        radial-gradient(circle at 90% 5%, rgba(233, 87, 47, 0.24), transparent 24rem),
+        linear-gradient(135deg, #fff8ed 0%, #f4ecdd 58%, #e9dcc9 100%);
+    }
+
+    a {
+      color: var(--ember);
+      font-weight: 700;
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 42px 0 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.75fr);
+      gap: 28px;
+      align-items: stretch;
+      min-height: 520px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--card);
+      box-shadow: 0 24px 80px rgba(48, 30, 18, 0.14);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-copy {
+      padding: clamp(28px, 5vw, 56px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      margin: 0 0 22px;
+      padding: 8px 12px;
+      border: 1px solid rgba(233, 87, 47, 0.24);
+      border-radius: 999px;
+      color: #81331f;
+      background: rgba(255, 255, 255, 0.45);
+      font: 700 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: clamp(46px, 8vw, 92px);
+      line-height: 0.9;
+      letter-spacing: -0.06em;
+    }
+
+    .lead {
+      max-width: 680px;
+      margin: 28px 0 0;
+      color: var(--muted);
+      font-size: clamp(18px, 2vw, 23px);
+      line-height: 1.45;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--ink);
+      text-decoration: none;
+      font: 800 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.03em;
+    }
+
+    .button.secondary {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid var(--line);
+    }
+
+    .router-card {
+      padding: 26px;
+      display: grid;
+      align-content: center;
+      gap: 14px;
+    }
+
+    .node {
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid var(--line);
+      font: 700 14px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .node strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--ember);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 18px;
+    }
+
+    .arrow {
+      text-align: center;
+      color: var(--muted);
+      font: 900 20px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .card {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255, 252, 245, 0.74);
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 12px;
+      letter-spacing: -0.03em;
+    }
+
+    .card p,
+    .card li {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .metric {
+      display: block;
+      margin-top: 10px;
+      color: var(--moss);
+      font-size: 34px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    pre {
+      overflow: auto;
+      margin: 0;
+      padding: 18px;
+      border-radius: 18px;
+      color: #f9efe1;
+      background: #251b16;
+      font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      .hero,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="panel hero-copy">
+        <p class="eyebrow">AMD Developer Hackathon ACT II / Track 1</p>
+        <h1>Accuracy first. Remote tokens only when needed.</h1>
+        <p class="lead">
+          Track 1 Token Router is a CLI-first routing agent that uses deterministic solvers,
+          local generation, local verification and compact Fireworks audit to preserve answer
+          quality while minimizing remote token spend.
+        </p>
+        <div class="actions">
+          <a class="button" href="public-reports/battle-report.md">Battle report</a>
+          <a class="button secondary" href="public-reports/fuzz-report.md">Fuzz report</a>
+          <a class="button secondary" href="public-reports/submission-readiness.md">Submission readiness</a>
+          <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/README.md">README</a>
+          <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/SUBMISSION.md">SUBMISSION</a>
+        </div>
+      </div>
+
+      <aside class="panel router-card" aria-label="Router flow">
+        <div class="node"><strong>0. Deterministic</strong> Guardrails and solvers answer mechanical tasks before any model.</div>
+        <div class="arrow">↓</div>
+        <div class="node"><strong>1. Local Candidate</strong> M1 proposes a free-form answer through an OpenAI-compatible endpoint.</div>
+        <div class="arrow">↓</div>
+        <div class="node"><strong>2. Local Verification</strong> M2A checks risk, format and confidence before spending remote tokens.</div>
+        <div class="arrow">↓</div>
+        <div class="node"><strong>3. Remote Audit</strong> Fireworks receives a compact approve-or-replace packet only on risky tasks.</div>
+      </aside>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Why this wins</h2>
+        <p>The hard part is not calling the strongest model. The hard part is knowing when not to call it.</p>
+        <span class="metric">local-first</span>
+      </article>
+
+      <article class="card">
+        <h2>Evidence</h2>
+        <p>Offline battle drill checks policy score, competition readiness, solver savings and fuzz robustness.</p>
+        <span class="metric">offline gated</span>
+      </article>
+
+      <article class="card">
+        <h2>Submission shape</h2>
+        <p>Public GitHub repo, Docker, CLI reproduction, static demo and no-credit release path.</p>
+        <span class="metric">zero credits</span>
+      </article>
+
+      <article class="card wide">
+        <h2>Demo command</h2>
+        <pre><code>ROUTER_MODE=competition COMPETITION_DRY_RUN=1 \
+python3 -m router ask "What is 6 * 7? Return only the number." --json</code></pre>
+      </article>
+
+      <article class="card">
+        <h3>Expected route</h3>
+        <p><code>solver_arithmetic</code>, because code can answer this safely.</p>
+      </article>
+
+      <article class="card">
+        <h3>Expected answer</h3>
+        <p><code>42</code>, with final validation preserving the strict numeric format.</p>
+      </article>
+
+      <article class="card">
+        <h3>Remote spend</h3>
+        <p><code>0</code> Fireworks tokens. The remote model is held for tasks where risk justifies it.</p>
+      </article>
+
+      <article class="card wide">
+        <h2>Reproduce locally</h2>
+        <pre><code>python3 -m pip install -e .
+scripts/offline_release_check.sh
+python3 scripts/export_public_report.py --check
+cd demo-site && python3 -m http.server 8080</code></pre>
+      </article>
+
+      <article class="card wide">
+        <h2>Remote audit dry-run</h2>
+        <p>
+          In no-credit mode, risky tasks exercise the same routing boundary without calling
+          Fireworks. The real remote provider is activated only after credentials and credits exist.
+        </p>
+        <pre><code>ROUTER_MODE=competition COMPETITION_DRY_RUN=1 \
+python3 -m router ask "Summarize the tradeoff between token cost and answer quality in one sentence." --json</code></pre>
+      </article>
+    </section>
+
+    <p class="footer">
+      Static demo for the Track 1 Token Router. The evaluator path remains the CLI/container; this page is only the public explanation layer.
+    </p>
+  </main>
+</body>
+</html>

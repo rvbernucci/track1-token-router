@@ -1,0 +1,13 @@
+{
+  "exported": [
+    "reports/public/battle-report.md",
+    "reports/public/fuzz-report.md",
+    "reports/public/submission-readiness.md"
+  ],
+  "redactions": {
+    "absolute_paths": 0,
+    "private_ips": 0
+  },
+  "safe_to_publish": true,
+  "source": "reports/generated"
+}
