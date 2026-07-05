@@ -7,13 +7,20 @@ from scripts.export_public_report import export_public_reports, sanitize_public_
 
 
 class PublicReportExportTests(unittest.TestCase):
-    def test_checked_in_generated_reports_export_to_public_and_demo_roots(self) -> None:
+    def test_generated_reports_export_to_public_and_demo_roots(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
+            generated_root = Path(tmp) / "reports" / "generated"
             public_root = Path(tmp) / "reports" / "public"
             demo_root = Path(tmp) / "demo-site"
+            generated_root.mkdir(parents=True)
+            for report_name in ("battle-report.md", "fuzz-report.md", "submission-readiness.md"):
+                (generated_root / report_name).write_text(
+                    f"# {report_name}\n\n- safe: true\n",
+                    encoding="utf-8",
+                )
 
             result = export_public_reports(
-                generated_root=Path("reports/generated"),
+                generated_root=generated_root,
                 public_root=public_root,
                 demo_root=demo_root,
             )
