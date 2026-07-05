@@ -98,6 +98,11 @@ Esta e a rota principal enquanto os creditos AMD/Fireworks nao forem liberados. 
 | 29 | Latency And Token Envelope Lab | Gates offline de latencia, timeout e exposicao de tokens. |
 | 30 | Artifact Build Kit | Slides, cover, video checklist e readiness estrito. |
 | 31 | Policy Pareto And Decision Replay | Otimizacao offline de politica e replay legivel de decisoes. |
+| 32 | Public Demo Deploy And Strict Readiness | Demo HTTPS, check de links e strict readiness mais proximo do final. |
+| 33 | Bad Local Model Chaos Lab | Simulacao de modelos locais ruins para testar confianca e escalacao. |
+| 34 | Semantic Validation Harness | Rubricas offline para respostas livres e parcialmente abertas. |
+| 35 | Batch Throughput And Timeout Stress | Stress de lote, throughput, timeout e falha parcial sem creditos. |
+| 36 | Submission Rehearsal And Log Redaction | Ensaio final de submissao e separacao segura entre logs internos/publicos. |
 
 ## Roadmap dependente de credito
 

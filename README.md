@@ -29,7 +29,8 @@ Prioridades:
 | [`planning`](./planning/README.md) | Builder plan, principios, definition of done e estrategia-mestra. |
 | [`sprints`](./sprints/README.md) | Plano operacional em 5 sprints com checklists e criterios de aceite. |
 | [`docs/COMPETITION_GAP_ANALYSIS.md`](./docs/COMPETITION_GAP_ANALYSIS.md) | Lacunas restantes sem credito e trilha de Sprints 22-26. |
-| [`docs/NEXT_NO_CREDIT_IMPROVEMENTS.md`](./docs/NEXT_NO_CREDIT_IMPROVEMENTS.md) | Segunda onda sem credito: demo, artefatos finais, adapter drill, latencia, token envelope e replay. |
+| [`docs/NEXT_NO_CREDIT_IMPROVEMENTS.md`](./docs/NEXT_NO_CREDIT_IMPROVEMENTS.md) | Terceira onda sem credito: deploy publico, caos de modelo local, validacao semantica, batch stress e redaction. |
+| [`docs/NO_CREDIT_WAVE_3_PLAN.md`](./docs/NO_CREDIT_WAVE_3_PLAN.md) | Plano executivo das Sprints 32-36, com dependencias, gates e anti-escopo. |
 
 ## Roadmap atual
 
@@ -44,6 +45,22 @@ A primeira trilha de readiness competitivo sem credito foi fechada:
 - Sprint 24: deterministic solver pack.
 - Sprint 25: platform runbooks e runtime profiles.
 - Sprint 26: submission readiness kit.
+
+A segunda trilha de readiness tambem foi fechada:
+
+- Sprint 27: static demo e public reports.
+- Sprint 28: evaluator contract e adapter drill.
+- Sprint 29: latency/token envelope.
+- Sprint 30: artifact build kit.
+- Sprint 31: policy Pareto e decision replay.
+
+O proximo bloco sem credito e a terceira onda:
+
+- Sprint 32: public demo deploy e strict readiness.
+- Sprint 33: bad local model chaos lab.
+- Sprint 34: semantic validation harness.
+- Sprint 35: batch throughput e timeout stress.
+- Sprint 36: submission rehearsal e log redaction.
 
 O proximo bloco recomendado esta em [`docs/NEXT_NO_CREDIT_IMPROVEMENTS.md`](./docs/NEXT_NO_CREDIT_IMPROVEMENTS.md).
 

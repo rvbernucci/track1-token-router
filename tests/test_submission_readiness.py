@@ -46,8 +46,40 @@ class SubmissionReadinessTests(unittest.TestCase):
         self.assertTrue(Path("submission/final/slides.pdf").exists())
         self.assertTrue(Path("submission/final/cover.png").exists())
 
-    def test_strict_mode_flags_pending_public_urls_and_ci(self) -> None:
+    def test_checked_in_strict_mode_is_ok_with_approved_video_placeholder(self) -> None:
         readiness = check_submission_readiness(Path("."), strict=True)
+
+        self.assertTrue(readiness.ok, readiness.errors)
+        self.assertTrue(any("video placeholder" in warning for warning in readiness.warnings))
+
+    def test_strict_mode_flags_pending_public_urls_and_ci(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            shutil.copytree("submission", tmp_root / "submission")
+            for relative in (
+                ".github",
+            ):
+                shutil.copytree(relative, tmp_root / relative)
+            for relative in (
+                "README.md",
+                "SUBMISSION.md",
+                "CREDIT_ACTIVATION.md",
+                "Dockerfile",
+            ):
+                shutil.copy2(relative, tmp_root / relative)
+            status_path = tmp_root / "submission" / "final" / "submission-status.json"
+            status_path.write_text(
+                "{\n"
+                '  "ci_status": "pending-final-green",\n'
+                '  "demo_url": "",\n'
+                '  "repo_url": "https://github.com/rvbernucci/track1-token-router",\n'
+                '  "video_placeholder_approved": true,\n'
+                '  "video_url": ""\n'
+                "}\n",
+                encoding="utf-8",
+            )
+
+            readiness = check_submission_readiness(tmp_root, strict=True)
 
         self.assertFalse(readiness.ok)
         self.assertTrue(any("demo_url" in error for error in readiness.errors))

@@ -46,16 +46,21 @@ Enquanto os creditos nao forem liberados, seguimos na trilha `offline`, usando d
 - [Sprint 24 - Deterministic Solver Pack](./24-deterministic-solver-pack/README.md)
 - [Sprint 25 - Platform Runbooks & Runtime Profiles](./25-platform-runbooks-runtime-profiles/README.md)
 - [Sprint 26 - Submission Readiness Kit](./26-submission-readiness-kit/README.md)
-
-## Proximas sprints sem credito
-
-Estas sprints formam a segunda onda de readiness: transformar o runner em uma submissao mais clara, robusta e dificil de interpretar errado.
-
 - [Sprint 27 - Static Demo And Public Reports](./27-static-demo-public-reports/README.md)
 - [Sprint 28 - Evaluator Contract And Adapter Drill](./28-evaluator-contract-adapter-drill/README.md)
 - [Sprint 29 - Latency And Token Envelope Lab](./29-latency-token-envelope-lab/README.md)
 - [Sprint 30 - Artifact Build Kit](./30-artifact-build-kit/README.md)
 - [Sprint 31 - Policy Pareto And Decision Replay](./31-policy-pareto-decision-replay/README.md)
+
+## Proximas sprints sem credito
+
+Estas sprints formam a terceira onda de readiness: publicar, ensaiar e endurecer o projeto contra surpresas externas sem depender de AMD/Fireworks.
+
+- [Sprint 32 - Public Demo Deploy And Strict Readiness](./32-public-demo-deploy-strict-readiness/README.md)
+- [Sprint 33 - Bad Local Model Chaos Lab](./33-bad-local-model-chaos-lab/README.md)
+- [Sprint 34 - Semantic Validation Harness](./34-semantic-validation-harness/README.md)
+- [Sprint 35 - Batch Throughput And Timeout Stress](./35-batch-throughput-timeout-stress/README.md)
+- [Sprint 36 - Submission Rehearsal And Log Redaction](./36-submission-rehearsal-log-redaction/README.md)
 
 ## Sprints dependentes de credito
 

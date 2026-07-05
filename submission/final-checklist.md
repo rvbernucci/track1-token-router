@@ -3,7 +3,7 @@
 ## Lablab Form
 
 - [ ] Public repository URL added.
-- [ ] Demo URL added.
+- [x] Demo URL added.
 - [ ] Video URL or approved placeholder added.
 - [ ] Short description pasted.
 - [ ] Long description pasted.
@@ -15,14 +15,14 @@
 - [x] `SUBMISSION.md` explains pitch and reproduction.
 - [x] `CREDIT_ACTIVATION.md` separates credit-dependent activation from no-credit work.
 - [x] Public reports are sanitized.
-- [ ] Final CI run confirmed green.
+- [x] Final CI run confirmed green.
 
 ## Demo
 
 - [x] Static demo exists under `demo-site/`.
 - [x] Demo can be served with `python3 -m http.server 8080`.
-- [ ] GitHub Pages or equivalent URL published.
-- [ ] Public report links checked after deploy.
+- [x] GitHub Pages or equivalent URL published.
+- [x] Public report links checked after deploy.
 
 ## Video
 

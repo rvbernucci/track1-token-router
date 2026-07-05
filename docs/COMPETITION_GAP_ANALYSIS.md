@@ -8,7 +8,9 @@ As Sprints 01-21 criaram um runner competitivo com dataset offline, scoring, gua
 
 As Sprints 22-26 ja transformaram essas pecas em modo competicao, fuzz pack, solvers deterministicos, runtime profiles e kit de submissao.
 
-O proximo bloco sem credito esta documentado em `docs/NEXT_NO_CREDIT_IMPROVEMENTS.md`. Ele mira demo URL, artefatos finais, adapter drill, latencia, token envelope e replay de decisoes.
+O bloco 27-31 sem credito foi executado e esta documentado em `docs/NEXT_NO_CREDIT_IMPROVEMENTS.md`. Ele fechou demo URL local, artefatos finais, adapter drill, latencia, token envelope e replay de decisoes.
+
+O proximo bloco sem credito e a onda 32-36: deploy publico, caos de modelo local, validacao semantica, batch stress e redaction/ensaio de submissao.
 
 ## Gaps fechados nas Sprints 22-26
 
@@ -58,4 +60,4 @@ Ao final da Sprint 26, o projeto deve estar pronto para:
 - Solver pack evita LLM em tarefas mecanicas.
 - Runbooks e runtime profiles estao prontos para AMD/DigitalOcean, Gemma, Fireworks e Native.Builder auxiliar.
 - Submission kit e readiness check estao prontos.
-- Proxima prioridade sem credito: transformar readiness tecnica em demo/submissao impossivel de interpretar errado.
+- Proxima prioridade sem credito: transformar demo/submissao local em experiencia publica, ensaiada e resistente a falhas de modelo local.

@@ -1,6 +1,6 @@
 {
-  "ci_status": "pending-final-green",
-  "demo_url": "",
+  "ci_status": "green",
+  "demo_url": "https://rvbernucci.github.io/track1-token-router/",
   "repo_url": "https://github.com/rvbernucci/track1-token-router",
   "video_placeholder_approved": true,
   "video_url": ""
