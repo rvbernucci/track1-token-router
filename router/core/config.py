@@ -30,6 +30,7 @@ class RouterConfig:
     fireworks_max_tokens: int
     enable_guardrails: bool
     enable_orchestrator: bool
+    competition_dry_run: bool
     max_remote_tokens_per_task: int
     max_remote_tokens_per_run: int
     max_remote_latency_ms: int
@@ -60,12 +61,16 @@ class RouterConfig:
             fireworks_max_tokens=int(os.getenv("FIREWORKS_MAX_TOKENS", "256")),
             enable_guardrails=_env_flag("ENABLE_GUARDRAILS"),
             enable_orchestrator=_env_flag("ENABLE_ORCHESTRATOR"),
+            competition_dry_run=_env_flag("COMPETITION_DRY_RUN", default=True),
             max_remote_tokens_per_task=int(os.getenv("MAX_REMOTE_TOKENS_PER_TASK", "300")),
             max_remote_tokens_per_run=int(os.getenv("MAX_REMOTE_TOKENS_PER_RUN", "6000")),
             max_remote_latency_ms=int(os.getenv("MAX_REMOTE_LATENCY_MS", "3000")),
         )
 
 
-def _env_flag(name: str) -> bool:
-    value = os.getenv(name, "").strip().lower()
+def _env_flag(name: str, *, default: bool = False) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    value = raw.strip().lower()
     return value in {"1", "true", "yes", "on"}

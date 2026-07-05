@@ -24,22 +24,22 @@ As Sprints 17-21 criaram pecas fortes. Para disputar seriamente, essas pecas pre
 
 ## Checklist
 
-- [ ] Definir contrato `CompetitionDecision`.
-- [ ] Definir contrato `CompetitionTrace`.
-- [ ] Criar `CompetitionRunner`.
-- [ ] Ligar guardrails como etapa zero.
-- [ ] Ligar risk signals antes da decisao.
-- [ ] Ligar budget decision antes de qualquer remoto.
-- [ ] Ligar policy engine no caminho quente.
-- [ ] Ligar final validator sempre antes do output.
-- [ ] Registrar `final_answer_repaired` quando houver reparo seguro.
-- [ ] Registrar `remote_packet_tokens` no trace.
-- [ ] Criar env var `ROUTER_MODE=competition`.
-- [ ] Criar dry-run que nao chama modelo real.
-- [ ] Adicionar teste CLI `ask`.
-- [ ] Adicionar teste JSONL `run`.
-- [ ] Adicionar teste de stdout limpo.
-- [ ] Atualizar battle drill para incluir modo `competition`.
+- [x] Definir contrato `CompetitionDecision`.
+- [x] Definir contrato `CompetitionTrace`.
+- [x] Criar `CompetitionRunner`.
+- [x] Ligar guardrails como etapa zero.
+- [x] Ligar risk signals antes da decisao.
+- [x] Ligar budget decision antes de qualquer remoto.
+- [x] Ligar policy engine no caminho quente.
+- [x] Ligar final validator sempre antes do output.
+- [x] Registrar `final_answer_repaired` quando houver reparo seguro.
+- [x] Registrar `remote_packet_tokens` no trace.
+- [x] Criar env var `ROUTER_MODE=competition`.
+- [x] Criar dry-run que nao chama modelo real.
+- [x] Adicionar teste CLI `ask`.
+- [x] Adicionar teste JSONL `run`.
+- [x] Adicionar teste de stdout limpo.
+- [x] Atualizar battle drill para incluir modo `competition`.
 
 ## Criterios de aceite
 
@@ -57,3 +57,8 @@ O projeto deixa de ser um conjunto de laboratorios e passa a ter um caminho comp
 
 O modo competicao deve ser opt-in ate provar vantagem no battle drill. Assim protegemos o caminho atual enquanto amadurecemos o runtime final.
 
+## Evidencia de fechamento
+
+- `python3 -m unittest discover -s tests`: 101 testes passando.
+- `python3 scripts/battle_drill.py`: `competition_mode_ready=true`.
+- `ROUTER_MODE=competition COMPETITION_DRY_RUN=1 python3 -m router ask "What is 10 + 5? Return only the number."`: stdout limpo com `15`.

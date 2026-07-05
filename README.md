@@ -99,11 +99,12 @@ python3 -m router ask "What is 2+2?"
 | Variavel | Padrao | Papel |
 |---|---|---|
 | `ROUTER_LOG_PATH` | `logs/run.jsonl` | Caminho dos logs estruturados JSONL. |
-| `ROUTER_MODE` | `mock` | Modo de execucao: `mock`, `auto`, `local`, `cascade` ou `hybrid`. |
+| `ROUTER_MODE` | `mock` | Modo de execucao: `mock`, `auto`, `local`, `cascade`, `hybrid` ou `competition`. |
 | `ROUTER_POLICY` | `balanced` | Politica de roteamento: `aggressive`, `balanced` ou `conservative`. |
 | `LOCAL_BASE_URL` | vazio | Endpoint OpenAI-compatible do modelo local. |
 | `ENABLE_GUARDRAILS` | `0` | Liga regras deterministicas conservadoras antes do runner. |
 | `ENABLE_ORCHESTRATOR` | `0` | Liga trace de state machine em torno do runner. |
+| `COMPETITION_DRY_RUN` | `1` | Mantem `ROUTER_MODE=competition` sem chamadas reais de modelo remoto/local por padrao. |
 | `MAX_REMOTE_TOKENS_PER_TASK` | `300` | Budget remoto simulado por task. |
 | `MAX_REMOTE_TOKENS_PER_RUN` | `6000` | Budget remoto simulado por run offline. |
 | `MAX_REMOTE_LATENCY_MS` | `3000` | Limite de risco de latencia remota por decisao. |
@@ -155,6 +156,16 @@ python3 -m router ask "What is 2+2?"
 ```
 
 Nesse modo, Fireworks so e chamado quando o M2A escala a tarefa.
+
+## Modo competicao dry-run
+
+```bash
+ROUTER_MODE=competition \
+COMPETITION_DRY_RUN=1 \
+python3 -m router ask "What is 10 + 5? Return only the number."
+```
+
+Esse modo integra guardrails, sinais de risco, budget, policy engine, prompt packet, state trace e validacao final sem consumir creditos por padrao.
 
 ## Docker
 
