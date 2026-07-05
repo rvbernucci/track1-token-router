@@ -18,22 +18,34 @@ Criar um release candidate que roda completamente sem creditos, mas esta pronto 
 
 ## Checklist
 
-- [ ] Rodar suite completa.
-- [ ] Rodar offline eval arena.
-- [ ] Rodar comparacao de politicas.
-- [ ] Rodar fake provider chaos lab.
-- [ ] Rodar Docker no CI.
-- [ ] Gerar relatorio consolidado.
-- [ ] Atualizar `SUBMISSION.md`.
-- [ ] Criar `CREDIT_ACTIVATION.md`.
-- [ ] Criar tag `offline-rc`.
-- [ ] Confirmar que nenhum passo exige segredo real.
+- [x] Rodar suite completa.
+- [x] Rodar offline eval arena.
+- [x] Rodar comparacao de politicas.
+- [x] Rodar fake provider chaos lab.
+- [x] Rodar Docker no CI.
+- [x] Gerar relatorio consolidado.
+- [x] Atualizar `SUBMISSION.md`.
+- [x] Criar `CREDIT_ACTIVATION.md`.
+- [x] Criar tag `offline-rc`.
+- [x] Confirmar que nenhum passo exige segredo real.
 
 ## Criterios de aceite
 
-- Qualquer pessoa consegue reproduzir a release candidate sem credito.
-- Quando os creditos chegarem, o trabalho vira configuracao de env vars e benchmark, nao refactor.
-- CI verde no commit/tag final.
+- [x] Qualquer pessoa consegue reproduzir a release candidate sem credito.
+- [x] Quando os creditos chegarem, o trabalho vira configuracao de env vars e benchmark, nao refactor.
+- [x] CI verde no commit/tag final.
+
+## Evidencias
+
+- `scripts/offline_release_check.sh`
+- `reports/OFFLINE_RC_REPORT.md`
+- `CREDIT_ACTIVATION.md`
+- `.github/workflows/ci.yml`
+- tag `offline-rc`
+
+## Resultado
+
+Release candidate offline pronta para operar sem credenciais reais e para receber creditos depois sem refactor estrutural.
 
 ## Riscos
 
@@ -43,4 +55,3 @@ Criar um release candidate que roda completamente sem creditos, mas esta pronto 
 ## Saida esperada
 
 Um pacote competitivo offline, pronto para plugar creditos quando chegarem.
-

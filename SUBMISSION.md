@@ -44,8 +44,20 @@ The architecture creates a Pareto search:
 
 ```bash
 python3 -m pip install -e .
-scripts/verify.sh
+scripts/offline_release_check.sh
 ```
+
+## Offline Release Candidate
+
+This repository has a no-credit release path. It can be tested without AMD Developer Cloud or Fireworks:
+
+- offline dataset with 160 tasks;
+- policy comparison for `aggressive`, `balanced`, and `conservative`;
+- fake OpenAI-compatible providers for local and Fireworks simulation;
+- official adapter templates for kickoff format changes;
+- secret scan and CI gate.
+
+Credit activation is documented in [`CREDIT_ACTIVATION.md`](./CREDIT_ACTIVATION.md).
 
 ## Docker
 
