@@ -31,14 +31,19 @@ Enquanto os creditos nao forem liberados, seguimos na trilha `offline`, usando d
 - [Sprint 09 - Official Adapter Readiness](./09-official-adapter-readiness/README.md)
 - [Sprint 10 - Offline Release Candidate](./10-offline-release-candidate/README.md)
 - [Sprint 11 - Testing Culture Lab](./11-testing-culture-lab/README.md)
-
-## Proximas sprints sem credito
-
 - [Sprint 12 - Offline Scoring Simulator](./12-offline-scoring-simulator/README.md)
 - [Sprint 13 - Prompt Versioning & Ablation Lab](./13-prompt-versioning-ablation-lab/README.md)
 - [Sprint 14 - Deterministic Guardrails](./14-deterministic-guardrails/README.md)
 - [Sprint 15 - Trace Analytics](./15-trace-analytics/README.md)
 - [Sprint 16 - Release Automation & GHCR](./16-release-automation-ghcr/README.md)
+
+## Proximas sprints sem credito
+
+- [Sprint 17 - Orchestration State Machine](./17-orchestration-state-machine/README.md)
+- [Sprint 18 - Budget Manager & Token-Latency Governor](./18-budget-manager-token-latency-governor/README.md)
+- [Sprint 19 - Adaptive Policy Engine & Risk Signals](./19-adaptive-policy-engine-risk-signals/README.md)
+- [Sprint 20 - Compact Prompt Packet & Final Validator](./20-compact-prompt-packet-final-validator/README.md)
+- [Sprint 21 - Calibration Loop & Battle Drill](./21-calibration-loop-battle-drill/README.md)
 
 ## Sprints dependentes de credito
 

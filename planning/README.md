@@ -83,6 +83,11 @@ Esta e a rota principal enquanto os creditos AMD/Fireworks nao forem liberados. 
 | 14 | Deterministic Guardrails | Respostas deterministicas seguras antes da cascata. |
 | 15 | Trace Analytics | Relatorios a partir de logs JSONL. |
 | 16 | Release Automation & GHCR | Release notes e publicacao de imagem em tags. |
+| 17 | Orchestration State Machine | Estados, transicoes, trace e fallbacks explicitos. |
+| 18 | Budget Manager & Token-Latency Governor | Controle de custo remoto, latencia e budget por task/run. |
+| 19 | Adaptive Policy Engine & Risk Signals | Decisoes por sinais, thresholds e historico de execucao. |
+| 20 | Compact Prompt Packet & Final Validator | Pacote remoto minimo e validacao final de formato. |
+| 21 | Calibration Loop & Battle Drill | Loop de comparacao, ajuste e battle report offline. |
 
 ## Roadmap dependente de credito
 

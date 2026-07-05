@@ -33,13 +33,15 @@ Prioridades:
 
 A rota principal do projeto nao depende de creditos AMD ou Fireworks.
 
-Enquanto os creditos nao chegam, seguimos nas sprints offline:
+Enquanto os creditos nao chegam, seguimos nas sprints offline. As sprints 06-16 ja criaram dataset, simuladores, testes, scoring, guardrails, analytics e release automation.
 
-- Sprint 06: offline evaluation arena.
-- Sprint 07: routing policy lab.
-- Sprint 08: fake provider chaos lab.
-- Sprint 09: official adapter readiness.
-- Sprint 10: offline release candidate.
+A proxima trilha sem credito e de orquestracao competitiva:
+
+- Sprint 17: orchestration state machine.
+- Sprint 18: budget manager e token-latency governor.
+- Sprint 19: adaptive policy engine e risk signals.
+- Sprint 20: compact prompt packet e final validator.
+- Sprint 21: calibration loop e battle drill.
 
 Quando os creditos chegarem, entramos na trilha paralela `credit-gated`:
 
