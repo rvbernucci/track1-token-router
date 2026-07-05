@@ -256,6 +256,14 @@ ENABLE_GUARDRAILS=1 python3 -m router ask "What is 12 - 5? Return only the numbe
 
 As regras sao conservadoras e cobrem apenas input vazio, saudacoes simples, soma/subtracao triviais e eco literal. Qualquer caso ambiguo segue para o runner normal.
 
+Trace analytics offline:
+
+```bash
+python3 scripts/analyze_traces.py \
+  --logs "logs/*.jsonl" \
+  --report reports/generated/trace-summary.md
+```
+
 ## Estrategia de token efficiency
 
 - M1 tenta responder localmente com formato livre.

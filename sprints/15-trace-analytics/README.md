@@ -19,16 +19,16 @@ Transformar logs JSONL em relatorios de rotas, latencia, tokens, erros e regress
 
 ## Checklist
 
-- [ ] Ler `logs/*.jsonl`.
-- [ ] Agregar por rota.
-- [ ] Agregar tokens remotos.
-- [ ] Agregar latencia por etapa.
-- [ ] Contar erros e parse failures.
-- [ ] Detectar run vazio.
-- [ ] Gerar relatorio Markdown.
-- [ ] Gerar JSON.
-- [ ] Adicionar fixtures de logs.
-- [ ] Adicionar testes.
+- [x] Ler `logs/*.jsonl`.
+- [x] Agregar por rota.
+- [x] Agregar tokens remotos.
+- [x] Agregar latencia por etapa.
+- [x] Contar erros e parse failures.
+- [x] Detectar run vazio.
+- [x] Gerar relatorio Markdown.
+- [x] Gerar JSON.
+- [x] Adicionar fixtures de logs.
+- [x] Adicionar testes.
 
 ## Criterios de aceite
 
@@ -41,3 +41,14 @@ Transformar logs JSONL em relatorios de rotas, latencia, tokens, erros e regress
 
 Uma lente operacional para entender como o roteador esta se comportando.
 
+## Evidencia local
+
+```bash
+python3 scripts/analyze_traces.py --logs fixtures/logs/sample-run.jsonl
+python3 -m unittest tests.test_trace_analytics
+scripts/offline_release_check.sh
+```
+
+## Decisao
+
+O script tolera `logs/*.jsonl` vazio ou ausente, porque os logs reais sao artefatos locais ignorados pelo Git. O release check usa `fixtures/logs/sample-run.jsonl` para validar comportamento reproduzivel.

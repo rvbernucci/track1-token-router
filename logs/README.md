@@ -25,6 +25,14 @@ JSONL, uma linha por task:
 }
 ```
 
+## Relatorio local
+
+```bash
+python3 scripts/analyze_traces.py --logs "logs/*.jsonl" --report reports/generated/trace-summary.md
+```
+
+O relatorio agrega rotas, tokens remotos, latencia por etapa, erros e falhas de parsing.
+
 ## Nao colocar aqui
 
 - API keys.
@@ -32,4 +40,3 @@ JSONL, uma linha por task:
 - arquivos grandes.
 - pesos de modelo.
 - dados que o evaluator nao permite persistir.
-
