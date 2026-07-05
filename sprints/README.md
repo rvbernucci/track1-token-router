@@ -25,17 +25,16 @@ Enquanto os creditos nao forem liberados, seguimos na trilha `offline`, usando d
 - [Sprint 03 - Verificador M2A e M2B](./03-local-verifier/README.md)
 - [Sprint 04 - Fireworks e scoring](./04-fireworks-scoring/README.md)
 - [Sprint 05 - Hardening e entrega](./05-hardening-submission/README.md)
-
-## Proximas sprints sem credito
-
-Estas sprints podem continuar imediatamente, sem AMD Developer Cloud e sem Fireworks real.
-
 - [Sprint 06 - Offline Evaluation Arena](./06-offline-eval-arena/README.md)
 - [Sprint 07 - Routing Policy Lab](./07-routing-policy-lab/README.md)
 - [Sprint 08 - Fake Provider Chaos Lab](./08-fake-provider-chaos-lab/README.md)
 - [Sprint 09 - Official Adapter Readiness](./09-official-adapter-readiness/README.md)
 - [Sprint 10 - Offline Release Candidate](./10-offline-release-candidate/README.md)
 - [Sprint 11 - Testing Culture Lab](./11-testing-culture-lab/README.md)
+
+## Proximas sprints sem credito
+
+As sprints offline planejadas ate agora foram concluidas. A proxima sprint sem credito deve nascer de uma nova lacuna concreta encontrada em testes, kickoff ou preparacao de release.
 
 ## Sprints dependentes de credito
 

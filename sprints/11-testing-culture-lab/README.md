@@ -26,25 +26,43 @@ Em TypeScript, muitas vezes usamos um `test.ts` rapido para testar uma ideia. Em
 
 ## Checklist
 
-- [ ] Criar `docs/TESTING_CULTURE.md`.
-- [ ] Criar `playground/README.md`.
-- [ ] Criar `playground/test_policy_logic.py`.
-- [ ] Criar `playground/test_adapter_logic.py`.
-- [ ] Criar `playground/test_prompt_packets.py`.
-- [ ] Criar `docs/TEST_MATRIX.md`.
-- [ ] Mapear areas: contracts, adapters, policies, prompts, cascade, fake provider, evals, CLI.
-- [ ] Criar `scripts/list_test_coverage.py`.
-- [ ] Adicionar teste que valida a matriz de testes.
-- [ ] Documentar quando usar `playground` versus `tests`.
-- [ ] Adicionar comando no README.
+- [x] Criar `docs/TESTING_CULTURE.md`.
+- [x] Criar `playground/README.md`.
+- [x] Criar `playground/test_policy_logic.py`.
+- [x] Criar `playground/test_adapter_logic.py`.
+- [x] Criar `playground/test_prompt_packets.py`.
+- [x] Criar `docs/TEST_MATRIX.md`.
+- [x] Mapear areas: contracts, adapters, policies, prompts, cascade, fake provider, evals, CLI.
+- [x] Criar `scripts/list_test_coverage.py`.
+- [x] Adicionar teste que valida a matriz de testes.
+- [x] Documentar quando usar `playground` versus `tests`.
+- [x] Adicionar comando no README.
 
 ## Criterios de aceite
 
-- Existe uma forma rapida de testar logica manualmente, equivalente ao espirito de um `test.ts`.
-- Toda logica critica tem pelo menos um teste automatizado mapeado.
-- A matriz deixa claro o que esta coberto e o que falta cobrir.
-- `scripts/offline_release_check.sh` continua passando.
-- Nenhum playground depende de credito real.
+- [x] Existe uma forma rapida de testar logica manualmente, equivalente ao espirito de um `test.ts`.
+- [x] Toda logica critica tem pelo menos um teste automatizado mapeado.
+- [x] A matriz deixa claro o que esta coberto e o que falta cobrir.
+- [x] `scripts/offline_release_check.sh` continua passando.
+- [x] Nenhum playground depende de credito real.
+
+## Evidencias
+
+- `docs/TESTING_CULTURE.md`
+- `docs/TEST_MATRIX.md`
+- `playground/test_policy_logic.py`
+- `playground/test_adapter_logic.py`
+- `playground/test_prompt_packets.py`
+- `scripts/list_test_coverage.py --check`
+- `tests/test_testing_culture.py`
+- `scripts/offline_release_check.sh`
+
+## Resultado
+
+- 8 dominios criticos mapeados: contracts, adapters, policies, prompts, cascade, fake provider, evals, CLI.
+- 3 playgrounds executaveis sem credito.
+- 50 testes automatizados passando.
+- Release check offline agora valida matriz, playgrounds e secret scan.
 
 ## Regra de promocao
 

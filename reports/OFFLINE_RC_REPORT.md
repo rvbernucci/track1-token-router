@@ -11,6 +11,7 @@ This release candidate covers only work that does not require AMD Developer Clou
 - Sprint 08: fake provider chaos lab.
 - Sprint 09: official adapter readiness.
 - Sprint 10: offline release candidate.
+- Sprint 11: testing culture lab.
 
 ## Verification commands
 
@@ -25,6 +26,8 @@ This runs:
 - offline eval arena;
 - routing policy comparison;
 - fake provider CLI smoke;
+- test coverage matrix;
+- playground probes;
 - secret scan.
 
 ## Offline dataset
@@ -49,6 +52,7 @@ Temporary default: `balanced`.
 - The project can run in `mock` mode with no services.
 - The fake provider can simulate local and Fireworks endpoints.
 - Official adapters can be extended without touching `router/core`.
+- Testing culture docs define when playground logic becomes automated regression coverage.
 - Credit activation is isolated in `CREDIT_ACTIVATION.md`.
 
 ## Remaining credit-gated work

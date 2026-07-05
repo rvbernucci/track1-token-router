@@ -68,7 +68,7 @@ TaskEnvelope
 
 ## Roadmap sem credito
 
-Esta e a rota principal enquanto os creditos AMD/Fireworks nao forem liberados.
+Esta e a rota principal enquanto os creditos AMD/Fireworks nao forem liberados. As sprints 06-11 ja foram executadas como pacote offline.
 
 | Sprint | Tema | Resultado esperado |
 |---|---|---|

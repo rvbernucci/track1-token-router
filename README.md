@@ -266,3 +266,14 @@ Quando o formato oficial aparecer, use:
 - [`KICKOFF_CHECKLIST.md`](./KICKOFF_CHECKLIST.md)
 - [`router/adapters/official`](./router/adapters/official/README.md)
 - [`fixtures/official`](./fixtures/official)
+
+## Cultura de testes
+
+Use `playground/` para experimentos rapidos no estilo de um `test.ts` e `tests/` para garantias automatizadas:
+
+```bash
+python3 playground/test_policy_logic.py
+python3 scripts/list_test_coverage.py --check
+```
+
+Guia completo em [`docs/TESTING_CULTURE.md`](./docs/TESTING_CULTURE.md) e matriz em [`docs/TEST_MATRIX.md`](./docs/TEST_MATRIX.md).
