@@ -56,6 +56,12 @@
 - false_approval_rate: `0.0`
 - containment_rate: `1.0`
 
+## Semantic Validation
+
+- semantic_validation_ready: `True`
+- semantic_acceptable_rate: `0.16666666666666666`
+- label_match_rate: `1.0`
+
 ## Readiness
 
 - candidate_selected: `ok`
@@ -70,6 +76,7 @@
 - latency_ready: `ok`
 - token_envelope_ready: `ok`
 - bad_local_model_ready: `ok`
+- semantic_validation_ready: `ok`
 
 ## Risks
 

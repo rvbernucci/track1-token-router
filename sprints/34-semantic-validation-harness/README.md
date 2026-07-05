@@ -28,17 +28,17 @@ Nao precisamos de um judge perfeito sem credito. Precisamos de um judge determin
 
 ## Checklist
 
-- [ ] Definir schema de rubrica offline.
-- [ ] Criar classes: `acceptable`, `partial`, `format_fail`, `unsafe`, `hallucinated`, `too_verbose`.
-- [ ] Criar tarefas abertas de explicacao curta.
-- [ ] Criar tarefas de resumo.
-- [ ] Criar tarefas de decisao com criterios.
-- [ ] Criar tarefas de conhecimento instavel que devem escalar.
-- [ ] Implementar judge deterministico por keywords, formato e constraints.
-- [ ] Medir taxa de acceptable/partial/fail.
-- [ ] Integrar categorias no report.
-- [ ] Garantir que stdout do runner continua limpo.
-- [ ] Documentar limites do judge semantico.
+- [x] Definir schema de rubrica offline.
+- [x] Criar classes: `acceptable`, `partial`, `format_fail`, `unsafe`, `hallucinated`, `too_verbose`.
+- [x] Criar tarefas abertas de explicacao curta.
+- [x] Criar tarefas de resumo.
+- [x] Criar tarefas de decisao com criterios.
+- [x] Criar tarefas de conhecimento instavel que devem escalar.
+- [x] Implementar judge deterministico por keywords, formato e constraints.
+- [x] Medir taxa de acceptable/partial/fail.
+- [x] Integrar categorias no report.
+- [x] Garantir que stdout do runner continua limpo.
+- [x] Documentar limites do judge semantico.
 
 ## Criterios de aceite
 

@@ -10,7 +10,7 @@ This matrix maps critical project areas to automated tests and playground probes
 | prompts | M1/M2A/M2B/Fireworks prompt packet shape | `tests/test_local_m1.py`, `tests/test_local_cascade.py`, `tests/test_hybrid_cascade.py` | `playground/test_prompt_packets.py` | `docs/TESTING_CULTURE.md` |
 | cascade | M1, M2A, M2B, hybrid audit routing | `tests/test_local_cascade.py`, `tests/test_hybrid_cascade.py` | none | `SUBMISSION.md` |
 | fake_provider | fake OpenAI-compatible server, chaos profiles | `tests/test_fake_provider.py`, `tests/test_bad_local_model_chaos.py` | none | `docs/CHAOS_LAB.md`, `fixtures/chaos/bad-local-model/` |
-| evals | offline dataset, eval summary, policy comparison | `tests/test_eval_summary.py`, `tests/test_offline_dataset.py`, `tests/test_policy_lab.py` | none | `evals/offline/README.md` |
+| evals | offline dataset, eval summary, policy comparison, semantic validation | `tests/test_eval_summary.py`, `tests/test_offline_dataset.py`, `tests/test_policy_lab.py`, `tests/test_semantic_validation.py` | none | `evals/offline/README.md`, `evals/semantic/` |
 | operational_envelope | latency percentiles, timeout probes, token exposure thresholds | `tests/test_operational_envelope.py`, `tests/test_battle_drill.py` | none | `reports/generated/latency-report.md`, `reports/generated/token-envelope.md` |
 | cli | ask, solve, run, eval, controlled errors | `tests/test_io_and_cli.py` | none | `README.md` |
 
