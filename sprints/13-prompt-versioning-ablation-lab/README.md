@@ -19,16 +19,16 @@ Versionar prompts e criar um laboratorio de ablation que compara tamanho, papeis
 
 ## Checklist
 
-- [ ] Criar `prompts/versions/v1/`.
-- [ ] Criar `prompts/manifest.json`.
-- [ ] Exportar prompts atuais para arquivos `.txt`.
-- [ ] Criar analisador de tamanho aproximado.
-- [ ] Comparar prompts por versao.
-- [ ] Detectar prompts vazios ou ausentes.
-- [ ] Gerar `reports/generated/prompt-ablation.md`.
-- [ ] Gerar `reports/generated/prompt-ablation.json`.
-- [ ] Adicionar testes.
-- [ ] Integrar no release check offline.
+- [x] Criar `prompts/versions/v1/`.
+- [x] Criar `prompts/manifest.json`.
+- [x] Exportar prompts atuais para arquivos `.txt`.
+- [x] Criar analisador de tamanho aproximado.
+- [x] Comparar prompts por versao.
+- [x] Detectar prompts vazios ou ausentes.
+- [x] Gerar `reports/generated/prompt-ablation.md`.
+- [x] Gerar `reports/generated/prompt-ablation.json`.
+- [x] Adicionar testes.
+- [x] Integrar no release check offline.
 
 ## Criterios de aceite
 
@@ -41,3 +41,14 @@ Versionar prompts e criar um laboratorio de ablation que compara tamanho, papeis
 
 Uma base limpa para testar prompt variants quando o runtime real chegar.
 
+## Evidencia local
+
+```bash
+python3 scripts/prompt_ablation.py --check
+python3 -m unittest tests.test_prompt_ablation
+scripts/offline_release_check.sh
+```
+
+## Decisao
+
+Os prompts ficam versionados como snapshot em `prompts/versions/v1/`, mas o runtime ainda usa `router/core/prompts.py`. Isso evita mudar comportamento durante a sprint e cria uma base segura para ablation quando houver modelo real.

@@ -239,6 +239,14 @@ score = exact_match_rate * accuracy_weight
   - parse_failures * parse_failure_weight
 ```
 
+Prompt ablation offline:
+
+```bash
+python3 scripts/prompt_ablation.py --check \
+  --manifest prompts/manifest.json \
+  --report reports/generated/prompt-ablation.md
+```
+
 ## Estrategia de token efficiency
 
 - M1 tenta responder localmente com formato livre.

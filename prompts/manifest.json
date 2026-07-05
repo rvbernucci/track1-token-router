@@ -1,0 +1,14 @@
+{
+  "default_version": "v1",
+  "versions": {
+    "v1": {
+      "description": "Baseline prompts mirrored from router.core.prompts after Sprint 12.",
+      "prompts": {
+        "fireworks_audit_system": "versions/v1/fireworks_audit_system.txt",
+        "m1_system": "versions/v1/m1_system.txt",
+        "m2a_system": "versions/v1/m2a_system.txt",
+        "m2b_system": "versions/v1/m2b_system.txt"
+      }
+    }
+  }
+}
