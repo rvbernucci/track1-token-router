@@ -29,6 +29,7 @@ Prioridades:
 | [`planning`](./planning/README.md) | Builder plan, principios, definition of done e estrategia-mestra. |
 | [`sprints`](./sprints/README.md) | Plano operacional em 5 sprints com checklists e criterios de aceite. |
 | [`docs/COMPETITION_GAP_ANALYSIS.md`](./docs/COMPETITION_GAP_ANALYSIS.md) | Lacunas restantes sem credito e trilha de Sprints 22-26. |
+| [`docs/NEXT_NO_CREDIT_IMPROVEMENTS.md`](./docs/NEXT_NO_CREDIT_IMPROVEMENTS.md) | Segunda onda sem credito: demo, artefatos finais, adapter drill, latencia, token envelope e replay. |
 
 ## Roadmap atual
 
@@ -36,13 +37,15 @@ A rota principal do projeto nao depende de creditos AMD ou Fireworks.
 
 Enquanto os creditos nao chegam, seguimos nas sprints offline. As sprints 06-21 ja criaram dataset, simuladores, testes, scoring, guardrails, analytics, release automation, state machine, budget manager, policy engine, prompt packet, final validator e battle drill.
 
-A proxima trilha sem credito e de readiness competitivo:
+A primeira trilha de readiness competitivo sem credito foi fechada:
 
 - Sprint 22: competition mode integration.
 - Sprint 23: official input fuzz pack.
 - Sprint 24: deterministic solver pack.
 - Sprint 25: platform runbooks e runtime profiles.
 - Sprint 26: submission readiness kit.
+
+O proximo bloco recomendado esta em [`docs/NEXT_NO_CREDIT_IMPROVEMENTS.md`](./docs/NEXT_NO_CREDIT_IMPROVEMENTS.md).
 
 Quando os creditos chegarem, entramos na trilha paralela `credit-gated`:
 

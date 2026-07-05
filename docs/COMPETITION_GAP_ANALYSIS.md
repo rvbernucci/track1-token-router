@@ -6,9 +6,11 @@ Atualizado em: 2026-07-05
 
 As Sprints 01-21 criaram um runner competitivo com dataset offline, scoring, guardrails, trace analytics, state machine, budget manager, policy engine, prompt packet, final validator e battle drill.
 
-O proximo bloco nao depende de creditos. Ele transforma o projeto em uma submissao pronta para ativar AMD Developer Cloud, DigitalOcean, Gemma, Fireworks e ferramentas parceiras quando os creditos chegarem.
+As Sprints 22-26 ja transformaram essas pecas em modo competicao, fuzz pack, solvers deterministicos, runtime profiles e kit de submissao.
 
-## Gaps restantes sem credito
+O proximo bloco sem credito esta documentado em `docs/NEXT_NO_CREDIT_IMPROVEMENTS.md`. Ele mira demo URL, artefatos finais, adapter drill, latencia, token envelope e replay de decisoes.
+
+## Gaps fechados nas Sprints 22-26
 
 | Gap | Risco | Sprint |
 |---|---|---|
@@ -31,7 +33,7 @@ Cada sprint precisa responder a pelo menos uma pergunta:
 
 Se a resposta for nao, nao entra nesta trilha.
 
-## Ordem recomendada
+## Ordem executada
 
 1. `Sprint 22 - Competition Mode Integration`
 2. `Sprint 23 - Official Input Fuzz Pack`
@@ -49,3 +51,11 @@ Ao final da Sprint 26, o projeto deve estar pronto para:
 - ativar AMD/Fireworks com env profiles;
 - submeter no lablab com narrativa, artefatos e checklist fortes.
 
+## Status pos Sprint 26
+
+- `ROUTER_MODE=competition` existe e roda sem creditos.
+- Fuzz pack cobre formatos e erros controlados.
+- Solver pack evita LLM em tarefas mecanicas.
+- Runbooks e runtime profiles estao prontos para AMD/DigitalOcean, Gemma, Fireworks e Native.Builder auxiliar.
+- Submission kit e readiness check estao prontos.
+- Proxima prioridade sem credito: transformar readiness tecnica em demo/submissao impossivel de interpretar errado.

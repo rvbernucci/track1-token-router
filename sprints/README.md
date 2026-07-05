@@ -41,14 +41,21 @@ Enquanto os creditos nao forem liberados, seguimos na trilha `offline`, usando d
 - [Sprint 19 - Adaptive Policy Engine & Risk Signals](./19-adaptive-policy-engine-risk-signals/README.md)
 - [Sprint 20 - Compact Prompt Packet & Final Validator](./20-compact-prompt-packet-final-validator/README.md)
 - [Sprint 21 - Calibration Loop & Battle Drill](./21-calibration-loop-battle-drill/README.md)
-
-## Proximas sprints sem credito
-
 - [Sprint 22 - Competition Mode Integration](./22-competition-mode-integration/README.md)
 - [Sprint 23 - Official Input Fuzz Pack](./23-official-input-fuzz-pack/README.md)
 - [Sprint 24 - Deterministic Solver Pack](./24-deterministic-solver-pack/README.md)
 - [Sprint 25 - Platform Runbooks & Runtime Profiles](./25-platform-runbooks-runtime-profiles/README.md)
 - [Sprint 26 - Submission Readiness Kit](./26-submission-readiness-kit/README.md)
+
+## Proximas sprints sem credito
+
+Estas sprints formam a segunda onda de readiness: transformar o runner em uma submissao mais clara, robusta e dificil de interpretar errado.
+
+- [Sprint 27 - Static Demo And Public Reports](./27-static-demo-public-reports/README.md)
+- [Sprint 28 - Evaluator Contract And Adapter Drill](./28-evaluator-contract-adapter-drill/README.md)
+- [Sprint 29 - Latency And Token Envelope Lab](./29-latency-token-envelope-lab/README.md)
+- [Sprint 30 - Artifact Build Kit](./30-artifact-build-kit/README.md)
+- [Sprint 31 - Policy Pareto And Decision Replay](./31-policy-pareto-decision-replay/README.md)
 
 ## Sprints dependentes de credito
 

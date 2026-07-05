@@ -93,6 +93,11 @@ Esta e a rota principal enquanto os creditos AMD/Fireworks nao forem liberados. 
 | 24 | Deterministic Solver Pack | Solvers mecanicos seguros antes de qualquer modelo. |
 | 25 | Platform Runbooks & Runtime Profiles | Perfis AMD/Gemma/Fireworks prontos para ativacao. |
 | 26 | Submission Readiness Kit | Artefatos e checklist de submissao lablab. |
+| 27 | Static Demo And Public Reports | Demo URL estatica e reports seguros para jurados. |
+| 28 | Evaluator Contract And Adapter Drill | Hipoteses do evaluator e treino de adaptacao rapida. |
+| 29 | Latency And Token Envelope Lab | Gates offline de latencia, timeout e exposicao de tokens. |
+| 30 | Artifact Build Kit | Slides, cover, video checklist e readiness estrito. |
+| 31 | Policy Pareto And Decision Replay | Otimizacao offline de politica e replay legivel de decisoes. |
 
 ## Roadmap dependente de credito
 
