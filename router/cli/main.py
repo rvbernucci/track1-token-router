@@ -10,7 +10,8 @@ from router.adapters.io import load_jsonl_tasks, parse_json_task, task_from_text
 from router.core.config import RouterConfig
 from router.core.contracts import AnswerResult, TaskEnvelope
 from router.core.logging import JsonlRunLogger
-from router.core.mock_runner import MockCascadeRunner
+from router.core.runner import TaskRunner
+from router.core.runner_factory import build_runner
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -44,11 +45,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    config = RouterConfig.from_env()
-    logger = JsonlRunLogger(config.log_path)
-    runner = MockCascadeRunner(logger=logger)
 
     try:
+        config = RouterConfig.from_env()
+        logger = JsonlRunLogger(config.log_path)
+        runner = build_runner(config, logger)
         if args.command == "ask":
             return _handle_ask(args, runner)
         if args.command == "solve":
@@ -65,7 +66,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     return 2
 
 
-def _handle_ask(args: argparse.Namespace, runner: MockCascadeRunner) -> int:
+def _handle_ask(args: argparse.Namespace, runner: TaskRunner) -> int:
     text = _read_ask_text(args)
     task = task_from_text(text, task_id=args.task_id)
     result = runner.run(task)
@@ -76,7 +77,7 @@ def _handle_ask(args: argparse.Namespace, runner: MockCascadeRunner) -> int:
     return 0
 
 
-def _handle_solve(args: argparse.Namespace, runner: MockCascadeRunner) -> int:
+def _handle_solve(args: argparse.Namespace, runner: TaskRunner) -> int:
     if not args.json:
         raise ValueError("solve currently requires --json so the evaluator contract stays explicit.")
     task = parse_json_task(sys.stdin.read())
@@ -85,7 +86,7 @@ def _handle_solve(args: argparse.Namespace, runner: MockCascadeRunner) -> int:
     return 0
 
 
-def _handle_run(args: argparse.Namespace, runner: MockCascadeRunner) -> int:
+def _handle_run(args: argparse.Namespace, runner: TaskRunner) -> int:
     tasks = load_jsonl_tasks(args.jsonl)
     results = [runner.run(task) for task in tasks]
     args.out.parent.mkdir(parents=True, exist_ok=True)
@@ -95,7 +96,7 @@ def _handle_run(args: argparse.Namespace, runner: MockCascadeRunner) -> int:
     return 0
 
 
-def _handle_eval(args: argparse.Namespace, runner: MockCascadeRunner) -> int:
+def _handle_eval(args: argparse.Namespace, runner: TaskRunner) -> int:
     tasks = load_jsonl_tasks(args.jsonl)
     results = [runner.run(task) for task in tasks]
     if args.out:
@@ -149,4 +150,3 @@ def _count_routes(results: list[AnswerResult]) -> dict[str, int]:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

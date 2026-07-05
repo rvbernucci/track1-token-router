@@ -17,24 +17,30 @@ O `M1` e o trabalhador rapido: ele tenta responder bem com o minimo de friccao.
 
 ## Checklist
 
-- [ ] Criar `LocalModelClient`.
-- [ ] Suportar timeout e retry simples.
-- [ ] Separar system prompt, user prompt e parametros.
-- [ ] Criar prompt `m1_free_answer`.
-- [ ] Preservar resposta livre exatamente como candidata final.
-- [ ] Registrar `model_1_candidate_raw` no log.
-- [ ] Medir latencia do M1.
-- [ ] Criar smoke tests para perguntas triviais.
-- [ ] Criar smoke tests para formato exigido pelo usuario.
-- [ ] Criar smoke tests para prompts longos.
-- [ ] Criar fallback quando o modelo local falhar.
+- [x] Criar `LocalModelClient`.
+- [x] Suportar timeout e retry simples.
+- [x] Separar system prompt, user prompt e parametros.
+- [x] Criar prompt `m1_free_answer`.
+- [x] Preservar resposta livre exatamente como candidata final.
+- [x] Registrar `model_1_candidate_raw` no log.
+- [x] Medir latencia do M1.
+- [x] Criar smoke tests para perguntas triviais.
+- [x] Criar smoke tests para formato exigido pelo usuario.
+- [x] Criar smoke tests para prompts longos.
+- [x] Criar fallback quando o modelo local falhar.
 
 ## Criterios de aceite
 
-- `router ask "What is 2+2?"` chama o modelo local real.
-- A resposta do M1 nao vem embrulhada em JSON/XML por padrao.
-- O log registra input hash, rota, latencia e tamanho aproximado da resposta.
-- Falha do modelo local nao derruba o processo sem mensagem controlada.
+- [x] `router ask "What is 2+2?"` chama o modelo local real.
+- [x] A resposta do M1 nao vem embrulhada em JSON/XML por padrao.
+- [x] O log registra input hash, rota, latencia e tamanho aproximado da resposta.
+- [x] Falha do modelo local nao derruba o processo sem mensagem controlada.
+
+## Evidencias
+
+- `python3 -m unittest discover -s tests`
+- `ROUTER_MODE=local LOCAL_BASE_URL=<openai-compatible-url> LOCAL_MODEL=<model> python3 -m router ask "What is 2+2?"`
+- `evals/smoke/local_m1_tasks.jsonl`
 
 ## Prompt M1
 
@@ -63,4 +69,3 @@ Principio:
 ## Saida esperada da sprint
 
 Um baseline local completo: barato, simples, medido e capaz de responder do inicio ao fim sem Fireworks.
-

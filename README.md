@@ -74,9 +74,23 @@ python3 -m router ask "What is 2+2?"
 | Variavel | Padrao | Papel |
 |---|---|---|
 | `ROUTER_LOG_PATH` | `logs/run.jsonl` | Caminho dos logs estruturados JSONL. |
-| `ROUTER_MODE` | `mock` | Modo de execucao do runner. |
+| `ROUTER_MODE` | `mock` | Modo de execucao: `mock`, `auto` ou `local`. |
 | `LOCAL_BASE_URL` | vazio | Endpoint OpenAI-compatible do modelo local. |
 | `LOCAL_MODEL` | vazio | Nome do modelo local. |
+| `LOCAL_API_KEY` | vazio | API key opcional para endpoint local protegido. |
+| `LOCAL_TIMEOUT_S` | `30` | Timeout por chamada local. |
+| `LOCAL_MAX_RETRIES` | `1` | Tentativas extras em falha local. |
+| `M1_TEMPERATURE` | `0.2` | Temperatura do gerador local M1. |
+| `M1_MAX_TOKENS` | `512` | Limite de output do M1. |
 | `FIREWORKS_BASE_URL` | `https://api.fireworks.ai/inference/v1` | Endpoint Fireworks OpenAI-compatible. |
 | `FIREWORKS_MODEL` | vazio | Modelo remoto Fireworks. |
 | `FIREWORKS_API_KEY` | vazio | API key Fireworks, usada apenas nas sprints remotas. |
+
+## Modo local M1
+
+```bash
+ROUTER_MODE=local \
+LOCAL_BASE_URL=http://localhost:8000/v1 \
+LOCAL_MODEL=local-model \
+python3 -m router ask "What is 2+2?"
+```

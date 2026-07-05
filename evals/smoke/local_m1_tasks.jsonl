@@ -1,0 +1,3 @@
+{"id":"trivial_math","input_text":"What is 2+2?"}
+{"id":"format_json","input_text":"Respond JSON only with an object containing answer: what is 2+2?"}
+{"id":"long_prompt","input_text":"Summarize this in one sentence: token token token token token token token token token token token token token token token token token token token token."}
