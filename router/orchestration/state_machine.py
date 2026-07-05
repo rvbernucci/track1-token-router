@@ -15,6 +15,7 @@ from router.orchestration.final_validator import validate_final_answer
 ORCHESTRATION_STATES = (
     "received",
     "guardrail",
+    "deterministic_solver",
     "m1_candidate",
     "local_verify",
     "local_repair",
@@ -150,6 +151,18 @@ def build_orchestration_trace(
 
     steps.append(OrchestrationStep(state="guardrail", event="skip", reason="no_guardrail_match", route=result.route))
 
+    if result.route.startswith("solver_"):
+        steps.append(
+            OrchestrationStep(
+                state="deterministic_solver",
+                event="approve",
+                reason=result.metadata.get("reason", "deterministic_solver_high_confidence"),
+                route=result.route,
+            )
+        )
+        steps.append(OrchestrationStep(state="final", event="approve", reason="solver_final", route=result.route))
+        return OrchestrationTrace(task_id=task.id, final_route=result.route, steps=steps)
+
     if result.route == "local_error":
         fallback = FALLBACK_MAP["local_error"]
         steps.extend(
@@ -254,6 +267,7 @@ def write_state_machine_report(path: Path, traces: list[OrchestrationTrace]) -> 
             "",
             "```text",
             "received -> guardrail -> m1_candidate -> local_verify -> local_repair -> remote_audit -> final",
+            "                 \\-> deterministic_solver -> final",
             "                                      \\-> failed -> final",
             "```",
             "",

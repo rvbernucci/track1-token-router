@@ -35,6 +35,17 @@ class CompetitionModeTests(unittest.TestCase):
         self.assertTrue(result.metadata["final_answer_repaired"])
         self.assertTrue(result.metadata["competition_trace"]["decision"]["final_answer_repaired"])
 
+    def test_solver_runs_before_inner_runner(self) -> None:
+        inner = CountingRunner(answer="should not run")
+        runner = CompetitionRunner(inner, dry_run=True)
+
+        result = runner.run(TaskEnvelope(input_text="What is 6 * 7? Return only the number."))
+
+        self.assertEqual(inner.calls, 0)
+        self.assertEqual(result.answer, "42")
+        self.assertEqual(result.route, "solver_arithmetic")
+        self.assertEqual(result.metadata["competition_trace"]["decision"]["reason"], "deterministic_solver_high_confidence")
+
     def test_remote_audit_is_dry_run_and_records_packet_tokens(self) -> None:
         runner = CompetitionRunner(CountingRunner(answer="I would check the latest source."), dry_run=True)
 

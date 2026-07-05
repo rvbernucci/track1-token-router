@@ -135,7 +135,7 @@ def build_fuzz_examples(fixtures_root: Path = Path("fixtures/fuzz")) -> list[Fuz
         FuzzExample(
             "fuzz_json_compact_001",
             'Return only compact JSON: {"ok":true,"count":2}.',
-            '{"ok":true,"count":2}',
+            '{"count":2,"ok":true}',
             "json_compact",
             "m1_approved",
         ),

@@ -19,6 +19,7 @@ class StateMachineTests(unittest.TestCase):
     def test_canonical_states_and_events_are_defined(self) -> None:
         self.assertIn("received", ORCHESTRATION_STATES)
         self.assertIn("remote_audit", ORCHESTRATION_STATES)
+        self.assertIn("deterministic_solver", ORCHESTRATION_STATES)
         self.assertIn("failed", ORCHESTRATION_STATES)
         self.assertIn("escalate", ORCHESTRATION_EVENTS)
         self.assertIn("fallback", ORCHESTRATION_EVENTS)
@@ -30,6 +31,15 @@ class StateMachineTests(unittest.TestCase):
 
         self.assertEqual(trace.final_route, "m1_approved")
         self.assertEqual(trace.steps[-1].state, "final")
+        self.assertEqual(trace.steps[-1].event, "approve")
+
+    def test_trace_for_solver_route_has_solver_state(self) -> None:
+        task = TaskEnvelope(id="s1", input_text="What is 6 * 7?")
+        result = AnswerResult(id="s1", answer="42", route="solver_arithmetic")
+        trace = build_orchestration_trace(task, result)
+
+        self.assertEqual(trace.final_route, "solver_arithmetic")
+        self.assertIn("deterministic_solver", [step.state for step in trace.steps])
         self.assertEqual(trace.steps[-1].event, "approve")
 
     def test_trace_for_remote_parse_failure_records_fallback(self) -> None:

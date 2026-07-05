@@ -23,22 +23,22 @@ Se codigo resolve com certeza, usar LLM e desperdicio de latencia e risco. O sol
 
 ## Checklist
 
-- [ ] Criar contrato `SolverResult`.
-- [ ] Criar registry de solvers.
-- [ ] Resolver soma, subtracao, multiplicacao e divisao inteira segura.
-- [ ] Resolver comparacao numerica simples.
-- [ ] Resolver contagem de caracteres.
-- [ ] Resolver contagem de palavras.
-- [ ] Resolver uppercase/lowercase/titlecase.
-- [ ] Resolver trim/normalize whitespace.
-- [ ] Resolver JSON compact quando payload for valido.
-- [ ] Resolver JSON pretty quando payload for valido.
-- [ ] Resolver extracao de primeiro/ultimo item de lista simples.
-- [ ] Bloquear algebra, datas ambiguas e word problems.
-- [ ] Adicionar testes de falso positivo.
-- [ ] Adicionar testes de formato final.
-- [ ] Medir rotas economizadas no battle drill.
-- [ ] Documentar limites dos solvers.
+- [x] Criar contrato `SolverResult`.
+- [x] Criar registry de solvers.
+- [x] Resolver soma, subtracao, multiplicacao e divisao inteira segura.
+- [x] Resolver comparacao numerica simples.
+- [x] Resolver contagem de caracteres.
+- [x] Resolver contagem de palavras.
+- [x] Resolver uppercase/lowercase/titlecase.
+- [x] Resolver trim/normalize whitespace.
+- [x] Resolver JSON compact quando payload for valido.
+- [x] Resolver JSON pretty quando payload for valido.
+- [x] Resolver extracao de primeiro/ultimo item de lista simples.
+- [x] Bloquear algebra, datas ambiguas e word problems.
+- [x] Adicionar testes de falso positivo.
+- [x] Adicionar testes de formato final.
+- [x] Medir rotas economizadas no battle drill.
+- [x] Documentar limites dos solvers.
 
 ## Criterios de aceite
 
@@ -55,3 +55,9 @@ Um ganho real de eficiencia sem depender de modelo, credito ou heuristica fragil
 
 Cada solver deve ser pequeno, explicito e testado. Se a regra precisa de interpretacao semantica, ela nao pertence ao solver deterministico.
 
+## Evidencia de fechamento
+
+- `python3 -m unittest tests.test_solvers tests.test_competition_mode tests.test_state_machine tests.test_battle_drill`: 25 testes focados passando.
+- `ROUTER_MODE=competition COMPETITION_DRY_RUN=1 python3 -m router ask "What is 6 * 7? Return only the number." --json`: rota `solver_arithmetic`, resposta `42`, zero tokens remotos.
+- `python3 scripts/battle_drill.py`: `solver_pack_ready=true`.
+- Limites documentados em `docs/DETERMINISTIC_SOLVERS.md`.

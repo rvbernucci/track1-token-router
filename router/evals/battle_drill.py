@@ -18,6 +18,7 @@ from router.evals.scoring import ScoringWeights, build_scoreboard
 from router.orchestration.budget import TaskBudget
 from router.orchestration.competition import CompetitionRunner
 from router.orchestration.prompt_packet import estimate_policy_packet_tokens
+from router.orchestration.solvers import solve_deterministic
 
 
 def run_battle_drill(
@@ -46,9 +47,10 @@ def run_battle_drill(
     policy_ablation = run_policy_ablation(tasks)
     guardrail_probe = _run_guardrail_probes()
     competition_probe = _run_competition_mode_probes()
+    solver_probe = _run_solver_pack_probe()
     fuzz_probe = _run_fuzz_pack_probe()
     candidate = scoreboard["rows"][0] if scoreboard["rows"] else {}
-    risks = _remaining_risks(scoreboard, prompt_ablation, trace_summary, competition_probe, fuzz_probe)
+    risks = _remaining_risks(scoreboard, prompt_ablation, trace_summary, competition_probe, solver_probe, fuzz_probe)
     return {
         "tasks": len(tasks),
         "candidate": candidate,
@@ -62,8 +64,9 @@ def run_battle_drill(
         "trace_summary": trace_summary,
         "guardrail_probe": guardrail_probe,
         "competition_probe": competition_probe,
+        "solver_probe": solver_probe,
         "fuzz_probe": fuzz_probe,
-        "readiness": _readiness(candidate, prompt_ablation, trace_summary, guardrail_probe, competition_probe, fuzz_probe),
+        "readiness": _readiness(candidate, prompt_ablation, trace_summary, guardrail_probe, competition_probe, solver_probe, fuzz_probe),
         "risks": risks,
     }
 
@@ -129,6 +132,12 @@ def write_battle_report_markdown(path: Path, report: dict[str, Any]) -> None:
     lines.extend(
         [
             "",
+            "## Solver Pack",
+            "",
+            f"- solved: `{report.get('solver_probe', {}).get('solved')}`",
+            f"- blocked: `{report.get('solver_probe', {}).get('blocked')}`",
+            f"- saved_cascade_calls: `{report.get('solver_probe', {}).get('saved_cascade_calls')}`",
+            "",
             "## Fuzz Pack",
             "",
             f"- contract_success: `{fuzz_probe.get('contract_success')}`",
@@ -177,6 +186,7 @@ def _run_competition_mode_probes() -> dict[str, Any]:
     runner = CompetitionRunner(MockCascadeRunner(), dry_run=True)
     probes = [
         TaskEnvelope(input_text="What is 10 + 5? Return only the number."),
+        TaskEnvelope(input_text="What is 6 * 7? Return only the number."),
         TaskEnvelope(input_text="Return exactly SAFE_OUTPUT and nothing else."),
         TaskEnvelope(input_text="Who is the CEO of AMD today?"),
     ]
@@ -208,6 +218,34 @@ def _run_competition_mode_probes() -> dict[str, Any]:
     }
 
 
+def _run_solver_pack_probe() -> dict[str, Any]:
+    probes = [
+        TaskEnvelope(input_text="What is 6 * 7? Return only the number."),
+        TaskEnvelope(input_text='Compact JSON: {"b":2, "a":1}'),
+        TaskEnvelope(input_text='Return the last item from this list: ["red", "blue"]'),
+        TaskEnvelope(input_text="A workshop makes 6 parts per hour for 4 hours, then discards 2. Return only the final count."),
+        TaskEnvelope(input_text="What is the date tomorrow?"),
+    ]
+    rows = []
+    for task in probes:
+        result = solve_deterministic(task)
+        rows.append(
+            {
+                "input": task.input_text,
+                "solved": result is not None,
+                "route": result.route if result else "",
+                "reason": result.reason if result else "blocked_or_not_mechanical",
+            }
+        )
+    solved = sum(1 for row in rows if row["solved"])
+    return {
+        "probes": rows,
+        "solved": solved,
+        "blocked": len(rows) - solved,
+        "saved_cascade_calls": solved,
+    }
+
+
 def _run_fuzz_pack_probe() -> dict[str, Any]:
     errors = validate_fuzz_dataset(Path("evals/fuzz"), fixtures_root=Path("fixtures/fuzz"))
     if errors:
@@ -226,6 +264,7 @@ def _readiness(
     trace_summary: dict[str, Any],
     guardrail_probe: dict[str, Any],
     competition_probe: dict[str, Any],
+    solver_probe: dict[str, Any],
     fuzz_probe: dict[str, Any],
 ) -> dict[str, bool]:
     return {
@@ -238,6 +277,8 @@ def _readiness(
         "competition_mode_ready": bool(competition_probe.get("dry_run"))
         and int(competition_probe.get("actual_remote_calls") or 0) == 0
         and bool(competition_probe.get("traces_complete")),
+        "solver_pack_ready": int(solver_probe.get("solved") or 0) >= 3
+        and int(solver_probe.get("blocked") or 0) >= 2,
         "fuzz_pack_ready": bool(fuzz_probe.get("contract_success"))
         and len(fuzz_probe.get("classes") or {}) >= 10,
     }
@@ -248,6 +289,7 @@ def _remaining_risks(
     prompt_ablation: dict[str, Any],
     trace_summary: dict[str, Any],
     competition_probe: dict[str, Any],
+    solver_probe: dict[str, Any],
     fuzz_probe: dict[str, Any],
 ) -> list[str]:
     risks = []
@@ -262,6 +304,8 @@ def _remaining_risks(
         risks.append("Best offline policy still spends remote tokens; calibrate with real Fireworks pricing.")
     if not competition_probe.get("traces_complete"):
         risks.append("Competition mode probe is missing decision, budget, or validation trace fields.")
+    if int(solver_probe.get("solved") or 0) < 3:
+        risks.append("Solver pack is not saving enough obvious mechanical tasks yet.")
     if not fuzz_probe.get("contract_success"):
         risks.append("Fuzz pack contract probe is not clean.")
     if not risks:

@@ -12,6 +12,7 @@ from router.orchestration.final_validator import FinalValidationResult, validate
 from router.orchestration.policy_engine import POLICY_PROFILES, PolicyDecision, decide_policy
 from router.orchestration.prompt_packet import RemoteAuditPacket, build_remote_audit_packet
 from router.orchestration.risk_signals import RiskSignalSet, extract_risk_signals
+from router.orchestration.solvers import SolverResult, solve_deterministic
 from router.orchestration.state_machine import OrchestrationTrace, build_orchestration_trace
 
 
@@ -94,6 +95,11 @@ class CompetitionRunner:
             candidate = _result_from_guardrail(task, guardrail)
             return self._finish(task, candidate, guardrail_reason=guardrail.reason)
 
+        solver = solve_deterministic(task)
+        if solver is not None:
+            candidate = _result_from_solver(task, solver)
+            return self._finish(task, candidate)
+
         candidate = self.inner.run(task)
         return self._finish(task, candidate)
 
@@ -117,20 +123,31 @@ class CompetitionRunner:
             concern=", ".join(signals.reasons) or "risk_within_local_acceptance",
         )
         remote_packet_tokens = remote_packet.approx_tokens()
+        thresholds = POLICY_PROFILES[_policy_profile_name(self.policy)]
         preliminary_policy = decide_policy(
             signals,
-            thresholds=POLICY_PROFILES[_policy_profile_name(self.policy)],
+            thresholds=thresholds,
         )
-        estimated_remote_tokens = remote_packet_tokens if preliminary_policy.action == "remote_audit" else 0
+        solver_approved = candidate.route.startswith("solver_")
+        estimated_remote_tokens = remote_packet_tokens if preliminary_policy.action == "remote_audit" and not solver_approved else 0
         budget_decision = self.budget_manager.allow_remote(
             estimated_remote_tokens=estimated_remote_tokens,
             latency_risk_ms=int(candidate.metadata.get("latency_fireworks_ms") or 0),
         )
-        policy_decision = decide_policy(
-            signals,
-            thresholds=POLICY_PROFILES[_policy_profile_name(self.policy)],
-            budget_decision=budget_decision if preliminary_policy.action == "remote_audit" else None,
-        )
+        if solver_approved:
+            policy_decision = PolicyDecision(
+                action="approve",
+                reason="deterministic_solver_high_confidence",
+                risk_score=signals.score,
+                reasons=[*signals.reasons, "deterministic_solver"],
+                thresholds=thresholds.to_dict(),
+            )
+        else:
+            policy_decision = decide_policy(
+                signals,
+                thresholds=thresholds,
+                budget_decision=budget_decision if preliminary_policy.action == "remote_audit" else None,
+            )
         route = _competition_route(candidate.route, policy_decision.action)
         answer, validation, repaired = _validated_answer(task, candidate.answer)
         remote_would_call = policy_decision.action == "remote_audit" and budget_decision.allowed
@@ -194,6 +211,19 @@ def _result_from_guardrail(task: TaskEnvelope, guardrail: GuardrailDecision) -> 
     )
 
 
+def _result_from_solver(task: TaskEnvelope, solver: SolverResult) -> AnswerResult:
+    return AnswerResult(
+        id=task.id,
+        answer=solver.answer,
+        route=solver.route,
+        metadata={
+            "runner": "competition_solver",
+            "solver": solver.to_dict(),
+            "reason": solver.reason,
+        },
+    )
+
+
 def _validated_answer(task: TaskEnvelope, answer: str) -> tuple[str, FinalValidationResult, bool]:
     validation = validate_final_answer(task, answer)
     if not validation.valid and validation.repaired_answer:
@@ -224,7 +254,7 @@ def _metadata(
 
 
 def _competition_route(candidate_route: str, action: str) -> str:
-    if candidate_route.startswith("guardrail_"):
+    if candidate_route.startswith("guardrail_") or candidate_route.startswith("solver_"):
         return candidate_route
     if action == "approve":
         if candidate_route == "mock_foundation":

@@ -8,7 +8,7 @@
 {"answer": "FILE_JSON_OK", "assert_exact": true, "fuzz_class": "file_json", "id": "fuzz_file_json_001"}
 {"answer": "", "assert_exact": false, "fuzz_class": "large_payload", "id": "fuzz_large_payload_001"}
 {"answer": "579", "assert_exact": true, "fuzz_class": "number_only", "id": "fuzz_number_only_001"}
-{"answer": "{\"ok\":true,\"count\":2}", "assert_exact": true, "fuzz_class": "json_compact", "id": "fuzz_json_compact_001"}
+{"answer": "{\"count\":2,\"ok\":true}", "assert_exact": true, "fuzz_class": "json_compact", "id": "fuzz_json_compact_001"}
 {"answer": "SAFE_OUTPUT", "assert_exact": true, "fuzz_class": "literal_echo", "id": "fuzz_literal_echo_001"}
 {"answer": "{\"ok\":true}", "assert_exact": true, "fuzz_class": "markdown_forbidden", "id": "fuzz_markdown_forbidden_001"}
 {"answer": "", "assert_exact": false, "fuzz_class": "uppercase", "id": "fuzz_uppercase_001"}
