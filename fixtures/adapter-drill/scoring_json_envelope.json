@@ -1,0 +1,23 @@
+{
+  "run_id": "adapter-drill-json-envelope",
+  "scoring": {
+    "primary": "accuracy",
+    "secondary": ["remote_tokens", "latency_ms", "parse_failure"]
+  },
+  "tasks": [
+    {
+      "task_id": "json-envelope-1",
+      "prompt": "What is 9 * 9? Return only the number.",
+      "difficulty": "easy"
+    },
+    {
+      "task_id": "json-envelope-2",
+      "prompt": "Return compact JSON with ok=true and count=2.",
+      "difficulty": "format"
+    }
+  ],
+  "output_contract": {
+    "format": "json",
+    "required_fields": ["id", "answer"]
+  }
+}

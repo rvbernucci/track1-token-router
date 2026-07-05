@@ -1,0 +1,6 @@
+--- task: text-batch-1 ---
+What is 2 + 2? Return only the number.
+--- task: text-batch-2 ---
+Return exactly SAFE_OUTPUT and nothing else.
+--- task: text-batch-3 ---
+Summarize the routing goal in one short sentence.

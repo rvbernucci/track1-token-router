@@ -29,21 +29,21 @@ O core deve continuar falando `TaskEnvelope` e `AnswerResult`. Toda surpresa ofi
 
 ## Checklist
 
-- [ ] Mapear hipoteses de input: texto, JSON, JSONL, arquivo, stdin.
-- [ ] Mapear hipoteses de output: texto puro, JSON, JSONL, arquivo.
-- [ ] Mapear hipoteses de scoring: accuracy, token count, latency, parse failure.
-- [ ] Mapear hipoteses de ambiente: container, env vars, rede, paths.
-- [ ] Mapear proibicoes provaveis: stdout sujo, estado local, segredo em log.
-- [ ] Criar lista de perguntas para kickoff.
-- [ ] Criar fixture `scoring_text_batch`.
-- [ ] Criar fixture `scoring_json_envelope`.
-- [ ] Criar fixture `scoring_file_bundle`.
-- [ ] Criar adapters experimentais para os tres formatos.
-- [ ] Criar testes de parse e format.
-- [ ] Criar drill cronometrado.
-- [ ] Medir tempo de adaptacao por formato.
-- [ ] Validar que o core nao importa adapters oficiais.
-- [ ] Documentar plano de decisao no kickoff.
+- [x] Mapear hipoteses de input: texto, JSON, JSONL, arquivo, stdin.
+- [x] Mapear hipoteses de output: texto puro, JSON, JSONL, arquivo.
+- [x] Mapear hipoteses de scoring: accuracy, token count, latency, parse failure.
+- [x] Mapear hipoteses de ambiente: container, env vars, rede, paths.
+- [x] Mapear proibicoes provaveis: stdout sujo, estado local, segredo em log.
+- [x] Criar lista de perguntas para kickoff.
+- [x] Criar fixture `scoring_text_batch`.
+- [x] Criar fixture `scoring_json_envelope`.
+- [x] Criar fixture `scoring_file_bundle`.
+- [x] Criar adapters experimentais para os tres formatos.
+- [x] Criar testes de parse e format.
+- [x] Criar drill cronometrado.
+- [x] Medir tempo de adaptacao por formato.
+- [x] Validar que o core nao importa adapters oficiais.
+- [x] Documentar plano de decisao no kickoff.
 
 ## Criterios de aceite
 
@@ -84,3 +84,13 @@ Adapters sao camada de borda. O core competitivo nao deve saber se a entrada vei
 - Tres formatos simulados estao testados.
 - Tempo de adaptacao foi medido.
 - Perguntas de kickoff foram documentadas.
+
+## Evidencias
+
+- `docs/EVALUATOR_ASSUMPTIONS.md` documenta hipoteses, impacto, mitigacao, testes e perguntas de kickoff.
+- `docs/KICKOFF_ADAPTER_DRILL.md` define o procedimento de adaptacao em menos de 30 minutos.
+- `fixtures/adapter-drill/` contem `scoring_text_batch`, `scoring_json_envelope` e `scoring_file_bundle`.
+- `router/adapters/official/` contem adapters experimentais para os tres formatos.
+- `scripts/adapter_drill.py --check` gera `reports/generated/adapter-drill-report.md`.
+- `tests/test_official_adapters.py` cobre parse e format dos tres formatos.
+- `scripts/offline_release_check.sh` executa o drill antes do battle drill.

@@ -13,7 +13,15 @@ class OfficialAdapterTests(unittest.TestCase):
     def test_registry_contains_templates(self) -> None:
         self.assertEqual(
             set(ADAPTERS),
-            {"plain_text", "json_task", "jsonl_batch", "file_payload"},
+            {
+                "plain_text",
+                "json_task",
+                "jsonl_batch",
+                "file_payload",
+                "scoring_text_batch",
+                "scoring_json_envelope",
+                "scoring_file_bundle",
+            },
         )
 
     def test_plain_text_round_trip(self) -> None:
@@ -59,6 +67,50 @@ class OfficialAdapterTests(unittest.TestCase):
 
         self.assertEqual(tasks[0].files[0].name, "brief.txt")
         self.assertEqual(payload["answer"], "summary")
+
+    def test_scoring_text_batch_round_trip(self) -> None:
+        adapter = get_adapter("scoring_text_batch")
+        tasks = adapter.parse(Path("fixtures/adapter-drill/scoring_text_batch.txt").read_text(encoding="utf-8"))
+
+        output = adapter.format(
+            [
+                AnswerResult(id=task.id, answer=f"DRILL_OK:{task.id}", route="test")
+                for task in tasks
+            ]
+        )
+
+        self.assertEqual(len(tasks), 3)
+        self.assertEqual(tasks[0].id, "text-batch-1")
+        self.assertEqual(len(output.splitlines()), 3)
+        self.assertIn("text-batch-2\tDRILL_OK:text-batch-2", output)
+
+    def test_scoring_json_envelope_round_trip(self) -> None:
+        adapter = get_adapter("scoring_json_envelope")
+        tasks = adapter.parse(Path("fixtures/adapter-drill/scoring_json_envelope.json").read_text(encoding="utf-8"))
+
+        output = adapter.format(
+            [
+                AnswerResult(id=tasks[0].id, answer="81", route="test"),
+                AnswerResult(id=tasks[1].id, answer='{"ok":true,"count":2}', route="test"),
+            ]
+        )
+        payload = json.loads(output)
+
+        self.assertEqual(len(tasks), 2)
+        self.assertEqual(tasks[0].id, "json-envelope-1")
+        self.assertEqual(tasks[0].metadata["scoring"]["primary"], "accuracy")
+        self.assertEqual(payload["answers"][0]["answer"], "81")
+
+    def test_scoring_file_bundle_round_trip(self) -> None:
+        adapter = get_adapter("scoring_file_bundle")
+        tasks = adapter.parse(Path("fixtures/adapter-drill/scoring_file_bundle.json").read_text(encoding="utf-8"))
+
+        output = adapter.format([AnswerResult(id=tasks[0].id, answer="short summary", route="test")])
+
+        self.assertEqual(tasks[0].id, "adapter-drill-file-bundle")
+        self.assertEqual(tasks[0].files[0].name, "brief.txt")
+        self.assertIn("remote token usage", tasks[0].metadata["inline_files"][0]["content"])
+        self.assertEqual(output, "short summary")
 
     def test_unknown_adapter_fails(self) -> None:
         with self.assertRaises(ValueError):

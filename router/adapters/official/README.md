@@ -15,6 +15,9 @@ Official input/output formats should be translated here.
 - `json_task`: one JSON task object.
 - `jsonl_batch`: many JSON task objects, one per line.
 - `file_payload`: one JSON task object with file metadata.
+- `scoring_text_batch`: simulated evaluator text batch with explicit task headers.
+- `scoring_json_envelope`: simulated evaluator JSON envelope with scoring metadata.
+- `scoring_file_bundle`: simulated evaluator file bundle with inline attachment content.
 
 ## Add a new adapter in 30 minutes
 

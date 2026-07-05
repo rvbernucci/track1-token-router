@@ -1,0 +1,14 @@
+{
+  "bundle_id": "adapter-drill-file-bundle",
+  "question": "Summarize the attached note in one sentence.",
+  "attachments": [
+    {
+      "filename": "brief.txt",
+      "mime": "text/plain",
+      "content": "Track 1 rewards answers that preserve accuracy while minimizing remote token usage."
+    }
+  ],
+  "output_contract": {
+    "format": "plain_text"
+  }
+}
