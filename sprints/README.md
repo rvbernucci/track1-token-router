@@ -34,7 +34,11 @@ Enquanto os creditos nao forem liberados, seguimos na trilha `offline`, usando d
 
 ## Proximas sprints sem credito
 
-As sprints offline planejadas ate agora foram concluidas. A proxima sprint sem credito deve nascer de uma nova lacuna concreta encontrada em testes, kickoff ou preparacao de release.
+- [Sprint 12 - Offline Scoring Simulator](./12-offline-scoring-simulator/README.md)
+- [Sprint 13 - Prompt Versioning & Ablation Lab](./13-prompt-versioning-ablation-lab/README.md)
+- [Sprint 14 - Deterministic Guardrails](./14-deterministic-guardrails/README.md)
+- [Sprint 15 - Trace Analytics](./15-trace-analytics/README.md)
+- [Sprint 16 - Release Automation & GHCR](./16-release-automation-ghcr/README.md)
 
 ## Sprints dependentes de credito
 

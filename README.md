@@ -221,6 +221,24 @@ python3 scripts/compare_policies.py \
   --report reports/generated/policy-comparison.md
 ```
 
+Scoreboard offline:
+
+```bash
+python3 scripts/offline_score_simulator.py \
+  --jsonl evals/offline/tasks.jsonl \
+  --expected evals/offline/expected.jsonl \
+  --report reports/generated/offline-scoreboard.md
+```
+
+Formula usada no simulador:
+
+```text
+score = exact_match_rate * accuracy_weight
+  - remote_tokens_total * remote_token_weight
+  - latency_ms_total * latency_ms_weight
+  - parse_failures * parse_failure_weight
+```
+
 ## Estrategia de token efficiency
 
 - M1 tenta responder localmente com formato livre.

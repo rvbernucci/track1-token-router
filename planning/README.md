@@ -78,6 +78,11 @@ Esta e a rota principal enquanto os creditos AMD/Fireworks nao forem liberados. 
 | 09 | Official Adapter Readiness | Estrutura para adaptar rapido ao formato oficial no kickoff. |
 | 10 | Offline Release Candidate | Release candidate que roda sem credito e esta pronto para plugar credenciais. |
 | 11 | Testing Culture Lab | Playground, matriz de testes e cultura de promocao para regressao automatizada. |
+| 12 | Offline Scoring Simulator | Leaderboard offline com accuracy, tokens, latencia e parse failures. |
+| 13 | Prompt Versioning & Ablation Lab | Prompts versionados e comparaveis sem modelo real. |
+| 14 | Deterministic Guardrails | Respostas deterministicas seguras antes da cascata. |
+| 15 | Trace Analytics | Relatorios a partir de logs JSONL. |
+| 16 | Release Automation & GHCR | Release notes e publicacao de imagem em tags. |
 
 ## Roadmap dependente de credito
 
