@@ -47,6 +47,24 @@ python3 -m pip install -e .
 scripts/offline_release_check.sh
 ```
 
+## Submission Kit
+
+Base lablab artifacts live in [`submission/`](./submission):
+
+- project title;
+- short and long descriptions;
+- tags;
+- video script;
+- slides outline;
+- CLI demo plan;
+- cover image brief.
+
+Validate them with:
+
+```bash
+python3 scripts/submission_readiness_check.py
+```
+
 ## Offline Release Candidate
 
 This repository has a no-credit release path. It can be tested without AMD Developer Cloud or Fireworks:

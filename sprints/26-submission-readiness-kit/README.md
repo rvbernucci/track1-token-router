@@ -28,22 +28,22 @@ Mesmo um runner forte pode perder se a submissao estiver incompleta, confusa ou 
 
 ## Checklist
 
-- [ ] Escrever short description ate 255 caracteres.
-- [ ] Escrever long description com mais de 100 palavras.
-- [ ] Definir project title final.
-- [ ] Definir technology/category tags.
-- [ ] Criar roteiro de video ate 5 minutos.
-- [ ] Criar estrutura de slides PDF.
-- [ ] Criar plano de demo em CLI.
-- [ ] Criar plano de demo visual opcional.
-- [ ] Criar brief de cover image PNG/JPG.
-- [ ] Criar checklist de URL de demo.
-- [ ] Criar checklist de repo publico.
-- [ ] Criar checklist de Docker/CI.
-- [ ] Criar readiness script.
-- [ ] Validar campos obrigatorios da lablab.
-- [ ] Integrar readiness ao battle drill ou release check.
-- [ ] Documentar o que fica pendente ate kickoff.
+- [x] Escrever short description ate 255 caracteres.
+- [x] Escrever long description com mais de 100 palavras.
+- [x] Definir project title final.
+- [x] Definir technology/category tags.
+- [x] Criar roteiro de video ate 5 minutos.
+- [x] Criar estrutura de slides PDF.
+- [x] Criar plano de demo em CLI.
+- [x] Criar plano de demo visual opcional.
+- [x] Criar brief de cover image PNG/JPG.
+- [x] Criar checklist de URL de demo.
+- [x] Criar checklist de repo publico.
+- [x] Criar checklist de Docker/CI.
+- [x] Criar readiness script.
+- [x] Validar campos obrigatorios da lablab.
+- [x] Integrar readiness ao battle drill ou release check.
+- [x] Documentar o que fica pendente ate kickoff.
 
 ## Criterios de aceite
 
@@ -60,3 +60,9 @@ Um pacote de submissao quase pronto, esperando apenas detalhes reais do kickoff 
 
 O kit deve vender o projeto como runner competitivo, nao como plataforma generica. A narrativa principal e accuracy com menor token remoto por meio de orquestracao calibrada.
 
+## Evidencia de fechamento
+
+- `python3 scripts/submission_readiness_check.py`: `ok=true`, short description com 199 caracteres, long description com 162 palavras, 12 tags e 10 slides.
+- `python3 -m unittest tests.test_submission_readiness`: readiness positivo, CLI e falha por artefato ausente testados.
+- `scripts/offline_release_check.sh`: readiness integrado a porteira pesada.
+- Pendencias ate kickoff documentadas como warnings: URL publica, video/demo URL e benchmark real AMD/Fireworks.
