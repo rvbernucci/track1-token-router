@@ -58,6 +58,7 @@ class FakeProviderConfig:
     response_text: str = "local answer"
     responses: tuple[str, ...] = ()
     status: int = 200
+    statuses: tuple[int, ...] = ()
     delay_s: float = 0.0
     invalid_json: bool = False
     prompt_tokens: int = 5
@@ -79,6 +80,7 @@ class FakeOpenAIProvider:
         self.config = config or FakeProviderConfig()
         self.requests: list[dict[str, Any]] = []
         self._responses = list(self.config.responses)
+        self._statuses = list(self.config.statuses)
         self._lock = threading.Lock()
         self._server = ThreadingHTTPServer((host, port), self._handler_class())
         self.url = f"http://{host}:{self._server.server_port}/v1"
@@ -128,8 +130,9 @@ class FakeOpenAIProvider:
                 if outer.config.delay_s:
                     time.sleep(outer.config.delay_s)
 
-                if outer.config.status >= 400:
-                    self._write_json({"error": "forced failure"}, status=outer.config.status)
+                status = outer._next_status()
+                if status >= 400:
+                    self._write_json({"error": "forced failure"}, status=status)
                     return
 
                 if outer.config.invalid_json:
@@ -175,6 +178,12 @@ class FakeOpenAIProvider:
             if self._responses:
                 return self._responses.pop(0)
             return self.config.response_text
+
+    def _next_status(self) -> int:
+        with self._lock:
+            if self._statuses:
+                return self._statuses.pop(0)
+            return self.config.status
 
 
 def main() -> int:

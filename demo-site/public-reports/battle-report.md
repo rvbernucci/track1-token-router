@@ -62,6 +62,12 @@
 - semantic_acceptable_rate: `0.16666666666666666`
 - label_match_rate: `1.0`
 
+## Batch Stress
+
+- batch_stress_ready: `True`
+- tasks_per_second: `11538.944`
+- output_contract_pass_rate: `1.0`
+
 ## Readiness
 
 - candidate_selected: `ok`
@@ -77,6 +83,7 @@
 - token_envelope_ready: `ok`
 - bad_local_model_ready: `ok`
 - semantic_validation_ready: `ok`
+- batch_stress_ready: `ok`
 
 ## Risks
 

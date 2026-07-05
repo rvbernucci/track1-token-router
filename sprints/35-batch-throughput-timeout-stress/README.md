@@ -27,18 +27,18 @@ Performance competitiva nao e apenas p95 de uma task. E estabilidade sob lote, f
 
 ## Checklist
 
-- [ ] Criar fixture JSONL com 1k tarefas sinteticas pequenas.
-- [ ] Criar fixture com mistura de facil, formato, adversarial e conhecimento instavel.
-- [ ] Simular provider local lento.
-- [ ] Simular provider local com erro intermitente.
-- [ ] Simular Fireworks lento em dry-run/fake provider.
-- [ ] Medir throughput tasks/s.
-- [ ] Medir tempo total por lote.
-- [ ] Medir p50/p95/p99 por task.
-- [ ] Medir falhas controladas versus crashes.
-- [ ] Validar que output JSONL preserva ids e ordem quando necessario.
-- [ ] Validar que stderr pode conter diagnostico, mas stdout nao suja resposta.
-- [ ] Definir threshold de lote para CI.
+- [x] Criar fixture JSONL com 1k tarefas sinteticas pequenas.
+- [x] Criar fixture com mistura de facil, formato, adversarial e conhecimento instavel.
+- [x] Simular provider local lento.
+- [x] Simular provider local com erro intermitente.
+- [x] Simular Fireworks lento em dry-run/fake provider.
+- [x] Medir throughput tasks/s.
+- [x] Medir tempo total por lote.
+- [x] Medir p50/p95/p99 por task.
+- [x] Medir falhas controladas versus crashes.
+- [x] Validar que output JSONL preserva ids e ordem quando necessario.
+- [x] Validar que stderr pode conter diagnostico, mas stdout nao suja resposta.
+- [x] Definir threshold de lote para CI.
 
 ## Criterios de aceite
 

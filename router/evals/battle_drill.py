@@ -14,6 +14,7 @@ from router.core.policy import DEFAULT_POLICY, POLICIES
 from router.evals.fuzz_dataset import run_fuzz_pack, validate_fuzz_dataset
 from router.evals.bad_local_model import run_bad_local_model_drill
 from router.evals.semantic_judge import run_semantic_eval
+from scripts.batch_stress import run_batch_stress
 from router.evals.operational_envelope import (
     LatencyThresholds,
     TokenEnvelopeThresholds,
@@ -67,6 +68,7 @@ def run_battle_drill(
     )
     bad_local_model_probe = run_bad_local_model_drill()
     semantic_probe = run_semantic_eval()
+    batch_stress_probe = run_batch_stress()
     risks = _remaining_risks(
         scoreboard,
         prompt_ablation,
@@ -78,6 +80,7 @@ def run_battle_drill(
         token_envelope,
         bad_local_model_probe,
         semantic_probe,
+        batch_stress_probe,
     )
     return {
         "tasks": len(tasks),
@@ -98,6 +101,7 @@ def run_battle_drill(
         "token_envelope": token_envelope,
         "bad_local_model_probe": bad_local_model_probe,
         "semantic_probe": semantic_probe,
+        "batch_stress_probe": batch_stress_probe,
         "readiness": _readiness(
             candidate,
             prompt_ablation,
@@ -110,6 +114,7 @@ def run_battle_drill(
             token_envelope,
             bad_local_model_probe,
             semantic_probe,
+            batch_stress_probe,
         ),
         "risks": risks,
     }
@@ -205,6 +210,12 @@ def write_battle_report_markdown(path: Path, report: dict[str, Any]) -> None:
             f"- semantic_validation_ready: `{report.get('semantic_probe', {}).get('ok')}`",
             f"- semantic_acceptable_rate: `{(report.get('semantic_probe', {}).get('metrics') or {}).get('semantic_acceptable_rate')}`",
             f"- label_match_rate: `{(report.get('semantic_probe', {}).get('metrics') or {}).get('label_match_rate')}`",
+            "",
+            "## Batch Stress",
+            "",
+            f"- batch_stress_ready: `{report.get('batch_stress_probe', {}).get('ok')}`",
+            f"- tasks_per_second: `{(report.get('batch_stress_probe', {}).get('large_batch') or {}).get('tasks_per_second')}`",
+            f"- output_contract_pass_rate: `{(report.get('batch_stress_probe', {}).get('cli_contract') or {}).get('output_contract_pass_rate')}`",
         ]
     )
     lines.extend(["", "## Readiness", ""])
@@ -355,6 +366,7 @@ def _readiness(
     token_envelope: dict[str, Any],
     bad_local_model_probe: dict[str, Any],
     semantic_probe: dict[str, Any],
+    batch_stress_probe: dict[str, Any],
 ) -> dict[str, bool]:
     return {
         "candidate_selected": bool(candidate.get("policy")),
@@ -374,6 +386,7 @@ def _readiness(
         "token_envelope_ready": bool(token_envelope.get("ready")),
         "bad_local_model_ready": bool(bad_local_model_probe.get("ok")),
         "semantic_validation_ready": bool(semantic_probe.get("ok")),
+        "batch_stress_ready": bool(batch_stress_probe.get("ok")),
     }
 
 
@@ -388,6 +401,7 @@ def _remaining_risks(
     token_envelope: dict[str, Any],
     bad_local_model_probe: dict[str, Any],
     semantic_probe: dict[str, Any],
+    batch_stress_probe: dict[str, Any],
 ) -> list[str]:
     risks = []
     if (prompt_ablation.get("errors") or []):
@@ -413,6 +427,8 @@ def _remaining_risks(
         risks.append("Bad local model chaos probe is not containing bad candidates.")
     if not semantic_probe.get("ok"):
         risks.append("Semantic validation harness is not classifying open-answer fixtures cleanly.")
+    if not batch_stress_probe.get("ok"):
+        risks.append("Batch stress probe is outside throughput, timeout, or output-contract thresholds.")
     if not risks:
         risks.append("No offline blocker found; next risk is real runtime calibration.")
     return risks
