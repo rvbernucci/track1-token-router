@@ -6,7 +6,7 @@ This matrix maps critical project areas to automated tests and playground probes
 |---|---|---|---|---|
 | contracts | `TaskEnvelope`, `AnswerResult`, token usage serialization | `tests/test_contracts.py` | none | none |
 | adapters | JSON, JSONL, official adapter templates | `tests/test_io_and_cli.py`, `tests/test_official_adapters.py` | `playground/test_adapter_logic.py` | `fixtures/official/` |
-| policies | policy normalization, route simulation, Pareto comparison | `tests/test_policy_lab.py` | `playground/test_policy_logic.py` | `reports/OFFLINE_RC_REPORT.md` |
+| policies | policy normalization, route simulation, Pareto comparison, decision replay | `tests/test_policy_lab.py`, `tests/test_policy_optimizer_replay.py` | `playground/test_policy_logic.py` | `reports/OFFLINE_RC_REPORT.md` |
 | prompts | M1/M2A/M2B/Fireworks prompt packet shape | `tests/test_local_m1.py`, `tests/test_local_cascade.py`, `tests/test_hybrid_cascade.py` | `playground/test_prompt_packets.py` | `docs/TESTING_CULTURE.md` |
 | cascade | M1, M2A, M2B, hybrid audit routing | `tests/test_local_cascade.py`, `tests/test_hybrid_cascade.py` | none | `SUBMISSION.md` |
 | fake_provider | fake OpenAI-compatible server, chaos profiles | `tests/test_fake_provider.py` | none | `docs/CHAOS_LAB.md` |

@@ -1,7 +1,7 @@
 # Submission Readiness Report
 
 - ok: `True`
-- metrics: `{"long_description_words": 162, "short_description_chars": 199, "slides": 10, "tags": 12, "title": "Track 1 Token Router", "video_script_words": 331}`
+- metrics: `{"long_description_words": 162, "short_description_chars": 199, "slides": 10, "tags": 12, "title": "Track 1 Token Router", "video_script_words": 376}`
 
 ## Errors
 

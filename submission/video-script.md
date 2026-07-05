@@ -34,6 +34,14 @@ scripts/battle_drill.py
 
 The report checks policy score, competition readiness, solver savings, fuzz input robustness and runtime profile readiness.
 
+Then show one readable replay:
+
+```bash
+python3 scripts/replay_decision.py --text "Who is the CEO of AMD today?"
+```
+
+This exposes risk signals, budget decision, policy decision and final validation. The contrast is the point: arithmetic stays deterministic, current knowledge becomes a remote-audit candidate in dry-run.
+
 ## 3:45 - Readiness
 
 The repo includes Docker, CI, offline release checks, fuzz tests, runtime profiles for AMD MI300X with vLLM or SGLang, Gemma runbooks and Fireworks activation steps. This makes credits an activation step, not a blocker.
