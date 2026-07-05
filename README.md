@@ -28,20 +28,21 @@ Prioridades:
 | [`docker`](./docker/README.md) | Container, imagem, env vars e comandos de execucao reproduzivel. |
 | [`planning`](./planning/README.md) | Builder plan, principios, definition of done e estrategia-mestra. |
 | [`sprints`](./sprints/README.md) | Plano operacional em 5 sprints com checklists e criterios de aceite. |
+| [`docs/COMPETITION_GAP_ANALYSIS.md`](./docs/COMPETITION_GAP_ANALYSIS.md) | Lacunas restantes sem credito e trilha de Sprints 22-26. |
 
 ## Roadmap atual
 
 A rota principal do projeto nao depende de creditos AMD ou Fireworks.
 
-Enquanto os creditos nao chegam, seguimos nas sprints offline. As sprints 06-16 ja criaram dataset, simuladores, testes, scoring, guardrails, analytics e release automation.
+Enquanto os creditos nao chegam, seguimos nas sprints offline. As sprints 06-21 ja criaram dataset, simuladores, testes, scoring, guardrails, analytics, release automation, state machine, budget manager, policy engine, prompt packet, final validator e battle drill.
 
-A proxima trilha sem credito e de orquestracao competitiva:
+A proxima trilha sem credito e de readiness competitivo:
 
-- Sprint 17: orchestration state machine.
-- Sprint 18: budget manager e token-latency governor.
-- Sprint 19: adaptive policy engine e risk signals.
-- Sprint 20: compact prompt packet e final validator.
-- Sprint 21: calibration loop e battle drill.
+- Sprint 22: competition mode integration.
+- Sprint 23: official input fuzz pack.
+- Sprint 24: deterministic solver pack.
+- Sprint 25: platform runbooks e runtime profiles.
+- Sprint 26: submission readiness kit.
 
 Quando os creditos chegarem, entramos na trilha paralela `credit-gated`:
 

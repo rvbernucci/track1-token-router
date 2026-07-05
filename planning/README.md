@@ -88,6 +88,11 @@ Esta e a rota principal enquanto os creditos AMD/Fireworks nao forem liberados. 
 | 19 | Adaptive Policy Engine & Risk Signals | Decisoes por sinais, thresholds e historico de execucao. |
 | 20 | Compact Prompt Packet & Final Validator | Pacote remoto minimo e validacao final de formato. |
 | 21 | Calibration Loop & Battle Drill | Loop de comparacao, ajuste e battle report offline. |
+| 22 | Competition Mode Integration | Caminho unico de runtime competitivo com trace consolidado. |
+| 23 | Official Input Fuzz Pack | Simulacao de contratos oficiais e payloads adversariais. |
+| 24 | Deterministic Solver Pack | Solvers mecanicos seguros antes de qualquer modelo. |
+| 25 | Platform Runbooks & Runtime Profiles | Perfis AMD/Gemma/Fireworks prontos para ativacao. |
+| 26 | Submission Readiness Kit | Artefatos e checklist de submissao lablab. |
 
 ## Roadmap dependente de credito
 
