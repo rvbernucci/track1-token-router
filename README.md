@@ -264,6 +264,16 @@ python3 scripts/analyze_traces.py \
   --report reports/generated/trace-summary.md
 ```
 
+Release notes dry-run:
+
+```bash
+python3 scripts/generate_release_notes.py \
+  --tag offline-dry-run \
+  --output reports/generated/release-notes.md
+```
+
+Publicacao GHCR fica em `.github/workflows/release.yml` e acontece apenas em tags `v*` ou `offline-*`.
+
 ## Estrategia de token efficiency
 
 - M1 tenta responder localmente com formato livre.
