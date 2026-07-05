@@ -47,7 +47,6 @@
 ## Operational Envelope
 
 - latency_ready: `True`
-- latency_p95_ms: `0.072`
 - token_envelope_ready: `True`
 - candidate_run_exposure: `6675`
 

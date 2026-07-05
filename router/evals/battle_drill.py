@@ -181,7 +181,6 @@ def write_battle_report_markdown(path: Path, report: dict[str, Any]) -> None:
             "## Operational Envelope",
             "",
             f"- latency_ready: `{report.get('latency_probe', {}).get('ready')}`",
-            f"- latency_p95_ms: `{report.get('latency_probe', {}).get('p95_ms')}`",
             f"- token_envelope_ready: `{report.get('token_envelope', {}).get('ready')}`",
             f"- candidate_run_exposure: `{(report.get('token_envelope', {}).get('candidate') or {}).get('run_exposure')}`",
         ]

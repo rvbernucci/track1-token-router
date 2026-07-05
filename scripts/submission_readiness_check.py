@@ -45,7 +45,7 @@ class SubmissionReadiness:
         }
 
 
-def check_submission_readiness(root: Path = Path(".")) -> SubmissionReadiness:
+def check_submission_readiness(root: Path = Path("."), *, strict: bool = False) -> SubmissionReadiness:
     errors: list[str] = []
     warnings: list[str] = []
     metrics: dict[str, object] = {}
@@ -96,6 +96,8 @@ def check_submission_readiness(root: Path = Path(".")) -> SubmissionReadiness:
 
     _check_submission_notes(root / "SUBMISSION.md", errors)
     _check_readme(root / "README.md", errors)
+    if strict:
+        _check_strict_artifacts(root, errors, warnings, metrics)
     _check_pending_items(warnings)
 
     return SubmissionReadiness(not errors, errors, warnings, metrics)
@@ -124,9 +126,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Validate hackathon submission readiness artifacts.")
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--report", type=Path, default=Path("reports/generated/submission-readiness.md"))
+    parser.add_argument("--strict", action="store_true", help="Require final URLs, CI status and final artifacts.")
     args = parser.parse_args()
 
-    readiness = check_submission_readiness(args.root)
+    readiness = check_submission_readiness(args.root, strict=args.strict)
     write_readiness_report(args.report, readiness)
     print(json.dumps(readiness.to_dict(), ensure_ascii=False, sort_keys=True))
     return 0 if readiness.ok else 1
@@ -151,6 +154,57 @@ def _check_readme(path: Path, errors: list[str]) -> None:
     for token in ("Instalacao local", "Modo competicao dry-run", "Docker"):
         if token not in content:
             errors.append(f"README.md missing section/token: {token}")
+
+
+def _check_strict_artifacts(root: Path, errors: list[str], warnings: list[str], metrics: dict[str, object]) -> None:
+    final_root = root / "submission" / "final"
+    status_path = final_root / "submission-status.json"
+    metrics["strict_mode"] = True
+    if not final_root.exists():
+        errors.append("strict: missing submission/final")
+        return
+    status = _load_status(status_path, errors)
+    metrics["strict_status"] = status
+
+    repo_url = str(status.get("repo_url") or "")
+    demo_url = str(status.get("demo_url") or "")
+    video_url = str(status.get("video_url") or "")
+    ci_status = str(status.get("ci_status") or "")
+    if not repo_url.startswith("https://"):
+        errors.append("strict: repo_url must be a public https URL")
+    if not demo_url.startswith("https://"):
+        errors.append("strict: demo_url must be a public https URL")
+    if ci_status != "green":
+        errors.append("strict: ci_status must be green")
+
+    slides_pdf = final_root / "slides.pdf"
+    if not slides_pdf.exists() or slides_pdf.stat().st_size < 100 or not slides_pdf.read_bytes().startswith(b"%PDF-"):
+        errors.append("strict: submission/final/slides.pdf must exist and be a valid PDF")
+    cover_candidates = [final_root / "cover.png", final_root / "cover.jpg", final_root / "cover.jpeg"]
+    if not any(path.exists() and path.stat().st_size >= 100 for path in cover_candidates):
+        errors.append("strict: submission/final/cover.png or cover.jpg must exist")
+
+    video_files = list(final_root.glob("*.mp4"))
+    placeholder_ok = bool(status.get("video_placeholder_approved")) and (final_root / "video-placeholder-approved.md").exists()
+    if not video_url.startswith("https://") and not video_files and not placeholder_ok:
+        errors.append("strict: provide video_url, video MP4, or approved video placeholder")
+    if placeholder_ok and not video_url:
+        warnings.append("strict: video placeholder is approved but must be replaced before final submission")
+
+
+def _load_status(path: Path, errors: list[str]) -> dict[str, object]:
+    if not path.exists():
+        errors.append("strict: missing submission/final/submission-status.json")
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        errors.append(f"strict: invalid submission status JSON: {exc}")
+        return {}
+    if not isinstance(payload, dict):
+        errors.append("strict: submission status must be a JSON object")
+        return {}
+    return payload
 
 
 def _check_pending_items(warnings: list[str]) -> None:

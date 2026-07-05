@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.build_submission_artifacts import build_submission_artifacts
 from scripts.submission_readiness_check import check_submission_readiness
 
 
@@ -31,6 +32,58 @@ class SubmissionReadinessTests(unittest.TestCase):
 
         self.assertIn('"ok": true', completed.stdout)
         self.assertIn("Submission Readiness Report", content)
+
+    def test_artifact_builder_creates_final_placeholders(self) -> None:
+        completed = subprocess.run(
+            [sys.executable, "scripts/build_submission_artifacts.py", "--check"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        payload = completed.stdout
+        self.assertIn('"ok": true', payload)
+        self.assertTrue(Path("submission/final/slides.pdf").exists())
+        self.assertTrue(Path("submission/final/cover.png").exists())
+
+    def test_strict_mode_flags_pending_public_urls_and_ci(self) -> None:
+        readiness = check_submission_readiness(Path("."), strict=True)
+
+        self.assertFalse(readiness.ok)
+        self.assertTrue(any("demo_url" in error for error in readiness.errors))
+        self.assertTrue(any("ci_status" in error for error in readiness.errors))
+
+    def test_strict_mode_passes_with_final_status_and_artifacts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            shutil.copytree("submission", tmp_root / "submission")
+            for relative in (
+                ".github",
+            ):
+                shutil.copytree(relative, tmp_root / relative)
+            for relative in (
+                "README.md",
+                "SUBMISSION.md",
+                "CREDIT_ACTIVATION.md",
+                "Dockerfile",
+            ):
+                shutil.copy2(relative, tmp_root / relative)
+            build_submission_artifacts(tmp_root)
+            status_path = tmp_root / "submission" / "final" / "submission-status.json"
+            status_path.write_text(
+                "{\n"
+                '  "ci_status": "green",\n'
+                '  "demo_url": "https://example.com/demo",\n'
+                '  "repo_url": "https://github.com/rvbernucci/track1-token-router",\n'
+                '  "video_placeholder_approved": true,\n'
+                '  "video_url": ""\n'
+                "}\n",
+                encoding="utf-8",
+            )
+
+            readiness = check_submission_readiness(tmp_root, strict=True)
+
+        self.assertTrue(readiness.ok, readiness.errors)
 
     def test_submission_readiness_fails_when_required_artifact_is_missing(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
