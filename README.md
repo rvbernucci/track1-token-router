@@ -97,6 +97,7 @@ python3 -m router ask "What is 2+2?"
 |---|---|---|
 | `ROUTER_LOG_PATH` | `logs/run.jsonl` | Caminho dos logs estruturados JSONL. |
 | `ROUTER_MODE` | `mock` | Modo de execucao: `mock`, `auto`, `local`, `cascade` ou `hybrid`. |
+| `ROUTER_POLICY` | `balanced` | Politica de roteamento: `aggressive`, `balanced` ou `conservative`. |
 | `LOCAL_BASE_URL` | vazio | Endpoint OpenAI-compatible do modelo local. |
 | `LOCAL_MODEL` | vazio | Nome do modelo local. |
 | `LOCAL_API_KEY` | vazio | API key opcional para endpoint local protegido. |
@@ -209,6 +210,15 @@ python3 -m router eval \
   --jsonl evals/offline/tasks.jsonl \
   --expected evals/offline/expected.jsonl \
   --report reports/generated/offline-report.md
+```
+
+Comparacao offline de politicas:
+
+```bash
+python3 scripts/compare_policies.py \
+  --jsonl evals/offline/tasks.jsonl \
+  --expected evals/offline/expected.jsonl \
+  --report reports/generated/policy-comparison.md
 ```
 
 ## Estrategia de token efficiency

@@ -14,3 +14,8 @@ python3 -m router eval \
   --expected evals/offline/expected.jsonl \
   --out reports/generated/offline-output.jsonl \
   --report reports/generated/offline-report.md
+python3 scripts/compare_policies.py \
+  --jsonl evals/offline/tasks.jsonl \
+  --expected evals/offline/expected.jsonl \
+  --out-json reports/generated/policy-comparison.json \
+  --report reports/generated/policy-comparison.md

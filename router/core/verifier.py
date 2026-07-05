@@ -77,16 +77,18 @@ class LocalVerifier:
         *,
         temperature: float = 0.0,
         max_tokens: int = 256,
+        policy: str = "balanced",
     ) -> None:
         self.client = client
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self.policy = policy
 
     def verify(self, task: TaskEnvelope, model_1_candidate_raw: str) -> VerificationResult:
         started_at = perf_counter()
         try:
             response = self.client.complete(
-                build_m2a_messages(task, model_1_candidate_raw),
+                build_m2a_messages(task, model_1_candidate_raw, policy=self.policy),
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
             )
@@ -138,4 +140,3 @@ def _extract_json_object(raw_text: str) -> str:
 
 def _elapsed_ms(started_at: float) -> int:
     return round((perf_counter() - started_at) * 1000)
-

@@ -69,6 +69,7 @@ def _build_local_cascade_runner(config: RouterConfig, logger: JsonlRunLogger) ->
         m2a_max_tokens=config.m2a_max_tokens,
         m2b_temperature=config.m2b_temperature,
         m2b_max_tokens=config.m2b_max_tokens,
+        policy=config.policy,
     )
 
 
@@ -108,4 +109,5 @@ def _build_hybrid_cascade_runner(config: RouterConfig, logger: JsonlRunLogger) -
         m2b_max_tokens=config.m2b_max_tokens,
         fireworks_temperature=config.fireworks_temperature,
         fireworks_max_tokens=config.fireworks_max_tokens,
+        policy=config.policy,
     )

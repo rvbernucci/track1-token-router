@@ -9,6 +9,7 @@ from pathlib import Path
 class RouterConfig:
     log_path: Path
     mode: str
+    policy: str
     local_base_url: str | None
     local_model: str | None
     local_api_key: str | None
@@ -33,6 +34,7 @@ class RouterConfig:
         return cls(
             log_path=Path(os.getenv("ROUTER_LOG_PATH", "logs/run.jsonl")),
             mode=os.getenv("ROUTER_MODE", "mock"),
+            policy=os.getenv("ROUTER_POLICY", "balanced"),
             local_base_url=os.getenv("LOCAL_BASE_URL"),
             local_model=os.getenv("LOCAL_MODEL"),
             local_api_key=os.getenv("LOCAL_API_KEY"),

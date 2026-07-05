@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from router.core.contracts import TaskEnvelope
+from router.core.policy import policy_guidance
 
 if False:  # pragma: no cover - imported only for type checkers without runtime cycles
     from router.core.verifier import VerificationDecision
@@ -33,8 +34,15 @@ Escalate if there is risk in format, factuality, math, instruction following, am
 Approve only when the candidate is clearly sufficient and another model call is unlikely to improve it."""
 
 
-def build_m2a_messages(task: TaskEnvelope, model_1_candidate_raw: str) -> list[dict[str, str]]:
+def build_m2a_messages(
+    task: TaskEnvelope,
+    model_1_candidate_raw: str,
+    *,
+    policy: str = "balanced",
+) -> list[dict[str, str]]:
     user_content = (
+        "ROUTING_POLICY:\n"
+        f"{policy_guidance(policy)}\n\n"
         "ORIGINAL_TASK:\n"
         f"{task.input_text}\n\n"
         "M1_CANDIDATE_RAW:\n"

@@ -29,6 +29,7 @@ class HybridCascadeRunner:
         m2b_max_tokens: int = 768,
         fireworks_temperature: float = 0.0,
         fireworks_max_tokens: int = 256,
+        policy: str = "balanced",
     ) -> None:
         self.local_client = local_client
         self.fireworks_client = fireworks_client
@@ -39,6 +40,7 @@ class HybridCascadeRunner:
             local_client,
             temperature=m2a_temperature,
             max_tokens=m2a_max_tokens,
+            policy=policy,
         )
         self.repair_generator = LocalRepairGenerator(
             local_client,
@@ -172,4 +174,3 @@ class HybridCascadeRunner:
 
 def _elapsed_ms(started_at: float) -> int:
     return round((perf_counter() - started_at) * 1000)
-
