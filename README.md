@@ -248,3 +248,13 @@ python3 scripts/compare_policies.py \
 ## Submissao
 
 Leia [`SUBMISSION.md`](./SUBMISSION.md) para a narrativa tecnica, estrategia e pitch curto.
+
+## Chaos lab sem credito
+
+O fake provider permite simular local model e Fireworks sem chaves reais:
+
+```bash
+python3 -m router.dev.fake_provider --help
+```
+
+Guia completo em [`docs/CHAOS_LAB.md`](./docs/CHAOS_LAB.md).

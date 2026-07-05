@@ -19,3 +19,4 @@ python3 scripts/compare_policies.py \
   --expected evals/offline/expected.jsonl \
   --out-json reports/generated/policy-comparison.json \
   --report reports/generated/policy-comparison.md
+python3 -m router.dev.fake_provider --help >/dev/null
