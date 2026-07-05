@@ -35,6 +35,7 @@ Estas sprints podem continuar imediatamente, sem AMD Developer Cloud e sem Firew
 - [Sprint 08 - Fake Provider Chaos Lab](./08-fake-provider-chaos-lab/README.md)
 - [Sprint 09 - Official Adapter Readiness](./09-official-adapter-readiness/README.md)
 - [Sprint 10 - Offline Release Candidate](./10-offline-release-candidate/README.md)
+- [Sprint 11 - Testing Culture Lab](./11-testing-culture-lab/README.md)
 
 ## Sprints dependentes de credito
 
@@ -66,4 +67,3 @@ Evitar nas proximas sprints:
 - trocar arquitetura sem ablation;
 - publicar segredo em log, README, env ou CI;
 - misturar debug com `stdout`.
-

@@ -77,6 +77,7 @@ Esta e a rota principal enquanto os creditos AMD/Fireworks nao forem liberados.
 | 08 | Fake Provider Chaos Lab | Simuladores de local/Fireworks com latencia, falhas e custos falsos. |
 | 09 | Official Adapter Readiness | Estrutura para adaptar rapido ao formato oficial no kickoff. |
 | 10 | Offline Release Candidate | Release candidate que roda sem credito e esta pronto para plugar credenciais. |
+| 11 | Testing Culture Lab | Playground, matriz de testes e cultura de promocao para regressao automatizada. |
 
 ## Roadmap dependente de credito
 
