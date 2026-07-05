@@ -7,6 +7,7 @@ python3 playground/test_policy_logic.py >/dev/null
 python3 playground/test_adapter_logic.py >/dev/null
 python3 playground/test_prompt_packets.py >/dev/null
 python3 scripts/offline_score_simulator.py >/dev/null
+python3 scripts/policy_ablation.py >/dev/null
 python3 scripts/prompt_ablation.py --check >/dev/null
 python3 scripts/analyze_traces.py --logs fixtures/logs/sample-run.jsonl >/dev/null
 python3 scripts/state_machine_report.py >/dev/null

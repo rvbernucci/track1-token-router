@@ -277,6 +277,14 @@ python3 scripts/state_machine_report.py \
   --report reports/generated/state-machine-report.md
 ```
 
+Adaptive policy ablation:
+
+```bash
+python3 scripts/policy_ablation.py \
+  --jsonl evals/offline/tasks.jsonl \
+  --report reports/generated/policy-ablation.md
+```
+
 Release notes dry-run:
 
 ```bash
