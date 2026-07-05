@@ -19,16 +19,16 @@ Adicionar uma camada deterministica opcional antes da cascata para resolver ou b
 
 ## Checklist
 
-- [ ] Detectar input vazio.
-- [ ] Detectar saudacoes simples.
-- [ ] Detectar contas triviais de soma/subtracao seguras.
-- [ ] Detectar pedido de eco literal.
-- [ ] Nao resolver matematica complexa.
-- [ ] Criar `GuardedRunner`.
-- [ ] Adicionar config `ENABLE_GUARDRAILS`.
-- [ ] Integrar sem quebrar modos existentes.
-- [ ] Adicionar testes.
-- [ ] Documentar limites.
+- [x] Detectar input vazio.
+- [x] Detectar saudacoes simples.
+- [x] Detectar contas triviais de soma/subtracao seguras.
+- [x] Detectar pedido de eco literal.
+- [x] Nao resolver matematica complexa.
+- [x] Criar `GuardedRunner`.
+- [x] Adicionar config `ENABLE_GUARDRAILS`.
+- [x] Integrar sem quebrar modos existentes.
+- [x] Adicionar testes.
+- [x] Documentar limites.
 
 ## Criterios de aceite
 
@@ -41,3 +41,16 @@ Adicionar uma camada deterministica opcional antes da cascata para resolver ou b
 
 Economia local/remota em tarefas triviais, sem transformar regex em motor de raciocinio.
 
+## Evidencia local
+
+```bash
+python3 -m unittest tests.test_guardrails
+ENABLE_GUARDRAILS=1 python3 -m router ask "What is 12 - 5? Return only the number." --json
+scripts/offline_release_check.sh
+```
+
+## Limites
+
+- Nao resolve multiplicacao, divisao, porcentagem, algebra, datas ou problemas de palavras.
+- Nao tenta julgar dificuldade ampla.
+- Nao substitui M1/M2A/M2B; apenas evita chamadas quando a resposta e deterministicamente segura.

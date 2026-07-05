@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from router.core.config import RouterConfig
 from router.core.fireworks import FireworksClient
+from router.core.guardrails import GuardedRunner
 from router.core.hybrid_cascade import HybridCascadeRunner
 from router.core.local_cascade import LocalCascadeRunner
 from router.core.local_runner import LocalM1Runner
@@ -14,18 +15,24 @@ from router.core.runner import TaskRunner
 def build_runner(config: RouterConfig, logger: JsonlRunLogger) -> TaskRunner:
     mode = config.mode.lower()
     if mode == "mock":
-        return MockCascadeRunner(logger=logger)
+        return _with_guardrails(MockCascadeRunner(logger=logger), config, logger)
     if mode == "auto":
         if config.local_base_url and config.local_model:
-            return _build_local_runner(config, logger)
-        return MockCascadeRunner(logger=logger)
+            return _with_guardrails(_build_local_runner(config, logger), config, logger)
+        return _with_guardrails(MockCascadeRunner(logger=logger), config, logger)
     if mode == "local":
-        return _build_local_runner(config, logger)
+        return _with_guardrails(_build_local_runner(config, logger), config, logger)
     if mode == "cascade":
-        return _build_local_cascade_runner(config, logger)
+        return _with_guardrails(_build_local_cascade_runner(config, logger), config, logger)
     if mode == "hybrid":
-        return _build_hybrid_cascade_runner(config, logger)
+        return _with_guardrails(_build_hybrid_cascade_runner(config, logger), config, logger)
     raise ValueError(f"Unsupported ROUTER_MODE: {config.mode}")
+
+
+def _with_guardrails(runner: TaskRunner, config: RouterConfig, logger: JsonlRunLogger) -> TaskRunner:
+    if config.enable_guardrails:
+        return GuardedRunner(runner, logger=logger)
+    return runner
 
 
 def _build_local_runner(config: RouterConfig, logger: JsonlRunLogger) -> LocalM1Runner:

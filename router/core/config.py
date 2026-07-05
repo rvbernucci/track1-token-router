@@ -28,6 +28,7 @@ class RouterConfig:
     fireworks_max_retries: int
     fireworks_temperature: float
     fireworks_max_tokens: int
+    enable_guardrails: bool
 
     @classmethod
     def from_env(cls) -> "RouterConfig":
@@ -53,4 +54,10 @@ class RouterConfig:
             fireworks_max_retries=int(os.getenv("FIREWORKS_MAX_RETRIES", "1")),
             fireworks_temperature=float(os.getenv("FIREWORKS_TEMPERATURE", "0.0")),
             fireworks_max_tokens=int(os.getenv("FIREWORKS_MAX_TOKENS", "256")),
+            enable_guardrails=_env_flag("ENABLE_GUARDRAILS"),
         )
+
+
+def _env_flag(name: str) -> bool:
+    value = os.getenv(name, "").strip().lower()
+    return value in {"1", "true", "yes", "on"}

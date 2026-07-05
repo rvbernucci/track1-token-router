@@ -99,6 +99,7 @@ python3 -m router ask "What is 2+2?"
 | `ROUTER_MODE` | `mock` | Modo de execucao: `mock`, `auto`, `local`, `cascade` ou `hybrid`. |
 | `ROUTER_POLICY` | `balanced` | Politica de roteamento: `aggressive`, `balanced` ou `conservative`. |
 | `LOCAL_BASE_URL` | vazio | Endpoint OpenAI-compatible do modelo local. |
+| `ENABLE_GUARDRAILS` | `0` | Liga regras deterministicas conservadoras antes do runner. |
 | `LOCAL_MODEL` | vazio | Nome do modelo local. |
 | `LOCAL_API_KEY` | vazio | API key opcional para endpoint local protegido. |
 | `LOCAL_TIMEOUT_S` | `30` | Timeout por chamada local. |
@@ -246,6 +247,14 @@ python3 scripts/prompt_ablation.py --check \
   --manifest prompts/manifest.json \
   --report reports/generated/prompt-ablation.md
 ```
+
+Guardrails deterministicos opcionais:
+
+```bash
+ENABLE_GUARDRAILS=1 python3 -m router ask "What is 12 - 5? Return only the number."
+```
+
+As regras sao conservadoras e cobrem apenas input vazio, saudacoes simples, soma/subtracao triviais e eco literal. Qualquer caso ambiguo segue para o runner normal.
 
 ## Estrategia de token efficiency
 
