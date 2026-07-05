@@ -38,6 +38,7 @@ def build_parser() -> argparse.ArgumentParser:
     eval_parser.add_argument("--jsonl", type=Path, required=True, help="Input JSONL file.")
     eval_parser.add_argument("--expected", type=Path, help="Expected JSONL file with answers.")
     eval_parser.add_argument("--out", type=Path, help="Optional output JSONL file.")
+    eval_parser.add_argument("--report", type=Path, help="Optional Markdown report path.")
 
     return parser
 
@@ -105,6 +106,8 @@ def _handle_eval(args: argparse.Namespace, runner: TaskRunner) -> int:
             write_jsonl_results(results, handle)
 
     summary = _build_eval_summary(results, args.expected)
+    if args.report:
+        _write_eval_report(args.report, summary)
     print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
     return 0
 
@@ -120,15 +123,22 @@ def _read_ask_text(args: argparse.Namespace) -> str:
 
 
 def _build_eval_summary(results: list[AnswerResult], expected_path: Path | None) -> dict[str, object]:
+    route_counts = _count_routes(results)
+    remote_tokens = _sum_remote_tokens(results)
     summary: dict[str, object] = {
         "tasks": len(results),
-        "routes": _count_routes(results),
+        "routes": route_counts,
+        "remote_tokens": remote_tokens,
+        "escalation_rate": _rate(_count_escalations(results), len(results)),
+        "replacement_rate": _rate(route_counts.get("fireworks_replaced", 0), len(results)),
+        "parse_failures": sum(1 for result in results if result.metadata.get("fireworks_parse_failed")),
+        "latency_ms": _latency_summary(results),
+        "final_answer_chars": sum(len(result.answer) for result in results),
     }
     if expected_path is None:
         return summary
 
-    expected = load_jsonl_tasks(expected_path)
-    expected_by_id = {task.id: task.input_text for task in expected if task.id is not None}
+    expected_by_id = _load_expected_answers(expected_path)
     comparable = [result for result in results if result.id in expected_by_id]
     exact_matches = sum(1 for result in comparable if result.answer.strip() == expected_by_id[result.id].strip())
     summary.update(
@@ -146,6 +156,72 @@ def _count_routes(results: list[AnswerResult]) -> dict[str, int]:
     for result in results:
         counts[result.route] = counts.get(result.route, 0) + 1
     return counts
+
+
+def _sum_remote_tokens(results: list[AnswerResult]) -> dict[str, int]:
+    return {
+        "prompt": sum(result.remote_tokens.prompt for result in results),
+        "completion": sum(result.remote_tokens.completion for result in results),
+        "total": sum(result.remote_tokens.total for result in results),
+    }
+
+
+def _count_escalations(results: list[AnswerResult]) -> int:
+    escalated_routes = {
+        "m2b_candidate",
+        "m2b_fireworks_approved",
+        "m2b_fireworks_error_approved",
+        "fireworks_replaced",
+        "m2b_error_return_m1",
+    }
+    return sum(1 for result in results if result.route in escalated_routes)
+
+
+def _rate(count: int, total: int) -> float:
+    return count / total if total else 0.0
+
+
+def _latency_summary(results: list[AnswerResult]) -> dict[str, int]:
+    keys = ["latency_m1_ms", "latency_m2a_ms", "latency_m2b_ms", "latency_fireworks_ms"]
+    return {
+        key: sum(int(result.metadata.get(key) or 0) for result in results)
+        for key in keys
+    }
+
+
+def _load_expected_answers(path: Path) -> dict[str, str]:
+    expected: dict[str, str] = {}
+    with path.open("r", encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            stripped = line.strip()
+            if not stripped:
+                continue
+            payload = json.loads(stripped)
+            if not isinstance(payload, dict):
+                raise ValueError(f"Expected JSONL line {line_number} must be an object.")
+            task_id = payload.get("id")
+            answer = payload.get("answer", payload.get("expected", payload.get("input_text")))
+            if task_id is not None and answer is not None:
+                expected[str(task_id)] = str(answer)
+    return expected
+
+
+def _write_eval_report(path: Path, summary: dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        "# Eval Report",
+        "",
+        f"- tasks: {summary.get('tasks')}",
+        f"- exact_match_rate: {summary.get('exact_match_rate', 'n/a')}",
+        f"- escalation_rate: {summary.get('escalation_rate')}",
+        f"- replacement_rate: {summary.get('replacement_rate')}",
+        f"- parse_failures: {summary.get('parse_failures')}",
+        f"- remote_tokens: `{json.dumps(summary.get('remote_tokens'), sort_keys=True)}`",
+        f"- routes: `{json.dumps(summary.get('routes'), sort_keys=True)}`",
+        f"- latency_ms: `{json.dumps(summary.get('latency_ms'), sort_keys=True)}`",
+        "",
+    ]
+    path.write_text("\n".join(lines), encoding="utf-8")
 
 
 if __name__ == "__main__":

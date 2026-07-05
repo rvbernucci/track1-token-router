@@ -75,3 +75,40 @@ def build_m2b_messages(
         {"role": "system", "content": M2B_SYSTEM_PROMPT},
         {"role": "user", "content": user_content},
     ]
+
+
+FIREWORKS_AUDIT_SYSTEM_PROMPT = """You are the remote Fireworks auditor.
+Validate the local M2B answer against the original task.
+Return only one compact JSON object. Do not include markdown.
+Do not reveal chain-of-thought or private reasoning.
+
+Schema:
+{"decision":"approve|replace","answer":"","reason":"short reason"}
+
+Use approve when M2B is correct and follows the requested output format.
+Use replace only when M2B is wrong, unsafe, incomplete, or violates the requested format.
+When decision is approve, answer must be an empty string.
+When decision is replace, answer must contain the final user-facing answer."""
+
+
+def build_fireworks_audit_messages(
+    task: TaskEnvelope,
+    model_1_candidate_raw: str,
+    model_2_alternative_raw: str,
+    verification: "VerificationDecision",
+) -> list[dict[str, str]]:
+    user_content = (
+        "ORIGINAL_TASK:\n"
+        f"{task.input_text}\n\n"
+        "M1_CANDIDATE_RAW:\n"
+        f"{model_1_candidate_raw}\n\n"
+        "M2B_ALTERNATIVE_RAW:\n"
+        f"{model_2_alternative_raw}\n\n"
+        "LOCAL_CONCERN:\n"
+        f"{verification.reason}\n\n"
+        "Audit M2B now."
+    )
+    return [
+        {"role": "system", "content": FIREWORKS_AUDIT_SYSTEM_PROMPT},
+        {"role": "user", "content": user_content},
+    ]

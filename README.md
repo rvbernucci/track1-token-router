@@ -49,6 +49,7 @@ router ask --file ./task.txt
 router solve --json < task.json
 router run --jsonl ./tasks.jsonl --out ./runs/output.jsonl
 router eval --jsonl ./tasks.jsonl --expected ./expected.jsonl
+router eval --jsonl ./tasks.jsonl --expected ./expected.jsonl --report ./reports/generated/report.md
 ```
 
 Regra importante:
@@ -89,6 +90,10 @@ python3 -m router ask "What is 2+2?"
 | `FIREWORKS_BASE_URL` | `https://api.fireworks.ai/inference/v1` | Endpoint Fireworks OpenAI-compatible. |
 | `FIREWORKS_MODEL` | vazio | Modelo remoto Fireworks. |
 | `FIREWORKS_API_KEY` | vazio | API key Fireworks, usada apenas nas sprints remotas. |
+| `FIREWORKS_TIMEOUT_S` | `60` | Timeout por chamada Fireworks. |
+| `FIREWORKS_MAX_RETRIES` | `1` | Tentativas extras em falha Fireworks. |
+| `FIREWORKS_TEMPERATURE` | `0.0` | Temperatura do auditor remoto. |
+| `FIREWORKS_MAX_TOKENS` | `256` | Limite de output do auditor remoto. |
 
 ## Modo local M1
 
@@ -107,3 +112,16 @@ LOCAL_BASE_URL=http://localhost:8000/v1 \
 LOCAL_MODEL=local-model \
 python3 -m router ask "What is 2+2?"
 ```
+
+## Modo hibrido com Fireworks
+
+```bash
+ROUTER_MODE=hybrid \
+LOCAL_BASE_URL=http://localhost:8000/v1 \
+LOCAL_MODEL=local-model \
+FIREWORKS_API_KEY=fw_... \
+FIREWORKS_MODEL=accounts/fireworks/models/... \
+python3 -m router ask "What is 2+2?"
+```
+
+Nesse modo, Fireworks so e chamado quando o M2A escala a tarefa.

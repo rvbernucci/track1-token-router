@@ -18,18 +18,18 @@ Aqui a pergunta deixa de ser "funciona?" e vira "ganha ponto?".
 
 ## Checklist
 
-- [ ] Criar `FireworksClient`.
-- [ ] Configurar `FIREWORKS_API_KEY`, `FIREWORKS_BASE_URL`, `FIREWORKS_MODEL`.
-- [ ] Criar prompt `fireworks_audit_or_replace`.
-- [ ] Enviar pacote compacto: task, M1, M2B, concern.
-- [ ] Nao enviar reasoning interno ou rubrica longa.
-- [ ] Parsear decisao `approve/replace`.
-- [ ] Registrar tokens de prompt, completion e total.
-- [ ] Registrar latencia remota.
-- [ ] Criar comando `router eval`.
-- [ ] Criar golden set com tarefas faceis, medias, dificeis e adversariais.
-- [ ] Criar metricas por rota.
-- [ ] Criar relatorio local em JSON/Markdown.
+- [x] Criar `FireworksClient`.
+- [x] Configurar `FIREWORKS_API_KEY`, `FIREWORKS_BASE_URL`, `FIREWORKS_MODEL`.
+- [x] Criar prompt `fireworks_audit_or_replace`.
+- [x] Enviar pacote compacto: task, M1, M2B, concern.
+- [x] Nao enviar reasoning interno ou rubrica longa.
+- [x] Parsear decisao `approve/replace`.
+- [x] Registrar tokens de prompt, completion e total.
+- [x] Registrar latencia remota.
+- [x] Criar comando `router eval`.
+- [x] Criar golden set com tarefas faceis, medias, dificeis e adversariais.
+- [x] Criar metricas por rota.
+- [x] Criar relatorio local em JSON/Markdown.
 
 ## Schema Fireworks alvo
 
@@ -49,11 +49,19 @@ Regras:
 
 ## Criterios de aceite
 
-- Fireworks so e chamado quando M2A escala.
-- Tokens remotos sao registrados por task.
-- O eval mostra accuracy aproximada, custo remoto e distribuicao de rotas.
-- O pacote enviado ao Fireworks e compacto.
-- O runner consegue operar sem Fireworks em modo local-only.
+- [x] Fireworks so e chamado quando M2A escala.
+- [x] Tokens remotos sao registrados por task.
+- [x] O eval mostra accuracy aproximada, custo remoto e distribuicao de rotas.
+- [x] O pacote enviado ao Fireworks e compacto.
+- [x] O runner consegue operar sem Fireworks em modo local-only.
+
+## Evidencias
+
+- `python3 -m unittest discover -s tests`
+- `ROUTER_MODE=hybrid LOCAL_BASE_URL=<local-url> LOCAL_MODEL=<local-model> FIREWORKS_API_KEY=<key> FIREWORKS_MODEL=<fw-model> python3 -m router ask "What is 2+2?"`
+- `python3 -m router eval --jsonl evals/golden/tasks.jsonl --expected evals/golden/expected.jsonl --report reports/generated/golden-report.md`
+- `evals/golden/tasks.jsonl`
+- `evals/golden/expected.jsonl`
 
 ## Metricas essenciais
 
@@ -88,4 +96,3 @@ Regras:
 ## Saida esperada da sprint
 
 Um sistema mensuravel, com custo remoto controlado e calibracao baseada em dados, nao em intuicao.
-
