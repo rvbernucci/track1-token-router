@@ -15,6 +15,7 @@ class ScoringWeights:
     latency_ms: float = 0.001
     parse_failure: float = 25.0
     budget_violation: float = 50.0
+    remote_packet_token: float = 0.001
 
     def to_dict(self) -> dict[str, float]:
         return asdict(self)
@@ -25,9 +26,16 @@ def build_scoreboard(
     weights: ScoringWeights,
     *,
     budget: TaskBudget | None = None,
+    packet_tokens_by_policy: dict[str, int] | None = None,
 ) -> dict[str, Any]:
     rows = [
-        _score_policy(policy, summary, weights, budget or TaskBudget())
+        _score_policy(
+            policy,
+            summary,
+            weights,
+            budget or TaskBudget(),
+            (packet_tokens_by_policy or {}).get(policy, 0),
+        )
         for policy, summary in comparison.get("policies", {}).items()
         if isinstance(summary, dict)
     ]
@@ -42,7 +50,8 @@ def build_scoreboard(
             "- remote_tokens_total * remote_token_weight "
             "- latency_ms_total * latency_ms_weight "
             "- parse_failures * parse_failure_weight "
-            "- budget_violations * budget_violation_weight"
+            "- budget_violations * budget_violation_weight "
+            "- remote_packet_tokens * remote_packet_token_weight"
         ),
         "rows": rows,
     }
@@ -67,11 +76,12 @@ def write_scoreboard_report(path: Path, scoreboard: dict[str, Any]) -> None:
             f"`remote_token={weights['remote_token']}`, "
             f"`latency_ms={weights['latency_ms']}`, "
             f"`parse_failure={weights['parse_failure']}`, "
-            f"`budget_violation={weights['budget_violation']}`"
+            f"`budget_violation={weights['budget_violation']}`, "
+            f"`remote_packet_token={weights['remote_packet_token']}`"
         ),
         "",
-        "| rank | policy | score | exact_match_rate | remote_tokens | budget_violations | latency_ms | parse_failures |",
-        "|---:|---|---:|---:|---:|---:|---:|---:|",
+        "| rank | policy | score | exact_match_rate | remote_tokens | packet_tokens | budget_violations | latency_ms | parse_failures |",
+        "|---:|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for row in scoreboard["rows"]:
         lines.append(
@@ -81,6 +91,7 @@ def write_scoreboard_report(path: Path, scoreboard: dict[str, Any]) -> None:
             f"{row['score']:.3f} | "
             f"{row['exact_match_rate']:.3f} | "
             f"{row['remote_tokens_total']} | "
+            f"{row.get('remote_packet_tokens', 0)} | "
             f"{row.get('budget_violations', 0)} | "
             f"{row['latency_ms_total']} | "
             f"{row['parse_failures']} |"
@@ -99,7 +110,13 @@ def write_scoreboard_report(path: Path, scoreboard: dict[str, Any]) -> None:
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
-def _score_policy(policy: str, summary: dict[str, Any], weights: ScoringWeights, budget: TaskBudget) -> dict[str, Any]:
+def _score_policy(
+    policy: str,
+    summary: dict[str, Any],
+    weights: ScoringWeights,
+    budget: TaskBudget,
+    remote_packet_tokens: int,
+) -> dict[str, Any]:
     exact_match_rate = _float(summary.get("exact_match_rate"))
     remote_tokens_total = _int(_nested(summary, "remote_tokens", "total"))
     latency_ms_total = sum(_int(value) for value in (summary.get("latency_ms") or {}).values())
@@ -112,6 +129,7 @@ def _score_policy(policy: str, summary: dict[str, Any], weights: ScoringWeights,
         - latency_ms_total * weights.latency_ms
         - parse_failures * weights.parse_failure
         - budget_violations * weights.budget_violation
+        - remote_packet_tokens * weights.remote_packet_token
     )
     return {
         "rank": 0,
@@ -119,6 +137,7 @@ def _score_policy(policy: str, summary: dict[str, Any], weights: ScoringWeights,
         "score": round(score, 6),
         "exact_match_rate": exact_match_rate,
         "remote_tokens_total": remote_tokens_total,
+        "remote_packet_tokens": remote_packet_tokens,
         "latency_ms_total": latency_ms_total,
         "parse_failures": parse_failures,
         "budget_violations": budget_violations,

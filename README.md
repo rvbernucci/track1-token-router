@@ -285,6 +285,8 @@ python3 scripts/policy_ablation.py \
   --report reports/generated/policy-ablation.md
 ```
 
+O scoreboard tambem estima `remote_packet_tokens`, isto e, o tamanho do pacote compacto que iria ao auditor remoto.
+
 Release notes dry-run:
 
 ```bash

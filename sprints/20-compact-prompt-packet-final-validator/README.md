@@ -24,18 +24,18 @@ O remoto deve ser usado como seguro, nao como conversa longa. E resposta certa n
 
 ## Checklist
 
-- [ ] Definir pacote remoto minimo: task, candidato, concern, formato esperado.
-- [ ] Remover informacao redundante do pacote.
-- [ ] Medir caracteres e tokens estimados do pacote.
-- [ ] Validar resposta JSON quando a task pede JSON.
-- [ ] Validar numero puro quando a task pede numero.
-- [ ] Validar eco literal quando a task pede texto exato.
-- [ ] Validar resposta vazia indevida.
-- [ ] Validar excesso de markdown em formato estrito.
-- [ ] Adicionar reparo local simples quando formato falhar.
-- [ ] Integrar falha de formato ao trace.
-- [ ] Integrar tamanho do packet ao scoreboard.
-- [ ] Adicionar testes de regressao.
+- [x] Definir pacote remoto minimo: task, candidato, concern, formato esperado.
+- [x] Remover informacao redundante do pacote.
+- [x] Medir caracteres e tokens estimados do pacote.
+- [x] Validar resposta JSON quando a task pede JSON.
+- [x] Validar numero puro quando a task pede numero.
+- [x] Validar eco literal quando a task pede texto exato.
+- [x] Validar resposta vazia indevida.
+- [x] Validar excesso de markdown em formato estrito.
+- [x] Adicionar reparo local simples quando formato falhar.
+- [x] Integrar falha de formato ao trace.
+- [x] Integrar tamanho do packet ao scoreboard.
+- [x] Adicionar testes de regressao.
 
 ## Criterios de aceite
 
@@ -48,3 +48,15 @@ O remoto deve ser usado como seguro, nao como conversa longa. E resposta certa n
 
 Menos token remoto e menos perda boba por formato.
 
+## Evidencia local
+
+```bash
+python3 -m unittest tests.test_prompt_packet_and_validator
+python3 scripts/offline_score_simulator.py
+ENABLE_ORCHESTRATOR=1 python3 -m router ask "Return exactly SAFE_OUTPUT and nothing else." --json
+scripts/offline_release_check.sh
+```
+
+## Decisao
+
+O pacote remoto fica em `RemoteAuditPacket` com apenas task compactada, candidato, concern e formato esperado. O validador final roda dentro do `OrchestratedRunner` quando o orquestrador esta ligado, sem mudar o caminho padrao.

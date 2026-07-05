@@ -84,6 +84,14 @@ class StateMachineTests(unittest.TestCase):
         self.assertEqual(payload["route"], "guardrail_arithmetic")
         self.assertIn("orchestration_trace", payload["metadata"])
 
+    def test_orchestrator_repairs_strict_format_when_possible(self) -> None:
+        runner = OrchestratedRunner(CountingRunner("mock_foundation"), enable_guardrails=False)
+
+        result = runner.run(TaskEnvelope(input_text="Return exactly SAFE_OUTPUT and nothing else."))
+
+        self.assertEqual(result.answer, "SAFE_OUTPUT")
+        self.assertTrue(result.metadata["final_answer_repaired"])
+
 
 class CountingRunner:
     def __init__(self, route: str) -> None:

@@ -9,6 +9,7 @@ from router.core.contracts import AnswerResult, TaskEnvelope
 from router.core.guardrails import evaluate_guardrail
 from router.core.logging import JsonlRunLogger
 from router.core.runner import TaskRunner
+from router.orchestration.final_validator import validate_final_answer
 
 
 ORCHESTRATION_STATES = (
@@ -102,7 +103,7 @@ class OrchestratedRunner:
                     },
                 )
                 trace = build_orchestration_trace(task, result, guardrail_reason=guardrail.reason)
-                result = _with_trace(result, trace)
+                result = _with_trace_and_validation(task, result, trace)
                 if self.logger:
                     self.logger.log_result(
                         task,
@@ -116,7 +117,7 @@ class OrchestratedRunner:
 
         result = self.inner.run(task)
         trace = build_orchestration_trace(task, result)
-        return _with_trace(result, trace)
+        return _with_trace_and_validation(task, result, trace)
 
 
 def build_orchestration_trace(
@@ -278,5 +279,23 @@ def _with_trace(result: AnswerResult, trace: OrchestrationTrace) -> AnswerResult
         answer=result.answer,
         route=result.route,
         remote_tokens=result.remote_tokens,
+        metadata=metadata,
+    )
+
+
+def _with_trace_and_validation(task: TaskEnvelope, result: AnswerResult, trace: OrchestrationTrace) -> AnswerResult:
+    with_trace = _with_trace(result, trace)
+    metadata = dict(with_trace.metadata)
+    validation = validate_final_answer(task, result.answer)
+    metadata["final_validation"] = validation.to_dict()
+    final_answer = with_trace.answer
+    if not validation.valid and validation.repaired_answer:
+        final_answer = validation.repaired_answer
+        metadata["final_answer_repaired"] = True
+    return AnswerResult(
+        id=with_trace.id,
+        answer=final_answer,
+        route=with_trace.route,
+        remote_tokens=with_trace.remote_tokens,
         metadata=metadata,
     )

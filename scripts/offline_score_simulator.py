@@ -33,6 +33,7 @@ def main() -> int:
     parser.add_argument("--latency-ms-weight", type=float, default=0.001)
     parser.add_argument("--parse-failure-weight", type=float, default=25.0)
     parser.add_argument("--budget-violation-weight", type=float, default=50.0)
+    parser.add_argument("--remote-packet-token-weight", type=float, default=0.001)
     parser.add_argument("--max-remote-tokens-per-task", type=int, default=300)
     parser.add_argument("--max-remote-tokens-per-run", type=int, default=6000)
     parser.add_argument("--max-remote-latency-ms", type=int, default=3000)
@@ -44,8 +45,10 @@ def main() -> int:
         latency_ms=args.latency_ms_weight,
         parse_failure=args.parse_failure_weight,
         budget_violation=args.budget_violation_weight,
+        remote_packet_token=args.remote_packet_token_weight,
     )
     from router.orchestration.budget import TaskBudget
+    from router.orchestration.prompt_packet import estimate_policy_packet_tokens
 
     budget = TaskBudget(
         max_remote_tokens_per_task=args.max_remote_tokens_per_task,
@@ -54,7 +57,16 @@ def main() -> int:
     )
     tasks = load_jsonl_tasks(args.jsonl)
     comparison = compare_policies(tasks, args.expected, policies=tuple(args.policies))
-    scoreboard = build_scoreboard(comparison, weights, budget=budget)
+    packet_tokens_by_policy = {
+        policy: estimate_policy_packet_tokens(tasks, policy)
+        for policy in args.policies
+    }
+    scoreboard = build_scoreboard(
+        comparison,
+        weights,
+        budget=budget,
+        packet_tokens_by_policy=packet_tokens_by_policy,
+    )
     write_scoreboard_json(args.out_json, scoreboard)
     write_scoreboard_report(args.report, scoreboard)
     print(json.dumps(scoreboard["rows"], ensure_ascii=False, sort_keys=True))
