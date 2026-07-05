@@ -258,3 +258,11 @@ python3 -m router.dev.fake_provider --help
 ```
 
 Guia completo em [`docs/CHAOS_LAB.md`](./docs/CHAOS_LAB.md).
+
+## Kickoff adapters
+
+Quando o formato oficial aparecer, use:
+
+- [`KICKOFF_CHECKLIST.md`](./KICKOFF_CHECKLIST.md)
+- [`router/adapters/official`](./router/adapters/official/README.md)
+- [`fixtures/official`](./fixtures/official)

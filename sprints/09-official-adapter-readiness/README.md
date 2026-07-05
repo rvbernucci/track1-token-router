@@ -18,22 +18,41 @@ Preparar o projeto para adaptar rapidamente o formato oficial de input/output re
 
 ## Checklist
 
-- [ ] Criar interface `OfficialAdapter`.
-- [ ] Criar adapter `plain_text`.
-- [ ] Criar adapter `json_task`.
-- [ ] Criar adapter `jsonl_batch`.
-- [ ] Criar adapter `file_payload`.
-- [ ] Criar fixture de exemplo por formato.
-- [ ] Criar testes de round-trip.
-- [ ] Documentar como adaptar em 30 minutos.
-- [ ] Criar `KICKOFF_CHECKLIST.md`.
-- [ ] Garantir que o core nao conhece detalhes oficiais.
+- [x] Criar interface `OfficialAdapter`.
+- [x] Criar adapter `plain_text`.
+- [x] Criar adapter `json_task`.
+- [x] Criar adapter `jsonl_batch`.
+- [x] Criar adapter `file_payload`.
+- [x] Criar fixture de exemplo por formato.
+- [x] Criar testes de round-trip.
+- [x] Documentar como adaptar em 30 minutos.
+- [x] Criar `KICKOFF_CHECKLIST.md`.
+- [x] Garantir que o core nao conhece detalhes oficiais.
 
 ## Criterios de aceite
 
-- Um novo formato pode ser adicionado sem mexer na cascata.
-- Testes provam entrada -> `TaskEnvelope` -> saida final.
-- O checklist de kickoff explica exatamente onde editar.
+- [x] Um novo formato pode ser adicionado sem mexer na cascata.
+- [x] Testes provam entrada -> `TaskEnvelope` -> saida final.
+- [x] O checklist de kickoff explica exatamente onde editar.
+
+## Evidencias
+
+- `router/adapters/official/README.md`
+- `fixtures/official/`
+- `KICKOFF_CHECKLIST.md`
+- `tests/test_official_adapters.py`
+- `python3 -m unittest discover -s tests`
+
+## Resultado
+
+Adapters prontos:
+
+- `plain_text`
+- `json_task`
+- `jsonl_batch`
+- `file_payload`
+
+O core permanece isolado: `router/core` nao importa `router.adapters.official`.
 
 ## Riscos
 
@@ -43,4 +62,3 @@ Preparar o projeto para adaptar rapidamente o formato oficial de input/output re
 ## Saida esperada
 
 Um ponto de encaixe claro para o kickoff, sem interromper a rota offline.
-
