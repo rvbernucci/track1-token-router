@@ -27,22 +27,22 @@ Quando os creditos chegarem, nao podemos gastar as primeiras horas decidindo com
 
 ## Checklist
 
-- [ ] Criar `runtime-profiles/amd-mi300x-vllm.env.example`.
-- [ ] Criar `runtime-profiles/amd-mi300x-sglang.env.example`.
-- [ ] Criar `runtime-profiles/gemma-local.env.example`.
-- [ ] Criar `runtime-profiles/fireworks-serverless.env.example`.
-- [ ] Criar `docs/RUNBOOK_AMD_DIGITALOCEAN.md`.
-- [ ] Criar `docs/RUNBOOK_GEMMA.md`.
-- [ ] Criar `docs/RUNBOOK_FIREWORKS.md`.
-- [ ] Criar `docs/RUNBOOK_NATIVE_BUILDER.md`.
-- [ ] Documentar portas, comandos e health checks.
-- [ ] Documentar variaveis obrigatorias e opcionais.
-- [ ] Documentar estrategia de scratch disk.
-- [ ] Documentar regra de destruir VM para parar custo.
-- [ ] Criar script `scripts/check_runtime_profiles.py`.
-- [ ] Validar que nenhum perfil contem segredo real.
-- [ ] Integrar profile check ao release check.
-- [ ] Atualizar `CREDIT_ACTIVATION.md`.
+- [x] Criar `runtime-profiles/amd-mi300x-vllm.env.example`.
+- [x] Criar `runtime-profiles/amd-mi300x-sglang.env.example`.
+- [x] Criar `runtime-profiles/gemma-local.env.example`.
+- [x] Criar `runtime-profiles/fireworks-serverless.env.example`.
+- [x] Criar `docs/RUNBOOK_AMD_DIGITALOCEAN.md`.
+- [x] Criar `docs/RUNBOOK_GEMMA.md`.
+- [x] Criar `docs/RUNBOOK_FIREWORKS.md`.
+- [x] Criar `docs/RUNBOOK_NATIVE_BUILDER.md`.
+- [x] Documentar portas, comandos e health checks.
+- [x] Documentar variaveis obrigatorias e opcionais.
+- [x] Documentar estrategia de scratch disk.
+- [x] Documentar regra de destruir VM para parar custo.
+- [x] Criar script `scripts/check_runtime_profiles.py`.
+- [x] Validar que nenhum perfil contem segredo real.
+- [x] Integrar profile check ao release check.
+- [x] Atualizar `CREDIT_ACTIVATION.md`.
 
 ## Criterios de aceite
 
@@ -59,3 +59,9 @@ Creditos deixam de ser bloqueio operacional e viram apenas troca de env vars.
 
 Runbooks devem ser comandos reproduziveis, nao anotacoes soltas. O objetivo e reduzir tempo de ativacao no kickoff.
 
+## Evidencia de fechamento
+
+- `python3 scripts/check_runtime_profiles.py`: perfis validos e sem segredo real.
+- `python3 -m unittest tests.test_runtime_profiles`: validador CLI e deteccao de segredo sintetico testados.
+- `python3 scripts/secret_scan.py`: scanner global sem achados.
+- `scripts/offline_release_check.sh`: profile check integrado a porteira pesada.
