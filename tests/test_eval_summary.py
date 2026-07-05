@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from router.cli.main import _build_eval_summary, _write_eval_report
-from router.core.contracts import AnswerResult, TokenUsage
+from router.core.contracts import AnswerResult, TaskEnvelope, TokenUsage
 
 
 class EvalSummaryTests(unittest.TestCase):
@@ -15,6 +15,18 @@ class EvalSummaryTests(unittest.TestCase):
                 '{"id":"1","answer":"4"}\n{"id":"2","answer":"corrected"}\n',
                 encoding="utf-8",
             )
+            tasks = [
+                TaskEnvelope(
+                    id="1",
+                    input_text="What is 2+2?",
+                    metadata={"category": "facil", "difficulty": "easy", "expected_route": "m1_approved"},
+                ),
+                TaskEnvelope(
+                    id="2",
+                    input_text="Repair this",
+                    metadata={"category": "matematica", "difficulty": "medium", "expected_route": "fireworks_replaced"},
+                ),
+            ]
             results = [
                 AnswerResult(
                     id="1",
@@ -32,7 +44,7 @@ class EvalSummaryTests(unittest.TestCase):
                 ),
             ]
 
-            summary = _build_eval_summary(results, expected)
+            summary = _build_eval_summary(tasks, results, expected)
 
         self.assertEqual(summary["routes"]["m1_approved"], 1)
         self.assertEqual(summary["routes"]["fireworks_replaced"], 1)
@@ -40,6 +52,9 @@ class EvalSummaryTests(unittest.TestCase):
         self.assertEqual(summary["exact_match_rate"], 1.0)
         self.assertEqual(summary["escalation_rate"], 0.5)
         self.assertEqual(summary["replacement_rate"], 0.5)
+        self.assertEqual(summary["categories"]["facil"]["tasks"], 1)
+        self.assertEqual(summary["categories"]["matematica"]["remote_tokens"]["total"], 7)
+        self.assertEqual(summary["expected_route"]["match_rate"], 1.0)
 
     def test_eval_report_writes_markdown(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -65,4 +80,3 @@ class EvalSummaryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

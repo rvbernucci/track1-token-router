@@ -21,25 +21,40 @@ Sem credito, o ativo mais importante e dataset. Ele nos diz onde a cascata erra,
 
 ## Checklist
 
-- [ ] Criar `evals/offline/tasks.jsonl`.
-- [ ] Criar `evals/offline/expected.jsonl`.
-- [ ] Adicionar campo `metadata.category`.
-- [ ] Adicionar campo `metadata.difficulty`.
-- [ ] Adicionar campo `metadata.expected_route`.
-- [ ] Criar tarefas triviais que devem sair localmente.
-- [ ] Criar tarefas de formato estrito.
-- [ ] Criar tarefas matematicas multi-etapa.
-- [ ] Criar tarefas adversariais de prompt injection.
-- [ ] Criar tarefas de conhecimento possivelmente desatualizado.
-- [ ] Criar relatorio por categoria.
-- [ ] Garantir que o dataset nao usa dados sensiveis.
+- [x] Criar `evals/offline/tasks.jsonl`.
+- [x] Criar `evals/offline/expected.jsonl`.
+- [x] Adicionar campo `metadata.category`.
+- [x] Adicionar campo `metadata.difficulty`.
+- [x] Adicionar campo `metadata.expected_route`.
+- [x] Criar tarefas triviais que devem sair localmente.
+- [x] Criar tarefas de formato estrito.
+- [x] Criar tarefas matematicas multi-etapa.
+- [x] Criar tarefas adversariais de prompt injection.
+- [x] Criar tarefas de conhecimento possivelmente desatualizado.
+- [x] Criar relatorio por categoria.
+- [x] Garantir que o dataset nao usa dados sensiveis.
 
 ## Criterios de aceite
 
-- `python3 -m router eval --jsonl evals/offline/tasks.jsonl --expected evals/offline/expected.jsonl` roda sem provedores reais.
-- O relatorio mostra rotas, exact match, escalations e tokens remotos simulados.
-- O dataset tem cobertura minima por categoria.
-- O README explica como adicionar novas tarefas.
+- [x] `python3 -m router eval --jsonl evals/offline/tasks.jsonl --expected evals/offline/expected.jsonl` roda sem provedores reais.
+- [x] O relatorio mostra rotas, exact match, escalations e tokens remotos simulados.
+- [x] O dataset tem cobertura minima por categoria.
+- [x] O README explica como adicionar novas tarefas.
+
+## Evidencias
+
+- `python3 scripts/generate_offline_eval.py`
+- `python3 scripts/generate_offline_eval.py --check`
+- `wc -l evals/offline/tasks.jsonl evals/offline/expected.jsonl`
+- `python3 -m router eval --jsonl evals/offline/tasks.jsonl --expected evals/offline/expected.jsonl --report reports/generated/offline-report.md`
+- `python3 -m unittest discover -s tests`
+
+## Resultado
+
+- 160 tarefas offline.
+- 8 categorias com 20 tarefas cada.
+- Metadados por tarefa: `category`, `difficulty`, `expected_route`, `risk`.
+- Relatorio do `router eval` inclui `categories`, `difficulties` e `expected_route`.
 
 ## Riscos
 
@@ -50,4 +65,3 @@ Sem credito, o ativo mais importante e dataset. Ele nos diz onde a cascata erra,
 ## Saida esperada
 
 Uma arena offline que permite continuar calibrando sem depender de creditos.
-

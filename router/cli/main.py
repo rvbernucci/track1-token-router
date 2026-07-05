@@ -105,7 +105,7 @@ def _handle_eval(args: argparse.Namespace, runner: TaskRunner) -> int:
         with args.out.open("w", encoding="utf-8") as handle:
             write_jsonl_results(results, handle)
 
-    summary = _build_eval_summary(results, args.expected)
+    summary = _build_eval_summary(tasks, results, args.expected)
     if args.report:
         _write_eval_report(args.report, summary)
     print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
@@ -122,9 +122,14 @@ def _read_ask_text(args: argparse.Namespace) -> str:
     return sys.stdin.read()
 
 
-def _build_eval_summary(results: list[AnswerResult], expected_path: Path | None) -> dict[str, object]:
+def _build_eval_summary(
+    tasks: list[TaskEnvelope],
+    results: list[AnswerResult],
+    expected_path: Path | None,
+) -> dict[str, object]:
     route_counts = _count_routes(results)
     remote_tokens = _sum_remote_tokens(results)
+    expected_by_id = _load_expected_answers(expected_path) if expected_path else {}
     summary: dict[str, object] = {
         "tasks": len(results),
         "routes": route_counts,
@@ -134,11 +139,13 @@ def _build_eval_summary(results: list[AnswerResult], expected_path: Path | None)
         "parse_failures": sum(1 for result in results if result.metadata.get("fireworks_parse_failed")),
         "latency_ms": _latency_summary(results),
         "final_answer_chars": sum(len(result.answer) for result in results),
+        "categories": _group_summary(tasks, results, expected_by_id, "category"),
+        "difficulties": _group_summary(tasks, results, expected_by_id, "difficulty"),
+        "expected_route": _expected_route_summary(tasks, results),
     }
     if expected_path is None:
         return summary
 
-    expected_by_id = _load_expected_answers(expected_path)
     comparable = [result for result in results if result.id in expected_by_id]
     exact_matches = sum(1 for result in comparable if result.answer.strip() == expected_by_id[result.id].strip())
     summary.update(
@@ -206,6 +213,56 @@ def _load_expected_answers(path: Path) -> dict[str, str]:
     return expected
 
 
+def _group_summary(
+    tasks: list[TaskEnvelope],
+    results: list[AnswerResult],
+    expected_by_id: dict[str, str],
+    metadata_key: str,
+) -> dict[str, dict[str, object]]:
+    grouped: dict[str, list[tuple[TaskEnvelope, AnswerResult]]] = {}
+    for task, result in zip(tasks, results):
+        group = str(task.metadata.get(metadata_key) or "unknown")
+        grouped.setdefault(group, []).append((task, result))
+
+    summary: dict[str, dict[str, object]] = {}
+    for group, pairs in sorted(grouped.items()):
+        group_results = [result for _task, result in pairs]
+        comparable = [result for result in group_results if result.id in expected_by_id]
+        exact_matches = sum(
+            1
+            for result in comparable
+            if result.answer.strip() == expected_by_id[result.id].strip()
+        )
+        summary[group] = {
+            "tasks": len(pairs),
+            "routes": _count_routes(group_results),
+            "remote_tokens": _sum_remote_tokens(group_results),
+            "escalation_rate": _rate(_count_escalations(group_results), len(group_results)),
+            "comparable": len(comparable),
+            "exact_matches": exact_matches,
+            "exact_match_rate": exact_matches / len(comparable) if comparable else 0.0,
+        }
+    return summary
+
+
+def _expected_route_summary(tasks: list[TaskEnvelope], results: list[AnswerResult]) -> dict[str, object]:
+    comparable = [
+        (task, result)
+        for task, result in zip(tasks, results)
+        if task.metadata.get("expected_route")
+    ]
+    matches = sum(
+        1
+        for task, result in comparable
+        if str(task.metadata["expected_route"]) == result.route
+    )
+    return {
+        "comparable": len(comparable),
+        "matches": matches,
+        "match_rate": matches / len(comparable) if comparable else 0.0,
+    }
+
+
 def _write_eval_report(path: Path, summary: dict[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     lines = [
@@ -219,8 +276,26 @@ def _write_eval_report(path: Path, summary: dict[str, object]) -> None:
         f"- remote_tokens: `{json.dumps(summary.get('remote_tokens'), sort_keys=True)}`",
         f"- routes: `{json.dumps(summary.get('routes'), sort_keys=True)}`",
         f"- latency_ms: `{json.dumps(summary.get('latency_ms'), sort_keys=True)}`",
+        f"- expected_route: `{json.dumps(summary.get('expected_route'), sort_keys=True)}`",
         "",
     ]
+    categories = summary.get("categories")
+    if isinstance(categories, dict) and categories:
+        lines.extend(["## Categories", ""])
+        lines.append("| category | tasks | exact_match_rate | escalation_rate | routes |")
+        lines.append("|---|---:|---:|---:|---|")
+        for category, payload in categories.items():
+            if not isinstance(payload, dict):
+                continue
+            lines.append(
+                "| "
+                f"{category} | "
+                f"{payload.get('tasks')} | "
+                f"{payload.get('exact_match_rate')} | "
+                f"{payload.get('escalation_rate')} | "
+                f"`{json.dumps(payload.get('routes'), sort_keys=True)}` |"
+            )
+        lines.append("")
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
