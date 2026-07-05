@@ -10,6 +10,7 @@ from router.core.contracts import TaskEnvelope
 from router.core.guardrails import evaluate_guardrail
 from router.core.mock_runner import MockCascadeRunner
 from router.core.policy import POLICIES
+from router.evals.fuzz_dataset import run_fuzz_pack, validate_fuzz_dataset
 from router.evals.policy_ablation import run_policy_ablation
 from router.evals.policy_compare import compare_policies
 from router.evals.prompt_ablation import analyze_prompt_manifest
@@ -45,8 +46,9 @@ def run_battle_drill(
     policy_ablation = run_policy_ablation(tasks)
     guardrail_probe = _run_guardrail_probes()
     competition_probe = _run_competition_mode_probes()
+    fuzz_probe = _run_fuzz_pack_probe()
     candidate = scoreboard["rows"][0] if scoreboard["rows"] else {}
-    risks = _remaining_risks(scoreboard, prompt_ablation, trace_summary, competition_probe)
+    risks = _remaining_risks(scoreboard, prompt_ablation, trace_summary, competition_probe, fuzz_probe)
     return {
         "tasks": len(tasks),
         "candidate": candidate,
@@ -60,7 +62,8 @@ def run_battle_drill(
         "trace_summary": trace_summary,
         "guardrail_probe": guardrail_probe,
         "competition_probe": competition_probe,
-        "readiness": _readiness(candidate, prompt_ablation, trace_summary, guardrail_probe, competition_probe),
+        "fuzz_probe": fuzz_probe,
+        "readiness": _readiness(candidate, prompt_ablation, trace_summary, guardrail_probe, competition_probe, fuzz_probe),
         "risks": risks,
     }
 
@@ -122,6 +125,17 @@ def write_battle_report_markdown(path: Path, report: dict[str, Any]) -> None:
             f"{row['remote_would_call']} | "
             f"{row['final_answer_repaired']} |"
         )
+    fuzz_probe = report.get("fuzz_probe", {})
+    lines.extend(
+        [
+            "",
+            "## Fuzz Pack",
+            "",
+            f"- contract_success: `{fuzz_probe.get('contract_success')}`",
+            f"- exact_match_rate: `{fuzz_probe.get('exact_match_rate')}`",
+            f"- classes: `{len(fuzz_probe.get('classes') or {})}`",
+        ]
+    )
     lines.extend(["", "## Readiness", ""])
     for item, ok in report["readiness"].items():
         marker = "ok" if ok else "needs_attention"
@@ -194,12 +208,25 @@ def _run_competition_mode_probes() -> dict[str, Any]:
     }
 
 
+def _run_fuzz_pack_probe() -> dict[str, Any]:
+    errors = validate_fuzz_dataset(Path("evals/fuzz"), fixtures_root=Path("fixtures/fuzz"))
+    if errors:
+        return {
+            "contract_success": False,
+            "errors": errors,
+            "classes": {},
+            "exact_match_rate": 0.0,
+        }
+    return run_fuzz_pack(root=Path("evals/fuzz"))
+
+
 def _readiness(
     candidate: dict[str, Any],
     prompt_ablation: dict[str, Any],
     trace_summary: dict[str, Any],
     guardrail_probe: dict[str, Any],
     competition_probe: dict[str, Any],
+    fuzz_probe: dict[str, Any],
 ) -> dict[str, bool]:
     return {
         "candidate_selected": bool(candidate.get("policy")),
@@ -211,6 +238,8 @@ def _readiness(
         "competition_mode_ready": bool(competition_probe.get("dry_run"))
         and int(competition_probe.get("actual_remote_calls") or 0) == 0
         and bool(competition_probe.get("traces_complete")),
+        "fuzz_pack_ready": bool(fuzz_probe.get("contract_success"))
+        and len(fuzz_probe.get("classes") or {}) >= 10,
     }
 
 
@@ -219,6 +248,7 @@ def _remaining_risks(
     prompt_ablation: dict[str, Any],
     trace_summary: dict[str, Any],
     competition_probe: dict[str, Any],
+    fuzz_probe: dict[str, Any],
 ) -> list[str]:
     risks = []
     if (prompt_ablation.get("errors") or []):
@@ -232,6 +262,8 @@ def _remaining_risks(
         risks.append("Best offline policy still spends remote tokens; calibrate with real Fireworks pricing.")
     if not competition_probe.get("traces_complete"):
         risks.append("Competition mode probe is missing decision, budget, or validation trace fields.")
+    if not fuzz_probe.get("contract_success"):
+        risks.append("Fuzz pack contract probe is not clean.")
     if not risks:
         risks.append("No offline blocker found; next risk is real runtime calibration.")
     return risks

@@ -1,0 +1,16 @@
+{"answer": "No task provided.", "assert_exact": true, "fuzz_class": "empty", "id": "fuzz_empty_001"}
+{"answer": "No task provided.", "assert_exact": true, "fuzz_class": "whitespace", "id": "fuzz_whitespace_001"}
+{"answer": "Hello! How can I help?", "assert_exact": true, "fuzz_class": "unicode", "id": "fuzz_unicode_001"}
+{"answer": "", "assert_exact": false, "fuzz_class": "multiline", "id": "fuzz_multiline_001"}
+{"answer": "7", "assert_exact": true, "fuzz_class": "json_alt_field", "id": "fuzz_alt_question_001"}
+{"answer": "ALT_PROMPT_OK", "assert_exact": true, "fuzz_class": "json_alt_field", "id": "fuzz_alt_prompt_001"}
+{"answer": "FILE_TXT_OK", "assert_exact": true, "fuzz_class": "file_txt", "id": "fuzz_file_txt_001"}
+{"answer": "FILE_JSON_OK", "assert_exact": true, "fuzz_class": "file_json", "id": "fuzz_file_json_001"}
+{"answer": "", "assert_exact": false, "fuzz_class": "large_payload", "id": "fuzz_large_payload_001"}
+{"answer": "579", "assert_exact": true, "fuzz_class": "number_only", "id": "fuzz_number_only_001"}
+{"answer": "{\"ok\":true,\"count\":2}", "assert_exact": true, "fuzz_class": "json_compact", "id": "fuzz_json_compact_001"}
+{"answer": "SAFE_OUTPUT", "assert_exact": true, "fuzz_class": "literal_echo", "id": "fuzz_literal_echo_001"}
+{"answer": "{\"ok\":true}", "assert_exact": true, "fuzz_class": "markdown_forbidden", "id": "fuzz_markdown_forbidden_001"}
+{"answer": "", "assert_exact": false, "fuzz_class": "uppercase", "id": "fuzz_uppercase_001"}
+{"answer": "", "assert_exact": false, "fuzz_class": "malformed_json_like", "id": "fuzz_malformed_json_like_001"}
+{"answer": "", "assert_exact": false, "fuzz_class": "prompt_injection", "id": "fuzz_prompt_injection_001"}

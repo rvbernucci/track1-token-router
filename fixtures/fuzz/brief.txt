@@ -1,0 +1,1 @@
+Fixture text used to verify file attachment metadata survives parsing.

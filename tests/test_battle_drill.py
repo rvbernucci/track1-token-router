@@ -21,7 +21,9 @@ class BattleDrillTests(unittest.TestCase):
         self.assertTrue(report["readiness"]["prompt_manifest_clean"])
         self.assertTrue(report["readiness"]["guardrails_probe_safe"])
         self.assertTrue(report["readiness"]["competition_mode_ready"])
+        self.assertTrue(report["readiness"]["fuzz_pack_ready"])
         self.assertTrue(report["competition_probe"]["traces_complete"])
+        self.assertTrue(report["fuzz_probe"]["contract_success"])
 
     def test_battle_report_markdown_is_written(self) -> None:
         report = run_battle_drill(
@@ -38,6 +40,7 @@ class BattleDrillTests(unittest.TestCase):
         self.assertIn("Battle Drill Report", content)
         self.assertIn("Adaptive Policy Ablation", content)
         self.assertIn("Competition Mode Probe", content)
+        self.assertIn("Fuzz Pack", content)
 
 
 if __name__ == "__main__":
