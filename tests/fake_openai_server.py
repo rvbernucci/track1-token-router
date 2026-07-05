@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 
@@ -13,10 +14,12 @@ class FakeOpenAIServer:
         response_text: str = "local answer",
         responses: list[str] | None = None,
         status: int = 200,
+        delay_s: float = 0.0,
     ) -> None:
         self.response_text = response_text
         self.responses = list(responses or [])
         self.status = status
+        self.delay_s = delay_s
         self.requests: list[dict[str, Any]] = []
         self._lock = threading.Lock()
         self._server = ThreadingHTTPServer(("127.0.0.1", 0), self._handler_class())
@@ -40,6 +43,8 @@ class FakeOpenAIServer:
                 body = self.rfile.read(length).decode("utf-8")
                 payload = json.loads(body)
                 outer.requests.append({"path": self.path, "payload": payload})
+                if outer.delay_s:
+                    time.sleep(outer.delay_s)
 
                 if outer.status >= 400:
                     self.send_response(outer.status)

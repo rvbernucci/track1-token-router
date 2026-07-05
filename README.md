@@ -75,7 +75,7 @@ python3 -m router ask "What is 2+2?"
 | Variavel | Padrao | Papel |
 |---|---|---|
 | `ROUTER_LOG_PATH` | `logs/run.jsonl` | Caminho dos logs estruturados JSONL. |
-| `ROUTER_MODE` | `mock` | Modo de execucao: `mock`, `auto`, `local` ou `cascade`. |
+| `ROUTER_MODE` | `mock` | Modo de execucao: `mock`, `auto`, `local`, `cascade` ou `hybrid`. |
 | `LOCAL_BASE_URL` | vazio | Endpoint OpenAI-compatible do modelo local. |
 | `LOCAL_MODEL` | vazio | Nome do modelo local. |
 | `LOCAL_API_KEY` | vazio | API key opcional para endpoint local protegido. |
@@ -119,9 +119,89 @@ python3 -m router ask "What is 2+2?"
 ROUTER_MODE=hybrid \
 LOCAL_BASE_URL=http://localhost:8000/v1 \
 LOCAL_MODEL=local-model \
-FIREWORKS_API_KEY=fw_... \
+FIREWORKS_API_KEY=<fireworks-api-key> \
 FIREWORKS_MODEL=accounts/fireworks/models/... \
 python3 -m router ask "What is 2+2?"
 ```
 
 Nesse modo, Fireworks so e chamado quando o M2A escala a tarefa.
+
+## Docker
+
+Build:
+
+```bash
+docker build -t track1-token-router .
+```
+
+Smoke test:
+
+```bash
+docker run --rm track1-token-router --help
+docker run --rm track1-token-router ask "What is 2+2?"
+```
+
+Run JSONL:
+
+```bash
+docker run --rm \
+  -v "$PWD/reports/generated:/app/reports/generated" \
+  track1-token-router eval \
+  --jsonl evals/golden/tasks.jsonl \
+  --expected evals/golden/expected.jsonl \
+  --out reports/generated/golden-output.jsonl \
+  --report reports/generated/golden-report.md
+```
+
+Hybrid run:
+
+```bash
+docker run --rm \
+  -e ROUTER_MODE=hybrid \
+  -e LOCAL_BASE_URL=http://host.docker.internal:8000/v1 \
+  -e LOCAL_MODEL=local-model \
+  -e FIREWORKS_API_KEY="$FIREWORKS_API_KEY" \
+  -e FIREWORKS_MODEL=accounts/fireworks/models/replace-me \
+  track1-token-router ask "What is 2+2?"
+```
+
+## Avaliacao local
+
+```bash
+scripts/verify.sh
+```
+
+Esse script roda:
+
+- suite de testes;
+- smoke test do CLI;
+- eval do golden set;
+- relatorio Markdown em `reports/generated/golden-report.md`.
+
+## Estrategia de token efficiency
+
+- M1 tenta responder localmente com formato livre.
+- M2A valida localmente com uma decisao curta `approve/escalate`.
+- Tarefas aprovadas por M2A saem com zero token remoto.
+- Tarefas escaladas passam por M2B local antes de Fireworks.
+- Fireworks recebe um pacote compacto e audita M2B com `approve/replace`.
+- Completion remota tende a ser pequena porque `approve` devolve `answer=""`.
+
+## Tradeoffs
+
+- Escalar pouco economiza tokens, mas aumenta risco de erro.
+- Escalar demais melhora seguranca, mas pode perder no custo.
+- M2A e o ponto de calibracao mais importante.
+- Logs guardam respostas candidatas para analise local; nao use dados sensiveis nos evals publicos.
+- O golden set usa exact match simples, suficiente para regressao, mas limitado para avaliar qualidade aberta.
+
+## Limites conhecidos
+
+- O formato oficial das tasks pode mudar no kickoff.
+- A qualidade final depende do modelo local disponivel na AMD Developer Cloud.
+- O modo `hybrid` exige um endpoint local OpenAI-compatible e credenciais Fireworks.
+- O projeto e CLI/headless de proposito; UI fica fora do caminho critico de scoring.
+
+## Submissao
+
+Leia [`SUBMISSION.md`](./SUBMISSION.md) para a narrativa tecnica, estrategia e pitch curto.

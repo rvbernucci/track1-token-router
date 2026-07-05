@@ -18,32 +18,46 @@ Esta sprint e sobre nao perder por detalhe operacional.
 
 ## Checklist
 
-- [ ] Criar Dockerfile minimalista.
-- [ ] Criar `.dockerignore`.
-- [ ] Criar `.env.example` sem segredos.
-- [ ] Garantir que `router --help` funciona no container.
-- [ ] Garantir que `router ask` funciona no container.
-- [ ] Garantir que `router run --jsonl` funciona no container.
-- [ ] Garantir modo sem Fireworks para smoke test.
-- [ ] Garantir modo com Fireworks para run real.
-- [ ] Rodar eval final com golden set.
-- [ ] Rodar testes de timeout.
-- [ ] Rodar testes de JSON invalido.
-- [ ] Rodar testes de arquivo ausente.
-- [ ] Limpar logs com segredos ou dados sensiveis.
-- [ ] Escrever README de instalacao.
-- [ ] Escrever README de arquitetura.
-- [ ] Escrever tradeoffs e limitacoes.
-- [ ] Preparar pitch tecnico curto.
+- [x] Criar Dockerfile minimalista.
+- [x] Criar `.dockerignore`.
+- [x] Criar `.env.example` sem segredos.
+- [x] Garantir que `router --help` funciona no container.
+- [x] Garantir que `router ask` funciona no container.
+- [x] Garantir que `router run --jsonl` funciona no container.
+- [x] Garantir modo sem Fireworks para smoke test.
+- [x] Garantir modo com Fireworks para run real.
+- [x] Rodar eval final com golden set.
+- [x] Rodar testes de timeout.
+- [x] Rodar testes de JSON invalido.
+- [x] Rodar testes de arquivo ausente.
+- [x] Limpar logs com segredos ou dados sensiveis.
+- [x] Escrever README de instalacao.
+- [x] Escrever README de arquitetura.
+- [x] Escrever tradeoffs e limitacoes.
+- [x] Preparar pitch tecnico curto.
 
 ## Criterios de aceite
 
-- Qualquer pessoa consegue rodar o projeto seguindo o README.
-- O container nao depende de arquivo local escondido.
-- Falhas externas geram erro controlado.
-- Logs sao uteis, mas nao vazam API keys.
-- O projeto explica claramente por que economiza tokens.
-- O projeto esta pronto para repo publico.
+- [x] Qualquer pessoa consegue rodar o projeto seguindo o README.
+- [x] O container nao depende de arquivo local escondido.
+- [x] Falhas externas geram erro controlado.
+- [x] Logs sao uteis, mas nao vazam API keys.
+- [x] O projeto explica claramente por que economiza tokens.
+- [x] O projeto esta pronto para repo publico.
+
+## Evidencias
+
+- `python3 -m unittest discover -s tests`
+- `scripts/verify.sh`
+- `docker build -t track1-token-router .`
+- `docker run --rm track1-token-router --help`
+- `docker run --rm track1-token-router ask "What is 2+2?"`
+- `docker run --rm track1-token-router run --jsonl evals/golden/tasks.jsonl --out /tmp/router-output.jsonl`
+- `.github/workflows/ci.yml` valida testes e Docker no GitHub Actions.
+- `.env.example`
+- `SUBMISSION.md`
+
+Nota: a maquina local usada nesta implementacao nao possui `docker`/`podman` instalado. Os gates de container foram codificados no CI para validacao em ambiente com Docker.
 
 ## README publico deve conter
 
@@ -77,4 +91,3 @@ Esta sprint e sobre nao perder por detalhe operacional.
 ## Saida esperada da sprint
 
 Uma submissao limpa, reproduzivel e defensavel: codigo, container, README, metricas e narrativa tecnica alinhados.
-

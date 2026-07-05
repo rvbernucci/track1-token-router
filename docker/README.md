@@ -1,30 +1,44 @@
 # Docker
 
-Responsavel pela execucao reproduzivel.
+Containerizacao do runner.
 
-## Objetivo
-
-O projeto final precisa ser containerizado. Esta pasta vai concentrar:
-
-- Dockerfile;
-- compose opcional;
-- entrypoint;
-- exemplos de env vars;
-- notas de execucao no ambiente padronizado.
-
-## Env vars previstas
+## Build
 
 ```bash
-LOCAL_BASE_URL=http://localhost:8000/v1
-LOCAL_MODEL=local-model
-FIREWORKS_API_KEY=fw_...
-FIREWORKS_BASE_URL=https://api.fireworks.ai/inference/v1
-FIREWORKS_MODEL=accounts/fireworks/models/...
-ROUTER_LOG_PATH=logs/run.jsonl
-ROUTER_MODE=balanced
+docker build -t track1-token-router .
 ```
 
-## Regra
+## Smoke tests
 
-O container nao deve depender de IP fixo, path local da maquina, dashboard, notebook ou estado manual.
+```bash
+docker run --rm track1-token-router --help
+docker run --rm track1-token-router ask "What is 2+2?"
+```
 
+## Eval
+
+```bash
+docker run --rm \
+  -v "$PWD/reports/generated:/app/reports/generated" \
+  track1-token-router eval \
+  --jsonl evals/golden/tasks.jsonl \
+  --expected evals/golden/expected.jsonl \
+  --out reports/generated/golden-output.jsonl \
+  --report reports/generated/golden-report.md
+```
+
+## Hybrid mode
+
+```bash
+docker run --rm \
+  -e ROUTER_MODE=hybrid \
+  -e LOCAL_BASE_URL=http://host.docker.internal:8000/v1 \
+  -e LOCAL_MODEL=local-model \
+  -e FIREWORKS_API_KEY="$FIREWORKS_API_KEY" \
+  -e FIREWORKS_MODEL=accounts/fireworks/models/replace-me \
+  track1-token-router ask "What is 2+2?"
+```
+
+## Env vars
+
+Use `.env.example` as the safe template. Never commit a real `.env`.

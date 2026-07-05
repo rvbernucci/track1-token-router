@@ -6,6 +6,8 @@ import unittest
 from pathlib import Path
 
 from router.adapters.io import load_jsonl_tasks, parse_json_task
+from router.core.model_client import LocalModelClient, ModelClientError
+from tests.fake_openai_server import FakeOpenAIServer
 
 
 class AdapterTests(unittest.TestCase):
@@ -68,7 +70,47 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(payload["answer"], "4")
 
+    def test_solve_invalid_json_returns_controlled_error(self) -> None:
+        completed = subprocess.run(
+            [sys.executable, "-m", "router", "solve", "--json"],
+            input="{not-json",
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertEqual(completed.stdout.strip(), "")
+        self.assertIn("router error:", completed.stderr)
+
+    def test_ask_missing_file_returns_controlled_error(self) -> None:
+        completed = subprocess.run(
+            [sys.executable, "-m", "router", "ask", "--file", "/tmp/router-missing-file.txt"],
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertEqual(completed.stdout.strip(), "")
+        self.assertIn("router error:", completed.stderr)
+
+
+class TimeoutTests(unittest.TestCase):
+    def test_model_client_timeout_is_controlled(self) -> None:
+        with FakeOpenAIServer(delay_s=0.2) as server:
+            client = LocalModelClient(
+                base_url=server.url,
+                model="fake-local",
+                timeout_s=0.01,
+                max_retries=0,
+            )
+
+            with self.assertRaises(ModelClientError):
+                client.complete(
+                    [{"role": "user", "content": "slow"}],
+                    temperature=0.0,
+                    max_tokens=16,
+                )
+
 
 if __name__ == "__main__":
     unittest.main()
-
