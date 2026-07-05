@@ -287,6 +287,14 @@ python3 scripts/policy_ablation.py \
 
 O scoreboard tambem estima `remote_packet_tokens`, isto e, o tamanho do pacote compacto que iria ao auditor remoto.
 
+Battle drill offline:
+
+```bash
+python3 scripts/battle_drill.py \
+  --report reports/generated/battle-report.md \
+  --out-json reports/generated/battle-report.json
+```
+
 Release notes dry-run:
 
 ```bash

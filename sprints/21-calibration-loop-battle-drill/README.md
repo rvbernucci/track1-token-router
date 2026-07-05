@@ -24,19 +24,19 @@ Depois que a orquestracao existir, a vantagem vem de iterar rapido. Precisamos d
 
 ## Checklist
 
-- [ ] Rodar offline dataset completo.
-- [ ] Rodar policy comparison.
-- [ ] Rodar offline scoreboard.
-- [ ] Rodar prompt ablation.
-- [ ] Rodar trace analytics.
-- [ ] Rodar guardrail probes.
-- [ ] Comparar pelo menos 3 configuracoes.
-- [ ] Eleger configuracao candidata.
-- [ ] Registrar tradeoff accuracy vs token remoto.
-- [ ] Registrar riscos restantes.
-- [ ] Gerar battle report Markdown.
-- [ ] Gerar battle report JSON.
-- [ ] Integrar ao release check ou comando dedicado.
+- [x] Rodar offline dataset completo.
+- [x] Rodar policy comparison.
+- [x] Rodar offline scoreboard.
+- [x] Rodar prompt ablation.
+- [x] Rodar trace analytics.
+- [x] Rodar guardrail probes.
+- [x] Comparar pelo menos 3 configuracoes.
+- [x] Eleger configuracao candidata.
+- [x] Registrar tradeoff accuracy vs token remoto.
+- [x] Registrar riscos restantes.
+- [x] Gerar battle report Markdown.
+- [x] Gerar battle report JSON.
+- [x] Integrar ao release check ou comando dedicado.
 
 ## Criterios de aceite
 
@@ -49,3 +49,14 @@ Depois que a orquestracao existir, a vantagem vem de iterar rapido. Precisamos d
 
 Um ritual de calibracao para transformar arquitetura em vantagem operacional.
 
+## Evidencia local
+
+```bash
+python3 scripts/battle_drill.py
+python3 -m unittest tests.test_battle_drill
+scripts/offline_release_check.sh
+```
+
+## Decisao
+
+O battle drill escolhe a configuracao candidata pelo scoreboard offline e coloca lado a lado policy comparison, policy ablation, prompt ablation, trace analytics e guardrail probes. Ele nao substitui o scoring oficial, mas cria um ritual repetivel para chegar no kickoff com uma hipotese forte.
