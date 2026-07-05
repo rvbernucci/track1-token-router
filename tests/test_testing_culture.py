@@ -12,7 +12,17 @@ class TestingCultureTests(unittest.TestCase):
 
         self.assertEqual(
             domains,
-            {"contracts", "adapters", "policies", "prompts", "cascade", "fake_provider", "evals", "cli"},
+            {
+                "contracts",
+                "adapters",
+                "policies",
+                "prompts",
+                "cascade",
+                "fake_provider",
+                "evals",
+                "operational_envelope",
+                "cli",
+            },
         )
 
     def test_test_matrix_is_valid(self) -> None:

@@ -14,6 +14,8 @@ python3 scripts/run_fuzz_eval.py --check >/dev/null
 python3 scripts/check_runtime_profiles.py >/dev/null
 python3 scripts/submission_readiness_check.py >/dev/null
 python3 scripts/analyze_traces.py --logs fixtures/logs/sample-run.jsonl >/dev/null
+python3 scripts/latency_drill.py --check >/dev/null
+python3 scripts/token_envelope.py --check >/dev/null
 python3 scripts/state_machine_report.py >/dev/null
 python3 scripts/generate_release_notes.py --tag offline-dry-run --output reports/generated/release-notes.md >/dev/null
 python3 scripts/adapter_drill.py --check >/dev/null

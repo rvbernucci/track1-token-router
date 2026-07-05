@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 from pathlib import Path
 from typing import Any
 
@@ -9,8 +10,14 @@ from router.analytics.traces import expand_log_paths, load_trace_records, summar
 from router.core.contracts import TaskEnvelope
 from router.core.guardrails import evaluate_guardrail
 from router.core.mock_runner import MockCascadeRunner
-from router.core.policy import POLICIES
+from router.core.policy import DEFAULT_POLICY, POLICIES
 from router.evals.fuzz_dataset import run_fuzz_pack, validate_fuzz_dataset
+from router.evals.operational_envelope import (
+    LatencyThresholds,
+    TokenEnvelopeThresholds,
+    build_token_envelope,
+    summarize_latency_envelope,
+)
 from router.evals.policy_ablation import run_policy_ablation
 from router.evals.policy_compare import compare_policies
 from router.evals.prompt_ablation import analyze_prompt_manifest
@@ -50,7 +57,22 @@ def run_battle_drill(
     solver_probe = _run_solver_pack_probe()
     fuzz_probe = _run_fuzz_pack_probe()
     candidate = scoreboard["rows"][0] if scoreboard["rows"] else {}
-    risks = _remaining_risks(scoreboard, prompt_ablation, trace_summary, competition_probe, solver_probe, fuzz_probe)
+    latency_probe = _run_latency_envelope_probe()
+    token_envelope = build_token_envelope(
+        tasks,
+        candidate_policy=str(candidate.get("policy") or DEFAULT_POLICY),
+        thresholds=TokenEnvelopeThresholds.from_env(),
+    )
+    risks = _remaining_risks(
+        scoreboard,
+        prompt_ablation,
+        trace_summary,
+        competition_probe,
+        solver_probe,
+        fuzz_probe,
+        latency_probe,
+        token_envelope,
+    )
     return {
         "tasks": len(tasks),
         "candidate": candidate,
@@ -66,7 +88,19 @@ def run_battle_drill(
         "competition_probe": competition_probe,
         "solver_probe": solver_probe,
         "fuzz_probe": fuzz_probe,
-        "readiness": _readiness(candidate, prompt_ablation, trace_summary, guardrail_probe, competition_probe, solver_probe, fuzz_probe),
+        "latency_probe": latency_probe,
+        "token_envelope": token_envelope,
+        "readiness": _readiness(
+            candidate,
+            prompt_ablation,
+            trace_summary,
+            guardrail_probe,
+            competition_probe,
+            solver_probe,
+            fuzz_probe,
+            latency_probe,
+            token_envelope,
+        ),
         "risks": risks,
     }
 
@@ -143,6 +177,13 @@ def write_battle_report_markdown(path: Path, report: dict[str, Any]) -> None:
             f"- contract_success: `{fuzz_probe.get('contract_success')}`",
             f"- exact_match_rate: `{fuzz_probe.get('exact_match_rate')}`",
             f"- classes: `{len(fuzz_probe.get('classes') or {})}`",
+            "",
+            "## Operational Envelope",
+            "",
+            f"- latency_ready: `{report.get('latency_probe', {}).get('ready')}`",
+            f"- latency_p95_ms: `{report.get('latency_probe', {}).get('p95_ms')}`",
+            f"- token_envelope_ready: `{report.get('token_envelope', {}).get('ready')}`",
+            f"- candidate_run_exposure: `{(report.get('token_envelope', {}).get('candidate') or {}).get('run_exposure')}`",
         ]
     )
     lines.extend(["", "## Readiness", ""])
@@ -258,6 +299,29 @@ def _run_fuzz_pack_probe() -> dict[str, Any]:
     return run_fuzz_pack(root=Path("evals/fuzz"))
 
 
+def _run_latency_envelope_probe() -> dict[str, Any]:
+    runner = CompetitionRunner(MockCascadeRunner(), dry_run=True)
+    probes = [
+        TaskEnvelope(input_text="What is 2 + 2? Return only the number."),
+        TaskEnvelope(input_text="Return exactly SAFE_OUTPUT and nothing else."),
+        TaskEnvelope(input_text="Return compact JSON with ok=true and count=2."),
+        TaskEnvelope(input_text="Who is the CEO of AMD today?"),
+    ]
+    samples: list[float] = []
+    batch_started = time.perf_counter()
+    for task in probes:
+        started = time.perf_counter()
+        runner.run(task)
+        samples.append((time.perf_counter() - started) * 1000)
+    batch_elapsed_ms = (time.perf_counter() - batch_started) * 1000
+    return summarize_latency_envelope(
+        samples,
+        batch_elapsed_ms=batch_elapsed_ms,
+        batch_tasks=len(probes),
+        thresholds=LatencyThresholds.from_env(),
+    )
+
+
 def _readiness(
     candidate: dict[str, Any],
     prompt_ablation: dict[str, Any],
@@ -266,6 +330,8 @@ def _readiness(
     competition_probe: dict[str, Any],
     solver_probe: dict[str, Any],
     fuzz_probe: dict[str, Any],
+    latency_probe: dict[str, Any],
+    token_envelope: dict[str, Any],
 ) -> dict[str, bool]:
     return {
         "candidate_selected": bool(candidate.get("policy")),
@@ -281,6 +347,8 @@ def _readiness(
         and int(solver_probe.get("blocked") or 0) >= 2,
         "fuzz_pack_ready": bool(fuzz_probe.get("contract_success"))
         and len(fuzz_probe.get("classes") or {}) >= 10,
+        "latency_ready": bool(latency_probe.get("ready")),
+        "token_envelope_ready": bool(token_envelope.get("ready")),
     }
 
 
@@ -291,6 +359,8 @@ def _remaining_risks(
     competition_probe: dict[str, Any],
     solver_probe: dict[str, Any],
     fuzz_probe: dict[str, Any],
+    latency_probe: dict[str, Any],
+    token_envelope: dict[str, Any],
 ) -> list[str]:
     risks = []
     if (prompt_ablation.get("errors") or []):
@@ -308,6 +378,10 @@ def _remaining_risks(
         risks.append("Solver pack is not saving enough obvious mechanical tasks yet.")
     if not fuzz_probe.get("contract_success"):
         risks.append("Fuzz pack contract probe is not clean.")
+    if not latency_probe.get("ready"):
+        risks.append("Latency envelope is outside the offline threshold.")
+    if not token_envelope.get("ready"):
+        risks.append("Candidate token envelope exceeds the conservative offline threshold.")
     if not risks:
         risks.append("No offline blocker found; next risk is real runtime calibration.")
     return risks

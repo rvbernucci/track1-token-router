@@ -44,6 +44,13 @@
 - exact_match_rate: `1.0`
 - classes: `15`
 
+## Operational Envelope
+
+- latency_ready: `True`
+- latency_p95_ms: `0.072`
+- token_envelope_ready: `True`
+- candidate_run_exposure: `6675`
+
 ## Readiness
 
 - candidate_selected: `ok`
@@ -55,6 +62,8 @@
 - competition_mode_ready: `ok`
 - solver_pack_ready: `ok`
 - fuzz_pack_ready: `ok`
+- latency_ready: `ok`
+- token_envelope_ready: `ok`
 
 ## Risks
 

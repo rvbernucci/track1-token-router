@@ -27,22 +27,22 @@ O battle drill deve evoluir de "esta pronto?" para "esta pronto dentro de um env
 
 ## Checklist
 
-- [ ] Medir cold start do CLI `ask`.
-- [ ] Medir tempo por task em `ROUTER_MODE=competition`.
-- [ ] Medir tempo por lote JSONL.
-- [ ] Medir p50, p95 e p99.
-- [ ] Simular provider local lento.
-- [ ] Simular Fireworks lento.
-- [ ] Simular timeout local.
-- [ ] Simular timeout remoto.
-- [ ] Criar thresholds configuraveis por env.
-- [ ] Falhar em `--check` quando p95 exceder limite.
-- [ ] Calcular tokens estimados por packet remoto.
-- [ ] Calcular pior caso por rota.
-- [ ] Gerar top 20 tarefas mais caras.
-- [ ] Mostrar exposicao remota por policy.
-- [ ] Integrar `latency_ready` ao battle drill.
-- [ ] Integrar `token_envelope_ready` ao battle drill.
+- [x] Medir cold start do CLI `ask`.
+- [x] Medir tempo por task em `ROUTER_MODE=competition`.
+- [x] Medir tempo por lote JSONL.
+- [x] Medir p50, p95 e p99.
+- [x] Simular provider local lento.
+- [x] Simular Fireworks lento.
+- [x] Simular timeout local.
+- [x] Simular timeout remoto.
+- [x] Criar thresholds configuraveis por env.
+- [x] Falhar em `--check` quando p95 exceder limite.
+- [x] Calcular tokens estimados por packet remoto.
+- [x] Calcular pior caso por rota.
+- [x] Gerar top 20 tarefas mais caras.
+- [x] Mostrar exposicao remota por policy.
+- [x] Integrar `latency_ready` ao battle drill.
+- [x] Integrar `token_envelope_ready` ao battle drill.
 
 ## Criterios de aceite
 
@@ -86,3 +86,12 @@ O sprint mede envelopes e tendencias. Benchmarks reais de AMD/Fireworks continua
 - Reports sao gerados.
 - Battle drill consome os sinais.
 - CI continua estavel.
+
+## Evidencias
+
+- `scripts/latency_drill.py --check` mede cold start, tarefas individuais, lote JSONL, p50/p95/p99 e probes de timeout.
+- `scripts/token_envelope.py --check` calcula exposicao remota por policy, pior caso por rota e top 20 tarefas mais caras.
+- `router/evals/operational_envelope.py` centraliza thresholds e calculos para scripts e battle drill.
+- `tests/test_operational_envelope.py` cobre percentis, falha por p95 e thresholds de token.
+- `tests/test_battle_drill.py` valida `latency_ready` e `token_envelope_ready`.
+- `scripts/offline_release_check.sh` executa os dois labs antes do battle drill.

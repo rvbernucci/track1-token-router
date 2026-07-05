@@ -23,9 +23,13 @@ class BattleDrillTests(unittest.TestCase):
         self.assertTrue(report["readiness"]["competition_mode_ready"])
         self.assertTrue(report["readiness"]["solver_pack_ready"])
         self.assertTrue(report["readiness"]["fuzz_pack_ready"])
+        self.assertTrue(report["readiness"]["latency_ready"])
+        self.assertTrue(report["readiness"]["token_envelope_ready"])
         self.assertTrue(report["competition_probe"]["traces_complete"])
         self.assertGreaterEqual(report["solver_probe"]["saved_cascade_calls"], 3)
         self.assertTrue(report["fuzz_probe"]["contract_success"])
+        self.assertTrue(report["latency_probe"]["ready"])
+        self.assertTrue(report["token_envelope"]["ready"])
 
     def test_battle_report_markdown_is_written(self) -> None:
         report = run_battle_drill(
@@ -44,6 +48,7 @@ class BattleDrillTests(unittest.TestCase):
         self.assertIn("Competition Mode Probe", content)
         self.assertIn("Solver Pack", content)
         self.assertIn("Fuzz Pack", content)
+        self.assertIn("Operational Envelope", content)
 
 
 if __name__ == "__main__":
