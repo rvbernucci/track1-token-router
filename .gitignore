@@ -1,0 +1,32 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Runtime logs and generated run artifacts
+logs/*.jsonl
+logs/*.log
+runs/
+reports/generated/
+
+# OS/editor noise
+.DS_Store
+.idea/
+.vscode/
+

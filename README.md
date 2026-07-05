@@ -1,0 +1,58 @@
+# Track 1 Token Router CLI
+
+Projeto separado para o `Track 1 - Hybrid Token-Efficient Routing Agent`.
+
+Objetivo: construir um runner headless, CLI-first, capaz de receber uma task em texto/arquivo/stdin/JSONL, executar a cascata local + Fireworks, registrar metricas e devolver uma resposta final limpa.
+
+## Principio
+
+Nao estamos construindo um app visual. Estamos construindo um runner competitivo.
+
+Prioridades:
+
+- stdout limpo para resposta final;
+- logs estruturados separados;
+- input adaptavel ao formato revelado no kickoff;
+- modelo local e Fireworks configuraveis por env vars;
+- container reproduzivel;
+- minimo acoplamento com UI ou framework web.
+
+## Pastas
+
+| Pasta | Papel |
+|---|---|
+| [`core`](./core/README.md) | Logica da cascata: M1, M2A, M2B, Fireworks auditor, contratos e metricas. |
+| [`cli`](./cli/README.md) | Comandos para interagir com o runner: `ask`, `solve`, `run`, `eval`. |
+| [`adapters`](./adapters/README.md) | Entrada e saida: stdin, JSONL, arquivos, formato do evaluator. |
+| [`logs`](./logs/README.md) | Logs locais JSONL, traces, tokens, rotas e resultados de runs. |
+| [`docker`](./docker/README.md) | Container, imagem, env vars e comandos de execucao reproduzivel. |
+| [`planning`](./planning/README.md) | Builder plan, principios, definition of done e estrategia-mestra. |
+| [`sprints`](./sprints/README.md) | Plano operacional em 5 sprints com checklists e criterios de aceite. |
+
+## Fluxo alvo
+
+```text
+TaskEnvelope
+-> Modelo 1 local sem reasoning gera resposta livre
+-> Modelo 2A local com reasoning valida em JSON pequeno
+-> se approve: entrega resposta do Modelo 1
+-> se escalate: Modelo 2B local com reasoning gera alternativa livre
+-> Fireworks audita alternativa em approve-or-replace
+-> resposta final limpa
+```
+
+## CLI alvo
+
+```bash
+router ask "What is 2+2?"
+router ask --file ./task.txt
+router solve --json < task.json
+router run --jsonl ./tasks.jsonl --out ./runs/output.jsonl
+router eval --jsonl ./tasks.jsonl --expected ./expected.jsonl
+```
+
+Regra importante:
+
+- `stdout`: resposta final ou JSON final esperado pelo evaluator.
+- `stderr`: mensagens humanas de debug.
+- `logs/`: metricas e traces estruturados.
