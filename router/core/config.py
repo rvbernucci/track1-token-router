@@ -16,6 +16,10 @@ class RouterConfig:
     local_max_retries: int
     m1_temperature: float
     m1_max_tokens: int
+    m2a_temperature: float
+    m2a_max_tokens: int
+    m2b_temperature: float
+    m2b_max_tokens: int
     fireworks_base_url: str
     fireworks_model: str | None
 
@@ -31,6 +35,10 @@ class RouterConfig:
             local_max_retries=int(os.getenv("LOCAL_MAX_RETRIES", "1")),
             m1_temperature=float(os.getenv("M1_TEMPERATURE", "0.2")),
             m1_max_tokens=int(os.getenv("M1_MAX_TOKENS", "512")),
+            m2a_temperature=float(os.getenv("M2A_TEMPERATURE", "0.0")),
+            m2a_max_tokens=int(os.getenv("M2A_MAX_TOKENS", "256")),
+            m2b_temperature=float(os.getenv("M2B_TEMPERATURE", "0.2")),
+            m2b_max_tokens=int(os.getenv("M2B_MAX_TOKENS", "768")),
             fireworks_base_url=os.getenv("FIREWORKS_BASE_URL", "https://api.fireworks.ai/inference/v1"),
             fireworks_model=os.getenv("FIREWORKS_MODEL"),
         )

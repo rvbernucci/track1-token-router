@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from router.core.config import RouterConfig
+from router.core.local_cascade import LocalCascadeRunner
 from router.core.local_runner import LocalM1Runner
 from router.core.logging import JsonlRunLogger
 from router.core.mock_runner import MockCascadeRunner
@@ -18,6 +19,8 @@ def build_runner(config: RouterConfig, logger: JsonlRunLogger) -> TaskRunner:
         return MockCascadeRunner(logger=logger)
     if mode == "local":
         return _build_local_runner(config, logger)
+    if mode == "cascade":
+        return _build_local_cascade_runner(config, logger)
     raise ValueError(f"Unsupported ROUTER_MODE: {config.mode}")
 
 
@@ -40,3 +43,26 @@ def _build_local_runner(config: RouterConfig, logger: JsonlRunLogger) -> LocalM1
         max_tokens=config.m1_max_tokens,
     )
 
+
+def _build_local_cascade_runner(config: RouterConfig, logger: JsonlRunLogger) -> LocalCascadeRunner:
+    if not config.local_base_url:
+        raise ValueError("LOCAL_BASE_URL is required when ROUTER_MODE=cascade.")
+    if not config.local_model:
+        raise ValueError("LOCAL_MODEL is required when ROUTER_MODE=cascade.")
+    client = LocalModelClient(
+        base_url=config.local_base_url,
+        model=config.local_model,
+        api_key=config.local_api_key,
+        timeout_s=config.local_timeout_s,
+        max_retries=config.local_max_retries,
+    )
+    return LocalCascadeRunner(
+        client,
+        logger=logger,
+        m1_temperature=config.m1_temperature,
+        m1_max_tokens=config.m1_max_tokens,
+        m2a_temperature=config.m2a_temperature,
+        m2a_max_tokens=config.m2a_max_tokens,
+        m2b_temperature=config.m2b_temperature,
+        m2b_max_tokens=config.m2b_max_tokens,
+    )

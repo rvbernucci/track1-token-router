@@ -1,0 +1,3 @@
+{"id":"easy_approval","input_text":"What is 2+2?"}
+{"id":"format_guard","input_text":"Return only a JSON object with key answer for 2+2."}
+{"id":"hard_escalation","input_text":"Solve this carefully and return the final answer only: if a train travels 135 km in 1.5 hours, what is its average speed in km/h?"}

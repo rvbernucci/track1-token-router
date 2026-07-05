@@ -17,18 +17,18 @@ Esta e a sprint onde a arquitetura deixa de ser "uma chamada local" e vira triag
 
 ## Checklist
 
-- [ ] Criar `LocalVerifier`.
-- [ ] Criar envelope seguro para `task` + `model_1_candidate_raw`.
-- [ ] Definir schema JSON minimo do M2A.
-- [ ] Validar schema com fallback se o modelo emitir JSON invalido.
-- [ ] Criar rubrica fixa do M2A.
-- [ ] Incluir criterios de erro: formato, factualidade, matematica, instrucao, ambiguidade.
-- [ ] Evitar chain-of-thought no log.
-- [ ] Criar `LocalRepairGenerator` para M2B.
-- [ ] Fazer M2B emitir resposta livre, nao JSON.
-- [ ] Registrar rota `m1_approved` ou `m2b_candidate`.
-- [ ] Testar casos faceis que M2A deve aprovar.
-- [ ] Testar casos dificeis que M2A deve escalar.
+- [x] Criar `LocalVerifier`.
+- [x] Criar envelope seguro para `task` + `model_1_candidate_raw`.
+- [x] Definir schema JSON minimo do M2A.
+- [x] Validar schema com fallback se o modelo emitir JSON invalido.
+- [x] Criar rubrica fixa do M2A.
+- [x] Incluir criterios de erro: formato, factualidade, matematica, instrucao, ambiguidade.
+- [x] Evitar chain-of-thought no log.
+- [x] Criar `LocalRepairGenerator` para M2B.
+- [x] Fazer M2B emitir resposta livre, nao JSON.
+- [x] Registrar rota `m1_approved` ou `m2b_candidate`.
+- [x] Testar casos faceis que M2A deve aprovar.
+- [x] Testar casos dificeis que M2A deve escalar.
 
 ## Schema M2A alvo
 
@@ -44,11 +44,17 @@ Esta e a sprint onde a arquitetura deixa de ser "uma chamada local" e vira triag
 
 ## Criterios de aceite
 
-- Perguntas triviais passam por M1 e sao aprovadas pelo M2A.
-- Perguntas com resposta ruim sao escaladas para M2B.
-- M2B consegue gerar alternativa livre sem contaminar formato.
-- O runner nunca entrega o JSON do M2A ao usuario final.
-- Logs permitem auditar por que uma rota foi escolhida.
+- [x] Perguntas triviais passam por M1 e sao aprovadas pelo M2A.
+- [x] Perguntas com resposta ruim sao escaladas para M2B.
+- [x] M2B consegue gerar alternativa livre sem contaminar formato.
+- [x] O runner nunca entrega o JSON do M2A ao usuario final.
+- [x] Logs permitem auditar por que uma rota foi escolhida.
+
+## Evidencias
+
+- `python3 -m unittest discover -s tests`
+- `ROUTER_MODE=cascade LOCAL_BASE_URL=<openai-compatible-url> LOCAL_MODEL=<model> python3 -m router ask "What is 2+2?"`
+- `evals/smoke/local_cascade_tasks.jsonl`
 
 ## Rubrica M2A
 
@@ -88,4 +94,3 @@ M2A deve aprovar quando:
 ## Saida esperada da sprint
 
 Uma cascata local funcional que ja reduz risco antes de gastar qualquer token remoto.
-
