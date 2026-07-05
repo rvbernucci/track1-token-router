@@ -29,14 +29,14 @@ class RiskSignalSet:
 def extract_risk_signals(
     task: TaskEnvelope,
     *,
-    candidate_answer: str = "",
+    candidate_answer: str | None = None,
     m2a_confidence: str = "",
     budget_remaining_ratio: float = 1.0,
     parse_failure_count: int = 0,
 ) -> RiskSignalSet:
     text = task.input_text.strip()
     lowered = text.lower()
-    answer = candidate_answer.strip()
+    answer = (candidate_answer or "").strip()
     reasons: list[str] = []
 
     strict_format = _has_strict_format(lowered)
@@ -44,7 +44,7 @@ def extract_risk_signals(
     complex_math = _has_complex_math(lowered) and not simple_math
     unstable_knowledge = _has_unstable_knowledge(lowered)
     prompt_injection = _has_prompt_injection(lowered)
-    answer_empty = candidate_answer != "" and not answer
+    answer_empty = candidate_answer is not None and not answer
     answer_too_short = bool(answer) and len(answer) < 2 and not simple_math
     answer_too_long = len(answer) > 1200
 

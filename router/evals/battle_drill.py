@@ -12,6 +12,7 @@ from router.core.guardrails import evaluate_guardrail
 from router.core.mock_runner import MockCascadeRunner
 from router.core.policy import DEFAULT_POLICY, POLICIES
 from router.evals.fuzz_dataset import run_fuzz_pack, validate_fuzz_dataset
+from router.evals.bad_local_model import run_bad_local_model_drill
 from router.evals.operational_envelope import (
     LatencyThresholds,
     TokenEnvelopeThresholds,
@@ -63,6 +64,7 @@ def run_battle_drill(
         candidate_policy=str(candidate.get("policy") or DEFAULT_POLICY),
         thresholds=TokenEnvelopeThresholds.from_env(),
     )
+    bad_local_model_probe = run_bad_local_model_drill()
     risks = _remaining_risks(
         scoreboard,
         prompt_ablation,
@@ -72,6 +74,7 @@ def run_battle_drill(
         fuzz_probe,
         latency_probe,
         token_envelope,
+        bad_local_model_probe,
     )
     return {
         "tasks": len(tasks),
@@ -90,6 +93,7 @@ def run_battle_drill(
         "fuzz_probe": fuzz_probe,
         "latency_probe": latency_probe,
         "token_envelope": token_envelope,
+        "bad_local_model_probe": bad_local_model_probe,
         "readiness": _readiness(
             candidate,
             prompt_ablation,
@@ -100,6 +104,7 @@ def run_battle_drill(
             fuzz_probe,
             latency_probe,
             token_envelope,
+            bad_local_model_probe,
         ),
         "risks": risks,
     }
@@ -183,6 +188,12 @@ def write_battle_report_markdown(path: Path, report: dict[str, Any]) -> None:
             f"- latency_ready: `{report.get('latency_probe', {}).get('ready')}`",
             f"- token_envelope_ready: `{report.get('token_envelope', {}).get('ready')}`",
             f"- candidate_run_exposure: `{(report.get('token_envelope', {}).get('candidate') or {}).get('run_exposure')}`",
+            "",
+            "## Bad Local Model Chaos",
+            "",
+            f"- bad_local_model_ready: `{report.get('bad_local_model_probe', {}).get('ok')}`",
+            f"- false_approval_rate: `{(report.get('bad_local_model_probe', {}).get('metrics') or {}).get('false_approval_rate')}`",
+            f"- containment_rate: `{(report.get('bad_local_model_probe', {}).get('metrics') or {}).get('containment_rate')}`",
         ]
     )
     lines.extend(["", "## Readiness", ""])
@@ -331,6 +342,7 @@ def _readiness(
     fuzz_probe: dict[str, Any],
     latency_probe: dict[str, Any],
     token_envelope: dict[str, Any],
+    bad_local_model_probe: dict[str, Any],
 ) -> dict[str, bool]:
     return {
         "candidate_selected": bool(candidate.get("policy")),
@@ -348,6 +360,7 @@ def _readiness(
         and len(fuzz_probe.get("classes") or {}) >= 10,
         "latency_ready": bool(latency_probe.get("ready")),
         "token_envelope_ready": bool(token_envelope.get("ready")),
+        "bad_local_model_ready": bool(bad_local_model_probe.get("ok")),
     }
 
 
@@ -360,6 +373,7 @@ def _remaining_risks(
     fuzz_probe: dict[str, Any],
     latency_probe: dict[str, Any],
     token_envelope: dict[str, Any],
+    bad_local_model_probe: dict[str, Any],
 ) -> list[str]:
     risks = []
     if (prompt_ablation.get("errors") or []):
@@ -381,6 +395,8 @@ def _remaining_risks(
         risks.append("Latency envelope is outside the offline threshold.")
     if not token_envelope.get("ready"):
         risks.append("Candidate token envelope exceeds the conservative offline threshold.")
+    if not bad_local_model_probe.get("ok"):
+        risks.append("Bad local model chaos probe is not containing bad candidates.")
     if not risks:
         risks.append("No offline blocker found; next risk is real runtime calibration.")
     return risks

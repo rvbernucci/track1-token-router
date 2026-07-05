@@ -50,6 +50,12 @@
 - token_envelope_ready: `True`
 - candidate_run_exposure: `6675`
 
+## Bad Local Model Chaos
+
+- bad_local_model_ready: `True`
+- false_approval_rate: `0.0`
+- containment_rate: `1.0`
+
 ## Readiness
 
 - candidate_selected: `ok`
@@ -63,6 +69,7 @@
 - fuzz_pack_ready: `ok`
 - latency_ready: `ok`
 - token_envelope_ready: `ok`
+- bad_local_model_ready: `ok`
 
 ## Risks
 

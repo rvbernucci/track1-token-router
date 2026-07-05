@@ -23,6 +23,7 @@ python3 scripts/state_machine_report.py >/dev/null
 python3 scripts/generate_release_notes.py --tag offline-dry-run --output reports/generated/release-notes.md >/dev/null
 python3 scripts/adapter_drill.py --check >/dev/null
 python3 scripts/battle_drill.py >/dev/null
+python3 scripts/bad_local_model_drill.py --check >/dev/null
 python3 scripts/export_public_report.py --check >/dev/null
 python3 scripts/check_demo_site.py --check >/dev/null
 python3 scripts/secret_scan.py

@@ -55,6 +55,17 @@ class PolicyEngineTests(unittest.TestCase):
         self.assertEqual(decision.action, "deny_remote")
         self.assertIn("run_budget_empty", decision.reasons)
 
+    def test_empty_candidate_requires_repair_without_polluting_input_only_signals(self) -> None:
+        task = TaskEnvelope(input_text="Summarize the router thesis.")
+
+        input_only = extract_risk_signals(task)
+        empty_candidate = extract_risk_signals(task, candidate_answer="")
+        decision = decide_policy(empty_candidate)
+
+        self.assertFalse(input_only.answer_empty)
+        self.assertTrue(empty_candidate.answer_empty)
+        self.assertEqual(decision.action, "repair")
+
     def test_policy_ablation_generates_ranked_profiles(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "offline"

@@ -12,6 +12,7 @@ from typing import Any
 
 SCENARIO_RESPONSES = {
     "happy": "local answer",
+    "empty_or_refusal": "   ",
     "verifier-approve": json.dumps(
         {
             "decision": "approve",
@@ -45,6 +46,10 @@ SCENARIO_RESPONSES = {
         }
     ),
     "wrong-answer": "intentionally wrong answer",
+    "hallucination_confident": "Dr. Lisa Su stepped down in 2025 and Mark Papermaster is the current CEO of AMD.",
+    "format_drift": '```json\n{"answer":"remote"}\n```',
+    "verbose_when_strict": "The answer is 2 because the task asks for the low-risk score.",
+    "wrong_math_plausible": "8",
 }
 
 

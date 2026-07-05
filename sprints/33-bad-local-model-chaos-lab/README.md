@@ -27,19 +27,19 @@ O maior risco nao e o modelo local errar. O maior risco e o sistema confiar no e
 
 ## Checklist
 
-- [ ] Criar perfil `hallucination_confident`.
-- [ ] Criar perfil `format_drift`.
-- [ ] Criar perfil `empty_or_refusal`.
-- [ ] Criar perfil `verbose_when_strict`.
-- [ ] Criar perfil `wrong_math_plausible`.
-- [ ] Criar fixture de tarefas que parecem faceis mas exigem validacao.
-- [ ] Medir taxa de aprovacao indevida.
-- [ ] Medir taxa de reparo local.
-- [ ] Medir taxa de remote audit dry-run.
-- [ ] Falhar em `--check` quando aprovacao indevida passar limite.
-- [ ] Confirmar que final validator repara formatos estritos simples.
-- [ ] Confirmar que perguntas atuais/riscadas escalam.
-- [ ] Adicionar testes automatizados para cada perfil ruim.
+- [x] Criar perfil `hallucination_confident`.
+- [x] Criar perfil `format_drift`.
+- [x] Criar perfil `empty_or_refusal`.
+- [x] Criar perfil `verbose_when_strict`.
+- [x] Criar perfil `wrong_math_plausible`.
+- [x] Criar fixture de tarefas que parecem faceis mas exigem validacao.
+- [x] Medir taxa de aprovacao indevida.
+- [x] Medir taxa de reparo local.
+- [x] Medir taxa de remote audit dry-run.
+- [x] Falhar em `--check` quando aprovacao indevida passar limite.
+- [x] Confirmar que final validator repara formatos estritos simples.
+- [x] Confirmar que perguntas atuais/riscadas escalam.
+- [x] Adicionar testes automatizados para cada perfil ruim.
 
 ## Criterios de aceite
 
