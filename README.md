@@ -56,3 +56,27 @@ Regra importante:
 - `stdout`: resposta final ou JSON final esperado pelo evaluator.
 - `stderr`: mensagens humanas de debug.
 - `logs/`: metricas e traces estruturados.
+
+## Instalacao local
+
+```bash
+python3 -m pip install -e .
+```
+
+Tambem e possivel rodar sem instalar:
+
+```bash
+python3 -m router ask "What is 2+2?"
+```
+
+## Variaveis de ambiente
+
+| Variavel | Padrao | Papel |
+|---|---|---|
+| `ROUTER_LOG_PATH` | `logs/run.jsonl` | Caminho dos logs estruturados JSONL. |
+| `ROUTER_MODE` | `mock` | Modo de execucao do runner. |
+| `LOCAL_BASE_URL` | vazio | Endpoint OpenAI-compatible do modelo local. |
+| `LOCAL_MODEL` | vazio | Nome do modelo local. |
+| `FIREWORKS_BASE_URL` | `https://api.fireworks.ai/inference/v1` | Endpoint Fireworks OpenAI-compatible. |
+| `FIREWORKS_MODEL` | vazio | Modelo remoto Fireworks. |
+| `FIREWORKS_API_KEY` | vazio | API key Fireworks, usada apenas nas sprints remotas. |

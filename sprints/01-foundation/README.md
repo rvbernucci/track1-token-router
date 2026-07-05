@@ -17,26 +17,33 @@ Esta sprint nao tenta ganhar o hackathon ainda. Ela impede que a gente se perca 
 
 ## Checklist
 
-- [ ] Criar `pyproject.toml`.
-- [ ] Criar pacote `router`.
-- [ ] Criar modulo `router.core.contracts`.
-- [ ] Criar modulo `router.cli.main`.
-- [ ] Definir schema de entrada para texto simples.
-- [ ] Definir schema de entrada para JSON.
-- [ ] Definir schema de entrada para JSONL.
-- [ ] Garantir que `stdout` so imprime resposta final.
-- [ ] Garantir que logs humanos vao para `stderr`.
-- [ ] Criar logger JSONL em `logs/run.jsonl`.
-- [ ] Criar testes de serializacao e desserializacao.
-- [ ] Documentar env vars minimas.
+- [x] Criar `pyproject.toml`.
+- [x] Criar pacote `router`.
+- [x] Criar modulo `router.core.contracts`.
+- [x] Criar modulo `router.cli.main`.
+- [x] Definir schema de entrada para texto simples.
+- [x] Definir schema de entrada para JSON.
+- [x] Definir schema de entrada para JSONL.
+- [x] Garantir que `stdout` so imprime resposta final.
+- [x] Garantir que logs humanos vao para `stderr`.
+- [x] Criar logger JSONL em `logs/run.jsonl`.
+- [x] Criar testes de serializacao e desserializacao.
+- [x] Documentar env vars minimas.
 
 ## Criterios de aceite
 
-- `router ask "What is 2+2?"` retorna uma resposta mockada no `stdout`.
-- `router solve --json < task.json` parseia o envelope e retorna JSON final.
-- `router run --jsonl tasks.jsonl --out output.jsonl` processa multiplas tasks.
-- Nenhum log de debug contamina `stdout`.
-- Testes passam localmente.
+- [x] `router ask "What is 2+2?"` retorna uma resposta mockada no `stdout`.
+- [x] `router solve --json < task.json` parseia o envelope e retorna JSON final.
+- [x] `router run --jsonl tasks.jsonl --out output.jsonl` processa multiplas tasks.
+- [x] Nenhum log de debug contamina `stdout`.
+- [x] Testes passam localmente.
+
+## Evidencias
+
+- `python3 -m unittest discover -s tests`
+- `python3 -m router ask "What is 2+2?"`
+- `python3 -m router solve --json`
+- `python3 -m router run --jsonl tasks.jsonl --out output.jsonl`
 
 ## Decisoes tecnicas
 
@@ -54,4 +61,3 @@ Esta sprint nao tenta ganhar o hackathon ainda. Ela impede que a gente se perca 
 ## Saida esperada da sprint
 
 Um runner ainda burro, mas confiavel. A partir daqui, qualquer inteligencia entra por tras de contratos estaveis.
-

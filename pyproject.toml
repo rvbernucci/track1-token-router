@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "track1-token-router"
+version = "0.1.0"
+description = "Hybrid token-efficient routing agent for AMD Developer Hackathon Track 1."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "rvbernucci" }
+]
+dependencies = []
+
+[project.scripts]
+router = "router.cli.main:main"
+
+[tool.setuptools.packages.find]
+include = ["router*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
