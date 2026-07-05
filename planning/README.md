@@ -56,7 +56,7 @@ TaskEnvelope
 - Container reproduzivel antes da ultima sprint, nao no ultimo dia.
 - Otimizacao por Pareto: qualidade suficiente com o menor token remoto possivel.
 
-## Cinco sprints
+## Sprints concluidas
 
 | Sprint | Tema | Resultado esperado |
 |---|---|---|
@@ -65,6 +65,29 @@ TaskEnvelope
 | 03 | Verificador M2A e M2B | Cascata local com decisao approve/escalate e alternativa. |
 | 04 | Fireworks e scoring | Auditor remoto, token accounting, eval harness e calibracao. |
 | 05 | Hardening e entrega | Docker, robustez, README publico e pacote de submissao. |
+
+## Roadmap sem credito
+
+Esta e a rota principal enquanto os creditos AMD/Fireworks nao forem liberados.
+
+| Sprint | Tema | Resultado esperado |
+|---|---|---|
+| 06 | Offline Evaluation Arena | Dataset grande, adversarial e medivel sem provedores reais. |
+| 07 | Routing Policy Lab | Modos `aggressive`, `balanced`, `conservative` calibrados offline. |
+| 08 | Fake Provider Chaos Lab | Simuladores de local/Fireworks com latencia, falhas e custos falsos. |
+| 09 | Official Adapter Readiness | Estrutura para adaptar rapido ao formato oficial no kickoff. |
+| 10 | Offline Release Candidate | Release candidate que roda sem credito e esta pronto para plugar credenciais. |
+
+## Roadmap dependente de credito
+
+Esta trilha nao bloqueia a rota principal. Ela comeca quando houver acesso real.
+
+| Sprint | Depende de | Resultado esperado |
+|---|---|---|
+| Credit A | AMD Developer Cloud | Modelo local real rodando em endpoint OpenAI-compatible. |
+| Credit B | Fireworks | Auditor remoto real calibrado com tokens reais. |
+| Credit C | AMD + Fireworks | Benchmark end-to-end de custo, latencia e qualidade. |
+| Credit D | AMD + Fireworks + kickoff | Ensaio final no ambiente mais parecido com scoring oficial. |
 
 ## Definition of Done global
 
@@ -88,4 +111,3 @@ TaskEnvelope
   - reduz risco no scoring?
   - melhora reproducibilidade?
   - ou e so complexidade bonita?
-

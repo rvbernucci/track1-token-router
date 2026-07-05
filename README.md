@@ -29,6 +29,27 @@ Prioridades:
 | [`planning`](./planning/README.md) | Builder plan, principios, definition of done e estrategia-mestra. |
 | [`sprints`](./sprints/README.md) | Plano operacional em 5 sprints com checklists e criterios de aceite. |
 
+## Roadmap atual
+
+A rota principal do projeto nao depende de creditos AMD ou Fireworks.
+
+Enquanto os creditos nao chegam, seguimos nas sprints offline:
+
+- Sprint 06: offline evaluation arena.
+- Sprint 07: routing policy lab.
+- Sprint 08: fake provider chaos lab.
+- Sprint 09: official adapter readiness.
+- Sprint 10: offline release candidate.
+
+Quando os creditos chegarem, entramos na trilha paralela `credit-gated`:
+
+- Credit A: AMD runtime bring-up.
+- Credit B: Fireworks real audit calibration.
+- Credit C: end-to-end cost benchmark.
+- Credit D: final cloud submission drill.
+
+Detalhes em [`sprints`](./sprints/README.md).
+
 ## Fluxo alvo
 
 ```text
