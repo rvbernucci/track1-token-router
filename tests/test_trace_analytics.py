@@ -24,6 +24,7 @@ class TraceAnalyticsTests(unittest.TestCase):
         self.assertEqual(summary["latency_ms"]["latency_fireworks_ms"], 95)
         self.assertEqual(summary["parse_failures"], 1)
         self.assertEqual(summary["errors"], 1)
+        self.assertEqual(summary["budget"]["decisions"]["allow_remote"], 1)
 
     def test_empty_trace_summary_is_valid(self) -> None:
         summary = summarize_traces([])

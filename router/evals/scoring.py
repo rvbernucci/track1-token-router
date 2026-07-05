@@ -5,6 +5,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+from router.orchestration.budget import TaskBudget, summarize_policy_budget
+
 
 @dataclass(frozen=True)
 class ScoringWeights:
@@ -12,14 +14,20 @@ class ScoringWeights:
     remote_token: float = 0.02
     latency_ms: float = 0.001
     parse_failure: float = 25.0
+    budget_violation: float = 50.0
 
     def to_dict(self) -> dict[str, float]:
         return asdict(self)
 
 
-def build_scoreboard(comparison: dict[str, Any], weights: ScoringWeights) -> dict[str, Any]:
+def build_scoreboard(
+    comparison: dict[str, Any],
+    weights: ScoringWeights,
+    *,
+    budget: TaskBudget | None = None,
+) -> dict[str, Any]:
     rows = [
-        _score_policy(policy, summary, weights)
+        _score_policy(policy, summary, weights, budget or TaskBudget())
         for policy, summary in comparison.get("policies", {}).items()
         if isinstance(summary, dict)
     ]
@@ -33,7 +41,8 @@ def build_scoreboard(comparison: dict[str, Any], weights: ScoringWeights) -> dic
             "score = exact_match_rate * accuracy_weight "
             "- remote_tokens_total * remote_token_weight "
             "- latency_ms_total * latency_ms_weight "
-            "- parse_failures * parse_failure_weight"
+            "- parse_failures * parse_failure_weight "
+            "- budget_violations * budget_violation_weight"
         ),
         "rows": rows,
     }
@@ -57,11 +66,12 @@ def write_scoreboard_report(path: Path, scoreboard: dict[str, Any]) -> None:
             f"`accuracy={weights['accuracy']}`, "
             f"`remote_token={weights['remote_token']}`, "
             f"`latency_ms={weights['latency_ms']}`, "
-            f"`parse_failure={weights['parse_failure']}`"
+            f"`parse_failure={weights['parse_failure']}`, "
+            f"`budget_violation={weights['budget_violation']}`"
         ),
         "",
-        "| rank | policy | score | exact_match_rate | remote_tokens | latency_ms | parse_failures |",
-        "|---:|---|---:|---:|---:|---:|---:|",
+        "| rank | policy | score | exact_match_rate | remote_tokens | budget_violations | latency_ms | parse_failures |",
+        "|---:|---|---:|---:|---:|---:|---:|---:|",
     ]
     for row in scoreboard["rows"]:
         lines.append(
@@ -71,6 +81,7 @@ def write_scoreboard_report(path: Path, scoreboard: dict[str, Any]) -> None:
             f"{row['score']:.3f} | "
             f"{row['exact_match_rate']:.3f} | "
             f"{row['remote_tokens_total']} | "
+            f"{row.get('budget_violations', 0)} | "
             f"{row['latency_ms_total']} | "
             f"{row['parse_failures']} |"
         )
@@ -88,16 +99,19 @@ def write_scoreboard_report(path: Path, scoreboard: dict[str, Any]) -> None:
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
-def _score_policy(policy: str, summary: dict[str, Any], weights: ScoringWeights) -> dict[str, Any]:
+def _score_policy(policy: str, summary: dict[str, Any], weights: ScoringWeights, budget: TaskBudget) -> dict[str, Any]:
     exact_match_rate = _float(summary.get("exact_match_rate"))
     remote_tokens_total = _int(_nested(summary, "remote_tokens", "total"))
     latency_ms_total = sum(_int(value) for value in (summary.get("latency_ms") or {}).values())
     parse_failures = _int(summary.get("parse_failures"))
+    budget_summary = summarize_policy_budget(summary, budget)
+    budget_violations = _int(budget_summary.get("budget_violations"))
     score = (
         exact_match_rate * weights.accuracy
         - remote_tokens_total * weights.remote_token
         - latency_ms_total * weights.latency_ms
         - parse_failures * weights.parse_failure
+        - budget_violations * weights.budget_violation
     )
     return {
         "rank": 0,
@@ -107,6 +121,8 @@ def _score_policy(policy: str, summary: dict[str, Any], weights: ScoringWeights)
         "remote_tokens_total": remote_tokens_total,
         "latency_ms_total": latency_ms_total,
         "parse_failures": parse_failures,
+        "budget_violations": budget_violations,
+        "budget": budget_summary,
         "escalation_rate": _float(summary.get("escalation_rate")),
         "replacement_rate": _float(summary.get("replacement_rate")),
         "expected_route_match_rate": _float(_nested(summary, "expected_route", "match_rate")),

@@ -103,6 +103,9 @@ python3 -m router ask "What is 2+2?"
 | `LOCAL_BASE_URL` | vazio | Endpoint OpenAI-compatible do modelo local. |
 | `ENABLE_GUARDRAILS` | `0` | Liga regras deterministicas conservadoras antes do runner. |
 | `ENABLE_ORCHESTRATOR` | `0` | Liga trace de state machine em torno do runner. |
+| `MAX_REMOTE_TOKENS_PER_TASK` | `300` | Budget remoto simulado por task. |
+| `MAX_REMOTE_TOKENS_PER_RUN` | `6000` | Budget remoto simulado por run offline. |
+| `MAX_REMOTE_LATENCY_MS` | `3000` | Limite de risco de latencia remota por decisao. |
 | `LOCAL_MODEL` | vazio | Nome do modelo local. |
 | `LOCAL_API_KEY` | vazio | API key opcional para endpoint local protegido. |
 | `LOCAL_TIMEOUT_S` | `30` | Timeout por chamada local. |

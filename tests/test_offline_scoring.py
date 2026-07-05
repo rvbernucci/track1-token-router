@@ -19,6 +19,7 @@ class OfflineScoringTests(unittest.TestCase):
         self.assertEqual(scoreboard["rows"][0]["policy"], "balanced")
         self.assertGreater(scoreboard["rows"][0]["score"], scoreboard["rows"][1]["score"])
         self.assertIn("remote_tokens_total", scoreboard["rows"][0])
+        self.assertIn("budget_violations", scoreboard["rows"][0])
 
     def test_scoreboard_report_documents_formula(self) -> None:
         scoreboard = {

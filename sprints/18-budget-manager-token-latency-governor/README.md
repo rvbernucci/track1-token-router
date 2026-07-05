@@ -24,18 +24,18 @@ O jogo do Track 1 e acertar gastando pouco. Sem budget manager, o sistema pode t
 
 ## Checklist
 
-- [ ] Definir budget padrao por task.
-- [ ] Definir budget global por run.
-- [ ] Estimar tokens antes de chamada remota.
-- [ ] Registrar tokens reais depois de chamada remota.
-- [ ] Criar decisao `allow_remote`.
-- [ ] Criar decisao `deny_remote_budget_exceeded`.
-- [ ] Criar decisao `deny_remote_latency_risk`.
-- [ ] Penalizar parse failure no budget.
-- [ ] Integrar com `offline_score_simulator.py`.
-- [ ] Adicionar metricas no trace analytics.
-- [ ] Adicionar testes de estouro de token.
-- [ ] Adicionar testes de estouro de latencia.
+- [x] Definir budget padrao por task.
+- [x] Definir budget global por run.
+- [x] Estimar tokens antes de chamada remota.
+- [x] Registrar tokens reais depois de chamada remota.
+- [x] Criar decisao `allow_remote`.
+- [x] Criar decisao `deny_remote_budget_exceeded`.
+- [x] Criar decisao `deny_remote_latency_risk`.
+- [x] Penalizar parse failure no budget.
+- [x] Integrar com `offline_score_simulator.py`.
+- [x] Adicionar metricas no trace analytics.
+- [x] Adicionar testes de estouro de token.
+- [x] Adicionar testes de estouro de latencia.
 
 ## Criterios de aceite
 
@@ -48,3 +48,15 @@ O jogo do Track 1 e acertar gastando pouco. Sem budget manager, o sistema pode t
 
 Um governador de custo que impede a arquitetura de vencer uma task e perder a competicao.
 
+## Evidencia local
+
+```bash
+python3 -m unittest tests.test_budget_manager
+python3 scripts/offline_score_simulator.py
+python3 scripts/analyze_traces.py --logs fixtures/logs/sample-run.jsonl
+scripts/offline_release_check.sh
+```
+
+## Decisao
+
+O budget manager nasce como modulo deterministico e offline. Ele define decisoes `allow_remote`, `deny_remote_budget_exceeded` e `deny_remote_latency_risk`, registra gasto real e injeta penalidade por violacao no scoreboard. A policy engine da Sprint 19 passa a consumir esses sinais para decidir melhor.

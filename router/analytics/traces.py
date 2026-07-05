@@ -71,6 +71,8 @@ def summarize_traces(
     parse_failures = 0
     error_count = 0
     answer_chars = 0
+    budget_decisions: dict[str, int] = {}
+    budget_denials = 0
 
     for record in records:
         route = str(record.get("route") or "unknown")
@@ -82,6 +84,11 @@ def summarize_traces(
             parse_failures += 1
         if _is_error_record(record):
             error_count += 1
+        decision = _budget_decision(record)
+        if decision:
+            budget_decisions[decision] = budget_decisions.get(decision, 0) + 1
+            if decision.startswith("deny_"):
+                budget_denials += 1
 
     return {
         "source_files": [str(path) for path in source_files],
@@ -94,6 +101,10 @@ def summarize_traces(
         "errors": error_count,
         "ingestion_errors": list(ingestion_errors),
         "answer_chars": answer_chars,
+        "budget": {
+            "decisions": budget_decisions,
+            "denials": budget_denials,
+        },
     }
 
 
@@ -113,6 +124,7 @@ def write_trace_summary_report(path: Path, summary: dict[str, Any]) -> None:
         f"- parse_failures: {summary.get('parse_failures')}",
         f"- remote_tokens: `{json.dumps(summary.get('remote_tokens'), sort_keys=True)}`",
         f"- latency_ms: `{json.dumps(summary.get('latency_ms'), sort_keys=True)}`",
+        f"- budget: `{json.dumps(summary.get('budget'), sort_keys=True)}`",
         "",
         "## Routes",
         "",
@@ -181,6 +193,16 @@ def _is_error_record(record: dict[str, Any]) -> bool:
             any(str(key).endswith("_error") for key in extra),
         ]
     )
+
+
+def _budget_decision(record: dict[str, Any]) -> str:
+    extra = record.get("extra") if isinstance(record.get("extra"), dict) else {}
+    payload = extra.get("budget_decision") or record.get("budget_decision")
+    if isinstance(payload, dict):
+        return str(payload.get("decision") or "")
+    if isinstance(payload, str):
+        return payload
+    return ""
 
 
 def _int(value: Any) -> int:

@@ -30,6 +30,9 @@ class RouterConfig:
     fireworks_max_tokens: int
     enable_guardrails: bool
     enable_orchestrator: bool
+    max_remote_tokens_per_task: int
+    max_remote_tokens_per_run: int
+    max_remote_latency_ms: int
 
     @classmethod
     def from_env(cls) -> "RouterConfig":
@@ -57,6 +60,9 @@ class RouterConfig:
             fireworks_max_tokens=int(os.getenv("FIREWORKS_MAX_TOKENS", "256")),
             enable_guardrails=_env_flag("ENABLE_GUARDRAILS"),
             enable_orchestrator=_env_flag("ENABLE_ORCHESTRATOR"),
+            max_remote_tokens_per_task=int(os.getenv("MAX_REMOTE_TOKENS_PER_TASK", "300")),
+            max_remote_tokens_per_run=int(os.getenv("MAX_REMOTE_TOKENS_PER_RUN", "6000")),
+            max_remote_latency_ms=int(os.getenv("MAX_REMOTE_LATENCY_MS", "3000")),
         )
 
 
