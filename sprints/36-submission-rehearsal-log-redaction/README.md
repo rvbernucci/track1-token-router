@@ -27,19 +27,19 @@ Uma submissao forte nao e so codigo passando. E um ritual reproduzivel: demo, co
 
 ## Checklist
 
-- [ ] Mapear campos sensiveis em logs e traces.
-- [ ] Redigir prompts longos acima de limite configuravel.
-- [ ] Redigir candidates longos acima de limite configuravel.
-- [ ] Mascarar paths locais absolutos.
-- [ ] Bloquear IPs privados.
-- [ ] Bloquear hostnames privados.
-- [ ] Bloquear tokens e env assignments.
-- [ ] Gerar trace summary publico.
-- [ ] Criar rehearsal script/runbook de 5 minutos.
-- [ ] Rodar comandos do video em ordem.
-- [ ] Medir duracao estimada do video.
-- [ ] Validar audio/tela/terminal como checklist.
-- [ ] Atualizar `submission/final-checklist.md`.
+- [x] Mapear campos sensiveis em logs e traces.
+- [x] Redigir prompts longos acima de limite configuravel.
+- [x] Redigir candidates longos acima de limite configuravel.
+- [x] Mascarar paths locais absolutos.
+- [x] Bloquear IPs privados.
+- [x] Bloquear hostnames privados.
+- [x] Bloquear tokens e env assignments.
+- [x] Gerar trace summary publico.
+- [x] Criar rehearsal script/runbook de 5 minutos.
+- [x] Rodar comandos do video em ordem.
+- [x] Medir duracao estimada do video.
+- [x] Validar audio/tela/terminal como checklist.
+- [x] Atualizar `submission/final-checklist.md`.
 
 ## Criterios de aceite
 

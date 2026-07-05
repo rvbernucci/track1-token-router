@@ -28,6 +28,8 @@
 
 - [x] Shotlist exists.
 - [x] Exact terminal commands are documented.
+- [x] Submission rehearsal runbook exists.
+- [x] Public trace redaction check exists.
 - [ ] Audio checked.
 - [ ] Screen resolution checked.
 - [ ] Terminal font size checked.

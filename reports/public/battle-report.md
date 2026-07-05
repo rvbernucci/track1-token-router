@@ -65,7 +65,7 @@
 ## Batch Stress
 
 - batch_stress_ready: `True`
-- tasks_per_second: `11538.944`
+- tasks_per_second: `11806.358`
 - output_contract_pass_rate: `1.0`
 
 ## Readiness
