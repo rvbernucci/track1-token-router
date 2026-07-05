@@ -102,6 +102,7 @@ python3 -m router ask "What is 2+2?"
 | `ROUTER_POLICY` | `balanced` | Politica de roteamento: `aggressive`, `balanced` ou `conservative`. |
 | `LOCAL_BASE_URL` | vazio | Endpoint OpenAI-compatible do modelo local. |
 | `ENABLE_GUARDRAILS` | `0` | Liga regras deterministicas conservadoras antes do runner. |
+| `ENABLE_ORCHESTRATOR` | `0` | Liga trace de state machine em torno do runner. |
 | `LOCAL_MODEL` | vazio | Nome do modelo local. |
 | `LOCAL_API_KEY` | vazio | API key opcional para endpoint local protegido. |
 | `LOCAL_TIMEOUT_S` | `30` | Timeout por chamada local. |
@@ -264,6 +265,13 @@ Trace analytics offline:
 python3 scripts/analyze_traces.py \
   --logs "logs/*.jsonl" \
   --report reports/generated/trace-summary.md
+```
+
+State machine report:
+
+```bash
+python3 scripts/state_machine_report.py \
+  --report reports/generated/state-machine-report.md
 ```
 
 Release notes dry-run:

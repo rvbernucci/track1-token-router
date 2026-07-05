@@ -24,18 +24,18 @@ Competicao nao premia arquitetura bonita; premia comportamento repetivel sob pre
 
 ## Checklist
 
-- [ ] Definir estados: `received`, `guardrail`, `m1_candidate`, `local_verify`, `local_repair`, `remote_audit`, `final`, `failed`.
-- [ ] Definir eventos de transicao: `approve`, `escalate`, `replace`, `fallback`, `error`.
-- [ ] Criar contrato `OrchestrationTrace`.
-- [ ] Criar contrato `OrchestrationStep`.
-- [ ] Integrar guardrails como primeiro estado opcional.
-- [ ] Integrar M1/M2A/M2B/Fireworks sem duplicar logica existente.
-- [ ] Definir fallback para erro local.
-- [ ] Definir fallback para erro remoto.
-- [ ] Definir fallback para parse invalido.
-- [ ] Adicionar testes de transicao.
-- [ ] Adicionar teste de trace completo.
-- [ ] Documentar diagrama da state machine.
+- [x] Definir estados: `received`, `guardrail`, `m1_candidate`, `local_verify`, `local_repair`, `remote_audit`, `final`, `failed`.
+- [x] Definir eventos de transicao: `approve`, `escalate`, `replace`, `fallback`, `error`.
+- [x] Criar contrato `OrchestrationTrace`.
+- [x] Criar contrato `OrchestrationStep`.
+- [x] Integrar guardrails como primeiro estado opcional.
+- [x] Integrar M1/M2A/M2B/Fireworks sem duplicar logica existente.
+- [x] Definir fallback para erro local.
+- [x] Definir fallback para erro remoto.
+- [x] Definir fallback para parse invalido.
+- [x] Adicionar testes de transicao.
+- [x] Adicionar teste de trace completo.
+- [x] Documentar diagrama da state machine.
 
 ## Criterios de aceite
 
@@ -48,3 +48,31 @@ Competicao nao premia arquitetura bonita; premia comportamento repetivel sob pre
 
 Um orquestrador previsivel, auditavel e pronto para receber politicas mais inteligentes.
 
+## Diagrama
+
+```text
+received
+  -> guardrail
+      -> final
+  -> m1_candidate
+      -> local_verify
+          -> final
+          -> local_repair
+              -> final
+              -> remote_audit
+                  -> final
+                  -> failed -> final
+```
+
+## Evidencia local
+
+```bash
+ENABLE_ORCHESTRATOR=1 ENABLE_GUARDRAILS=1 python3 -m router ask "What is 10 + 5?" --json
+python3 scripts/state_machine_report.py
+python3 -m unittest tests.test_state_machine
+scripts/offline_release_check.sh
+```
+
+## Decisao
+
+O `OrchestratedRunner` envolve os runners existentes e infere estados a partir da rota final. Isso evita duplicar a logica M1/M2A/M2B/Fireworks agora, mas ja entrega trace estruturado para policy, budget e battle drill nas proximas sprints.

@@ -29,6 +29,7 @@ class RouterConfig:
     fireworks_temperature: float
     fireworks_max_tokens: int
     enable_guardrails: bool
+    enable_orchestrator: bool
 
     @classmethod
     def from_env(cls) -> "RouterConfig":
@@ -55,6 +56,7 @@ class RouterConfig:
             fireworks_temperature=float(os.getenv("FIREWORKS_TEMPERATURE", "0.0")),
             fireworks_max_tokens=int(os.getenv("FIREWORKS_MAX_TOKENS", "256")),
             enable_guardrails=_env_flag("ENABLE_GUARDRAILS"),
+            enable_orchestrator=_env_flag("ENABLE_ORCHESTRATOR"),
         )
 
 

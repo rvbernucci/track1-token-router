@@ -10,23 +10,30 @@ from router.core.logging import JsonlRunLogger
 from router.core.mock_runner import MockCascadeRunner
 from router.core.model_client import LocalModelClient
 from router.core.runner import TaskRunner
+from router.orchestration.state_machine import OrchestratedRunner
 
 
 def build_runner(config: RouterConfig, logger: JsonlRunLogger) -> TaskRunner:
     mode = config.mode.lower()
     if mode == "mock":
-        return _with_guardrails(MockCascadeRunner(logger=logger), config, logger)
+        return _wrap_runner(MockCascadeRunner(logger=logger), config, logger)
     if mode == "auto":
         if config.local_base_url and config.local_model:
-            return _with_guardrails(_build_local_runner(config, logger), config, logger)
-        return _with_guardrails(MockCascadeRunner(logger=logger), config, logger)
+            return _wrap_runner(_build_local_runner(config, logger), config, logger)
+        return _wrap_runner(MockCascadeRunner(logger=logger), config, logger)
     if mode == "local":
-        return _with_guardrails(_build_local_runner(config, logger), config, logger)
+        return _wrap_runner(_build_local_runner(config, logger), config, logger)
     if mode == "cascade":
-        return _with_guardrails(_build_local_cascade_runner(config, logger), config, logger)
+        return _wrap_runner(_build_local_cascade_runner(config, logger), config, logger)
     if mode == "hybrid":
-        return _with_guardrails(_build_hybrid_cascade_runner(config, logger), config, logger)
+        return _wrap_runner(_build_hybrid_cascade_runner(config, logger), config, logger)
     raise ValueError(f"Unsupported ROUTER_MODE: {config.mode}")
+
+
+def _wrap_runner(runner: TaskRunner, config: RouterConfig, logger: JsonlRunLogger) -> TaskRunner:
+    if config.enable_orchestrator:
+        return OrchestratedRunner(runner, logger=logger, enable_guardrails=config.enable_guardrails)
+    return _with_guardrails(runner, config, logger)
 
 
 def _with_guardrails(runner: TaskRunner, config: RouterConfig, logger: JsonlRunLogger) -> TaskRunner:
