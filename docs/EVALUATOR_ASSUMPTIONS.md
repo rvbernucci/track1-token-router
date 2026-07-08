@@ -19,6 +19,7 @@ This document maps what can still surprise us after the Participant Guide reveal
 - Fireworks calls must use `FIREWORKS_BASE_URL`.
 - Allowed model IDs arrive through `ALLOWED_MODELS`.
 - Local models and local tokens count as zero for final score.
+- Local model answers count fully toward accuracy.
 - Accuracy gate happens before token-efficiency ranking.
 
 ## Assumption Matrix
@@ -33,6 +34,7 @@ This document maps what can still surprise us after the Participant Guide reveal
 | output | The evaluator may require plain text only. | JSON output would be marked wrong even if answer is correct. | Adapter-specific `format()` owns final output shape. | `plain_text` and `scoring_file_bundle` tests |
 | output | The evaluator may require JSON or JSONL with ids. | Missing ids can make answers unmatchable. | Preserve ids through `TaskEnvelope` and `AnswerResult`. | `json_task`, `jsonl_batch`, `scoring_json_envelope` tests |
 | scoring | Accuracy is primary and remote token count is secondary. | Over-aggressive local routing can lose accuracy. | Keep battle drill policy score and remote packet accounting. | `scripts/battle_drill.py` |
+| scoring | Local model answers count for accuracy while using zero Fireworks tokens. | A strong local path can dominate Fireworks-only routing, but a weak local path can fail the accuracy gate. | Validate `ROUTER_MODE=hybrid` on the AMD pod before making it the default. | `tests/test_hybrid_cascade.py` |
 | scoring | Parse failure may count as a hard failure. | Extra logs on stdout can poison output. | Keep stdout clean and logs in files/stderr only. | CLI and fuzz tests |
 | scoring | Per-request time must stay under 30 seconds and total runtime under 10 minutes. | Long cascades can fail even with good answers. | Keep batch stress, per-task timeout, and official Docker smoke tests. | `scripts/batch_stress.py --check` |
 | environment | The evaluator may run inside a container. | Local paths or undeclared dependencies can fail. | Keep zero-dependency package and Docker path. | CI and release check |
@@ -49,6 +51,7 @@ This document maps what can still surprise us after the Participant Guide reveal
 - Are deterministic solvers allowed before model calls?
 - Which exact Fireworks model IDs will appear in `ALLOWED_MODELS`?
 - Are AMD Developer Cloud local models expected to run in the same container or as a service endpoint?
+- Does the final standardized scoring environment provide GPU access for local inference, or only the development pod?
 - Is network access restricted to `FIREWORKS_BASE_URL` only?
 - Can we write traces/logs to disk, and if yes, are they inspected?
 

@@ -36,6 +36,20 @@ docker run --rm \
 cat /tmp/track1-output/results.json
 ```
 
+The Docker default remains `ROUTER_MODE=fireworks` because it is the safest path when no local model endpoint is available. For the championship local-first path, run with `ROUTER_MODE=hybrid` and provide a local OpenAI-compatible endpoint:
+
+```bash
+docker run --rm \
+  -e ROUTER_MODE=hybrid \
+  -e LOCAL_BASE_URL=http://host.docker.internal:8000/v1 \
+  -e LOCAL_MODEL=local-model \
+  -e FIREWORKS_API_KEY="$FIREWORKS_API_KEY" \
+  -e ALLOWED_MODELS="minimax-m3,kimi-k2p7-code,gemma-4-31b-it,gemma-4-26b-a4b-it,gemma-4-31b-it-nvfp4" \
+  -v /tmp/track1-input:/input:ro \
+  -v /tmp/track1-output:/output \
+  track1-token-router
+```
+
 ## Eval
 
 ```bash

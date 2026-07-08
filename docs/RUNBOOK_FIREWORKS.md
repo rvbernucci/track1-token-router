@@ -6,6 +6,8 @@ Ativar Fireworks como auditor remoto compacto somente quando a cascata local esc
 
 Perfil recomendado: `runtime-profiles/fireworks-serverless.env.example`.
 
+Nota Track 1 atual: local models sao uma estrategia valida de scoring. Respostas locais contam para accuracy e usam zero Fireworks tokens. Portanto Fireworks deve ser tratado como fallback/auditor no modo campeonato, nao necessariamente como caminho default.
+
 ## Variaveis obrigatorias
 
 - `FIREWORKS_API_KEY`: nunca commitar.
@@ -197,6 +199,7 @@ Politica atual para o caminho oficial:
 - strong math/logic/code/debug: `minimax-m3` first;
 - fallback entre modelos permitidos se o modelo escolhido retornar erro de API, 404, timeout ou resposta sem `message.content`;
 - `kimi-k2p7-code` permanece como fallback/candidato, especialmente para codigo/logica, mas nao como default atual.
+- se um modelo local confiavel estiver disponivel, `ROUTER_MODE=hybrid` deve ser comparado contra `ROUTER_MODE=fireworks`, porque respostas locais corretas custam zero Fireworks tokens.
 
 ## Serverless vs Batch vs Deployments
 

@@ -226,6 +226,8 @@ python3 -m router ask "What is 2+2?"
 
 Nesse modo, Fireworks so e chamado quando o M2A escala a tarefa.
 
+No Track 1 atual, esse e o modo campeonato quando ha um modelo local confiavel: respostas locais corretas contam para accuracy e usam zero Fireworks tokens. Se nao houver endpoint local estavel no ambiente final, use `ROUTER_MODE=fireworks`.
+
 ## Modo oficial Fireworks direto
 
 ```bash

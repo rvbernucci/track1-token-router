@@ -6,7 +6,7 @@ Source: `Participant Guide: AMD Developer Hackathon (ACT II)`, attached PDF.
 
 Track 1 is now described as a general-purpose AI agent benchmark. Exact evaluation inputs are intentionally omitted and hidden variants are used.
 
-Update from the Track 1 page: final scoring rewards routing intelligence across Fireworks models. Local models are optional for development/testing and are not the core scoring path. Only inference routed through `FIREWORKS_BASE_URL` using a model from `ALLOWED_MODELS` is recorded for token scoring.
+Update from the Track 1 page shared on 2026-07-08: final scoring rewards routing intelligence across Fireworks models and local inference. Local models are a valid scoring strategy: answers produced by local models inside the container count fully toward accuracy, while only calls routed through `FIREWORKS_BASE_URL` count toward the Fireworks token score. Local inference therefore has zero Fireworks-token cost.
 
 Update from the Track 1 guide shared on 2026-07-08: Track 1 is constrained to this model set:
 
@@ -30,6 +30,14 @@ The container must:
 - keep response time per request under 30 seconds;
 - finish within a maximum runtime of 10 minutes;
 - answer in English.
+
+GPU/team access:
+
+- participants must create or join a lablab.ai team, even when competing solo;
+- one AMD GPU pod is assigned per registered team;
+- allocation can take up to 24 hours after team registration;
+- GPU pod usage is limited to 8 hours per 24 hours per team;
+- `team not registered` on `notebooks.amd.com/hackathon` means the team step is missing.
 
 Input format:
 
@@ -70,6 +78,8 @@ Rules:
 - do not hardcode model IDs.
 
 Important implication: calls that bypass `FIREWORKS_BASE_URL` will not be recorded and score zero tokens.
+
+Important correction: local model calls do not bypass scoring for accuracy. They bypass only Fireworks token accounting. If a local model answer is correct, it counts for the accuracy gate and costs zero Fireworks tokens.
 
 ## Fireworks Access Modes
 
@@ -129,6 +139,7 @@ Scoring is two-stage:
 Confirmed:
 
 - local models and local tokens count as zero for final score;
+- local model answers count fully toward the accuracy gate;
 - all Fireworks inference must go through `FIREWORKS_BASE_URL`;
 - malformed `/output/results.json` scores zero;
 - hardcoded or cached answers are prohibited;
