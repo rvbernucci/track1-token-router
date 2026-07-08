@@ -250,6 +250,8 @@ Deployments criam GPUs dedicadas e permitem acessar modelos que nao existem em s
 
 Exemplo: em 2026-07-07, `accounts/fireworks/models/gemma-4-31b-it` aparece na Model Library como on-demand, mas `Serverless: Not supported`. Chamada direta em `/chat/completions` retorna `Model not found, inaccessible, and/or not deployed` enquanto nao houver deployment proprio ou liberacao especifica.
 
+A documentacao oficial de On-Demand Deployments descreve esse caminho como deploy de um modelo em recurso dedicado, com consulta posterior via API OpenAI-compatible usando o deployment criado. Isso resolve acesso tecnico ao modelo, mas muda a natureza do risco: deixa de ser apenas escolha de modelo serverless e passa a envolver ciclo de vida de deployment.
+
 Uso aceitavel:
 
 - demonstrar Best Use of Gemma se o hackathon permitir esse caminho;
@@ -259,15 +261,26 @@ Uso aceitavel:
 Risco para Track 1:
 
 - deployment e cobrado por GPU-second;
+- deployment pode continuar gerando custo se ficar ativo;
+- deployment ID pode ser diferente do model ID listado em `ALLOWED_MODELS`;
 - modelo de deployment pode nao estar em `ALLOWED_MODELS`;
 - se nao passar por `FIREWORKS_BASE_URL` do harness, pode nao contar corretamente para o score.
+- criar deployment dentro do container pode violar a ideia de ambiente padronizado e aumentar tempo de startup.
+
+Perguntas que precisam de confirmacao antes de usar Gemma On-Demand no scoring:
+
+- o harness vai injetar IDs serverless ou IDs de deployment em `ALLOWED_MODELS`?
+- chamadas para deployment proprio contam para token efficiency?
+- custo por GPU-second entra no score ou apenas tokens Fireworks?
+- o deployment precisa existir antes da submissao ou pode ser criado pelo container?
+- usar deployment proprio viola alguma restricao do Track 1?
 
 Decisao operacional:
 
-- perseguir Gemma como bonus/partner prize;
-- nao depender de Gemma no caminho final ate ver `ALLOWED_MODELS`;
-- se Gemma aparecer em `ALLOWED_MODELS`, ativar estrategia Gemma-first no router;
-- se Gemma aparecer apenas como deployment, pedir confirmacao no Discord antes de usar no caminho avaliado.
+- final Track 1: `ALLOWED_MODELS` serverless-first, com fallback entre modelos permitidos;
+- Gemma serverless liberado no harness: ativar Gemma-first em cheap/medium linguagem;
+- Gemma apenas via On-Demand: usar como trilha de pesquisa/demo ate confirmacao explicita;
+- nunca criar deployment automaticamente em script de teste sem aprovacao humana, porque pode abrir custo recorrente.
 
 ## Smoke hibrido
 

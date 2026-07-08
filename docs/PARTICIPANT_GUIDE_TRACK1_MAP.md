@@ -112,6 +112,13 @@ Practical strategy:
 - If Gemma is not accessible in local Fireworks credits, fallback to `minimax-m3` without failing the run.
 - Do not create a paid on-demand Gemma deployment inside the final Track 1 path unless the organizers explicitly confirm it is allowed and counted.
 
+On-Demand Deployment note:
+
+- Fireworks On-Demand can likely make Gemma callable through a dedicated deployment.
+- That is useful for calibration, demo and Gemma partner narrative.
+- It is not automatically safe for final Track 1 scoring because deployment IDs may not match `ALLOWED_MODELS`, may not be token-scored the same way, and may create GPU-second cost.
+- Treat On-Demand Gemma as a separate lane until the organizers confirm it is allowed inside the judged route.
+
 ## Scoring
 
 Scoring is two-stage:
