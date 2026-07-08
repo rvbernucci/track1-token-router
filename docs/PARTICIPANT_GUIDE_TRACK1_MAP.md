@@ -85,6 +85,12 @@ Observed Gemma status on 2026-07-07:
 - it is marked `Serverless: Not supported`;
 - direct serverless chat completion returns `Model not found, inaccessible, and/or not deployed` without a dedicated deployment or special access.
 
+Rechecked on 2026-07-08 after receiving Fireworks credits:
+
+- direct serverless smoke for `accounts/fireworks/models/gemma-4-31b-it` still returns `HTTP 404 Not Found`;
+- Fireworks public model pages still show Gemma models as on-demand rather than serverless;
+- the API key can call serverless models such as `deepseek-v4-flash`, so this is a Gemma access/path issue, not a general key failure.
+
 Implication: Gemma is still valuable for the partner challenge, demos, calibration and possible on-demand deployment, but the competition router must remain `ALLOWED_MODELS`-first.
 
 Practical strategy:

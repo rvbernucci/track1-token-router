@@ -129,6 +129,15 @@ Em microbench Pareto real de 2026-07-07, com 36 chamadas e custo estimado total 
 - `gpt-oss-20b` subiu para 5/6 com `low`, mas ainda falhou em logica por content vazio;
 - `qwen3p7-plus` falhou em tarefas estritas por devolver raciocinio junto com a resposta.
 
+Em nova rodada de 2026-07-08, com `select_reasoning_effort()` usando `low` para `gpt-oss`, o mesmo microbench produziu:
+
+- 36 chamadas, 33 validas, custo estimado `0.00281451` USD;
+- `deepseek-v4-flash`, `gpt-oss-20b`, `gpt-oss-120b`, `minimax-m3` e `kimi-k2p7-code` fizeram 6/6;
+- `qwen3p7-plus` repetiu 3/6 e segue fora do caminho estrito ate controlarmos thinking/output;
+- por custo, `deepseek-v4-flash` venceu `formatting`, `classification` e `logic`;
+- por custo, `gpt-oss-20b` venceu `math_reasoning` e `code_generation`;
+- por latencia, `gpt-oss-120b` ficou surpreendentemente forte em tarefas curtas, apesar do custo maior que `gpt-oss-20b` e `deepseek-v4-flash`.
+
 ## Implicacao Competitiva
 
 O router nao deve ser:

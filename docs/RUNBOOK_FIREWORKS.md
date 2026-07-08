@@ -60,6 +60,13 @@ Se Gemma retornar `HTTP 404` com `Model not found, inaccessible, and/or not depl
 
 Modelos com reasoning podem consumir poucos tokens apenas em `reasoning_content`. Para smoke real, evitar `--max-tokens 8`; usar `--max-tokens 64` ou maior para permitir uma resposta final em `message.content`.
 
+Resultado de 2026-07-08:
+
+- `accounts/fireworks/models/gemma-4-31b-it` retornou `HTTP 404 Not Found`;
+- endpoint `/models` retornou `HTTP 403 Forbidden` para a chave atual;
+- `accounts/fireworks/models/gpt-oss-20b` no smoke simples retornou resposta sem `message.content`, entao nao usar smoke simples para `gpt-oss`;
+- `accounts/fireworks/models/deepseek-v4-flash` validou conectividade com `usage.total=59`, mas nao seguiu formato estrito no smoke; qualidade deve ser medida pelo microbench com validadores.
+
 ## Microbench de reasoning
 
 Em 2026-07-07, um microteste real com a chave Fireworks do projeto mostrou:
@@ -98,6 +105,50 @@ Relatorios gerados:
 
 - `reports/generated/fireworks-microbench-report.md`;
 - `reports/generated/fireworks-microbench-gpt-low-report.md`.
+
+Em 2026-07-08, apos receber creditos Fireworks, o microbench Pareto completo foi repetido com `--max-calls 36 --budget-usd 0.10`:
+
+- chamadas: `36`;
+- validas: `33/36`;
+- tokens totais: `4835`;
+- custo estimado: `0.00281451` USD;
+- `deepseek-v4-flash`: 6/6, custo `0.00011788`, media `1699ms`;
+- `gpt-oss-20b`: 6/6, custo `0.00012393`, media `1934ms`;
+- `gpt-oss-120b`: 6/6, custo `0.00024825`, media `788ms`;
+- `minimax-m3`: 6/6, custo `0.00055590`, media `1234ms`;
+- `kimi-k2p7-code`: 6/6, custo `0.00112255`, media `1648ms`;
+- `qwen3p7-plus`: 3/6, falhando por retornar raciocinio junto em tarefas estritas.
+
+Vencedores por custo no dataset minimo de 2026-07-08:
+
+- `formatting`: `deepseek-v4-flash`;
+- `classification`: `deepseek-v4-flash`;
+- `logic`: `deepseek-v4-flash`;
+- `math_reasoning`: `gpt-oss-20b`;
+- `code_generation`: `gpt-oss-20b`.
+
+Vencedores por latencia no mesmo dataset:
+
+- `format_json`, `math_reasoning` e `logic`: `gpt-oss-120b`;
+- `code_generation`: `minimax-m3`;
+- `cheap_exact_ack` e `cheap_sentiment`: `kimi-k2p7-code`, mas com custo maior que `deepseek-v4-flash`.
+
+Smoke do contrato oficial em 2026-07-08:
+
+```bash
+ROUTER_MODE=fireworks \
+ALLOWED_MODELS=accounts/fireworks/models/deepseek-v4-flash,accounts/fireworks/models/gpt-oss-20b,accounts/fireworks/models/gpt-oss-120b,accounts/fireworks/models/minimax-m3 \
+python3 -m router submit-track1 \
+  --input fixtures/official/lablab_track1_tasks.json \
+  --output reports/generated/fireworks-official-smoke-results.json
+```
+
+Resultado:
+
+- `/output/results.json` valido;
+- tarefa de resumo usou Fireworks com `173` tokens remotos;
+- tarefa aritmetica `6 * 7` saiu por solver deterministico com `0` tokens remotos;
+- resposta final: `42`.
 
 ## Serverless vs Batch vs Deployments
 
