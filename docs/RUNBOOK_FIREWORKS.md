@@ -9,14 +9,17 @@ Perfil recomendado: `runtime-profiles/fireworks-serverless.env.example`.
 ## Variaveis obrigatorias
 
 - `FIREWORKS_API_KEY`: nunca commitar.
-- `FIREWORKS_MODEL`: modelo permitido no hackathon.
+- `ALLOWED_MODELS`: lista oficial injetada pelo harness; o runtime usa o primeiro modelo quando `FIREWORKS_MODEL` nao esta definido.
+- `FIREWORKS_MODEL`: override local para desenvolvimento.
 - `FIREWORKS_BASE_URL`: `https://api.fireworks.ai/inference/v1`.
+- `FIREWORKS_SERVICE_TIER`: opcional; vazio usa Standard, `priority` so para fallback manual.
 
 ## Ativacao
 
 ```bash
 cp runtime-profiles/fireworks-serverless.env.example .env.fireworks
 printf "FIREWORKS_API_KEY=<set locally, not in git>\n" >> .env.fireworks.local
+chmod 600 .env.fireworks.local
 ```
 
 Carregar em shell local:
@@ -28,7 +31,146 @@ set -a
 set +a
 ```
 
-## Smoke
+## Smoke real seguro
+
+O smoke usa o mesmo cliente OpenAI-compatible do router, nunca imprime `FIREWORKS_API_KEY` e carrega `.env.fireworks` + `.env.fireworks.local` automaticamente se existirem.
+
+```bash
+python3 scripts/fireworks_smoke.py --json
+```
+
+Com modelo explicito:
+
+```bash
+python3 scripts/fireworks_smoke.py \
+  --model accounts/fireworks/models/gemma-4-31b-it \
+  --max-tokens 64 \
+  --prompt "Answer with exactly one word: ready" \
+  --json
+```
+
+Esperado:
+
+- `ok=true`;
+- `model` igual ao modelo testado;
+- `usage.total` preenchido;
+- nenhuma chave impressa no terminal.
+
+Se Gemma retornar `HTTP 404` com `Model not found, inaccessible, and/or not deployed`, a chave Fireworks pode estar valida, mas o modelo Gemma ainda nao esta liberado para a conta/chave atual. Nesse caso, listar os modelos acessiveis pelo endpoint `/models` e usar temporariamente um modelo retornado por essa lista ate a liberacao do parceiro/hackathon.
+
+Modelos com reasoning podem consumir poucos tokens apenas em `reasoning_content`. Para smoke real, evitar `--max-tokens 8`; usar `--max-tokens 64` ou maior para permitir uma resposta final em `message.content`.
+
+## Microbench de reasoning
+
+Em 2026-07-07, um microteste real com a chave Fireworks do projeto mostrou:
+
+- prompt: `Answer with exactly one word: ready`;
+- sem controle de reasoning, `glm-5p1` e `glm-5p2` gastaram 88-95 tokens e devolveram raciocinio no `content`;
+- com `reasoning_effort=none`, `glm-5p1`, `deepseek-v4-pro`, `kimi-k2p6` e `glm-5p2` responderam em 13-18 tokens totais;
+- `gpt-oss-120b` rejeitou `reasoning_effort=none`, mas aceitou `reasoning_effort=low`;
+- o campo `reasoning=disabled` foi rejeitado pelo endpoint atual como input extra.
+
+Implementacao atual:
+
+- tarefas `cheap` e `medium` usam `reasoning_effort=none` quando o modelo nao e `gpt-oss`;
+- `gpt-oss` usa `low` tambem em tarefas fortes, porque microbench com `medium` gerou content vazio/truncado com budget curto;
+- se o modelo rejeitar o parametro, o runner refaz a chamada uma vez sem extra body.
+
+## Microbench de Pareto
+
+Em 2026-07-07, `scripts/fireworks_microbench.py` rodou 36 chamadas reais com 6 modelos e 6 tarefas mecanicamente validadas:
+
+- custo estimado total: `0.00275120` USD;
+- `deepseek-v4-flash`: 6/6 validas, custo `0.00011788`, media `1775ms`;
+- `minimax-m3`: 6/6 validas, custo `0.00055590`, media `1508ms`;
+- `kimi-k2p7-code`: 6/6 validas, custo `0.00112655`, media `1193ms`;
+- `gpt-oss-20b`: 4/6 em auto, com falhas de content vazio em strong;
+- `gpt-oss-120b`: 4/6 em auto, com falhas de content vazio/truncado em strong;
+- `qwen3p7-plus`: 3/6, falhando por devolver raciocinio junto quando a tarefa exigia resposta estrita.
+
+Teste complementar com `--reasoning-effort-override low` para `gpt-oss`:
+
+- `gpt-oss-120b`: 6/6 validas, custo `0.00026265`, media `1805ms`;
+- `gpt-oss-20b`: 5/6 validas, custo `0.00008870`, media `2436ms`;
+- conclusao: `low` e o default seguro atual para `gpt-oss` com `max_tokens` curto.
+
+Relatorios gerados:
+
+- `reports/generated/fireworks-microbench-report.md`;
+- `reports/generated/fireworks-microbench-gpt-low-report.md`.
+
+## Serverless vs Batch vs Deployments
+
+Fireworks tem tres caminhos diferentes, e eles nao significam a mesma coisa para o Track 1.
+
+O texto oficial do hackathon diz que Gemma pode ser acessado por Fireworks AI e AMD Developer Cloud, sem sign-up separado, e que existe premio de Track 1 para Best Use of Gemma via Fireworks. O mesmo texto tambem diz para checar as restricoes de cada track antes de escolher modelo.
+
+### Serverless
+
+Serverless e o caminho mais proximo do scoring do Track 1: chamada OpenAI-compatible em `FIREWORKS_BASE_URL` com modelo permitido em `ALLOWED_MODELS`.
+
+Uso no projeto:
+
+- `ROUTER_MODE=fireworks`;
+- `python3 -m router submit-track1`;
+- selecionar o menor modelo suficiente dentro de `ALLOWED_MODELS`.
+
+Serving paths:
+
+- Standard: default, sem `service_tier`.
+- Priority: `service_tier=priority`; mais confiavel em pico, mas mais caro. Nao usar no caminho feliz de economia de creditos.
+- Fast: nao e parametro; e outro model ID, como `accounts/fireworks/routers/glm-5p2-fast`. So usar se esse ID vier em `ALLOWED_MODELS` ou em teste local explicito.
+
+Prompt cache:
+
+- Fireworks ativa prompt caching por default.
+- O router mantem o system prompt estatico no inicio e o input variavel no final.
+- O runner envia `user=track1-token-router-v1` para dar uma pista de afinidade de sessao e aumentar chance de cache em prompts com prefixo comum.
+- Nao colocar timestamp ou dados dinamicos no system prompt.
+
+### Batch Inference Jobs
+
+Batch e para inferencia assincrona em dataset JSONL. Ele pode mostrar modelos elegiveis para batch/on-demand, mas nao e o caminho natural do contrato oficial `/input/tasks.json` -> `/output/results.json`.
+
+Riscos:
+
+- pode ficar em `pending` se o modelo nao for compativel;
+- depende de quota de batch;
+- nao deve ser assumido como permitido no scoring final;
+- pode consumir creditos sem melhorar a submissao oficial.
+
+Uso aceitavel:
+
+- avaliacao offline;
+- gerar dataset de calibracao;
+- testar prompt/router fora do harness.
+
+### On-demand Deployments
+
+Deployments criam GPUs dedicadas e permitem acessar modelos que nao existem em serverless. A Model Library pode mostrar Gemma como `Ready` e `Deploy on Demand`, mas isso nao significa que `accounts/fireworks/models/<gemma>` funcione diretamente no endpoint serverless.
+
+Exemplo: em 2026-07-07, `accounts/fireworks/models/gemma-4-31b-it` aparece na Model Library como on-demand, mas `Serverless: Not supported`. Chamada direta em `/chat/completions` retorna `Model not found, inaccessible, and/or not deployed` enquanto nao houver deployment proprio ou liberacao especifica.
+
+Uso aceitavel:
+
+- demonstrar Best Use of Gemma se o hackathon permitir esse caminho;
+- calibrar Gemma fora do scoring;
+- prototipar agente Gemma-first.
+
+Risco para Track 1:
+
+- deployment e cobrado por GPU-second;
+- modelo de deployment pode nao estar em `ALLOWED_MODELS`;
+- se nao passar por `FIREWORKS_BASE_URL` do harness, pode nao contar corretamente para o score.
+
+Decisao operacional:
+
+- perseguir Gemma como bonus/partner prize;
+- nao depender de Gemma no caminho final ate ver `ALLOWED_MODELS`;
+- se Gemma aparecer em `ALLOWED_MODELS`, ativar estrategia Gemma-first no router;
+- se Gemma aparecer apenas como deployment, pedir confirmacao no Discord antes de usar no caminho avaliado.
+
+## Smoke hibrido
 
 O modo hibrido exige endpoint local ativo.
 
@@ -54,6 +196,20 @@ Esperado:
 - chamada remota apenas se a cascata local escalar;
 - resposta Fireworks em formato compacto `approve` ou `replace`;
 - `remote_tokens` registrado.
+
+## Modo oficial sem endpoint local
+
+O Participant Guide injeta Fireworks, nao um endpoint local. Para o caminho oficial:
+
+```bash
+ROUTER_MODE=fireworks \
+FIREWORKS_API_KEY=<harness-key> \
+FIREWORKS_BASE_URL=<harness-base-url> \
+ALLOWED_MODELS=<comma-separated-models> \
+python3 -m router submit-track1 --input /input/tasks.json --output /output/results.json
+```
+
+Nesse modo, solvers deterministicos rodam antes da chamada remota e o primeiro modelo de `ALLOWED_MODELS` e usado quando `FIREWORKS_MODEL` estiver vazio.
 
 ## Budget guard
 

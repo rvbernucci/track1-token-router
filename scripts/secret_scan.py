@@ -28,6 +28,8 @@ def main() -> int:
             continue
         if any(part in IGNORED_PARTS for part in path.parts):
             continue
+        if path.name.startswith(".env") and path.name != ".env.example":
+            continue
         try:
             text = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:

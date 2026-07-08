@@ -1,0 +1,10 @@
+[
+  {
+    "task_id": "t1",
+    "prompt": "Summarise the following text in one sentence: Local verification reduces remote token spend."
+  },
+  {
+    "task_id": "t2",
+    "prompt": "What is 6 * 7? Return only the number."
+  }
+]

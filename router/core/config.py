@@ -23,11 +23,13 @@ class RouterConfig:
     m2b_max_tokens: int
     fireworks_base_url: str
     fireworks_model: str | None
+    allowed_models: list[str]
     fireworks_api_key: str | None
     fireworks_timeout_s: float
     fireworks_max_retries: int
     fireworks_temperature: float
     fireworks_max_tokens: int
+    fireworks_service_tier: str | None
     enable_guardrails: bool
     enable_orchestrator: bool
     competition_dry_run: bool
@@ -53,12 +55,14 @@ class RouterConfig:
             m2b_temperature=float(os.getenv("M2B_TEMPERATURE", "0.2")),
             m2b_max_tokens=int(os.getenv("M2B_MAX_TOKENS", "768")),
             fireworks_base_url=os.getenv("FIREWORKS_BASE_URL", "https://api.fireworks.ai/inference/v1"),
-            fireworks_model=os.getenv("FIREWORKS_MODEL"),
+            fireworks_model=os.getenv("FIREWORKS_MODEL") or _first_allowed_model(os.getenv("ALLOWED_MODELS")),
+            allowed_models=_allowed_models(os.getenv("ALLOWED_MODELS")),
             fireworks_api_key=os.getenv("FIREWORKS_API_KEY"),
             fireworks_timeout_s=float(os.getenv("FIREWORKS_TIMEOUT_S", "60")),
             fireworks_max_retries=int(os.getenv("FIREWORKS_MAX_RETRIES", "1")),
             fireworks_temperature=float(os.getenv("FIREWORKS_TEMPERATURE", "0.0")),
             fireworks_max_tokens=int(os.getenv("FIREWORKS_MAX_TOKENS", "256")),
+            fireworks_service_tier=os.getenv("FIREWORKS_SERVICE_TIER") or None,
             enable_guardrails=_env_flag("ENABLE_GUARDRAILS"),
             enable_orchestrator=_env_flag("ENABLE_ORCHESTRATOR"),
             competition_dry_run=_env_flag("COMPETITION_DRY_RUN", default=True),
@@ -74,3 +78,14 @@ def _env_flag(name: str, *, default: bool = False) -> bool:
         return default
     value = raw.strip().lower()
     return value in {"1", "true", "yes", "on"}
+
+
+def _first_allowed_model(raw: str | None) -> str | None:
+    models = _allowed_models(raw)
+    return models[0] if models else None
+
+
+def _allowed_models(raw: str | None) -> list[str]:
+    if not raw:
+        return []
+    return [item.strip() for item in raw.split(",") if item.strip()]

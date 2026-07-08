@@ -61,6 +61,13 @@ Estas sprints formam a terceira onda de readiness: publicar, ensaiar e endurecer
 - [Sprint 34 - Semantic Validation Harness](./34-semantic-validation-harness/README.md)
 - [Sprint 35 - Batch Throughput And Timeout Stress](./35-batch-throughput-timeout-stress/README.md)
 - [Sprint 36 - Submission Rehearsal And Log Redaction](./36-submission-rehearsal-log-redaction/README.md)
+- [Sprint 37 - Mechanical Validation Evidence For M2A](./37-mechanical-validation-evidence-for-m2a/README.md)
+- [Sprint 38 - Fireworks Model Router Cost Optimizer](./38-fireworks-model-router-cost-optimizer/README.md)
+- [Sprint 39 - Spec-Driven Governance](./39-spec-driven-governance/README.md)
+- [Sprint 40 - Pareto Spec Operationalization](./40-pareto-spec-operationalization/README.md)
+- [Sprint 41 - Domain Correlation Eval Pack](./41-domain-correlation-eval-pack/README.md)
+- [Sprint 42 - Nash Payoff Replay Lab](./42-nash-payoff-replay-lab/README.md)
+- [Sprint 43 - Router Telemetry Calibration Dashboard](./43-router-telemetry-calibration-dashboard/README.md)
 
 ## Sprints dependentes de credito
 
@@ -70,6 +77,7 @@ Estas sprints so devem comecar quando houver acesso real a AMD Developer Cloud e
 - [Credit Sprint B - Fireworks Real Audit Calibration](./credit-b-fireworks-real-calibration/README.md)
 - [Credit Sprint C - End-to-End Cost Benchmark](./credit-c-e2e-cost-benchmark/README.md)
 - [Credit Sprint D - Final Cloud Submission Drill](./credit-d-final-cloud-drill/README.md)
+- [Sprint 44 - Fireworks Minimal Credit Calibration](./44-fireworks-minimal-credit-calibration/README.md)
 
 ## Regra de ouro
 

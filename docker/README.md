@@ -8,11 +8,32 @@ Containerizacao do runner.
 docker build -t track1-token-router .
 ```
 
+Official judging runs on `linux/amd64`. If building on Apple Silicon, use:
+
+```bash
+docker buildx build --platform linux/amd64 -t track1-token-router .
+```
+
 ## Smoke tests
 
 ```bash
 docker run --rm track1-token-router --help
-docker run --rm track1-token-router ask "What is 2+2?"
+docker run --rm -e ROUTER_MODE=mock track1-token-router ask "What is 2+2?"
+```
+
+## Official Track 1 contract
+
+The default container command reads `/input/tasks.json` and writes `/output/results.json`.
+
+```bash
+mkdir -p /tmp/track1-input /tmp/track1-output
+cp fixtures/official/lablab_track1_tasks.json /tmp/track1-input/tasks.json
+docker run --rm \
+  -e ROUTER_MODE=mock \
+  -v /tmp/track1-input:/input:ro \
+  -v /tmp/track1-output:/output \
+  track1-token-router
+cat /tmp/track1-output/results.json
 ```
 
 ## Eval

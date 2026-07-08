@@ -4,6 +4,7 @@ from router.adapters.official.base import OfficialAdapter
 from router.adapters.official.file_payload import FilePayloadAdapter
 from router.adapters.official.json_task import JsonTaskAdapter
 from router.adapters.official.jsonl_batch import JsonlBatchAdapter
+from router.adapters.official.lablab_track1 import LablabTrack1Adapter
 from router.adapters.official.plain_text import PlainTextAdapter
 from router.adapters.official.scoring_file_bundle import ScoringFileBundleAdapter
 from router.adapters.official.scoring_json_envelope import ScoringJsonEnvelopeAdapter
@@ -13,6 +14,7 @@ ADAPTERS: dict[str, OfficialAdapter] = {
     "plain_text": PlainTextAdapter(),
     "json_task": JsonTaskAdapter(),
     "jsonl_batch": JsonlBatchAdapter(),
+    "lablab_track1": LablabTrack1Adapter(),
     "file_payload": FilePayloadAdapter(),
     "scoring_text_batch": ScoringTextBatchAdapter(),
     "scoring_json_envelope": ScoringJsonEnvelopeAdapter(),
@@ -32,6 +34,7 @@ __all__ = [
     "FilePayloadAdapter",
     "JsonTaskAdapter",
     "JsonlBatchAdapter",
+    "LablabTrack1Adapter",
     "OfficialAdapter",
     "PlainTextAdapter",
     "ScoringFileBundleAdapter",

@@ -1,5 +1,5 @@
 {
-  "default_version": "v1",
+  "default_version": "v2",
   "versions": {
     "v1": {
       "description": "Baseline prompts mirrored from router.core.prompts after Sprint 12.",
@@ -8,6 +8,15 @@
         "m1_system": "versions/v1/m1_system.txt",
         "m2a_system": "versions/v1/m2a_system.txt",
         "m2b_system": "versions/v1/m2b_system.txt"
+      }
+    },
+    "v2": {
+      "description": "Championship M2A verifier prompt with untrusted-data boundaries, calibrated escalation, failure taxonomy and few-shot traps.",
+      "prompts": {
+        "fireworks_audit_system": "versions/v2/fireworks_audit_system.txt",
+        "m1_system": "versions/v2/m1_system.txt",
+        "m2a_system": "versions/v2/m2a_system.txt",
+        "m2b_system": "versions/v2/m2b_system.txt"
       }
     }
   }

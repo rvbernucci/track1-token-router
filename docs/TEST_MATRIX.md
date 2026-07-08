@@ -5,14 +5,16 @@ This matrix maps critical project areas to automated tests and playground probes
 | Domain | Critical logic | Automated tests | Playground | Fixture/docs |
 |---|---|---|---|---|
 | contracts | `TaskEnvelope`, `AnswerResult`, token usage serialization | `tests/test_contracts.py` | none | none |
-| adapters | JSON, JSONL, official adapter templates | `tests/test_io_and_cli.py`, `tests/test_official_adapters.py` | `playground/test_adapter_logic.py` | `fixtures/official/` |
+| adapters | JSON, JSONL, official adapter templates, ACT II `/input/tasks.json` contract | `tests/test_io_and_cli.py`, `tests/test_official_adapters.py` | `playground/test_adapter_logic.py` | `fixtures/official/` |
 | policies | policy normalization, route simulation, Pareto comparison, decision replay | `tests/test_policy_lab.py`, `tests/test_policy_optimizer_replay.py` | `playground/test_policy_logic.py` | `reports/OFFLINE_RC_REPORT.md` |
+| fireworks_model_router | allowed model ranking, cheap/medium/strong task routing | `tests/test_fireworks_model_router.py`, `tests/test_fireworks_runner.py` | none | `docs/PARTICIPANT_GUIDE_TRACK1_MAP.md` |
+| matrix_regression_selector | offline ridge regression fit, learned model selection, weights roundtrip | `tests/test_matrix_regression_selector.py` | none | `docs/MATRIX_REGRESSION_SELECTION.md` |
 | prompts | M1/M2A/M2B/Fireworks prompt packet shape | `tests/test_local_m1.py`, `tests/test_local_cascade.py`, `tests/test_hybrid_cascade.py` | `playground/test_prompt_packets.py` | `docs/TESTING_CULTURE.md` |
 | cascade | M1, M2A, M2B, hybrid audit routing | `tests/test_local_cascade.py`, `tests/test_hybrid_cascade.py` | none | `SUBMISSION.md` |
 | fake_provider | fake OpenAI-compatible server, chaos profiles | `tests/test_fake_provider.py`, `tests/test_bad_local_model_chaos.py` | none | `docs/CHAOS_LAB.md`, `fixtures/chaos/bad-local-model/` |
 | evals | offline dataset, eval summary, policy comparison, semantic validation | `tests/test_eval_summary.py`, `tests/test_offline_dataset.py`, `tests/test_policy_lab.py`, `tests/test_semantic_validation.py` | none | `evals/offline/README.md`, `evals/semantic/` |
 | operational_envelope | latency percentiles, timeout probes, token exposure thresholds, batch stress | `tests/test_operational_envelope.py`, `tests/test_battle_drill.py`, `tests/test_batch_stress.py` | none | `reports/generated/latency-report.md`, `reports/generated/token-envelope.md`, `fixtures/stress/` |
-| cli | ask, solve, run, eval, controlled errors, submission rehearsal | `tests/test_io_and_cli.py`, `tests/test_redaction_rehearsal.py` | none | `README.md`, `docs/SUBMISSION_REHEARSAL.md` |
+| cli | ask, solve, run, eval, official submit-track1, controlled errors, submission rehearsal | `tests/test_io_and_cli.py`, `tests/test_official_adapters.py`, `tests/test_redaction_rehearsal.py` | none | `README.md`, `docs/SUBMISSION_REHEARSAL.md`, `docs/PARTICIPANT_GUIDE_TRACK1_MAP.md` |
 
 ## Coverage Rule
 

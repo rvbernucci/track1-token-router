@@ -224,6 +224,26 @@ def build_orchestration_trace(
         steps.extend(_remote_steps(result.route, event, reason))
         return OrchestrationTrace(task_id=task.id, final_route=result.route, steps=steps, fallback=fallback)
 
+    if result.route == "fireworks_direct":
+        steps.extend(
+            [
+                OrchestrationStep(state="remote_audit", event="approve", reason="remote_direct_answer", route=result.route),
+                OrchestrationStep(state="final", event="approve", reason="return_remote_direct_answer", route=result.route),
+            ]
+        )
+        return OrchestrationTrace(task_id=task.id, final_route=result.route, steps=steps)
+
+    if result.route == "fireworks_error":
+        fallback = "return_controlled_fireworks_error"
+        steps.extend(
+            [
+                OrchestrationStep(state="remote_audit", event="error", reason="remote_direct_error", route=result.route),
+                OrchestrationStep(state="failed", event="fallback", reason=fallback, route=result.route),
+                OrchestrationStep(state="final", event="fallback", reason=fallback, route=result.route),
+            ]
+        )
+        return OrchestrationTrace(task_id=task.id, final_route=result.route, steps=steps, fallback=fallback)
+
     steps.append(OrchestrationStep(state="final", event="fallback", reason="unknown_route_returned", route=result.route))
     return OrchestrationTrace(task_id=task.id, final_route=result.route, steps=steps, fallback="unknown_route_returned")
 

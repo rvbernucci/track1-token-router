@@ -2,13 +2,31 @@
 
 ## Purpose
 
-This document maps what can surprise us when the official Track 1 evaluator is revealed. The current strategy is to keep `router/core/*` stable and isolate evaluator-specific input/output changes inside `router/adapters/official/`.
+This document maps what can still surprise us after the Participant Guide reveal. The current strategy is to keep `router/core/*` stable and isolate evaluator-specific input/output changes inside `router/adapters/official/`.
+
+## Confirmed By Participant Guide
+
+- Input path: `/input/tasks.json`.
+- Output path: `/output/results.json`.
+- Input shape: JSON array of `{ "task_id": "...", "prompt": "..." }`.
+- Output shape: JSON array of `{ "task_id": "...", "answer": "..." }`.
+- Max runtime: 10 minutes.
+- Container startup readiness: 60 seconds.
+- Per-request response time: under 30 seconds.
+- All responses must be in English.
+- Docker image must be public and include `linux/amd64`.
+- Compressed image size must not exceed 10GB.
+- Fireworks calls must use `FIREWORKS_BASE_URL`.
+- Allowed model IDs arrive through `ALLOWED_MODELS`.
+- Local models and local tokens count as zero for final score.
+- Accuracy gate happens before token-efficiency ranking.
 
 ## Assumption Matrix
 
 | Area | Assumption | Impact If Wrong | Mitigation | Local Test |
 |---|---|---|---|---|
 | input | The evaluator may send plain text through stdin. | The CLI could over-wrap the prompt or emit noisy stdout. | Keep `plain_text` and `scoring_text_batch` adapters. | `tests.test_official_adapters` |
+| input | The official guide requires `/input/tasks.json` as a task array. | Missing exact adapter would fail scoring. | Use `lablab_track1` adapter and `submit-track1`. | `tests.test_official_adapters` |
 | input | The evaluator may send one JSON object per task. | Parse failure or lost ids can break scoring. | Keep `json_task` and `scoring_json_envelope` adapters. | `scripts/adapter_drill.py --check` |
 | input | The evaluator may send JSONL batches. | Batch order, ids or partial failures may drift. | Keep `jsonl_batch` adapter and answer one line per result. | `tests.test_official_adapters` |
 | input | The evaluator may include file metadata or inline content. | The router may ignore attachments needed for accuracy. | Normalize files into `TaskEnvelope.files` and inline content into metadata. | `scoring_file_bundle` fixture |
@@ -16,7 +34,7 @@ This document maps what can surprise us when the official Track 1 evaluator is r
 | output | The evaluator may require JSON or JSONL with ids. | Missing ids can make answers unmatchable. | Preserve ids through `TaskEnvelope` and `AnswerResult`. | `json_task`, `jsonl_batch`, `scoring_json_envelope` tests |
 | scoring | Accuracy is primary and remote token count is secondary. | Over-aggressive local routing can lose accuracy. | Keep battle drill policy score and remote packet accounting. | `scripts/battle_drill.py` |
 | scoring | Parse failure may count as a hard failure. | Extra logs on stdout can poison output. | Keep stdout clean and logs in files/stderr only. | CLI and fuzz tests |
-| scoring | Latency may become a tie-breaker. | Multi-agent cascade can become too slow. | Measure latency envelope in Sprint 29. | `scripts/adapter_drill.py` plus latency lab |
+| scoring | Per-request time must stay under 30 seconds and total runtime under 10 minutes. | Long cascades can fail even with good answers. | Keep batch stress, per-task timeout, and official Docker smoke tests. | `scripts/batch_stress.py --check` |
 | environment | The evaluator may run inside a container. | Local paths or undeclared dependencies can fail. | Keep zero-dependency package and Docker path. | CI and release check |
 | environment | Network may be blocked except official endpoints. | Runtime provider calls could hang or fail. | Support dry-run and deterministic fallbacks. | `COMPETITION_DRY_RUN=1` tests |
 | environment | Secrets arrive through env vars only. | Logging env or credentials would disqualify us. | Secret scan public artifacts and runtime profiles. | `scripts/secret_scan.py` |
@@ -25,15 +43,13 @@ This document maps what can surprise us when the official Track 1 evaluator is r
 
 ## Kickoff Questions
 
-- What exact input format will the evaluator send: stdin, file path, HTTP request, JSONL, archive or mixed mode?
-- What exact output format is accepted: plain text, JSON object, JSONL, file artifact or HTTP response?
-- Are ids required in the final answer, or does scoring preserve request order?
-- Is latency scored directly, used as a cutoff, or ignored?
-- Are local model tokens counted, or only remote Fireworks tokens?
+- Does the official harness invoke only container startup, or can it also pass command arguments?
+- Is the 30-second response limit measured per task internally or externally by the harness?
+- What is the exact accuracy threshold for leaderboard inclusion?
 - Are deterministic solvers allowed before model calls?
-- Can we call Fireworks during scoring, or must all endpoints be predeclared?
+- Which exact Fireworks model IDs will appear in `ALLOWED_MODELS`?
 - Are AMD Developer Cloud local models expected to run in the same container or as a service endpoint?
-- Is network access restricted during final scoring?
+- Is network access restricted to `FIREWORKS_BASE_URL` only?
 - Can we write traces/logs to disk, and if yes, are they inspected?
 
 ## Decision Rule

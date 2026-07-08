@@ -34,6 +34,19 @@ class FakeProviderTests(unittest.TestCase):
         self.assertEqual(response.usage.completion, 25)
         self.assertEqual(response.usage.total, 125)
 
+    def test_client_merges_extra_body_into_chat_payload(self) -> None:
+        with FakeOpenAIServer(response_text="ok") as server:
+            client = LocalModelClient(base_url=server.url, model="fake", max_retries=0)
+
+            client.complete(
+                [{"role": "user", "content": "hello"}],
+                temperature=0.0,
+                max_tokens=16,
+                extra_body={"reasoning_effort": "none"},
+            )
+
+        self.assertEqual(server.requests[0]["payload"]["reasoning_effort"], "none")
+
     def test_invalid_json_profile_is_controlled(self) -> None:
         with FakeOpenAIServer(invalid_json=True) as server:
             client = LocalModelClient(base_url=server.url, model="fake", max_retries=0)
@@ -44,6 +57,21 @@ class FakeProviderTests(unittest.TestCase):
                     temperature=0.0,
                     max_tokens=16,
                 )
+
+    def test_http_error_preserves_sanitized_response_body(self) -> None:
+        with FakeOpenAIServer(status=403) as server:
+            client = LocalModelClient(base_url=server.url, model="fake", max_retries=0)
+
+            with self.assertRaises(ModelClientError) as raised:
+                client.complete(
+                    [{"role": "user", "content": "hello"}],
+                    temperature=0.0,
+                    max_tokens=16,
+                )
+
+        message = str(raised.exception)
+        self.assertIn("HTTP 403", message)
+        self.assertIn("forced failure", message)
 
     def test_fake_provider_cli_help(self) -> None:
         completed = subprocess.run(

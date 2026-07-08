@@ -16,6 +16,8 @@ class TestingCultureTests(unittest.TestCase):
                 "contracts",
                 "adapters",
                 "policies",
+                "fireworks_model_router",
+                "matrix_regression_selector",
                 "prompts",
                 "cascade",
                 "fake_provider",

@@ -14,9 +14,14 @@ class PromptAblationTests(unittest.TestCase):
         analysis = analyze_prompt_manifest(Path("prompts/manifest.json"))
 
         self.assertEqual(analysis["errors"], [])
-        self.assertEqual(analysis["default_version"], "v1")
+        self.assertEqual(analysis["default_version"], "v2")
         self.assertEqual(len(analysis["versions"]["v1"]["prompts"]), 4)
+        self.assertEqual(len(analysis["versions"]["v2"]["prompts"]), 4)
         self.assertGreater(analysis["versions"]["v1"]["totals"]["approx_tokens"], 0)
+        self.assertGreater(
+            analysis["versions"]["v2"]["totals"]["approx_tokens"],
+            analysis["versions"]["v1"]["totals"]["approx_tokens"],
+        )
 
     def test_missing_prompt_file_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -52,6 +57,16 @@ class PromptAblationTests(unittest.TestCase):
 
         self.assertIn("Prompt Ablation Report", content)
         self.assertIn("strict_json_output", content)
+
+    def test_championship_m2a_prompt_contains_protection_structure(self) -> None:
+        prompt = Path("prompts/versions/v2/m2a_system.txt").read_text(encoding="utf-8")
+
+        self.assertIn("untrusted data", prompt)
+        self.assertIn("prompt injection", prompt)
+        self.assertIn("Required schema", prompt)
+        self.assertIn("failure_modes", prompt)
+        self.assertIn("stale_knowledge", prompt)
+        self.assertIn("Few-shot calibration examples", prompt)
 
 
 if __name__ == "__main__":

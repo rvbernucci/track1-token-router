@@ -56,6 +56,23 @@ class StateMachineTests(unittest.TestCase):
         self.assertIn("remote_audit", [step.state for step in trace.steps])
         self.assertEqual(trace.steps[-1].state, "final")
 
+    def test_trace_for_fireworks_direct_records_remote_state(self) -> None:
+        task = TaskEnvelope(id="t3", input_text="Summarise this.")
+        result = AnswerResult(id="t3", answer="Summary.", route="fireworks_direct")
+        trace = build_orchestration_trace(task, result)
+
+        self.assertEqual(trace.fallback, "")
+        self.assertIn("remote_audit", [step.state for step in trace.steps])
+        self.assertEqual(trace.steps[-1].reason, "return_remote_direct_answer")
+
+    def test_trace_for_fireworks_error_records_fallback(self) -> None:
+        task = TaskEnvelope(id="t4", input_text="Summarise this.")
+        result = AnswerResult(id="t4", answer="Unable to complete the task.", route="fireworks_error")
+        trace = build_orchestration_trace(task, result)
+
+        self.assertEqual(trace.fallback, "return_controlled_fireworks_error")
+        self.assertEqual(trace.steps[-1].event, "fallback")
+
     def test_orchestrated_runner_uses_guardrail_before_inner_runner(self) -> None:
         inner = CountingRunner("inner")
         runner = OrchestratedRunner(inner, enable_guardrails=True)

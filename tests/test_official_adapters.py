@@ -1,4 +1,8 @@
 import json
+import os
+import subprocess
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -17,6 +21,7 @@ class OfficialAdapterTests(unittest.TestCase):
                 "plain_text",
                 "json_task",
                 "jsonl_batch",
+                "lablab_track1",
                 "file_payload",
                 "scoring_text_batch",
                 "scoring_json_envelope",
@@ -57,6 +62,63 @@ class OfficialAdapterTests(unittest.TestCase):
 
         self.assertEqual(len(tasks), 2)
         self.assertEqual(rows[1]["answer"], "SAFE_OUTPUT")
+
+    def test_lablab_track1_round_trip(self) -> None:
+        adapter = get_adapter("lablab_track1")
+        tasks = adapter.parse((FIXTURES / "lablab_track1_tasks.json").read_text(encoding="utf-8"))
+
+        output = adapter.format(
+            [
+                AnswerResult(id=tasks[0].id, answer="Local verification reduces token spend.", route="test"),
+                AnswerResult(id=tasks[1].id, answer="42", route="test"),
+            ]
+        )
+        payload = json.loads(output)
+
+        self.assertEqual(len(tasks), 2)
+        self.assertEqual(tasks[0].id, "t1")
+        self.assertEqual(tasks[0].input_text.startswith("Summarise"), True)
+        self.assertEqual(tasks[0].metadata["adapter"], "lablab_track1")
+        self.assertEqual(payload[0], {"task_id": "t1", "answer": "Local verification reduces token spend."})
+        self.assertEqual(payload[1], {"task_id": "t2", "answer": "42"})
+
+    def test_lablab_track1_cli_submission_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            input_dir = root / "input"
+            output_dir = root / "output"
+            input_dir.mkdir()
+            output_dir.mkdir()
+            input_path = input_dir / "tasks.json"
+            output_path = output_dir / "results.json"
+            input_path.write_text((FIXTURES / "lablab_track1_tasks.json").read_text(encoding="utf-8"), encoding="utf-8")
+            env = {
+                **os.environ,
+                "ROUTER_MODE": "mock",
+                "ROUTER_LOG_PATH": str(root / "run.jsonl"),
+            }
+
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "router",
+                    "submit-track1",
+                    "--input",
+                    str(input_path),
+                    "--output",
+                    str(output_path),
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+            payload = json.loads(output_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(completed.stdout, "")
+        self.assertEqual([row["task_id"] for row in payload], ["t1", "t2"])
+        self.assertTrue(all(isinstance(row["answer"], str) and row["answer"] for row in payload))
 
     def test_file_payload_round_trip(self) -> None:
         adapter = get_adapter("file_payload")

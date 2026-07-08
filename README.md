@@ -17,6 +17,51 @@ Prioridades:
 - container reproduzivel;
 - minimo acoplamento com UI ou framework web.
 
+## Quickstart limpo
+
+Do zero, use virtualenv. Em macOS/Homebrew, `python3 -m pip install -e .` fora de uma venv pode falhar por PEP 668.
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -e .
+router ask "What is 2+2?"
+```
+
+Sem instalacao local, tambem funciona:
+
+```bash
+python3 -m router ask "What is 2+2?"
+```
+
+Checks principais:
+
+```bash
+python3 -m unittest discover -s tests
+scripts/offline_release_check.sh
+python3 scripts/secret_scan.py
+git diff --check
+```
+
+Atalhos equivalentes:
+
+```bash
+make setup
+make smoke
+make test
+make release-check
+make doctor
+```
+
+Contrato oficial Track 1 em modo offline:
+
+```bash
+ROUTER_MODE=mock \
+python3 -m router submit-track1 \
+  --input fixtures/official/lablab_track1_tasks.json \
+  --output reports/generated/official-smoke-results.json
+```
+
 ## Pastas
 
 | Pasta | Papel |
@@ -105,7 +150,9 @@ Regra importante:
 ## Instalacao local
 
 ```bash
-python3 -m pip install -e .
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -e .
 ```
 
 Tambem e possivel rodar sem instalar:
@@ -119,7 +166,7 @@ python3 -m router ask "What is 2+2?"
 | Variavel | Padrao | Papel |
 |---|---|---|
 | `ROUTER_LOG_PATH` | `logs/run.jsonl` | Caminho dos logs estruturados JSONL. |
-| `ROUTER_MODE` | `mock` | Modo de execucao: `mock`, `auto`, `local`, `cascade`, `hybrid` ou `competition`. |
+| `ROUTER_MODE` | `mock` | Modo de execucao: `mock`, `auto`, `local`, `cascade`, `hybrid`, `competition` ou `fireworks`. |
 | `ROUTER_POLICY` | `balanced` | Politica de roteamento: `aggressive`, `balanced` ou `conservative`. |
 | `LOCAL_BASE_URL` | vazio | Endpoint OpenAI-compatible do modelo local. |
 | `ENABLE_GUARDRAILS` | `0` | Liga regras deterministicas conservadoras antes do runner. |
@@ -139,12 +186,14 @@ python3 -m router ask "What is 2+2?"
 | `M2B_TEMPERATURE` | `0.2` | Temperatura do gerador local M2B. |
 | `M2B_MAX_TOKENS` | `768` | Limite de output do M2B. |
 | `FIREWORKS_BASE_URL` | `https://api.fireworks.ai/inference/v1` | Endpoint Fireworks OpenAI-compatible. |
-| `FIREWORKS_MODEL` | vazio | Modelo remoto Fireworks. |
+| `ALLOWED_MODELS` | vazio | Lista oficial de modelos permitidos injetada pelo harness ACT II. |
+| `FIREWORKS_MODEL` | vazio | Override local; se vazio, usa o primeiro item de `ALLOWED_MODELS`. |
 | `FIREWORKS_API_KEY` | vazio | API key Fireworks, usada apenas nas sprints remotas. |
 | `FIREWORKS_TIMEOUT_S` | `60` | Timeout por chamada Fireworks. |
 | `FIREWORKS_MAX_RETRIES` | `1` | Tentativas extras em falha Fireworks. |
 | `FIREWORKS_TEMPERATURE` | `0.0` | Temperatura do auditor remoto. |
 | `FIREWORKS_MAX_TOKENS` | `256` | Limite de output do auditor remoto. |
+| `FIREWORKS_SERVICE_TIER` | vazio | Vazio usa Standard; `priority` deve ser usado apenas como fallback manual de confiabilidade. |
 
 ## Modo local M1
 
@@ -177,6 +226,18 @@ python3 -m router ask "What is 2+2?"
 
 Nesse modo, Fireworks so e chamado quando o M2A escala a tarefa.
 
+## Modo oficial Fireworks direto
+
+```bash
+ROUTER_MODE=fireworks \
+FIREWORKS_API_KEY=<harness-key> \
+FIREWORKS_BASE_URL=<harness-base-url> \
+ALLOWED_MODELS=accounts/fireworks/models/... \
+python3 -m router submit-track1 --input /input/tasks.json --output /output/results.json
+```
+
+Esse modo implementa o contrato oficial ACT II: le `/input/tasks.json`, escreve `/output/results.json`, usa solvers deterministicos antes de Fireworks e escolhe entre modelos de `ALLOWED_MODELS` por tier de tarefa.
+
 ## Modo competicao dry-run
 
 ```bash
@@ -199,7 +260,19 @@ Smoke test:
 
 ```bash
 docker run --rm track1-token-router --help
-docker run --rm track1-token-router ask "What is 2+2?"
+docker run --rm -e ROUTER_MODE=mock track1-token-router ask "What is 2+2?"
+```
+
+Official Track 1 file contract:
+
+```bash
+mkdir -p /tmp/track1-input /tmp/track1-output
+cp fixtures/official/lablab_track1_tasks.json /tmp/track1-input/tasks.json
+docker run --rm \
+  -e ROUTER_MODE=mock \
+  -v /tmp/track1-input:/input:ro \
+  -v /tmp/track1-output:/output \
+  track1-token-router
 ```
 
 Run JSONL:

@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 from typing import Sequence
 
+from router.adapters.official import get_adapter
 from router.adapters.io import load_jsonl_tasks, parse_json_task, task_from_text, write_jsonl_results
 from router.core.config import RouterConfig
 from router.core.contracts import AnswerResult, TaskEnvelope
@@ -34,6 +35,10 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--jsonl", type=Path, required=True, help="Input JSONL file.")
     run.add_argument("--out", type=Path, required=True, help="Output JSONL file.")
 
+    submit = subparsers.add_parser("submit-track1", help="Run the official ACT II Track 1 file contract.")
+    submit.add_argument("--input", type=Path, default=Path("/input/tasks.json"), help="Official input tasks JSON.")
+    submit.add_argument("--output", type=Path, default=Path("/output/results.json"), help="Official output results JSON.")
+
     eval_parser = subparsers.add_parser("eval", help="Run JSONL tasks and optionally compare expected answers.")
     eval_parser.add_argument("--jsonl", type=Path, required=True, help="Input JSONL file.")
     eval_parser.add_argument("--expected", type=Path, help="Expected JSONL file with answers.")
@@ -57,6 +62,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _handle_solve(args, runner)
         if args.command == "run":
             return _handle_run(args, runner)
+        if args.command == "submit-track1":
+            return _handle_submit_track1(args, runner)
         if args.command == "eval":
             return _handle_eval(args, runner)
     except Exception as exc:  # pragma: no cover - exercised through CLI behavior
@@ -94,6 +101,17 @@ def _handle_run(args: argparse.Namespace, runner: TaskRunner) -> int:
     with args.out.open("w", encoding="utf-8") as handle:
         write_jsonl_results(results, handle)
     print(json.dumps({"tasks": len(results), "out": str(args.out)}, ensure_ascii=False), file=sys.stderr)
+    return 0
+
+
+def _handle_submit_track1(args: argparse.Namespace, runner: TaskRunner) -> int:
+    adapter = get_adapter("lablab_track1")
+    raw = args.input.read_text(encoding="utf-8")
+    tasks = adapter.parse(raw)
+    results = [runner.run(task) for task in tasks]
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(adapter.format(results), encoding="utf-8")
+    print(json.dumps({"tasks": len(results), "out": str(args.output)}, ensure_ascii=False), file=sys.stderr)
     return 0
 
 

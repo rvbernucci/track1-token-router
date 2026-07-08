@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 import urllib.error
 import urllib.request
@@ -47,6 +48,7 @@ class LocalModelClient:
         *,
         temperature: float,
         max_tokens: int,
+        extra_body: dict[str, Any] | None = None,
     ) -> ModelResponse:
         payload = {
             "model": self.model,
@@ -54,6 +56,8 @@ class LocalModelClient:
             "temperature": temperature,
             "max_tokens": max_tokens,
         }
+        if extra_body:
+            payload.update(extra_body)
         response = self._post_json("/chat/completions", payload)
         return _parse_chat_completion(response)
 
@@ -75,7 +79,13 @@ class LocalModelClient:
                 if not isinstance(parsed, dict):
                     raise ModelClientError("Model response must be a JSON object.")
                 return parsed
-            except (TimeoutError, urllib.error.URLError, urllib.error.HTTPError, json.JSONDecodeError) as exc:
+            except urllib.error.HTTPError as exc:
+                last_error = ModelClientError(_format_http_error(exc))
+                if attempt < self.max_retries:
+                    time.sleep(self.retry_sleep_s)
+                    continue
+                break
+            except (TimeoutError, urllib.error.URLError, json.JSONDecodeError) as exc:
                 last_error = exc
                 if attempt < self.max_retries:
                     time.sleep(self.retry_sleep_s)
@@ -85,7 +95,10 @@ class LocalModelClient:
         raise ModelClientError(str(last_error) if last_error else "Unknown model client error.")
 
     def _headers(self) -> dict[str, str]:
-        headers = {"Content-Type": "application/json"}
+        headers = {
+            "Content-Type": "application/json",
+            "User-Agent": "track1-token-router/0.1",
+        }
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
         return headers
@@ -117,3 +130,20 @@ def _parse_chat_completion(payload: dict[str, Any]) -> ModelResponse:
     )
     return ModelResponse(text=content, usage=usage, raw=payload)
 
+
+def _format_http_error(exc: urllib.error.HTTPError) -> str:
+    body = ""
+    try:
+        body = exc.read().decode("utf-8", errors="replace").strip()
+    except Exception:
+        body = ""
+    if body:
+        body = _sanitize_error_body(body)
+        if len(body) > 500:
+            body = body[:500] + "...[truncated]"
+        return f"HTTP {exc.code} {exc.reason}: {body}"
+    return f"HTTP {exc.code} {exc.reason}"
+
+
+def _sanitize_error_body(body: str) -> str:
+    return re.sub(r"fw_[A-Za-z0-9_-]{8,}", "fw_[redacted]", body)

@@ -14,12 +14,14 @@ class FakeOpenAIServer(FakeOpenAIProvider):
         invalid_json: bool = False,
         prompt_tokens: int = 5,
         completion_tokens: int = 2,
+        statuses: list[int] | None = None,
     ) -> None:
         super().__init__(
             config=FakeProviderConfig(
                 response_text=response_text,
                 responses=tuple(responses or ()),
                 status=status,
+                statuses=tuple(statuses or ()),
                 delay_s=delay_s,
                 invalid_json=invalid_json,
                 prompt_tokens=prompt_tokens,

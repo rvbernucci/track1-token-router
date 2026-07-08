@@ -17,6 +17,7 @@ from router.core.contracts import AnswerResult
 
 
 DRILLS = {
+    "lablab_track1": Path("fixtures/official/lablab_track1_tasks.json"),
     "scoring_text_batch": Path("fixtures/adapter-drill/scoring_text_batch.txt"),
     "scoring_json_envelope": Path("fixtures/adapter-drill/scoring_json_envelope.json"),
     "scoring_file_bundle": Path("fixtures/adapter-drill/scoring_file_bundle.json"),
@@ -158,6 +159,13 @@ def _validate_output(adapter_name: str, output: str, *, tasks_count: int) -> Non
         answers = payload.get("answers") if isinstance(payload, dict) else None
         if not isinstance(answers, list) or len(answers) != tasks_count:
             raise ValueError("scoring_json_envelope output must contain one answer per task.")
+    if adapter_name == "lablab_track1":
+        payload = json.loads(output)
+        if not isinstance(payload, list) or len(payload) != tasks_count:
+            raise ValueError("lablab_track1 output must contain one result per task.")
+        for row in payload:
+            if not isinstance(row, dict) or not row.get("task_id") or "answer" not in row:
+                raise ValueError("lablab_track1 rows must contain task_id and answer.")
     if adapter_name == "scoring_text_batch" and len(output.splitlines()) != tasks_count:
         raise ValueError("scoring_text_batch output must contain one line per task.")
 

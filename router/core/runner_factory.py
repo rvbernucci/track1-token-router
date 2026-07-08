@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from router.core.config import RouterConfig
 from router.core.fireworks import FireworksClient
+from router.core.fireworks_runner import FireworksDirectRunner
 from router.core.guardrails import GuardedRunner
 from router.core.hybrid_cascade import HybridCascadeRunner
 from router.core.local_cascade import LocalCascadeRunner
@@ -29,6 +30,8 @@ def build_runner(config: RouterConfig, logger: JsonlRunLogger) -> TaskRunner:
         return _wrap_runner(_build_local_cascade_runner(config, logger), config, logger)
     if mode == "hybrid":
         return _wrap_runner(_build_hybrid_cascade_runner(config, logger), config, logger)
+    if mode == "fireworks":
+        return _wrap_runner(_build_fireworks_direct_runner(config, logger), config, logger)
     if mode == "competition":
         return _build_competition_runner(config, logger)
     raise ValueError(f"Unsupported ROUTER_MODE: {config.mode}")
@@ -146,4 +149,26 @@ def _build_hybrid_cascade_runner(config: RouterConfig, logger: JsonlRunLogger) -
         fireworks_temperature=config.fireworks_temperature,
         fireworks_max_tokens=config.fireworks_max_tokens,
         policy=config.policy,
+    )
+
+
+def _build_fireworks_direct_runner(config: RouterConfig, logger: JsonlRunLogger) -> FireworksDirectRunner:
+    if not config.fireworks_model:
+        raise ValueError("FIREWORKS_MODEL or ALLOWED_MODELS is required when ROUTER_MODE=fireworks.")
+    if not config.fireworks_api_key:
+        raise ValueError("FIREWORKS_API_KEY is required when ROUTER_MODE=fireworks.")
+    client = FireworksClient(
+        base_url=config.fireworks_base_url,
+        model=config.fireworks_model,
+        api_key=config.fireworks_api_key,
+        timeout_s=config.fireworks_timeout_s,
+        max_retries=config.fireworks_max_retries,
+    )
+    return FireworksDirectRunner(
+        client,
+        logger=logger,
+        temperature=config.fireworks_temperature,
+        max_tokens=config.fireworks_max_tokens,
+        allowed_models=config.allowed_models,
+        service_tier=config.fireworks_service_tier,
     )

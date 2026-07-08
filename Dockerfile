@@ -2,7 +2,10 @@ FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    ROUTER_LOG_PATH=/app/logs/run.jsonl
+    ROUTER_LOG_PATH=/app/logs/run.jsonl \
+    ROUTER_MODE=fireworks \
+    ENABLE_GUARDRAILS=1 \
+    ENABLE_ORCHESTRATOR=1
 
 WORKDIR /app
 
@@ -20,4 +23,4 @@ RUN useradd --create-home --shell /usr/sbin/nologin routeruser \
 USER routeruser
 
 ENTRYPOINT ["router"]
-CMD ["--help"]
+CMD ["submit-track1"]
