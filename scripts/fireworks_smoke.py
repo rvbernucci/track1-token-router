@@ -12,6 +12,7 @@ if str(ROOT) not in sys.path:
 
 from router.core.fireworks import FireworksClient
 from router.core.model_client import ModelClientError
+from router.orchestration.fireworks_model_router import normalize_fireworks_model_id
 
 
 DEFAULT_BASE_URL = "https://api.fireworks.ai/inference/v1"
@@ -38,7 +39,7 @@ def main() -> int:
     api_key = os.getenv("FIREWORKS_API_KEY")
     base_url = args.base_url or os.getenv("FIREWORKS_BASE_URL") or DEFAULT_BASE_URL
     allowed_models = _parse_models(args.allowed_models or os.getenv("ALLOWED_MODELS"))
-    model = args.model or os.getenv("FIREWORKS_MODEL") or (allowed_models[0] if allowed_models else None)
+    model = normalize_fireworks_model_id(args.model or os.getenv("FIREWORKS_MODEL") or (allowed_models[0] if allowed_models else None))
 
     if not api_key:
         _print_missing("FIREWORKS_API_KEY is not set.")
@@ -123,7 +124,7 @@ def _strip_quotes(value: str) -> str:
 def _parse_models(raw: str | None) -> list[str]:
     if not raw:
         return []
-    return [item.strip() for item in raw.split(",") if item.strip()]
+    return [normalize_fireworks_model_id(item) for item in raw.split(",") if item.strip()]
 
 
 def _print_missing(message: str) -> None:

@@ -60,6 +60,16 @@ O preco veio da documentacao de Serverless Pricing da Fireworks. A latencia e to
 
 Modelos de resposta final, todos via `accounts/fireworks/models/...`:
 
+Nota de 2026-07-08: o Track 1 ACT II passou a ter Pareto restrito oficial. No caminho final, considerar apenas:
+
+- `minimax-m3`;
+- `kimi-k2p7-code`;
+- `gemma-4-31b-it`;
+- `gemma-4-26b-a4b-it`;
+- `gemma-4-31b-it-nvfp4`.
+
+Os modelos abaixo que nao pertencem a essa lista ficam como pesquisa/calibracao historica, nao como rota final de submissao.
+
 | Modelo | Papel no Pareto | Uso preferencial |
 | --- | --- | --- |
 | `gpt-oss-20b` | menor custo de entrada para chat | classificacao, formato simples, resposta curta |
@@ -138,6 +148,24 @@ Em nova rodada de 2026-07-08, com `select_reasoning_effort()` usando `low` para 
 - por custo, `gpt-oss-20b` venceu `math_reasoning` e `code_generation`;
 - por latencia, `gpt-oss-120b` ficou surpreendentemente forte em tarefas curtas, apesar do custo maior que `gpt-oss-20b` e `deepseek-v4-flash`.
 
+Rodada restrita aos modelos oficiais acessiveis na chave local em 2026-07-08:
+
+- dataset: `evals/fireworks-pareto/track1-category-microbench.jsonl`;
+- categorias: factual Q&A, math reasoning, sentiment, summarization, NER, code debugging, logic puzzles e code generation;
+- modelos testados: `minimax-m3`, `kimi-k2p7-code`;
+- chamadas: `32`;
+- validas: `29/32`;
+- custo estimado: `0.00517850` USD;
+- `minimax-m3`: `15/16`, custo `0.00141390`, latencia media `1330ms`;
+- `kimi-k2p7-code`: `14/16`, custo `0.00376460`, latencia media `2008ms`;
+- conclusao operacional: `minimax-m3` e o default acessivel mais forte; `kimi-k2p7-code` deve ser fallback/candidato, nao default.
+
+Gemma no estado atual:
+
+- os tres Gemma oficiais retornam `HTTP 404` com a chave local atual;
+- o router esta preparado para escolher Gemma em tarefas cheap/medium se o harness liberar;
+- se Gemma falhar, o runner tenta o proximo modelo permitido antes de devolver erro.
+
 ## Implicacao Competitiva
 
 O router nao deve ser:
@@ -149,7 +177,8 @@ O router nao deve ser:
 
 O router deve ser:
 
-- Gemma-first se Gemma estiver em `ALLOWED_MODELS` e estiver na fronteira para a tarefa;
+- Gemma-first apenas em cheap/medium linguagem, se Gemma estiver acessivel;
+- Minimax-first para strong math, logic, code debugging e code generation;
 - custo-first quando a tarefa for simples;
 - capacidade-first quando a tarefa for forte;
 - sempre `ALLOWED_MODELS`-first no caminho oficial.

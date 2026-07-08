@@ -82,6 +82,14 @@ TIER_GAME_WEIGHTS: dict[str, dict[str, float]] = {
     "strong": {"cost": 0.40, "quality": 0.50, "latency": 0.10},
 }
 
+FIREWORKS_MODEL_ALIASES: dict[str, str] = {
+    "minimax-m3": "accounts/fireworks/models/minimax-m3",
+    "kimi-k2p7-code": "accounts/fireworks/models/kimi-k2p7-code",
+    "gemma-4-31b-it": "accounts/fireworks/models/gemma-4-31b-it",
+    "gemma-4-26b-a4b-it": "accounts/fireworks/models/gemma-4-26b-a4b-it",
+    "gemma-4-31b-it-nvfp4": "accounts/fireworks/models/gemma-4-31b-it-nvfp4",
+}
+
 
 @dataclass(frozen=True)
 class FireworksModelProfile:
@@ -180,11 +188,20 @@ def rank_fireworks_models(models: list[str]) -> list[str]:
     unique = []
     seen = set()
     for model in models:
-        clean = model.strip()
+        clean = normalize_fireworks_model_id(model)
         if clean and clean not in seen:
             unique.append(clean)
             seen.add(clean)
     return sorted(unique, key=_model_cost_score)
+
+
+def normalize_fireworks_model_id(model: str | None) -> str:
+    if not model:
+        return ""
+    clean = model.strip()
+    if clean.startswith("accounts/"):
+        return clean
+    return FIREWORKS_MODEL_ALIASES.get(clean, clean)
 
 
 def select_reasoning_effort(model: str, tier: str) -> str | None:
@@ -192,6 +209,8 @@ def select_reasoning_effort(model: str, tier: str) -> str | None:
     lowered = model.lower()
     if "gpt-oss" in lowered:
         return "low"
+    if "gemma" in lowered:
+        return None
     if tier in {"cheap", "medium"}:
         return "none"
     return None
@@ -570,6 +589,63 @@ def _profile_for_model(model: str) -> FireworksModelProfile:
 
 def _known_profile(lowered_model: str) -> FireworksModelProfile | None:
     known = [
+        (
+            "gemma-4-31b-it-nvfp4",
+            FireworksModelProfile(
+                input_price_per_mtok=0.20,
+                output_price_per_mtok=0.50,
+                latency_ms=850,
+                simple_total_tokens=18,
+                strengths=frozenset(
+                    {
+                        "general",
+                        "classification",
+                        "formatting",
+                        "summarization",
+                        "extraction",
+                    }
+                ),
+                reliability=0.92,
+            ),
+        ),
+        (
+            "gemma-4-26b-a4b-it",
+            FireworksModelProfile(
+                input_price_per_mtok=0.20,
+                output_price_per_mtok=0.50,
+                latency_ms=950,
+                simple_total_tokens=20,
+                strengths=frozenset(
+                    {
+                        "general",
+                        "classification",
+                        "formatting",
+                        "summarization",
+                        "extraction",
+                    }
+                ),
+                reliability=0.91,
+            ),
+        ),
+        (
+            "gemma-4-31b-it",
+            FireworksModelProfile(
+                input_price_per_mtok=0.24,
+                output_price_per_mtok=0.60,
+                latency_ms=1050,
+                simple_total_tokens=22,
+                strengths=frozenset(
+                    {
+                        "general",
+                        "classification",
+                        "formatting",
+                        "summarization",
+                        "extraction",
+                    }
+                ),
+                reliability=0.93,
+            ),
+        ),
         (
             "qwen3-embedding-8b",
             FireworksModelProfile(

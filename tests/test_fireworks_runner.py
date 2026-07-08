@@ -116,6 +116,29 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertEqual(client.extra_bodies, [{"user": "track1-token-router-v1", "reasoning_effort": "none"}, None])
         self.assertIn("reasoning_effort", result.metadata["fireworks_request_options_fallback"])
 
+    def test_model_error_falls_back_to_next_allowed_model(self) -> None:
+        with FakeOpenAIServer(
+            response_text="Fallback answer.",
+            statuses=[404, 200],
+            prompt_tokens=9,
+            completion_tokens=3,
+        ) as server:
+            client = FireworksClient(base_url=server.url, model="fallback-model", api_key="test", max_retries=0)
+            runner = FireworksDirectRunner(
+                client,
+                allowed_models=["gemma-4-31b-it", "minimax-m3"],
+            )
+
+            result = runner.run(TaskEnvelope(id="summary", input_text="Summarise this: token routing matters."))
+
+        self.assertEqual(result.route, "fireworks_direct")
+        self.assertEqual(result.answer, "Fallback answer.")
+        self.assertEqual(result.remote_tokens.total, 12)
+        self.assertEqual(len(server.requests), 2)
+        self.assertNotEqual(server.requests[0]["payload"]["model"], server.requests[1]["payload"]["model"])
+        self.assertTrue(result.metadata["fireworks_attempt_errors"])
+        self.assertEqual(client.model, "fallback-model")
+
     def test_submit_track1_with_fireworks_mode_and_allowed_models(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

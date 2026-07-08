@@ -63,9 +63,12 @@ Modelos com reasoning podem consumir poucos tokens apenas em `reasoning_content`
 Resultado de 2026-07-08:
 
 - `accounts/fireworks/models/gemma-4-31b-it` retornou `HTTP 404 Not Found`;
+- `accounts/fireworks/models/gemma-4-26b-a4b-it` retornou `HTTP 404 Not Found`;
+- `accounts/fireworks/models/gemma-4-31b-it-nvfp4` retornou `HTTP 404 Not Found`;
 - endpoint `/models` retornou `HTTP 403 Forbidden` para a chave atual;
 - `accounts/fireworks/models/gpt-oss-20b` no smoke simples retornou resposta sem `message.content`, entao nao usar smoke simples para `gpt-oss`;
 - `accounts/fireworks/models/deepseek-v4-flash` validou conectividade com `usage.total=59`, mas nao seguiu formato estrito no smoke; qualidade deve ser medida pelo microbench com validadores.
+- `accounts/fireworks/models/minimax-m3` e `accounts/fireworks/models/kimi-k2p7-code` funcionaram com a chave atual e tambem funcionam quando chamados por alias curto via scripts do projeto.
 
 ## Microbench de reasoning
 
@@ -149,6 +152,51 @@ Resultado:
 - tarefa de resumo usou Fireworks com `173` tokens remotos;
 - tarefa aritmetica `6 * 7` saiu por solver deterministico com `0` tokens remotos;
 - resposta final: `42`.
+
+## Track 1 ACT II - Pareto Restrito Oficial
+
+O guia Track 1 compartilhado em 2026-07-08 restringe os modelos a:
+
+- `minimax-m3`;
+- `kimi-k2p7-code`;
+- `gemma-4-31b-it`;
+- `gemma-4-26b-a4b-it`;
+- `gemma-4-31b-it-nvfp4`.
+
+O runtime normaliza aliases curtos para IDs Fireworks completos:
+
+- `minimax-m3` -> `accounts/fireworks/models/minimax-m3`;
+- `kimi-k2p7-code` -> `accounts/fireworks/models/kimi-k2p7-code`;
+- `gemma-4-31b-it` -> `accounts/fireworks/models/gemma-4-31b-it`;
+- `gemma-4-26b-a4b-it` -> `accounts/fireworks/models/gemma-4-26b-a4b-it`;
+- `gemma-4-31b-it-nvfp4` -> `accounts/fireworks/models/gemma-4-31b-it-nvfp4`.
+
+Smoke permitido em 2026-07-08:
+
+- `minimax-m3`: OK, `162` tokens totais no smoke curto;
+- `kimi-k2p7-code`: OK, `57` tokens totais no smoke curto;
+- os tres Gemma: `HTTP 404 Not Found` na chave local atual.
+
+Benchmark `evals/fireworks-pareto/track1-category-microbench.jsonl`, cobrindo as 8 categorias oficiais, com `minimax-m3` e `kimi-k2p7-code`:
+
+- chamadas: `32`;
+- validas mecanicas: `29/32`;
+- custo estimado: `0.00517850` USD;
+- `minimax-m3`: `15/16`, custo `0.00141390`, latencia media `1330ms`;
+- `kimi-k2p7-code`: `14/16`, custo `0.00376460`, latencia media `2008ms`.
+
+Falhas observadas:
+
+- NER de data/dinheiro normalizou `July 8, 2026` para `2026-07-08` e `$450` para `450`; mecanicamente falhou, mas semanticamente provavelmente aceitavel;
+- `kimi-k2p7-code` falhou em `debug_first_even` por devolver explicacao junto e codigo truncado;
+- `reasoning_effort=none` global reduziu custo para `0.00282810` USD, mas piorou validade para `28/32`; portanto nao forcar `none` em tarefas fortes.
+
+Politica atual para o caminho oficial:
+
+- cheap/medium linguagem: Gemma-first quando Gemma estiver acessivel no harness;
+- strong math/logic/code/debug: `minimax-m3` first;
+- fallback entre modelos permitidos se o modelo escolhido retornar erro de API, 404, timeout ou resposta sem `message.content`;
+- `kimi-k2p7-code` permanece como fallback/candidato, especialmente para codigo/logica, mas nao como default atual.
 
 ## Serverless vs Batch vs Deployments
 

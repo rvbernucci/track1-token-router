@@ -8,6 +8,16 @@ Track 1 is now described as a general-purpose AI agent benchmark. Exact evaluati
 
 Update from the Track 1 page: final scoring rewards routing intelligence across Fireworks models. Local models are optional for development/testing and are not the core scoring path. Only inference routed through `FIREWORKS_BASE_URL` using a model from `ALLOWED_MODELS` is recorded for token scoring.
 
+Update from the Track 1 guide shared on 2026-07-08: Track 1 is constrained to this model set:
+
+- `minimax-m3`;
+- `kimi-k2p7-code`;
+- `gemma-4-31b-it`;
+- `gemma-4-26b-a4b-it`;
+- `gemma-4-31b-it-nvfp4`.
+
+The router accepts both these short names and full Fireworks IDs like `accounts/fireworks/models/minimax-m3`.
+
 The container must:
 
 - read tasks from `/input/tasks.json` on startup;
@@ -88,15 +98,18 @@ Observed Gemma status on 2026-07-07:
 Rechecked on 2026-07-08 after receiving Fireworks credits:
 
 - direct serverless smoke for `accounts/fireworks/models/gemma-4-31b-it` still returns `HTTP 404 Not Found`;
+- direct serverless smoke for `accounts/fireworks/models/gemma-4-26b-a4b-it` and `accounts/fireworks/models/gemma-4-31b-it-nvfp4` also returns `HTTP 404 Not Found`;
 - Fireworks public model pages still show Gemma models as on-demand rather than serverless;
-- the API key can call serverless models such as `deepseek-v4-flash`, so this is a Gemma access/path issue, not a general key failure.
+- the API key can call official allowed serverless models `minimax-m3` and `kimi-k2p7-code`, so this is a Gemma access/path issue, not a general key failure.
 
-Implication: Gemma is still valuable for the partner challenge, demos, calibration and possible on-demand deployment, but the competition router must remain `ALLOWED_MODELS`-first.
+Implication: Gemma is official for Track 1, but our current Fireworks credit key does not expose it through serverless. The competition router must remain `ALLOWED_MODELS`-first and must gracefully fall back if one allowed model is inaccessible in a given environment.
 
 Practical strategy:
 
-- If Gemma appears in `ALLOWED_MODELS`, make the router Gemma-first for tasks where Gemma is the cheapest sufficient model.
-- If Gemma is not in `ALLOWED_MODELS`, keep the final scoring router compliant and use Gemma in documented development/calibration or an AMD-hosted companion demo.
+- Use Gemma-first only for cheap/medium language tasks: classification, formatting, summarization and extraction.
+- Use `minimax-m3` first for strong math, logic, code debugging and code generation because it is accessible and benchmarked.
+- Keep `kimi-k2p7-code` as an allowed fallback/candidate for code and logic, but do not make it default on current evidence because it is slower and more expensive.
+- If Gemma is not accessible in local Fireworks credits, fallback to `minimax-m3` without failing the run.
 - Do not create a paid on-demand Gemma deployment inside the final Track 1 path unless the organizers explicitly confirm it is allowed and counted.
 
 ## Scoring

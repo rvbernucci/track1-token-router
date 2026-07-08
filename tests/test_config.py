@@ -36,6 +36,32 @@ class RouterConfigTests(unittest.TestCase):
         self.assertIsNone(default_config.fireworks_service_tier)
         self.assertEqual(priority_config.fireworks_service_tier, "priority")
 
+    def test_short_allowed_model_names_are_normalized(self) -> None:
+        with patched_env(
+            FIREWORKS_MODEL=None,
+            ALLOWED_MODELS="minimax-m3,kimi-k2p7-code,gemma-4-31b-it",
+        ):
+            config = RouterConfig.from_env()
+
+        self.assertEqual(config.fireworks_model, "accounts/fireworks/models/minimax-m3")
+        self.assertEqual(
+            config.allowed_models,
+            [
+                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
+                "accounts/fireworks/models/gemma-4-31b-it",
+            ],
+        )
+
+    def test_short_fireworks_model_name_is_normalized(self) -> None:
+        with patched_env(
+            FIREWORKS_MODEL="gemma-4-31b-it-nvfp4",
+            ALLOWED_MODELS=None,
+        ):
+            config = RouterConfig.from_env()
+
+        self.assertEqual(config.fireworks_model, "accounts/fireworks/models/gemma-4-31b-it-nvfp4")
+
 
 class patched_env:
     def __init__(self, **values: str | None) -> None:

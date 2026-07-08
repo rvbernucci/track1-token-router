@@ -3,6 +3,7 @@ import unittest
 from router.core.contracts import TaskEnvelope
 from router.orchestration.fireworks_model_router import (
     DOMAIN_CORRELATION_MATRIX,
+    normalize_fireworks_model_id,
     rank_fireworks_models,
     select_fireworks_model,
     select_reasoning_effort,
@@ -24,6 +25,14 @@ FIREWORKS_PARETO_CATALOG = [
     "accounts/fireworks/models/deepseek-v4-flash",
     "accounts/fireworks/models/qwen3-reranker-8b",
     "accounts/fireworks/models/qwen3-embedding-8b",
+]
+
+TRACK1_ALLOWED_SHORT_NAMES = [
+    "minimax-m3",
+    "kimi-k2p7-code",
+    "gemma-4-31b-it",
+    "gemma-4-26b-a4b-it",
+    "gemma-4-31b-it-nvfp4",
 ]
 
 
@@ -50,6 +59,53 @@ class FireworksModelRouterTests(unittest.TestCase):
         )
 
         self.assertEqual(ranked[0], "accounts/fireworks/models/gpt-oss-120b")
+
+    def test_normalizes_track1_allowed_short_names(self) -> None:
+        ranked = rank_fireworks_models(TRACK1_ALLOWED_SHORT_NAMES)
+
+        self.assertIn("accounts/fireworks/models/minimax-m3", ranked)
+        self.assertIn("accounts/fireworks/models/kimi-k2p7-code", ranked)
+        self.assertIn("accounts/fireworks/models/gemma-4-31b-it", ranked)
+        self.assertEqual(
+            normalize_fireworks_model_id("gemma-4-31b-it-nvfp4"),
+            "accounts/fireworks/models/gemma-4-31b-it-nvfp4",
+        )
+
+    def test_track1_allowed_catalog_can_route_with_short_names(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(input_text="Return exactly this string and nothing else: ACK-742"),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertTrue(selection.model.startswith("accounts/fireworks/models/"))
+        self.assertIn(selection.model, rank_fireworks_models(TRACK1_ALLOWED_SHORT_NAMES))
+
+    def test_track1_allowed_catalog_uses_minimax_for_strong_reasoning(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(
+                input_text=(
+                    "A plan costs 80. It receives a 15 percent discount and then a 5 fee is added. "
+                    "Return only the final number."
+                )
+            ),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertEqual(selection.domain, "math_reasoning")
+        self.assertEqual(selection.tier, "strong")
+        self.assertEqual(selection.model, "accounts/fireworks/models/minimax-m3")
+
+    def test_track1_allowed_catalog_still_uses_gemma_for_medium_language_tasks(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(input_text="Summarise this: Local verification reduces remote token spend."),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertEqual(selection.domain, "summarization")
+        self.assertTrue(selection.model.endswith("gemma-4-31b-it-nvfp4"))
+
+    def test_gemma_does_not_send_reasoning_effort(self) -> None:
+        self.assertIsNone(select_reasoning_effort("accounts/fireworks/models/gemma-4-31b-it", "cheap"))
 
     def test_sentiment_uses_cheapest_model(self) -> None:
         selection = select_fireworks_model(

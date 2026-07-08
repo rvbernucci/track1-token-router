@@ -50,22 +50,41 @@ class FireworksDirectRunner:
 
         started_at = perf_counter()
         selection = select_fireworks_model(task, self.allowed_models, default_model=self.client.model)
-        request_options = _request_options_for_selection(selection.model, selection.tier, service_tier=self.service_tier)
+        selected_model = selection.model
+        request_options = _request_options_for_selection(selected_model, selection.tier, service_tier=self.service_tier)
         request_options_fallback: str | None = None
         original_model = self.client.model
-        self.client.model = selection.model
+        attempt_errors: list[dict[str, str]] = []
+        response: ModelResponse | None = None
         try:
-            response = _complete_with_optional_request_options(
-                self.client,
-                build_m1_messages(task),
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
-                request_options=request_options,
-            )
-        except _RequestOptionsFallback as fallback:
-            response = fallback.response
-            request_options_fallback = fallback.reason
-        except ModelClientError as exc:
+            for attempt_model in _models_to_try(selection):
+                selected_model = attempt_model
+                request_options = _request_options_for_selection(
+                    selected_model,
+                    selection.tier,
+                    service_tier=self.service_tier,
+                )
+                self.client.model = selected_model
+                try:
+                    response = _complete_with_optional_request_options(
+                        self.client,
+                        build_m1_messages(task),
+                        temperature=self.temperature,
+                        max_tokens=self.max_tokens,
+                        request_options=request_options,
+                    )
+                    break
+                except _RequestOptionsFallback as fallback:
+                    response = fallback.response
+                    request_options_fallback = fallback.reason
+                    break
+                except ModelClientError as exc:
+                    attempt_errors.append({"model": selected_model, "error": str(exc)})
+                    continue
+        finally:
+            self.client.model = original_model
+
+        if response is None:
             latency_ms = _elapsed_ms(started_at)
             result = AnswerResult(
                 id=task.id,
@@ -74,24 +93,24 @@ class FireworksDirectRunner:
                 remote_tokens=TokenUsage.empty(),
                 metadata={
                     "runner": "fireworks_direct",
-                    "fireworks_model": selection.model,
+                    "fireworks_model": selected_model,
                     "fireworks_model_selection": selection.to_dict(),
                     "fireworks_request_options": request_options,
+                    "fireworks_attempt_errors": attempt_errors,
                     "latency_fireworks_ms": latency_ms,
-                    "error": str(exc),
+                    "error": attempt_errors[-1]["error"] if attempt_errors else "no_model_attempted",
                 },
             )
             self._log(
                 task,
                 result,
                 stage="fireworks_direct_error",
-                error=str(exc),
+                error=result.metadata["error"],
                 latency_fireworks_ms=latency_ms,
                 fireworks_request_options=request_options,
+                fireworks_attempt_errors=attempt_errors,
             )
             return result
-        finally:
-            self.client.model = original_model
 
         latency_ms = _elapsed_ms(started_at)
         result = AnswerResult(
@@ -101,10 +120,11 @@ class FireworksDirectRunner:
             remote_tokens=response.usage,
             metadata={
                 "runner": "fireworks_direct",
-                "fireworks_model": selection.model,
+                "fireworks_model": selected_model,
                 "fireworks_model_selection": selection.to_dict(),
                 "fireworks_request_options": request_options,
                 "fireworks_request_options_fallback": request_options_fallback,
+                "fireworks_attempt_errors": attempt_errors,
                 "latency_fireworks_ms": latency_ms,
             },
         )
@@ -114,8 +134,10 @@ class FireworksDirectRunner:
             stage="fireworks_direct",
             latency_fireworks_ms=latency_ms,
             fireworks_tokens=response.usage.to_dict(),
+            fireworks_model=selected_model,
             fireworks_request_options=request_options,
             fireworks_request_options_fallback=request_options_fallback,
+            fireworks_attempt_errors=attempt_errors,
         )
         return result
 
@@ -136,6 +158,34 @@ def _request_options_for_selection(model: str, tier: str, *, service_tier: str |
     if reasoning_effort:
         options["reasoning_effort"] = reasoning_effort
     return options
+
+
+def _models_to_try(selection: object) -> list[str]:
+    models: list[str] = []
+
+    def add(model: object) -> None:
+        if isinstance(model, str) and model and model not in models:
+            models.append(model)
+
+    add(getattr(selection, "model", ""))
+    candidates = getattr(selection, "candidates", [])
+    if isinstance(candidates, list):
+        sorted_candidates = sorted(
+            [candidate for candidate in candidates if isinstance(candidate, dict) and candidate.get("supports_chat")],
+            key=lambda candidate: (
+                float(candidate.get("nash_product") or 0.0),
+                float(candidate.get("prisoner_payoff") or 0.0),
+                -float(candidate.get("estimated_cost_usd") or 0.0),
+            ),
+            reverse=True,
+        )
+        for candidate in sorted_candidates:
+            add(candidate.get("model"))
+    ranked_models = getattr(selection, "ranked_models", [])
+    if isinstance(ranked_models, list):
+        for model in ranked_models:
+            add(model)
+    return models
 
 
 def _complete_with_optional_request_options(

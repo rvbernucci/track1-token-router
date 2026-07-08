@@ -4,6 +4,8 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+from router.orchestration.fireworks_model_router import normalize_fireworks_model_id
+
 
 @dataclass(frozen=True)
 class RouterConfig:
@@ -55,7 +57,7 @@ class RouterConfig:
             m2b_temperature=float(os.getenv("M2B_TEMPERATURE", "0.2")),
             m2b_max_tokens=int(os.getenv("M2B_MAX_TOKENS", "768")),
             fireworks_base_url=os.getenv("FIREWORKS_BASE_URL", "https://api.fireworks.ai/inference/v1"),
-            fireworks_model=os.getenv("FIREWORKS_MODEL") or _first_allowed_model(os.getenv("ALLOWED_MODELS")),
+            fireworks_model=_optional_model(os.getenv("FIREWORKS_MODEL") or _first_allowed_model(os.getenv("ALLOWED_MODELS"))),
             allowed_models=_allowed_models(os.getenv("ALLOWED_MODELS")),
             fireworks_api_key=os.getenv("FIREWORKS_API_KEY"),
             fireworks_timeout_s=float(os.getenv("FIREWORKS_TIMEOUT_S", "60")),
@@ -88,4 +90,9 @@ def _first_allowed_model(raw: str | None) -> str | None:
 def _allowed_models(raw: str | None) -> list[str]:
     if not raw:
         return []
-    return [item.strip() for item in raw.split(",") if item.strip()]
+    return [normalize_fireworks_model_id(item) for item in raw.split(",") if item.strip()]
+
+
+def _optional_model(raw: str | None) -> str | None:
+    model = normalize_fireworks_model_id(raw)
+    return model or None

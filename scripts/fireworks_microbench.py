@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import builtins
 import json
 import os
 import re
@@ -17,7 +18,7 @@ if str(ROOT) not in sys.path:
 
 from router.core.fireworks import FireworksClient
 from router.core.model_client import ModelClientError, ModelResponse
-from router.orchestration.fireworks_model_router import _profile_for_model, select_reasoning_effort
+from router.orchestration.fireworks_model_router import _profile_for_model, normalize_fireworks_model_id, select_reasoning_effort
 
 
 DEFAULT_BASE_URL = "https://api.fireworks.ai/inference/v1"
@@ -52,7 +53,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Run a tiny Fireworks model microbenchmark.")
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
     parser.add_argument("--models", help="Comma-separated model IDs. Defaults to a compact Pareto set.")
-    parser.add_argument("--base-url", default=os.getenv("FIREWORKS_BASE_URL") or DEFAULT_BASE_URL)
+    parser.add_argument("--base-url")
     parser.add_argument("--env-file", action="append", type=Path, help="Load KEY=VALUE pairs before running.")
     parser.add_argument("--output-jsonl", type=Path, default=DEFAULT_OUTPUT_JSONL)
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
@@ -62,6 +63,7 @@ def main() -> int:
     parser.add_argument("--max-retries", type=int, default=0)
     parser.add_argument("--max-calls", type=int, default=36)
     parser.add_argument("--budget-usd", type=float, default=0.25)
+    parser.add_argument("--progress-every", type=int, default=0, help="Print progress to stderr every N completed calls.")
     parser.add_argument(
         "--reasoning-effort-override",
         choices=["auto", "off", "none", "low", "medium", "high"],
@@ -119,7 +121,7 @@ def main() -> int:
                 if spent_estimate >= args.budget_usd:
                     break
                 result = _run_case(
-                    base_url=args.base_url,
+                    base_url=args.base_url or os.getenv("FIREWORKS_BASE_URL") or DEFAULT_BASE_URL,
                     api_key=api_key,
                     model=model,
                     task=task,
@@ -132,6 +134,22 @@ def main() -> int:
                 spent_estimate += float(result.get("estimated_cost_usd") or 0.0)
                 results.append(result)
                 handle.write(json.dumps(result, ensure_ascii=True, separators=(",", ":")) + "\n")
+                handle.flush()
+                if args.progress_every > 0 and len(results) % args.progress_every == 0:
+                    print(
+                        json.dumps(
+                            {
+                                "completed": len(results),
+                                "valid": sum(1 for item in results if item.get("valid")),
+                                "estimated_cost_usd": round(spent_estimate, 8),
+                                "last_model": model,
+                                "last_task": task.id,
+                            },
+                            ensure_ascii=True,
+                            separators=(",", ":"),
+                        ),
+                        file=sys.stderr,
+                    )
             if len(results) >= args.max_calls or spent_estimate >= args.budget_usd:
                 break
 
@@ -316,8 +334,24 @@ def _validate(validator: dict[str, Any], answer: str) -> dict[str, Any]:
         if not isinstance(payload, dict) or not isinstance(expected, dict):
             return _validation(False, "expected and answer must be JSON objects")
         return _validation(all(payload.get(key) == value for key, value in expected.items()), "expected JSON key/value pairs")
+    if kind == "contains_all_lower":
+        expected_terms = [str(item).lower() for item in validator.get("terms", [])]
+        lowered = clean.lower()
+        missing = [term for term in expected_terms if term not in lowered]
+        if missing:
+            return _validation(False, f"missing terms: {missing}")
+        max_words = validator.get("max_words")
+        if max_words is not None and len(re.findall(r"\b\w+\b", clean)) > int(max_words):
+            return _validation(False, f"expected at most {int(max_words)} words")
+        return _validation(True, "all required terms present")
     if kind == "python_function_static":
         return _validate_python_function(clean, str(validator.get("function_name", "")))
+    if kind == "python_function_cases":
+        return _validate_python_function_cases(
+            clean,
+            str(validator.get("function_name", "")),
+            list(validator.get("cases") or []),
+        )
     return _validation(False, f"unknown validator {kind!r}")
 
 
@@ -328,6 +362,79 @@ def _validate_python_function(code: str, function_name: str) -> dict[str, Any]:
         return _validation(False, f"syntax error: {exc.msg}")
     has_function = any(isinstance(node, ast.FunctionDef) and node.name == function_name for node in module.body)
     return _validation(has_function, f"expected function {function_name}")
+
+
+def _validate_python_function_cases(code: str, function_name: str, cases: list[Any]) -> dict[str, Any]:
+    try:
+        module = ast.parse(code)
+    except SyntaxError as exc:
+        return _validation(False, f"syntax error: {exc.msg}")
+    has_function = any(isinstance(node, ast.FunctionDef) and node.name == function_name for node in module.body)
+    if not has_function:
+        return _validation(False, f"expected function {function_name}")
+    safety_error = _python_safety_error(module)
+    if safety_error:
+        return _validation(False, safety_error)
+    namespace: dict[str, Any] = {"__builtins__": _safe_builtins()}
+    try:
+        exec(compile(module, "<fireworks-microbench>", "exec"), namespace, namespace)
+        target = namespace.get(function_name)
+        if not callable(target):
+            return _validation(False, f"{function_name} is not callable")
+        for index, case in enumerate(cases, start=1):
+            if not isinstance(case, dict):
+                return _validation(False, f"case {index} must be an object")
+            args = case.get("args", [])
+            kwargs = case.get("kwargs", {})
+            expected = case.get("expected")
+            if not isinstance(args, list) or not isinstance(kwargs, dict):
+                return _validation(False, f"case {index} args/kwargs shape is invalid")
+            actual = target(*args, **kwargs)
+            if actual != expected:
+                return _validation(False, f"case {index} expected {expected!r}, got {actual!r}")
+    except Exception as exc:  # pragma: no cover - exercised by live model outputs
+        return _validation(False, f"runtime error: {type(exc).__name__}: {_truncate(str(exc), 120)}")
+    return _validation(True, f"{len(cases)} behavior cases passed")
+
+
+def _python_safety_error(module: ast.AST) -> str:
+    blocked_nodes = (ast.Import, ast.ImportFrom, ast.Global, ast.Nonlocal, ast.ClassDef)
+    blocked_names = {"__import__", "eval", "exec", "compile", "open", "input", "breakpoint"}
+    for node in ast.walk(module):
+        if isinstance(node, blocked_nodes):
+            return f"blocked Python construct: {type(node).__name__}"
+        if isinstance(node, ast.Name) and node.id in blocked_names:
+            return f"blocked Python name: {node.id}"
+    return ""
+
+
+def _safe_builtins() -> dict[str, Any]:
+    allowed = [
+        "abs",
+        "all",
+        "any",
+        "bool",
+        "dict",
+        "enumerate",
+        "filter",
+        "float",
+        "int",
+        "len",
+        "list",
+        "map",
+        "max",
+        "min",
+        "range",
+        "reversed",
+        "round",
+        "set",
+        "sorted",
+        "str",
+        "sum",
+        "tuple",
+        "zip",
+    ]
+    return {name: getattr(builtins, name) for name in allowed}
 
 
 def _validation(valid: bool, reason: str) -> dict[str, Any]:
@@ -499,7 +606,7 @@ def _strip_quotes(value: str) -> str:
 def _parse_models(raw: str | None) -> list[str]:
     if not raw:
         return []
-    return [item.strip() for item in raw.split(",") if item.strip()]
+    return [normalize_fireworks_model_id(item) for item in raw.split(",") if item.strip()]
 
 
 if __name__ == "__main__":
