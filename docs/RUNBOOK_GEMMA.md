@@ -6,6 +6,19 @@ Usar Gemma como modelo local para M1, M2A e M2B via endpoint OpenAI-compatible.
 
 Perfil recomendado: `runtime-profiles/gemma-local.env.example`.
 
+Contexto Track 1: Gemma no AMD GPU pod e a trilha local-first mais importante. Respostas locais corretas contam para accuracy e custam zero Fireworks tokens. Fireworks fica como fallback quando a cascata local escala.
+
+## AMD GPU Pod
+
+Antes de rodar Gemma local:
+
+- criar ou entrar em um time no lablab.ai, mesmo competindo solo;
+- aguardar ate 24 horas para alocacao do pod;
+- acessar `https://notebooks.amd.com/hackathon`;
+- lembrar que o uso do pod e limitado a 8 horas por 24 horas.
+
+Se aparecer `team not registered`, o problema nao e codigo: falta criar/entrar no time.
+
 ## Escolha inicial
 
 - Comecar com um modelo Gemma grande apenas se a GPU e a latencia permitirem.
@@ -42,11 +55,19 @@ Esperado:
 ## Calibracao minima
 
 ```bash
-python3 -m router eval \
-  --jsonl evals/fuzz/tasks.jsonl \
-  --expected evals/fuzz/expected.jsonl \
-  --out reports/generated/gemma-fuzz-output.jsonl \
-  --report reports/generated/gemma-fuzz-report.md
+ROUTER_MODE=cascade python3 -m router eval \
+  --jsonl evals/fireworks-pareto/track1-category-microbench.jsonl \
+  --out reports/generated/gemma-track1-category-output.jsonl \
+  --report reports/generated/gemma-track1-category-report.md
+```
+
+Depois testar o modo campeonato:
+
+```bash
+ROUTER_MODE=hybrid python3 -m router eval \
+  --jsonl evals/fireworks-pareto/track1-category-microbench.jsonl \
+  --out reports/generated/gemma-hybrid-track1-category-output.jsonl \
+  --report reports/generated/gemma-hybrid-track1-category-report.md
 ```
 
 ## Limites
@@ -54,3 +75,4 @@ python3 -m router eval \
 - Gemma grande pode ser bom demais para gastar em tarefas mecanicas, por isso solvers e guardrails rodam antes.
 - Modelo local nao deve decidir sobre conhecimento atual sem escalacao remota ou fonte confiavel.
 - Se o scoring final usar outro hardware, os parametros locais precisam ser recalibrados.
+- Se a latencia local passar do limite por task, voltar para Fireworks-only ou reduzir modelo/quantizacao.

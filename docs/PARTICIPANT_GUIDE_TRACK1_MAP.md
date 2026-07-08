@@ -92,6 +92,12 @@ Official partner statement:
 - Track 1 has a specific partner prize: Best Use of Gemma via Fireworks.
 - The same official page says model restrictions vary by track, so choices must be checked against Track 1 requirements.
 
+Current practical interpretation:
+
+- Gemma on the AMD GPU pod is the strongest local-first path and supports the Best Use of Gemma narrative.
+- Gemma through Fireworks serverless is still not accessible with the current local credit key.
+- Fireworks remains necessary as fallback/router path through `FIREWORKS_BASE_URL`.
+
 For Track 1 final scoring, the safe interpretation is:
 
 - use only the models injected through `ALLOWED_MODELS`;

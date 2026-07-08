@@ -4,6 +4,8 @@
 
 Track 1 allows local models as a scoring strategy. A local answer produced inside the container counts toward accuracy, and local inference contributes zero Fireworks tokens. This makes local-first routing the best theoretical strategy when local quality and latency are good enough.
 
+The AMD/Gemma partner wording now fits this reading: Gemma is available through AMD Developer Cloud and Fireworks AI, while each registered team receives an AMD GPU pod. The practical interpretation is that Gemma can be the zero-Fireworks-token local model on the AMD pod, while Fireworks remains the fallback/model-router path.
+
 ## Two Final Modes
 
 ### Safe Mode: Fireworks Direct
@@ -53,8 +55,21 @@ Local-first only wins if all of these are true:
 
 - Keep Docker default as `ROUTER_MODE=fireworks` until local model serving is proven in the AMD pod.
 - Use `ROUTER_MODE=hybrid` as the championship path once a local endpoint is stable.
+- Treat Gemma-on-AMD-pod as the primary local model lane for the Best Use of Gemma story.
 - Keep deterministic solvers enabled in both paths.
 - Use Fireworks as fallback, not as default, once local quality is validated.
+
+## AMD Pod Action
+
+Team registration is required before GPU access. Even solo participants must create or join a lablab.ai team. After registration, resource allocation can take up to 24 hours, and pod usage is limited to 8 hours per 24 hours.
+
+Once access is active:
+
+- open `https://notebooks.amd.com/hackathon`;
+- confirm the team pod is allocated;
+- start a local OpenAI-compatible Gemma endpoint with vLLM or SGLang;
+- point `LOCAL_BASE_URL` and `LOCAL_MODEL` to that endpoint;
+- run local, cascade and hybrid evals before spending more Fireworks tokens.
 
 ## Next Calibration
 
