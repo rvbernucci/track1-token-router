@@ -24,6 +24,7 @@ docker run --rm -e ROUTER_MODE=mock track1-token-router ask "What is 2+2?"
 ## Official Track 1 contract
 
 The default container command reads `/input/tasks.json` and writes `/output/results.json`.
+The image runs as root by default so it can write to host-owned `/output` mounts in CI and scoring harnesses.
 
 ```bash
 mkdir -p /tmp/track1-input /tmp/track1-output

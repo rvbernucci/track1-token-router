@@ -16,11 +16,10 @@ COPY logs ./logs
 
 RUN pip install --no-cache-dir .
 
-RUN useradd --create-home --shell /usr/sbin/nologin routeruser \
-    && mkdir -p /app/logs /app/reports/generated \
-    && chown -R routeruser:routeruser /app
+RUN mkdir -p /app/logs /app/reports/generated
 
-USER routeruser
+# The official evaluator mounts /input and /output at runtime. Running as root keeps
+# the file contract robust when /output is owned by the host or harness.
 
 ENTRYPOINT ["router"]
 CMD ["submit-track1"]
