@@ -2,7 +2,9 @@
 
 Last run: 2026-07-09
 
-Dataset: `evals/fireworks-pareto/track1-category-microbench.jsonl`
+Primary dataset: `evals/fireworks-pareto/track1-category-microbench.jsonl`
+
+Hidden-variant dataset: `evals/fireworks-pareto/hidden-variant-microbench.jsonl`
 
 Command shape:
 
@@ -15,11 +17,15 @@ python3 scripts/fireworks_microbench.py \
   --max-tokens 128
 ```
 
-Latest result file: `reports/generated/fireworks-track1-category-20260709-results.jsonl`
+Latest primary result file: `reports/generated/fireworks-track1-category-20260709-results.jsonl`
 
-Latest report: `reports/generated/fireworks-track1-category-20260709-report.md`
+Latest hidden-variant result file: `reports/generated/fireworks-hidden-variant-results.jsonl`
 
-Actual estimated spend: `$0.00448690`.
+Latest primary report: `reports/generated/fireworks-track1-category-20260709-report.md`
+
+Latest hidden-variant report: `reports/generated/fireworks-hidden-variant-report.md`
+
+Actual estimated spend: `$0.00448690` primary + `$0.00213260` hidden variants = `$0.00661950`.
 
 ## Aggregate Results
 
@@ -36,6 +42,7 @@ Actual estimated spend: `$0.00448690`.
 - `minimax-m3` is the current cheapest high-accuracy Fireworks fallback among accessible Track 1 allowed models.
 - `kimi-k2p7-code` is more expensive and slower, but it was the only accessible model with `16/16` valid answers in this run.
 - Domain winner policy changed: `kimi-k2p7-code` is preferred for `code_debug`; `minimax-m3` is preferred for code generation, math, logic, factual, sentiment, summarization and NER unless future calibration says otherwise.
+- Hidden-variant rerun: both accessible models passed `8/8`; `minimax-m3` cost `$0.00070650`, while `kimi-k2p7-code` cost `$0.00142610`.
 - The three Gemma serverless IDs returned `HTTP 404 Not Found` with the current local Fireworks key.
 - Gemma should remain in the architecture through AMD local inference and should still be attempted when the official harness exposes it, but repeated 404s should be cached and skipped within a batch.
 - NER data/date/currency tasks need explicit formatting instructions in our evals; otherwise semantic normalization can look like a mechanical failure.
@@ -46,6 +53,7 @@ After tightening the `ner_money_date` prompt to require date and amount exactly 
 
 - Use local Gemma first when an AMD pod endpoint is available and validated.
 - In Fireworks-only mode, the Docker image now enables `FIREWORKS_MATRIX_WEIGHTS=/app/router/data/fireworks_track1_allowed_weights.json` by default.
+- The checked-in matrix weights now use `120` real microbench rows: `80` primary category rows plus `40` hidden-variant rows.
 - The matrix selector uses ridge-regression utility plus Nash welfare. For strong tasks, regression/accuracy is weighted above token cost; for cheap tasks, token cost remains a larger part of the score.
 - Keep `kimi-k2p7-code` as the preferred remote candidate for code debugging because the latest empirical run showed `2/2` valid debugging cases versus `1/2` for `minimax-m3`.
 - Keep `minimax-m3` as the preferred remote candidate for the other observed Track 1 domains because it matched Kimi accuracy at lower token cost.
@@ -59,6 +67,7 @@ The pre-routing classifier now treats common hidden-evaluator variants as their 
 - numeric JSON prompts such as `Given values [...], return min and max` map to `math_reasoning` even when they request minified JSON;
 - `Fix this Python code...` maps to `code_debug`, preserving the calibrated Kimi preference;
 - `Write a Python function...` maps to `code_generation`, preserving the calibrated Minimax preference.
+- quantified logic prompts such as `All merls are... Is it guaranteed... Return exactly yes or no` map to `logic` instead of `formatting`.
 
 This does not answer tasks by regex. It only prevents format words like `Return only` or `JSON` from polluting the model-selection feature vector.
 

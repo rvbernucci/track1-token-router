@@ -301,6 +301,13 @@ def _task_domain(prompt: str) -> str:
 
 
 def _looks_like_syllogism(lowered_prompt: str) -> bool:
+    quantified_statement = bool(re.search(r"\b(all|some|no)\s+[a-z][a-z0-9_-]*s?\s+(are|is)\b", lowered_prompt))
+    conclusion_question = _has_any(
+        lowered_prompt,
+        ["can ", "is it guaranteed", "must ", "necessarily", "does it follow", "is it certain"],
+    )
+    if quantified_statement and conclusion_question:
+        return True
     return "all " in lowered_prompt and " no " in f" {lowered_prompt} " and "can " in lowered_prompt
 
 

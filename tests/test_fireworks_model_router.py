@@ -238,6 +238,20 @@ class FireworksModelRouterTests(unittest.TestCase):
         self.assertEqual(selection.tier, "strong")
         self.assertEqual(selection.domain, "logic")
 
+    def test_quantified_guarantee_question_is_logic_not_formatting(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(
+                input_text=(
+                    "All merls are tivas. Some tivas are roons. "
+                    "Is it guaranteed that some merls are roons? Return exactly yes or no."
+                )
+            ),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertEqual(selection.tier, "strong")
+        self.assertEqual(selection.domain, "logic")
+
     def test_code_generation_uses_strongest_model(self) -> None:
         selection = select_fireworks_model(
             TaskEnvelope(input_text="Write a function that parses nested JSON and handles edge cases."),

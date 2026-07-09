@@ -154,6 +154,11 @@ class CheckedInTrack1WeightsTests(unittest.TestCase):
                 "code_generation",
                 "accounts/fireworks/models/minimax-m3",
             ),
+            (
+                "All merls are tivas. Some tivas are roons. Is it guaranteed that some merls are roons? Return exactly yes or no.",
+                "logic",
+                "accounts/fireworks/models/minimax-m3",
+            ),
         ]
 
         for prompt, expected_domain, expected_model in cases:
