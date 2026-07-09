@@ -46,6 +46,22 @@ class CompetitionModeTests(unittest.TestCase):
         self.assertEqual(result.route, "solver_arithmetic")
         self.assertEqual(result.metadata["competition_trace"]["decision"]["reason"], "deterministic_solver_high_confidence")
 
+    def test_yes_no_solver_is_not_repaired_as_literal_echo(self) -> None:
+        inner = CountingRunner(answer="should not run")
+        runner = CompetitionRunner(inner, dry_run=True)
+
+        result = runner.run(
+            TaskEnvelope(
+                input_text="If the alarm is armed, the door locks. The alarm is armed. Is the door locked? Return exactly yes or no."
+            )
+        )
+
+        self.assertEqual(inner.calls, 0)
+        self.assertEqual(result.answer, "yes")
+        self.assertEqual(result.route, "solver_modus_ponens")
+        self.assertEqual(result.metadata["final_validation"]["expected_format"], "yes_no")
+        self.assertNotIn("final_answer_repaired", result.metadata)
+
     def test_remote_audit_is_dry_run_and_records_packet_tokens(self) -> None:
         runner = CompetitionRunner(CountingRunner(answer="I would check the latest source."), dry_run=True)
 

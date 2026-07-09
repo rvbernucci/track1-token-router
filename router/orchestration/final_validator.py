@@ -44,6 +44,11 @@ def validate_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationRes
         if stripped == expected:
             return FinalValidationResult(True, expected_format, "valid_literal_echo")
         return FinalValidationResult(False, expected_format, "literal_echo_mismatch", expected)
+    if expected_format == "yes_no":
+        if stripped.lower() in {"yes", "no"}:
+            return FinalValidationResult(True, expected_format, "valid_yes_no")
+        repaired = repair_final_answer(task, answer).repaired_answer
+        return FinalValidationResult(False, expected_format, "not_yes_no", repaired)
     if expected_format == "uppercase":
         if stripped == stripped.upper():
             return FinalValidationResult(True, expected_format, "valid_uppercase")
@@ -64,6 +69,12 @@ def repair_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationResul
     if expected_format == "literal_echo":
         expected = extract_literal_echo(task)
         return FinalValidationResult(bool(expected), expected_format, "literal_echo_repair", expected)
+    if expected_format == "yes_no":
+        lowered = stripped.lower()
+        yes = bool(re.search(r"\byes\b", lowered))
+        no = bool(re.search(r"\bno\b", lowered))
+        repaired = "yes" if yes and not no else "no" if no and not yes else ""
+        return FinalValidationResult(bool(repaired), expected_format, "yes_no_repair", repaired)
     if expected_format == "uppercase":
         return FinalValidationResult(bool(stripped), expected_format, "uppercase_repair", stripped.upper())
     return FinalValidationResult(bool(stripped), expected_format, "free_text_repair", stripped)

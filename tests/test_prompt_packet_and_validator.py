@@ -69,6 +69,28 @@ class FinalValidatorTests(unittest.TestCase):
         self.assertTrue(result.valid)
         self.assertEqual(infer_expected_format(task), "literal_echo")
 
+    def test_validates_yes_no_without_literal_echo_repair(self) -> None:
+        task = TaskEnvelope(input_text="Is the door locked? Return exactly yes or no.")
+
+        result = validate_final_answer(task, "yes")
+
+        self.assertTrue(result.valid)
+        self.assertEqual(infer_expected_format(task), "yes_no")
+
+    def test_repairs_yes_no_when_single_label_is_present(self) -> None:
+        task = TaskEnvelope(input_text="Is the door locked? Return exactly yes or no.")
+
+        result = repair_final_answer(task, "Yes, the door is locked.")
+
+        self.assertEqual(result.repaired_answer, "yes")
+
+    def test_does_not_repair_ambiguous_yes_no(self) -> None:
+        task = TaskEnvelope(input_text="Is the door locked? Return exactly yes or no.")
+
+        result = repair_final_answer(task, "yes or no")
+
+        self.assertEqual(result.repaired_answer, "")
+
     def test_free_text_allows_natural_answer(self) -> None:
         task = TaskEnvelope(input_text="Explain Nash equilibrium briefly.")
 

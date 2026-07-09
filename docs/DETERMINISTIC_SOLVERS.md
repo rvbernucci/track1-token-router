@@ -11,7 +11,13 @@ Ele existe para economizar latencia e reduzir risco quando a resposta pode ser c
 | solver | cobre | limite de seguranca |
 |---|---|---|
 | `arithmetic` | soma, subtracao, multiplicacao e divisao inteira exata | apenas expressoes inteiras de uma operacao |
+| `percent_fee_math` | desconto percentual unico seguido de fee fixa | exige formula textual `cost/price -> percent discount -> fee added` |
+| `proportional_rate` | taxa linear de unidades identicas | exige frase com unidades identicas, producao total e novo numero de unidades |
 | `numeric_compare` | maior/menor entre dois numeros | exige exatamente dois numeros e palavra-chave de comparacao |
+| `sentiment_lexicon` | sentimento explicito `positive/neutral/negative` | exige prompt de sentimento, marcador `Text:` e margem lexical clara |
+| `entity_extract` | JSON minificado para padroes NER mecanicos | apenas pagamento datado, fundacao pessoa/org/cidade e contato email/url/phone |
+| `logic_ordering` | endpoint de ordenacao transitiva simples | exige relacoes comparativas nominais e endpoint unico |
+| `modus_ponens` | inferencia `if A then B; A; is B?` | responde apenas `yes` quando antecedente e consequente normalizados batem exatamente |
 | `char_count` | contagem de caracteres | exige string entre aspas |
 | `word_count` | contagem de palavras | exige string entre aspas |
 | `case_transform` | uppercase, lowercase, titlecase | exige string entre aspas |
@@ -27,6 +33,23 @@ Ele existe para economizar latencia e reduzir risco quando a resposta pode ser c
 - Divisao nao inteira e divisao por zero ficam fora.
 - Tarefas que pedem ordenacao ficam fora, mesmo se tambem pedirem primeiro/ultimo item.
 - Strings sem aspas ficam fora em solvers de contagem e transformacao.
+- Sentimento misto ou sem margem lexical fica fora.
+- NER generico fica fora; o solver so entra em padroes estruturais comprovaveis.
+- Logica com contrapositiva, afirmacao do consequente ou grafos desconectados fica fora.
+
+## Track 1 payoff
+
+O Track 1 inclui factual Q&A, math reasoning, sentiment, summarization, NER, code debugging, logic puzzles e code generation.
+
+Este pack nao tenta substituir os modelos nessas oito categorias. Ele remove do caminho remoto apenas os subcasos em que codigo e mais confiavel que LLM:
+
+- math reasoning mecanico com formula unica;
+- sentiment obvio com vocabulario explicitamente polarizado;
+- NER estrutural em frases regulares;
+- logic puzzles de uma inferencia ou uma cadeia transitiva curta;
+- transformacoes de formato e contagem.
+
+O ganho esperado e reduzir chamadas Fireworks sem derrubar o accuracy gate. Quando o padrao nao e claro, `solve_deterministic` retorna `None` e a cascata/model router continua normalmente.
 
 ## Regra operacional
 

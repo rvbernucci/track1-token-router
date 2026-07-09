@@ -13,7 +13,13 @@ class SolverPackTests(unittest.TestCase):
             names,
             [
                 "arithmetic",
+                "percent_fee_math",
+                "proportional_rate",
                 "numeric_compare",
+                "sentiment_lexicon",
+                "entity_extract",
+                "logic_ordering",
+                "modus_ponens",
                 "char_count",
                 "word_count",
                 "case_transform",
@@ -37,6 +43,17 @@ class SolverPackTests(unittest.TestCase):
                 self.assertEqual(result.answer, answer)
                 self.assertEqual(result.confidence, "high")
 
+    def test_solves_safe_percent_and_rate_math(self) -> None:
+        cases = {
+            "A plan costs 80. It receives a 15 percent discount and then a 5 fee is added. Return only the final number.": "73",
+            "If 3 identical machines produce 18 widgets per hour, how many widgets per hour do 2 machines produce? Return only the number.": "12",
+        }
+        for prompt, answer in cases.items():
+            with self.subTest(prompt=prompt):
+                result = solve_deterministic(TaskEnvelope(input_text=prompt))
+                self.assertIsNotNone(result)
+                self.assertEqual(result.answer, answer)
+
     def test_blocks_unsafe_or_complex_arithmetic(self) -> None:
         blocked = [
             "What is 10 / 4? Return only the number.",
@@ -44,6 +61,84 @@ class SolverPackTests(unittest.TestCase):
             "What is 12 * 5 + 3?",
             "A workshop makes 6 parts per hour for 4 hours, then discards 2. Return only the final count.",
             "Solve for x: 2x + 1 = 5",
+        ]
+        for prompt in blocked:
+            with self.subTest(prompt=prompt):
+                self.assertIsNone(solve_deterministic(TaskEnvelope(input_text=prompt)))
+
+    def test_solves_explicit_sentiment(self) -> None:
+        cases = {
+            "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The interface is quick, clean, and reliable.": "positive",
+            "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The deployment failed twice and the logs were confusing.": "negative",
+            "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The update is standard and okay.": "neutral",
+        }
+        for prompt, answer in cases.items():
+            with self.subTest(prompt=prompt):
+                result = solve_deterministic(TaskEnvelope(input_text=prompt))
+                self.assertIsNotNone(result)
+                self.assertEqual(result.answer, answer)
+
+    def test_blocks_ambiguous_sentiment(self) -> None:
+        blocked = [
+            "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: It is good but also confusing.",
+            "Is this positive or negative? Text: maybe.",
+            "Classify tone: The interface is reliable.",
+        ]
+        for prompt in blocked:
+            with self.subTest(prompt=prompt):
+                self.assertIsNone(solve_deterministic(TaskEnvelope(input_text=prompt)))
+
+    def test_solves_structured_entity_extraction(self) -> None:
+        cases = {
+            "Return only minified JSON. Text: Ana Ribeiro founded Nova Labs in Recife. Extract person, organization, city.": {
+                "person": "Ana Ribeiro",
+                "organization": "Nova Labs",
+                "city": "Recife",
+            },
+            "Return only minified JSON. Text: On July 8, 2026, Orion paid $450 to Atlas. Extract date, payer, amount, payee.": {
+                "date": "July 8, 2026",
+                "payer": "Orion",
+                "amount": "$450",
+                "payee": "Atlas",
+            },
+            "Return only minified JSON. Text: Contact support at ops@example.com and visit https://example.com/help. Extract email and url.": {
+                "email": "ops@example.com",
+                "url": "https://example.com/help",
+            },
+        }
+        for prompt, expected in cases.items():
+            with self.subTest(prompt=prompt):
+                result = solve_deterministic(TaskEnvelope(input_text=prompt))
+                self.assertIsNotNone(result)
+                self.assertEqual(json.loads(result.answer), expected)
+
+    def test_blocks_ambiguous_entity_extraction(self) -> None:
+        blocked = [
+            "Extract named entities from: ana founded nova labs.",
+            "Return only minified JSON. Text: Ana may join Nova Labs. Extract person, organization, city.",
+            "Text: On July 8, 2026, Orion paid Atlas. Extract date, payer, amount, payee.",
+        ]
+        for prompt in blocked:
+            with self.subTest(prompt=prompt):
+                self.assertIsNone(solve_deterministic(TaskEnvelope(input_text=prompt)))
+
+    def test_solves_simple_logic_patterns(self) -> None:
+        cases = {
+            "Ava is taller than Bea. Bea is taller than Cora. Who is the shortest? Return only the name.": "Cora",
+            "Ava is taller than Bea. Bea is taller than Cora. Who is the tallest? Return only the name.": "Ava",
+            "If the alarm is armed, the door locks. The alarm is armed. Is the door locked? Return exactly yes or no.": "yes",
+        }
+        for prompt, answer in cases.items():
+            with self.subTest(prompt=prompt):
+                result = solve_deterministic(TaskEnvelope(input_text=prompt))
+                self.assertIsNotNone(result)
+                self.assertEqual(result.answer, answer)
+
+    def test_blocks_ambiguous_logic_patterns(self) -> None:
+        blocked = [
+            "Ava is taller than Bea. Cora is taller than Dani. Who is the shortest?",
+            "If the alarm is armed, the door locks. The alarm is not armed. Is the door locked?",
+            "If it rains, the ground is wet. The ground is wet. Did it rain?",
         ]
         for prompt in blocked:
             with self.subTest(prompt=prompt):

@@ -77,6 +77,8 @@ def infer_expected_format(task: TaskEnvelope) -> str:
         return "number"
     if "uppercase" in text:
         return "uppercase"
+    if re.search(r"\b(?:return|answer|respond)\s+(?:exactly\s+)?(?:yes\s+or\s+no|yes/no)\b", text):
+        return "yes_no"
     if re.search(r"return exactly .+?(?: and nothing else)?[.!]?$", task.input_text, re.IGNORECASE):
         return "literal_echo"
     return "free_text"
