@@ -288,6 +288,68 @@ class MatrixRegressionSelectorTests(unittest.TestCase):
         self.assertLess(ranked[0]["token_utility"], ranked[1]["token_utility"])
         self.assertGreater(ranked[1]["predicted_total_tokens"], ranked[0]["predicted_total_tokens"])
 
+    def test_shape_specific_empirical_risk_overrides_domain_average(self) -> None:
+        weights = MatrixRegressionWeights(
+            feature_names=FEATURE_NAMES,
+            coefficients=[0.0 for _ in FEATURE_NAMES],
+            ridge_lambda=0.35,
+            training_rows=48,
+            target_mean=0.95,
+            observed_models=[
+                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
+            ],
+            domain_model_stats={
+                "summarization": {
+                    "accounts/fireworks/models/minimax-m3": {
+                        "calls": 20.0,
+                        "valid": 20.0,
+                        "valid_rate": 1.0,
+                        "valid_rate_smoothed": 0.99,
+                        "confidence": 0.83,
+                        "avg_total_tokens": 180.0,
+                    },
+                    "accounts/fireworks/models/kimi-k2p7-code": {
+                        "calls": 20.0,
+                        "valid": 20.0,
+                        "valid_rate": 1.0,
+                        "valid_rate_smoothed": 0.99,
+                        "confidence": 0.83,
+                        "avg_total_tokens": 70.0,
+                    },
+                },
+                "summarization::constrained_summary": {
+                    "accounts/fireworks/models/minimax-m3": {
+                        "calls": 12.0,
+                        "valid": 12.0,
+                        "valid_rate": 1.0,
+                        "valid_rate_smoothed": 0.98,
+                        "confidence": 0.75,
+                        "avg_total_tokens": 190.0,
+                    },
+                    "accounts/fireworks/models/kimi-k2p7-code": {
+                        "calls": 12.0,
+                        "valid": 4.0,
+                        "valid_rate": 0.33,
+                        "valid_rate_smoothed": 0.45,
+                        "confidence": 0.75,
+                        "avg_total_tokens": 65.0,
+                    },
+                },
+            },
+        )
+
+        selection = select_model_by_matrix_regression(
+            TaskEnvelope(input_text="Summarize in at most 8 words and include latency: Local checks reduce remote calls."),
+            ["minimax-m3", "kimi-k2p7-code"],
+            weights,
+        )
+        ranked = selection["ranked_candidates"]
+
+        self.assertEqual(selection["model"], "accounts/fireworks/models/minimax-m3")
+        self.assertEqual(ranked[0]["features"]["shape_constrained_summary"], 1.0)
+        self.assertLess(ranked[1]["empirical_valid_rate_smoothed"], ranked[0]["empirical_valid_rate_smoothed"])
+
 
 def _row(task_id: str, model: str, valid: bool, cost: float, latency_ms: int, *, tokens: int = 100) -> dict[str, object]:
     return {
@@ -367,7 +429,7 @@ class CheckedInTrack1WeightsTests(unittest.TestCase):
             (
                 "Write a Python function add(a, b) that returns the sum.",
                 "code_generation",
-                "accounts/fireworks/models/kimi-k2p7-code",
+                "accounts/fireworks/models/minimax-m3",
             ),
             (
                 "All merls are tivas. Some tivas are roons. Is it guaranteed that some merls are roons? Return exactly yes or no.",

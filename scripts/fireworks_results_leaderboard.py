@@ -11,6 +11,7 @@ DEFAULT_RESULTS = (
     Path("reports/generated/fireworks-hidden-variant-results.jsonl"),
     Path("reports/generated/fireworks-championship-results.jsonl"),
     Path("reports/generated/fireworks-frontier-20260709-results.jsonl"),
+    Path("reports/generated/fireworks-structure-heldout-20260709-results.jsonl"),
 )
 DEFAULT_REPORT = Path("reports/generated/fireworks-results-leaderboard.md")
 

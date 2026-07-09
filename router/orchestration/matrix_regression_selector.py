@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import Any
@@ -27,6 +28,19 @@ FEATURE_NAMES = [
     "domain_code_debug",
     "domain_code_generation",
     "domain_current_factual",
+    "shape_exact_output",
+    "shape_json_output",
+    "shape_json_numeric",
+    "shape_json_extraction",
+    "shape_constrained_summary",
+    "shape_direct_numeric",
+    "shape_word_problem",
+    "shape_structured_extraction",
+    "shape_code_fix",
+    "shape_code_generate",
+    "shape_syllogism",
+    "shape_ordering_logic",
+    "shape_short_answer",
     "capability",
     "correlation",
     "reliability",
@@ -120,9 +134,10 @@ def fit_matrix_regression(
         tier = task.tier or _task_profile(task.prompt).tier
         domain = _normalize_domain(task.domain or _task_profile(task.prompt).domain)
         reasoning_effort = _row_reasoning_effort(row)
+        _add_domain_model_stat(stats_accumulator, _domain_shape_key(domain, task.prompt), candidate.model, row)
         _add_domain_model_stat(stats_accumulator, domain, candidate.model, row)
         _add_domain_model_stat(stats_accumulator, "__overall__", candidate.model, row)
-        matrix.append(_feature_vector(candidate, tier, domain, reasoning_effort))
+        matrix.append(_feature_vector(candidate, tier, domain, reasoning_effort, task.prompt))
         targets.append(_target(row, cost_bounds, token_bounds, latency_bounds))
     if not matrix:
         raise ValueError("No trainable rows matched the provided tasks.")
@@ -160,14 +175,14 @@ def select_model_by_matrix_regression(
     pool = eligible or chat_candidates
     prepared = []
     for candidate in pool:
-        empirical = _empirical_stats_for(weights, task_profile.domain, candidate.model)
+        empirical = _empirical_stats_for(weights, task_profile.domain, candidate.model, task.input_text)
         predicted_total_tokens = _predicted_total_tokens(candidate.estimated_total_tokens, empirical)
         prepared.append((candidate, empirical, predicted_total_tokens))
     token_bounds = _bounds(predicted_total_tokens for _, _, predicted_total_tokens in prepared)
     scored = []
     for candidate, empirical, predicted_total_tokens in prepared:
         reasoning_effort = select_reasoning_effort(candidate.model, task_profile.tier)
-        features = _feature_vector(candidate, task_profile.tier, task_profile.domain, reasoning_effort)
+        features = _feature_vector(candidate, task_profile.tier, task_profile.domain, reasoning_effort, task.input_text)
         regression_score = weights.predict(features)
         regression_utility = _clamp(regression_score, 0.0, 1.0)
         score_weights = _hybrid_score_weights(task_profile.tier)
@@ -281,10 +296,11 @@ def _candidate_for_training_row(
     return None
 
 
-def _feature_vector(candidate: Any, tier: str, domain: str, reasoning_effort: str | None) -> list[float]:
+def _feature_vector(candidate: Any, tier: str, domain: str, reasoning_effort: str | None, prompt: str = "") -> list[float]:
     family = _model_family(candidate.model)
     reasoning = reasoning_effort or "omitted"
     domain = _normalize_domain(domain)
+    shape = _prompt_shape(prompt)
     return [
         1.0,
         1.0 if tier == "cheap" else 0.0,
@@ -298,6 +314,19 @@ def _feature_vector(candidate: Any, tier: str, domain: str, reasoning_effort: st
         1.0 if domain == "code_debug" else 0.0,
         1.0 if domain == "code_generation" else 0.0,
         1.0 if domain == "current_factual" else 0.0,
+        shape["exact_output"],
+        shape["json_output"],
+        shape["json_numeric"],
+        shape["json_extraction"],
+        shape["constrained_summary"],
+        shape["direct_numeric"],
+        shape["word_problem"],
+        shape["structured_extraction"],
+        shape["code_fix"],
+        shape["code_generate"],
+        shape["syllogism"],
+        shape["ordering_logic"],
+        shape["short_answer"],
         min(candidate.capability / 4.0, 1.0),
         candidate.correlation,
         candidate.reliability,
@@ -324,6 +353,79 @@ def _feature_vector(candidate: Any, tier: str, domain: str, reasoning_effort: st
         1.0 if reasoning == "medium" else 0.0,
         1.0 if reasoning == "omitted" else 0.0,
     ]
+
+
+def _prompt_shape(prompt: str) -> dict[str, float]:
+    lowered = prompt.lower()
+    word_count = len(re.findall(r"\b\w+\b", prompt))
+    direct_numeric = bool(
+        re.search(r"\d", lowered)
+        and (
+            re.search(r"\b(compute|calculate|evaluate)\b", lowered)
+            or re.search(r"\b(min|max|minimum|maximum|mean|median|sum|total|product)\b", lowered)
+            or re.search(r"\d+\s*[-+*/]\s*\d+", lowered)
+        )
+    )
+    word_problem = bool(
+        re.search(r"\d", lowered)
+        and (
+            re.search(r"\bhow\s+(many|much)\b", lowered)
+            or re.search(r"\b(percent|percentage|rate|average|discount|fee|per hour|ratio)\b", lowered)
+        )
+    )
+    structured_extraction = bool(re.search(r"\b(extract|return only the title|invoice|date|amount|email|url|phone|named entit)", lowered))
+    constrained_summary = bool(re.search(r"\bsummari[sz]e\b", lowered) and "include" in lowered and re.search(r"\bat most\s+\d+\s+words?\b", lowered))
+    json_output = bool(re.search(r"\b(json|minified)\b", lowered))
+    return {
+        "exact_output": 1.0 if re.search(r"\b(return only|return exactly|nothing else|exactly this string)\b", lowered) else 0.0,
+        "json_output": 1.0 if json_output else 0.0,
+        "json_numeric": 1.0 if json_output and direct_numeric else 0.0,
+        "json_extraction": 1.0 if json_output and structured_extraction else 0.0,
+        "constrained_summary": 1.0 if constrained_summary else 0.0,
+        "direct_numeric": 1.0 if direct_numeric else 0.0,
+        "word_problem": 1.0 if word_problem else 0.0,
+        "structured_extraction": 1.0 if structured_extraction else 0.0,
+        "code_fix": 1.0 if re.search(r"\b(debug|fix|bug|traceback|corrected)\b", lowered) else 0.0,
+        "code_generate": 1.0 if re.search(r"\b(write|create|define|implement)\b.{0,80}\b(function|class|method|script|program|python code|javascript code|typescript code)\b", lowered) else 0.0,
+        "syllogism": 1.0 if re.search(r"\b(all|some|no)\s+[a-z][a-z0-9_-]*s?\s+(are|is)\b", lowered) else 0.0,
+        "ordering_logic": 1.0 if re.search(r"\b(shortest|tallest|smallest|largest|youngest|oldest|lightest|heaviest)\b", lowered) else 0.0,
+        "short_answer": 1.0 if word_count <= 32 else 0.0,
+    }
+
+
+def _domain_shape_key(domain: str, prompt: str) -> str:
+    return f"{_normalize_domain(domain)}::{_shape_signature(prompt)}"
+
+
+def _shape_signature(prompt: str) -> str:
+    shape = _prompt_shape(prompt)
+    if shape["json_numeric"]:
+        return "json_numeric"
+    if shape["json_extraction"]:
+        return "json_extraction"
+    if shape["constrained_summary"]:
+        return "constrained_summary"
+    if shape["word_problem"]:
+        return "word_problem"
+    if shape["direct_numeric"]:
+        return "direct_numeric"
+    if shape["code_fix"]:
+        return "code_fix"
+    if shape["code_generate"]:
+        return "code_generate"
+    if shape["structured_extraction"]:
+        return "structured_extraction"
+    if shape["syllogism"]:
+        return "syllogism"
+    if shape["ordering_logic"]:
+        return "ordering_logic"
+    if shape["json_output"]:
+        return "json"
+    if shape["exact_output"]:
+        return "exact"
+    if shape["short_answer"]:
+        return "short_answer"
+    return "general"
 
 
 def _hybrid_score_weights(tier: str) -> dict[str, float]:
@@ -447,7 +549,7 @@ def _finalize_domain_model_stats(
     return finalized
 
 
-def _empirical_stats_for(weights: MatrixRegressionWeights, domain: str, model: str) -> dict[str, float]:
+def _empirical_stats_for(weights: MatrixRegressionWeights, domain: str, model: str, prompt: str = "") -> dict[str, float]:
     stats = weights.domain_model_stats or {}
     normalized_domain = _normalize_domain(domain)
     fallback = {
@@ -460,7 +562,9 @@ def _empirical_stats_for(weights: MatrixRegressionWeights, domain: str, model: s
         "avg_cost_usd": 0.0,
         "avg_latency_ms": 0.0,
     }
-    row = stats.get(normalized_domain, {}).get(model)
+    row = stats.get(_domain_shape_key(normalized_domain, prompt), {}).get(model)
+    if row is None:
+        row = stats.get(normalized_domain, {}).get(model)
     if row is None:
         row = stats.get("__overall__", {}).get(model)
     if row is None:

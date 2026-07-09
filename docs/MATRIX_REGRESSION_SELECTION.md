@@ -78,31 +78,32 @@ A ideia competitiva e simples: em tarefa forte, primeiro passar pelo accuracy ga
 - Fit offline: `scripts/fit_fireworks_matrix_regression.py`
 - Pesos Track 1 usados no Docker: `router/data/fireworks_track1_allowed_weights.json`
 - Relatorio Track 1: `reports/generated/fireworks-track1-allowed-20260709-regression.md`
-- Resultados Fireworks reais: `reports/generated/fireworks-track1-category-20260709-results.jsonl`, `reports/generated/fireworks-hidden-variant-results.jsonl`, `reports/generated/fireworks-championship-results.jsonl`, `reports/generated/fireworks-frontier-20260709-results.jsonl`
+- Resultados Fireworks reais: `reports/generated/fireworks-track1-category-20260709-results.jsonl`, `reports/generated/fireworks-hidden-variant-results.jsonl`, `reports/generated/fireworks-championship-results.jsonl`, `reports/generated/fireworks-frontier-20260709-results.jsonl`, `reports/generated/fireworks-structure-heldout-20260709-results.jsonl`
 
 ## Resultado Atual
 
-Treino Track 1 permitido com `104` linhas uteis, filtradas de `367` linhas brutas:
+Treino Track 1 permitido com `151` linhas uteis, filtradas de `487` linhas brutas:
 
 - `minimax-m3`
 - `kimi-k2p7-code`
 
 As linhas `ok=false` sao excluidas por padrao para nao confundir erro de acesso/transporte com qualidade do modelo. Os pesos tambem registram `observed_models`; no runtime matricial, modelos permitidos mas sem nenhuma chamada concluida no treino sao filtrados quando ha alternativa observada. Isso evita escolher Gemma cegamente enquanto os IDs serverless seguem retornando `404` na chave local.
 
-Os pesos agora tambem registram uma matriz empirica `domain_model_stats`. No runtime, cada candidato recebe ajuste por taxa de validade suavizada e confianca por dominio/modelo. Isso evita que uma opcao barata com historico ruim no dominio vire estrategia dominante so por custo/tokens.
+Os pesos agora tambem registram uma matriz empirica `domain_model_stats` em dois niveis: `dominio::estrutura` e `dominio`. No runtime, cada candidato recebe ajuste por taxa de validade suavizada e confianca primeiro por estrutura especifica, depois por dominio, depois por media geral. Isso evita que uma opcao barata com historico ruim naquele formato vire estrategia dominante so por custo/tokens.
 
 Top coeficientes aprendidos no fit atual:
 
 | Feature | Sinal |
 | --- | ---: |
 | `bias` | positivo |
-| `capability` | negativo no fit pequeno |
+| `shape_json_numeric` | negativo |
+| `shape_constrained_summary` | negativo |
+| `shape_json_output` | positivo |
+| `shape_direct_numeric` | negativo |
+| `shape_json_extraction` | negativo |
+| `shape_word_problem` | negativo |
 | `correlation` | positivo |
-| `interaction_kimi_extraction` | negativo |
-| `interaction_minimax_math` | positivo |
-| `token_utility` | positivo |
-| `interaction_minimax_extraction` | positivo |
-| `domain_logic` | positivo |
+| `interaction_kimi_math` | positivo |
 | `interaction_kimi_code_debug` | negativo |
 
 Replay atual:
@@ -113,7 +114,7 @@ Replay atual:
 | `summarization_tokens` | `kimi-k2p7-code` |
 | `debug_first_even` | `kimi-k2p7-code` |
 | `debug_is_adult` | `kimi-k2p7-code` |
-| `code_gen_clamp` | `kimi-k2p7-code` |
+| `code_gen_clamp` | `minimax-m3` |
 | `math_discount_fee` | `minimax-m3` |
 | `ner_money_date` | `minimax-m3` |
 | `sentiment_positive` | `kimi-k2p7-code` |
@@ -122,8 +123,8 @@ Replay atual:
 
 A regressao confirmou alguns sinais fortes:
 
-- `kimi-k2p7-code` deve vencer quando a validade observada e comparavel e o `usage.total` observado por dominio/modelo e menor, especialmente em respostas curtas de language, formatting, logic e code;
-- `minimax-m3` continua forte como fallback de robustez, especialmente em extraction e em math mais composto, onde o score calibrado ainda pode superar a economia de tokens;
+- `kimi-k2p7-code` deve vencer quando a validade observada e comparavel e o `usage.total` observado por dominio/estrutura/modelo e menor, especialmente em factual QA, formatting, logic, math direto e code debugging;
+- `minimax-m3` continua forte como fallback de robustez, especialmente em code generation, extraction estruturada e math composto quando o score calibrado supera a economia de tokens;
 - Gemma serverless segue indisponivel na chave local, entao o runner precisa tentar, cachear 404 e seguir sem travar;
 - interacoes familia x dominio sao necessarias, porque uma media global por modelo esconde especializacoes.
 
@@ -133,8 +134,8 @@ O dataset ainda e pequeno, mas a regressao agora esta ativa como camada de calib
 
 Principal lacuna:
 
-- a estimativa runtime de tokens ja mistura perfil teorico com `avg_total_tokens` observado por dominio/modelo, ponderado pela confianca da amostra;
-- o microbench frontier mostrou que verbosidade real varia por familia e por formato de pergunta;
+- a estimativa runtime de tokens ja mistura perfil teorico com `avg_total_tokens` observado por dominio/estrutura/modelo, ponderado pela confianca da amostra;
+- os microbenches frontier e structure-heldout mostraram que verbosidade e validade variam por familia e formato de pergunta;
 - proximo passo e separar `prompt_tokens` e `completion_tokens` quando o provedor retornar esses campos de forma estavel, para calibrar melhor respostas longas.
 
 ## Proximo Passo
