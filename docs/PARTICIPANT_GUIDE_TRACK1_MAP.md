@@ -1,6 +1,13 @@
 # Participant Guide Track 1 Map
 
-Source: `Participant Guide: AMD Developer Hackathon (ACT II)`, attached PDF.
+Source: `Participant Guide: AMD Developer Hackathon (ACT II)`, current attached PDF.
+
+Current PDF evidence:
+
+- file: `1-Participant-Guide_-AMD-Developer-Hackathon-ACT-II-2.pdf`;
+- pages: `10`;
+- SHA-256: `28ce1490e780962942c3fabdcae7efdf86b0b2707d848a91228b59525f47529f`;
+- Drive copy and attached copy checked on 2026-07-09 are byte-identical.
 
 ## Confirmed Track 1 Contract
 
@@ -30,6 +37,14 @@ The container must:
 - keep response time per request under 30 seconds;
 - finish within a maximum runtime of 10 minutes;
 - answer in English.
+
+Judging environment constraints:
+
+- `4 GB` RAM;
+- `2 vCPU`;
+- local models are permitted, but must fit inside that envelope;
+- the guide calls `2B-3B` 4-bit quantized local models safe;
+- `7B` 4-bit can fill the full RAM budget and leave little room for agent code.
 
 GPU/team access:
 
@@ -146,6 +161,7 @@ Confirmed:
 
 - local models and local tokens count as zero for final score;
 - local model answers count fully toward the accuracy gate;
+- `ZERO_API_CALLS` is a marker, not a failure, when the answer path makes no Fireworks proxy calls;
 - all Fireworks inference must go through `FIREWORKS_BASE_URL`;
 - malformed `/output/results.json` scores zero;
 - hardcoded or cached answers are prohibited;
