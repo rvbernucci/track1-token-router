@@ -10,6 +10,7 @@ from router.core.logging import JsonlRunLogger
 from router.core.model_client import ModelClientError, ModelResponse
 from router.core.prompts import build_m1_messages
 from router.orchestration.fireworks_model_router import select_fireworks_model, select_reasoning_effort
+from router.orchestration.final_validator import validate_final_answer
 from router.orchestration.matrix_regression_selector import (
     MatrixRegressionWeights,
     load_weights,
@@ -72,6 +73,7 @@ class FireworksDirectRunner:
         try:
             for attempt_model in _models_to_try(
                 selection,
+                matrix_selection=matrix_selection,
                 first_model=selected_model,
                 unavailable_models=self._unavailable_models,
             ):
@@ -137,9 +139,11 @@ class FireworksDirectRunner:
             return result
 
         latency_ms = _elapsed_ms(started_at)
+        final_validation = validate_final_answer(task, response.text)
+        final_answer = final_validation.repaired_answer if not final_validation.valid and final_validation.repaired_answer else response.text
         result = AnswerResult(
             id=task.id,
-            answer=response.text,
+            answer=final_answer,
             route="fireworks_direct",
             remote_tokens=response.usage,
             metadata={
@@ -152,6 +156,8 @@ class FireworksDirectRunner:
                 "fireworks_attempt_errors": attempt_errors,
                 "fireworks_unavailable_models": sorted(self._unavailable_models),
                 "latency_fireworks_ms": latency_ms,
+                "final_validation": final_validation.to_dict(),
+                "final_answer_repaired": final_answer != response.text,
             },
         )
         self._log(
@@ -205,6 +211,7 @@ def _request_options_for_selection(model: str, tier: str, *, service_tier: str |
 def _models_to_try(
     selection: object,
     *,
+    matrix_selection: dict[str, Any] | None = None,
     first_model: str | None = None,
     unavailable_models: set[str] | None = None,
 ) -> list[str]:
@@ -216,6 +223,12 @@ def _models_to_try(
             models.append(model)
 
     add(first_model)
+    if matrix_selection:
+        ranked = matrix_selection.get("ranked_candidates")
+        if isinstance(ranked, list):
+            for candidate in ranked:
+                if isinstance(candidate, dict):
+                    add(candidate.get("model"))
     add(getattr(selection, "model", ""))
     candidates = getattr(selection, "candidates", [])
     if isinstance(candidates, list):

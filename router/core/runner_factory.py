@@ -149,6 +149,9 @@ def _build_hybrid_cascade_runner(config: RouterConfig, logger: JsonlRunLogger) -
         fireworks_temperature=config.fireworks_temperature,
         fireworks_max_tokens=config.fireworks_max_tokens,
         policy=config.policy,
+        allowed_models=config.allowed_models,
+        fireworks_service_tier=config.fireworks_service_tier,
+        matrix_weights_path=config.fireworks_matrix_weights,
     )
 
 

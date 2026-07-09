@@ -33,6 +33,7 @@ x = [
   nash_product,
   prisoner_payoff,
   family flags,
+  family x domain interaction flags,
   reasoning flags
 ]
 ```
@@ -56,61 +57,70 @@ No runtime experimental:
 
 ```text
 regression_utility = clamp(beta dot x, 0, 1)
-hybrid_score =
-  0.50 * regression_utility
-  + 0.30 * nash_product
-  + 0.20 * cost_utility
 ```
+
+O `hybrid_score` muda por tier:
+
+| Tier | Regressao | Nash | Custo |
+| --- | ---: | ---: | ---: |
+| `cheap` | 0.55 | 0.25 | 0.20 |
+| `medium` | 0.70 | 0.20 | 0.10 |
+| `strong` | 0.85 | 0.10 | 0.05 |
+
+A ideia competitiva e simples: em tarefa forte, primeiro passar pelo accuracy gate; em tarefa barata, reduzir tokens agressivamente.
 
 ## Artefatos
 
 - Codigo: `router/orchestration/matrix_regression_selector.py`
 - Fit offline: `scripts/fit_fireworks_matrix_regression.py`
-- Pesos gerados: `reports/generated/fireworks-matrix-regression-weights.json`
-- Relatorio: `reports/generated/fireworks-matrix-regression-report.md`
+- Pesos Track 1 usados no Docker: `router/data/fireworks_track1_allowed_weights.json`
+- Relatorio Track 1: `reports/generated/fireworks-track1-allowed-20260709-regression.md`
+- Resultado Fireworks real: `reports/generated/fireworks-track1-category-20260709-results.jsonl`
 
 ## Resultado Atual
 
-Treino com 48 linhas:
+Treino Track 1 permitido com 80 linhas:
 
-- `reports/generated/fireworks-microbench-results.jsonl`
-- `reports/generated/fireworks-microbench-gpt-low-results.jsonl`
+- `minimax-m3`
+- `kimi-k2p7-code`
+- `gemma-4-31b-it`
+- `gemma-4-26b-a4b-it`
+- `gemma-4-31b-it-nvfp4`
 
 Top coeficientes aprendidos no fit atual:
 
 | Feature | Sinal |
 | --- | ---: |
-| `family_qwen` | negativo |
-| `reasoning_medium` | negativo |
-| `reasoning_low` | positivo |
-| `family_deepseek` | positivo |
 | `family_minimax` | positivo |
-| `domain_math_reasoning` | positivo |
+| `family_kimi` | positivo |
+| `interaction_minimax_code_debug` | negativo |
+| `interaction_kimi_code_debug` | positivo |
+| `interaction_minimax_math` | positivo |
+| `interaction_minimax_code_generation` | positivo |
 
 Replay atual:
 
 | Task | Modelo escolhido |
 | --- | --- |
-| `cheap_exact_ack` | `gpt-oss-20b` |
-| `cheap_sentiment` | `gpt-oss-20b` |
-| `format_json` | `gpt-oss-20b` |
-| `code_static` | `minimax-m3` |
-| `logic_exact` | `deepseek-v4-flash` |
-| `math_exact` | `deepseek-v4-flash` |
+| `debug_first_even` | `kimi-k2p7-code` |
+| `debug_is_adult` | `kimi-k2p7-code` |
+| `code_gen_clamp` | `minimax-m3` |
+| `math_discount_fee` | `minimax-m3` |
+| `ner_money_date` | `minimax-m3` |
+| `sentiment_positive` | `minimax-m3` |
 
 ## Leitura Competitiva
 
 A regressao confirmou alguns sinais fortes:
 
-- `reasoning_effort=medium` prejudicou `gpt-oss` com budget curto;
-- `reasoning_effort=low` e melhor default para `gpt-oss`;
-- `qwen3p7-plus` precisa de controle de overthinking antes de entrar em resposta estrita;
-- `deepseek-v4-flash` parece subestimado pelo Pareto manual em tarefas curtas e raciocinio simples;
-- `minimax-m3` continua bom candidato para codigo.
+- `minimax-m3` e o melhor default empirico para a maioria dos dominios Track 1 observados;
+- `kimi-k2p7-code` deve ser escalado para code debugging quando a tarefa pede correcao de codigo existente;
+- Gemma serverless segue indisponivel na chave local, entao o runner precisa tentar, cachear 404 e seguir sem travar;
+- interacoes familia x dominio sao necessarias, porque uma media global por modelo esconde especializacoes.
 
 ## Limite Atual
 
-O dataset ainda e pequeno. A regressao ja e util para calibrar, mas ainda nao deve substituir o seletor principal.
+O dataset ainda e pequeno, mas a regressao agora esta ativa como camada de calibracao do seletor principal no Docker. Ela nao substitui Nash: ela o combina com o score aprendido.
 
 Principal lacuna:
 

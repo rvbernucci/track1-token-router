@@ -207,7 +207,7 @@ python3 -m router ask "What is 2+2?"
 | `FIREWORKS_TEMPERATURE` | `0.0` | Temperatura do auditor remoto. |
 | `FIREWORKS_MAX_TOKENS` | `256` | Limite de output do auditor remoto. |
 | `FIREWORKS_SERVICE_TIER` | vazio | Vazio usa Standard; `priority` deve ser usado apenas como fallback manual de confiabilidade. |
-| `FIREWORKS_MATRIX_WEIGHTS` | vazio | Caminho opcional para pesos calibrados por `scripts/fit_fireworks_matrix_regression.py`; quando presente, o Fireworks runner usa regressao matricial + Nash para escolher o modelo. |
+| `FIREWORKS_MATRIX_WEIGHTS` | vazio localmente; `/app/router/data/fireworks_track1_allowed_weights.json` no Docker | Caminho para pesos calibrados por microbench; quando presente, os runners Fireworks e hibrido usam regressao matricial + Nash para escolher o modelo. |
 
 ## Modo local M1
 
@@ -254,12 +254,16 @@ python3 -m router submit-track1 --input /input/tasks.json --output /output/resul
 
 Esse modo implementa o contrato oficial ACT II: le `/input/tasks.json`, escreve `/output/results.json`, usa solvers deterministicos antes de Fireworks e escolhe entre modelos de `ALLOWED_MODELS` por tier de tarefa.
 
+No Docker de submissao, `FIREWORKS_MATRIX_WEIGHTS` ja aponta para `router/data/fireworks_track1_allowed_weights.json`, treinado com microbench real dos modelos permitidos Track 1 em 2026-07-09. A politica atual prefere `kimi-k2p7-code` para code debugging e `minimax-m3` para os demais dominios observados quando ambos estao disponiveis.
+
 Para usar calibracao por microbench:
 
 ```bash
-python3 scripts/fit_fireworks_matrix_regression.py
+python3 scripts/fit_fireworks_matrix_regression.py \
+  --dataset evals/fireworks-pareto/track1-category-microbench.jsonl \
+  --results reports/generated/fireworks-track1-category-20260709-results.jsonl
 ROUTER_MODE=fireworks \
-FIREWORKS_MATRIX_WEIGHTS=reports/generated/fireworks-matrix-regression-weights.json \
+FIREWORKS_MATRIX_WEIGHTS=router/data/fireworks_track1_allowed_weights.json \
 FIREWORKS_API_KEY=<harness-key> \
 ALLOWED_MODELS=minimax-m3,kimi-k2p7-code,gemma-4-31b-it,gemma-4-26b-a4b-it,gemma-4-31b-it-nvfp4 \
 python3 -m router ask "Summarise token-efficient routing in one sentence."

@@ -73,6 +73,12 @@ def infer_expected_format(task: TaskEnvelope) -> str:
     text = task.input_text.lower()
     if "json" in text:
         return "json"
+    if (
+        "return only python code" in text
+        or "return only corrected python code" in text
+        or "return only code" in text
+    ):
+        return "code"
     if "return only the number" in text or re.search(r"\bwhat is\b.*[+\-*/]", text):
         return "number"
     if "uppercase" in text:

@@ -56,11 +56,9 @@ def validate_submission_artifacts(root: Path = Path(".")) -> list[str]:
     if (root / COVER_PNG).exists() and not (root / COVER_PNG).read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
         errors.append("cover.png is not a PNG")
     if (root / DEMO_MP4).exists():
-        mp4 = root / DEMO_MP4
-        header = mp4.read_bytes()[:16]
-        if mp4.stat().st_size < 1000:
+        if (root / DEMO_MP4).stat().st_size < 1000:
             errors.append("demo.mp4 is unexpectedly small")
-        if len(header) < 12 or header[4:8] != b"ftyp":
+        if not _is_valid_mp4(root / DEMO_MP4):
             errors.append("demo.mp4 is not an MP4")
     return errors
 
@@ -189,6 +187,8 @@ def _write_cover_png(path: Path, width: int = 1280, height: int = 720) -> None:
 
 
 def _write_demo_video(path: Path, slides: list[dict[str, str]]) -> bool:
+    if _is_valid_mp4(path):
+        return True
     ffmpeg = shutil.which("ffmpeg")
     if not ffmpeg:
         return False
@@ -249,6 +249,13 @@ def _write_demo_video(path: Path, slides: list[dict[str, str]]) -> bool:
             except (OSError, subprocess.CalledProcessError):
                 continue
     return False
+
+
+def _is_valid_mp4(path: Path) -> bool:
+    if not path.exists() or path.stat().st_size < 1000:
+        return False
+    header = path.read_bytes()[:16]
+    return len(header) >= 12 and header[4:8] == b"ftyp"
 
 
 def _write_video_frame(path: Path, slide: dict[str, str], width: int = 1280, height: int = 720) -> None:

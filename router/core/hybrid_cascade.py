@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from time import perf_counter
 
 from router.core.auditor import FireworksAuditor
@@ -30,6 +31,9 @@ class HybridCascadeRunner:
         fireworks_temperature: float = 0.0,
         fireworks_max_tokens: int = 256,
         policy: str = "balanced",
+        allowed_models: list[str] | None = None,
+        fireworks_service_tier: str | None = None,
+        matrix_weights_path: Path | None = None,
     ) -> None:
         self.local_client = local_client
         self.fireworks_client = fireworks_client
@@ -51,6 +55,9 @@ class HybridCascadeRunner:
             fireworks_client,
             temperature=fireworks_temperature,
             max_tokens=fireworks_max_tokens,
+            allowed_models=allowed_models,
+            service_tier=fireworks_service_tier,
+            matrix_weights_path=matrix_weights_path,
         )
 
     def run(self, task: TaskEnvelope) -> AnswerResult:
@@ -138,6 +145,7 @@ class HybridCascadeRunner:
                 "fireworks_raw": audit.raw_text,
                 "latency_fireworks_ms": audit.latency_ms,
                 "remote_tokens": audit.usage.to_dict(),
+                "fireworks_audit_metadata": audit.metadata,
             }
         )
 
@@ -156,7 +164,11 @@ class HybridCascadeRunner:
             metadata={
                 "runner": "hybrid_cascade",
                 "local_model": self.local_client.model,
-                "fireworks_model": self.fireworks_client.model,
+                "fireworks_model": audit.metadata.get("fireworks_model", self.fireworks_client.model),
+                "fireworks_model_selection": audit.metadata.get("fireworks_model_selection"),
+                "fireworks_matrix_selection": audit.metadata.get("fireworks_matrix_selection"),
+                "fireworks_attempt_errors": audit.metadata.get("fireworks_attempt_errors", []),
+                "fireworks_unavailable_models": audit.metadata.get("fireworks_unavailable_models", []),
                 "latency_m1_ms": m1_latency_ms,
                 "latency_m2a_ms": verification.latency_ms,
                 "latency_m2b_ms": repair.latency_ms,

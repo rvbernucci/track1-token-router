@@ -48,6 +48,15 @@ class FinalValidatorTests(unittest.TestCase):
         self.assertFalse(result.valid)
         self.assertEqual(result.repaired_answer, '{"answer":4}')
 
+    def test_repairs_python_code_wrapped_in_markdown(self) -> None:
+        task = TaskEnvelope(input_text="Return only Python code. Define a function add(a, b).")
+
+        result = validate_final_answer(task, "```python\ndef add(a, b):\n    return a + b\n```")
+
+        self.assertFalse(result.valid)
+        self.assertEqual(result.expected_format, "code")
+        self.assertEqual(result.repaired_answer, "def add(a, b):\n    return a + b")
+
     def test_validates_number_only_answer(self) -> None:
         task = TaskEnvelope(input_text="What is 12 - 5? Return only the number.")
 

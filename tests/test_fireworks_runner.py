@@ -10,7 +10,7 @@ from router.core.contracts import TaskEnvelope, TokenUsage
 from router.core.fireworks import FireworksClient
 from router.core.fireworks_runner import FireworksDirectRunner
 from router.core.model_client import ModelClientError, ModelResponse
-from router.orchestration.matrix_regression_selector import MatrixRegressionWeights, save_weights
+from router.orchestration.matrix_regression_selector import FEATURE_NAMES, MatrixRegressionWeights, save_weights
 from tests.fake_openai_server import FakeOpenAIServer
 
 
@@ -38,6 +38,18 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertEqual(result.route, "fireworks_direct")
         self.assertEqual(result.remote_tokens.total, 15)
         self.assertEqual(server.requests[0]["payload"]["model"], "fake-fireworks")
+
+    def test_repairs_code_fence_for_code_only_task(self) -> None:
+        fenced = "```python\ndef add(a, b):\n    return a + b\n```"
+        with FakeOpenAIServer(response_text=fenced, prompt_tokens=11, completion_tokens=8) as server:
+            client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
+            runner = FireworksDirectRunner(client)
+
+            result = runner.run(TaskEnvelope(id="code", input_text="Return only Python code. Define a function add(a, b)."))
+
+        self.assertEqual(result.answer, "def add(a, b):\n    return a + b")
+        self.assertTrue(result.metadata["final_answer_repaired"])
+        self.assertEqual(result.metadata["final_validation"]["expected_format"], "code")
 
     def test_uses_selected_allowed_model_for_task(self) -> None:
         with FakeOpenAIServer(response_text="Fixed implementation.", prompt_tokens=20, completion_tokens=8) as server:
@@ -174,58 +186,8 @@ class FireworksDirectRunnerTests(unittest.TestCase):
 
     def test_matrix_weights_can_override_nash_selection(self) -> None:
         weights = MatrixRegressionWeights(
-            feature_names=[
-                "bias",
-                "tier_cheap",
-                "tier_strong",
-                "domain_formatting",
-                "domain_classification",
-                "domain_math_reasoning",
-                "domain_logic",
-                "domain_code_generation",
-                "capability",
-                "correlation",
-                "reliability",
-                "cost_utility",
-                "latency_utility",
-                "nash_product",
-                "prisoner_payoff",
-                "family_gpt_oss",
-                "family_deepseek",
-                "family_minimax",
-                "family_kimi",
-                "family_qwen",
-                "reasoning_none",
-                "reasoning_low",
-                "reasoning_medium",
-                "reasoning_omitted",
-            ],
-            coefficients=[
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                10.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            ],
+            feature_names=FEATURE_NAMES,
+            coefficients=_coefficients({"family_kimi": 10.0}),
             ridge_lambda=0.35,
             training_rows=1,
             target_mean=1.0,
@@ -307,6 +269,10 @@ class _RejectReasoningOnceClient:
         if extra_body:
             raise ModelClientError("Invalid reasoning_effort: none")
         return ModelResponse(text="positive", usage=TokenUsage(prompt=4, completion=1, total=5))
+
+
+def _coefficients(values: dict[str, float]) -> list[float]:
+    return [values.get(name, 0.0) for name in FEATURE_NAMES]
 
 
 if __name__ == "__main__":

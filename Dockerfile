@@ -4,6 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     ROUTER_LOG_PATH=/app/logs/run.jsonl \
     ROUTER_MODE=fireworks \
+    FIREWORKS_MATRIX_WEIGHTS=/app/router/data/fireworks_track1_allowed_weights.json \
     ENABLE_GUARDRAILS=1 \
     ENABLE_ORCHESTRATOR=1
 

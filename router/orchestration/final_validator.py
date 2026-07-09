@@ -53,6 +53,11 @@ def validate_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationRes
         if stripped == stripped.upper():
             return FinalValidationResult(True, expected_format, "valid_uppercase")
         return FinalValidationResult(False, expected_format, "not_uppercase", stripped.upper())
+    if expected_format == "code":
+        if _has_markdown_fence(stripped):
+            repaired = repair_final_answer(task, answer).repaired_answer
+            return FinalValidationResult(False, expected_format, "markdown_fence_in_code", repaired)
+        return FinalValidationResult(True, expected_format, "valid_code")
     return FinalValidationResult(True, expected_format, "valid_free_text")
 
 
@@ -77,6 +82,8 @@ def repair_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationResul
         return FinalValidationResult(bool(repaired), expected_format, "yes_no_repair", repaired)
     if expected_format == "uppercase":
         return FinalValidationResult(bool(stripped), expected_format, "uppercase_repair", stripped.upper())
+    if expected_format == "code":
+        return FinalValidationResult(bool(stripped), expected_format, "code_repair", stripped)
     return FinalValidationResult(bool(stripped), expected_format, "free_text_repair", stripped)
 
 

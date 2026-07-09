@@ -107,5 +107,34 @@ def _row(task_id: str, model: str, valid: bool, cost: float, latency_ms: int) ->
     }
 
 
+class CheckedInTrack1WeightsTests(unittest.TestCase):
+    def test_checked_in_track1_weights_are_loadable_and_select_allowed_model(self) -> None:
+        weights = load_weights(Path("router/data/fireworks_track1_allowed_weights.json"))
+        selection = select_model_by_matrix_regression(
+            TaskEnvelope(
+                id="code",
+                input_text="Return only Python code. Define a function clamp(value, low, high).",
+            ),
+            ["minimax-m3", "kimi-k2p7-code", "gemma-4-31b-it"],
+            weights,
+        )
+
+        self.assertIn(
+            selection["model"],
+            {
+                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
+                "accounts/fireworks/models/gemma-4-31b-it",
+            },
+        )
+        self.assertEqual(selection["selection_rule"], "matrix_regression_plus_nash")
+
+    def test_dockerfile_enables_checked_in_track1_weights(self) -> None:
+        dockerfile = Path("Dockerfile").read_text(encoding="utf-8")
+
+        self.assertIn("FIREWORKS_MATRIX_WEIGHTS=/app/router/data/fireworks_track1_allowed_weights.json", dockerfile)
+        self.assertIn("COPY router ./router", dockerfile)
+
+
 if __name__ == "__main__":
     unittest.main()

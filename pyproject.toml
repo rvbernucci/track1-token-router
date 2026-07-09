@@ -19,6 +19,9 @@ router = "router.cli.main:main"
 [tool.setuptools.packages.find]
 include = ["router*"]
 
+[tool.setuptools.package-data]
+router = ["data/*.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]

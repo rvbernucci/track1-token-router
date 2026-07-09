@@ -22,7 +22,11 @@ FEATURE_NAMES = [
     "domain_classification",
     "domain_math_reasoning",
     "domain_logic",
+    "domain_summarization",
+    "domain_extraction",
+    "domain_code_debug",
     "domain_code_generation",
+    "domain_current_factual",
     "capability",
     "correlation",
     "reliability",
@@ -35,6 +39,14 @@ FEATURE_NAMES = [
     "family_minimax",
     "family_kimi",
     "family_qwen",
+    "interaction_minimax_math",
+    "interaction_minimax_code_debug",
+    "interaction_minimax_code_generation",
+    "interaction_minimax_extraction",
+    "interaction_kimi_math",
+    "interaction_kimi_code_debug",
+    "interaction_kimi_code_generation",
+    "interaction_kimi_extraction",
     "reasoning_none",
     "reasoning_low",
     "reasoning_medium",
@@ -97,7 +109,7 @@ def fit_matrix_regression(
         if candidate is None:
             continue
         tier = task.tier or _task_profile(task.prompt).tier
-        domain = task.domain or _task_profile(task.prompt).domain
+        domain = _normalize_domain(task.domain or _task_profile(task.prompt).domain)
         reasoning_effort = _row_reasoning_effort(row)
         matrix.append(_feature_vector(candidate, tier, domain, reasoning_effort))
         targets.append(_target(row, cost_bounds, latency_bounds))
@@ -136,10 +148,11 @@ def select_model_by_matrix_regression(
         features = _feature_vector(candidate, task_profile.tier, task_profile.domain, reasoning_effort)
         regression_score = weights.predict(features)
         regression_utility = _clamp(regression_score, 0.0, 1.0)
+        score_weights = _hybrid_score_weights(task_profile.tier)
         hybrid_score = (
-            (0.50 * regression_utility)
-            + (0.30 * candidate.nash_product)
-            + (0.20 * candidate.cost_utility)
+            (score_weights["regression"] * regression_utility)
+            + (score_weights["nash"] * candidate.nash_product)
+            + (score_weights["cost"] * candidate.cost_utility)
         )
         scored.append(
             {
@@ -147,6 +160,7 @@ def select_model_by_matrix_regression(
                 "regression_score": regression_score,
                 "regression_utility": regression_utility,
                 "hybrid_score": hybrid_score,
+                "hybrid_score_weights": score_weights,
                 "nash_product": candidate.nash_product,
                 "estimated_cost_usd": candidate.estimated_cost_usd,
                 "features": dict(zip(FEATURE_NAMES, features)),
@@ -224,6 +238,7 @@ def _candidate_for_training_row(
 def _feature_vector(candidate: Any, tier: str, domain: str, reasoning_effort: str | None) -> list[float]:
     family = _model_family(candidate.model)
     reasoning = reasoning_effort or "omitted"
+    domain = _normalize_domain(domain)
     return [
         1.0,
         1.0 if tier == "cheap" else 0.0,
@@ -232,7 +247,11 @@ def _feature_vector(candidate: Any, tier: str, domain: str, reasoning_effort: st
         1.0 if domain == "classification" else 0.0,
         1.0 if domain == "math_reasoning" else 0.0,
         1.0 if domain == "logic" else 0.0,
+        1.0 if domain == "summarization" else 0.0,
+        1.0 if domain == "extraction" else 0.0,
+        1.0 if domain == "code_debug" else 0.0,
         1.0 if domain == "code_generation" else 0.0,
+        1.0 if domain == "current_factual" else 0.0,
         min(candidate.capability / 4.0, 1.0),
         candidate.correlation,
         candidate.reliability,
@@ -245,11 +264,27 @@ def _feature_vector(candidate: Any, tier: str, domain: str, reasoning_effort: st
         1.0 if family == "minimax" else 0.0,
         1.0 if family == "kimi" else 0.0,
         1.0 if family == "qwen" else 0.0,
+        1.0 if family == "minimax" and domain == "math_reasoning" else 0.0,
+        1.0 if family == "minimax" and domain == "code_debug" else 0.0,
+        1.0 if family == "minimax" and domain == "code_generation" else 0.0,
+        1.0 if family == "minimax" and domain == "extraction" else 0.0,
+        1.0 if family == "kimi" and domain == "math_reasoning" else 0.0,
+        1.0 if family == "kimi" and domain == "code_debug" else 0.0,
+        1.0 if family == "kimi" and domain == "code_generation" else 0.0,
+        1.0 if family == "kimi" and domain == "extraction" else 0.0,
         1.0 if reasoning == "none" else 0.0,
         1.0 if reasoning == "low" else 0.0,
         1.0 if reasoning == "medium" else 0.0,
         1.0 if reasoning == "omitted" else 0.0,
     ]
+
+
+def _hybrid_score_weights(tier: str) -> dict[str, float]:
+    if tier == "strong":
+        return {"regression": 0.85, "nash": 0.10, "cost": 0.05}
+    if tier == "medium":
+        return {"regression": 0.70, "nash": 0.20, "cost": 0.10}
+    return {"regression": 0.55, "nash": 0.25, "cost": 0.20}
 
 
 def _target(row: dict[str, Any], cost_bounds: tuple[float, float], latency_bounds: tuple[float, float]) -> float:
@@ -266,6 +301,22 @@ def _row_reasoning_effort(row: dict[str, Any]) -> str | None:
         if isinstance(value, str):
             return value
     return None
+
+
+def _normalize_domain(domain: str) -> str:
+    aliases = {
+        "sentiment": "classification",
+        "sentiment_classification": "classification",
+        "ner": "extraction",
+        "named_entity_recognition": "extraction",
+        "code_debugging": "code_debug",
+        "debugging": "code_debug",
+        "logic_puzzles": "logic",
+        "logical_reasoning": "logic",
+        "factual_qa": "current_factual",
+        "factual": "current_factual",
+    }
+    return aliases.get(domain, domain)
 
 
 def _model_family(model: str) -> str:
