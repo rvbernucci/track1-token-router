@@ -51,25 +51,25 @@ PENDING_VIDEO_URL - placeholder approved until final recording upload
 
 ## Public Docker Image
 
-ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0245
+ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0307
 
 ## Release Evidence
 
-- release_tag: `offline-rc-20260709-0245`
-- commit_sha: `2efdab9bd89cc06d2cbf4f8571059961b3e5dd70`
+- release_tag: `offline-rc-20260709-0307`
+- commit_sha: `0ebdc64dd21c5dbccd242a6850526a0c818d77f6`
 - ci_status: `green`
 - release_status: `green`
 - image_audit_status: `green`
 - image_platform: `linux/amd64`
-- image_compressed_size_bytes: `44939874`
+- image_compressed_size_bytes: `44941556`
 
 ## Image Audit Command
 
 ```bash
 python3 scripts/competition_submission_audit.py \
-  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0245 \
-  --expected-revision 2efdab9bd89cc06d2cbf4f8571059961b3e5dd70 \
-  --expected-version offline-rc-20260709-0245
+  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0307 \
+  --expected-revision 0ebdc64dd21c5dbccd242a6850526a0c818d77f6 \
+  --expected-version offline-rc-20260709-0307
 ```
 
 ## Notes
