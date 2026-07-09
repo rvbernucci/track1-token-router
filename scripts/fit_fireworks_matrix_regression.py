@@ -19,6 +19,7 @@ from router.orchestration.matrix_regression_selector import (
     save_weights,
     select_model_by_matrix_regression,
 )
+from router.orchestration.fireworks_model_router import rank_fireworks_models
 
 
 DEFAULT_DATASET = Path("evals/fireworks-pareto/minimal-microbench.jsonl")
@@ -35,8 +36,14 @@ DEFAULT_REPORT = Path("reports/generated/fireworks-matrix-regression-report.md")
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Fit an offline matrix regression for Fireworks model selection.")
-    parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
+    parser.add_argument("--dataset", action="append", type=Path, help="Task JSONL dataset. Can be repeated.")
     parser.add_argument("--results", action="append", type=Path, help="Microbench JSONL result path. Can be repeated.")
+    parser.add_argument("--allowed-models", help="Comma-separated model IDs. Rows for other models are ignored.")
+    parser.add_argument(
+        "--include-failed-calls",
+        action="store_true",
+        help="Include transport/access failures in training. By default only completed model calls are used.",
+    )
     parser.add_argument("--weights-output", type=Path, default=DEFAULT_WEIGHTS)
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
     parser.add_argument("--ridge-lambda", type=float, default=0.35)
@@ -46,16 +53,19 @@ def main() -> int:
     result_paths = args.results or _default_result_paths()
     if not result_paths:
         raise FileNotFoundError("No microbench result files found. Run scripts/fireworks_microbench.py or keep the seed results fixture.")
-    rows = load_microbench_rows(result_paths)
-    tasks = load_regression_tasks(args.dataset)
-    models = sorted({str(row["model"]) for row in rows})
+    raw_rows = load_microbench_rows(result_paths)
+    tasks = load_all_regression_tasks(tuple(args.dataset or [DEFAULT_DATASET]))
+    models = rank_fireworks_models(_parse_models(args.allowed_models)) or sorted({str(row["model"]) for row in raw_rows})
+    rows = filter_training_rows(raw_rows, tasks, models, include_failed_calls=args.include_failed_calls)
     weights = fit_matrix_regression(rows, tasks, allowed_models=models, ridge_lambda=args.ridge_lambda)
     save_weights(weights, args.weights_output)
     report = _render_report(rows, tasks, models, weights, result_paths)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(report, encoding="utf-8")
     payload = {
+        "raw_rows": len(raw_rows),
         "rows": len(rows),
+        "datasets": [str(path) for path in tuple(args.dataset or [DEFAULT_DATASET])],
         "models": models,
         "weights_output": str(args.weights_output),
         "report": str(args.report),
@@ -73,6 +83,45 @@ def _default_result_paths() -> list[Path]:
     if real_results:
         return real_results
     return [path for path in DEFAULT_SEED_RESULTS if path.exists()]
+
+
+def load_all_regression_tasks(paths: tuple[Path, ...]) -> dict[str, Any]:
+    tasks: dict[str, Any] = {}
+    for path in paths:
+        for task_id, task in load_regression_tasks(path).items():
+            tasks[task_id] = task
+    return tasks
+
+
+def filter_training_rows(
+    rows: list[dict[str, Any]],
+    tasks: dict[str, Any],
+    allowed_models: list[str],
+    *,
+    include_failed_calls: bool = False,
+) -> list[dict[str, Any]]:
+    allowed = set(allowed_models)
+    filtered: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, str]] = set()
+    for row in rows:
+        task_id = str(row.get("id") or "")
+        model = str(row.get("model") or "")
+        if task_id not in tasks or model not in allowed:
+            continue
+        if not include_failed_calls and row.get("ok") is False:
+            continue
+        key = (task_id, model, str(row.get("request_options") or {}))
+        if key in seen:
+            continue
+        seen.add(key)
+        filtered.append(row)
+    return filtered
+
+
+def _parse_models(raw: str | None) -> list[str]:
+    if not raw:
+        return []
+    return [model.strip() for model in raw.split(",") if model.strip()]
 
 
 def _render_report(
@@ -115,8 +164,8 @@ def _selection_replay_lines(
 ) -> list[str]:
     observed = _observed_by_task_model(rows)
     lines = [
-        "| Task | Domain | Selected | Observed Valid | Observed Cost USD | Score |",
-        "| --- | --- | --- | ---: | ---: | ---: |",
+        "| Task | Domain | Selected | Observed | Observed Valid | Observed Cost USD | Score |",
+        "| --- | --- | --- | ---: | ---: | ---: | ---: |",
     ]
     for task_id, task in sorted(tasks.items()):
         selection = select_model_by_matrix_regression(
@@ -126,11 +175,12 @@ def _selection_replay_lines(
         )
         selected = selection["model"]
         observed_row = observed.get((task_id, selected))
-        valid = bool(observed_row.get("valid")) if observed_row else False
-        cost = float(observed_row.get("estimated_cost_usd") or 0.0) if observed_row else 0.0
+        observed_flag = observed_row is not None
+        valid = int(bool(observed_row.get("valid"))) if observed_row else "-"
+        cost = f"{float(observed_row.get('estimated_cost_usd') or 0.0):.8f}" if observed_row else "-"
         score = selection["ranked_candidates"][0]["hybrid_score"]
         lines.append(
-            f"| `{task_id}` | `{selection['domain']}` | `{selected}` | {int(valid)} | {cost:.8f} | {score:.5f} |"
+            f"| `{task_id}` | `{selection['domain']}` | `{selected}` | {int(observed_flag)} | {valid} | {cost} | {score:.5f} |"
         )
     return lines
 

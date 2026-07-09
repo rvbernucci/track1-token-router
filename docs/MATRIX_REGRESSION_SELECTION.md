@@ -75,26 +75,27 @@ A ideia competitiva e simples: em tarefa forte, primeiro passar pelo accuracy ga
 - Fit offline: `scripts/fit_fireworks_matrix_regression.py`
 - Pesos Track 1 usados no Docker: `router/data/fireworks_track1_allowed_weights.json`
 - Relatorio Track 1: `reports/generated/fireworks-track1-allowed-20260709-regression.md`
-- Resultado Fireworks real: `reports/generated/fireworks-track1-category-20260709-results.jsonl`
+- Resultados Fireworks reais: `reports/generated/fireworks-track1-category-20260709-results.jsonl`, `reports/generated/fireworks-hidden-variant-results.jsonl`, `reports/generated/fireworks-championship-results.jsonl`
 
 ## Resultado Atual
 
-Treino Track 1 permitido com 80 linhas:
+Treino Track 1 permitido com `76` linhas uteis, filtradas de `339` linhas brutas:
 
 - `minimax-m3`
 - `kimi-k2p7-code`
-- `gemma-4-31b-it`
-- `gemma-4-26b-a4b-it`
-- `gemma-4-31b-it-nvfp4`
+
+As linhas `ok=false` sao excluidas por padrao para nao confundir erro de acesso/transporte com qualidade do modelo. Os pesos tambem registram `observed_models`; no runtime matricial, modelos permitidos mas sem nenhuma chamada concluida no treino sao filtrados quando ha alternativa observada. Isso evita escolher Gemma cegamente enquanto os IDs serverless seguem retornando `404` na chave local.
 
 Top coeficientes aprendidos no fit atual:
 
 | Feature | Sinal |
 | --- | ---: |
-| `family_minimax` | positivo |
-| `family_kimi` | positivo |
-| `interaction_minimax_code_debug` | negativo |
-| `interaction_kimi_code_debug` | positivo |
+| `correlation` | positivo |
+| `prisoner_payoff` | positivo |
+| `interaction_minimax_extraction` | positivo |
+| `interaction_kimi_extraction` | negativo |
+| `interaction_minimax_code_debug` | positivo |
+| `interaction_kimi_code_debug` | negativo |
 | `interaction_minimax_math` | positivo |
 | `interaction_minimax_code_generation` | positivo |
 
@@ -102,8 +103,8 @@ Replay atual:
 
 | Task | Modelo escolhido |
 | --- | --- |
-| `debug_first_even` | `kimi-k2p7-code` |
-| `debug_is_adult` | `kimi-k2p7-code` |
+| `debug_first_even` | `minimax-m3` |
+| `debug_is_adult` | `minimax-m3` |
 | `code_gen_clamp` | `minimax-m3` |
 | `math_discount_fee` | `minimax-m3` |
 | `ner_money_date` | `minimax-m3` |
@@ -114,7 +115,7 @@ Replay atual:
 A regressao confirmou alguns sinais fortes:
 
 - `minimax-m3` e o melhor default empirico para a maioria dos dominios Track 1 observados;
-- `kimi-k2p7-code` deve ser escalado para code debugging quando a tarefa pede correcao de codigo existente;
+- `kimi-k2p7-code` permanece como fallback observado e valido, mas nao deve ser o default quando Minimax ja passa o validador a menor custo;
 - Gemma serverless segue indisponivel na chave local, entao o runner precisa tentar, cachear 404 e seguir sem travar;
 - interacoes familia x dominio sao necessarias, porque uma media global por modelo esconde especializacoes.
 

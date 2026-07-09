@@ -21,6 +21,8 @@ Latest primary result file: `reports/generated/fireworks-track1-category-2026070
 
 Latest hidden-variant result file: `reports/generated/fireworks-hidden-variant-results.jsonl`
 
+Latest championship result file: `reports/generated/fireworks-championship-results.jsonl`
+
 Latest primary report: `reports/generated/fireworks-track1-category-20260709-report.md`
 
 Latest hidden-variant report: `reports/generated/fireworks-hidden-variant-report.md`
@@ -53,10 +55,11 @@ After tightening the `ner_money_date` prompt to require date and amount exactly 
 
 - Use local Gemma first when an AMD pod endpoint is available and validated.
 - In Fireworks-only mode, the Docker image now enables `FIREWORKS_MATRIX_WEIGHTS=/app/router/data/fireworks_track1_allowed_weights.json` by default.
-- The checked-in matrix weights now use `120` real microbench rows: `80` primary category rows plus `40` hidden-variant rows.
+- The checked-in matrix weights now use `76` completed, deduplicated, observed Track 1 rows from category, hidden-variant, and championship result files.
+- Transport/access failures such as Gemma `404` are excluded from quality fitting by default. The weights record `observed_models`, and the matrix selector filters unobserved allowed models when observed alternatives exist.
 - The matrix selector uses ridge-regression utility plus Nash welfare. For strong tasks, regression/accuracy is weighted above token cost; for cheap tasks, token cost remains a larger part of the score.
-- Keep `kimi-k2p7-code` as the preferred remote candidate for code debugging because the latest empirical run showed `2/2` valid debugging cases versus `1/2` for `minimax-m3`.
-- Keep `minimax-m3` as the preferred remote candidate for the other observed Track 1 domains because it matched Kimi accuracy at lower token cost.
+- Keep `minimax-m3` as the preferred remote candidate for observed Track 1 domains because it matched or exceeded the accessible alternatives at lower estimated token cost after the championship recalibration.
+- Keep `kimi-k2p7-code` as an observed fallback for code/debug cases if Minimax errors at runtime.
 - Keep Gemma IDs in `ALLOWED_MODELS` support, but cache unavailable-model errors per runner instance so one inaccessible Gemma endpoint does not cause repeated latency across the whole evaluator batch.
 
 ## Classifier Hardening

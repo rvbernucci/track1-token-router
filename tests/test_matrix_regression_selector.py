@@ -93,7 +93,40 @@ class MatrixRegressionSelectorTests(unittest.TestCase):
 
         self.assertEqual(loaded.feature_names, weights.feature_names)
         self.assertEqual(loaded.training_rows, weights.training_rows)
+        self.assertEqual(loaded.observed_models, weights.observed_models)
         self.assertEqual(len(loaded.coefficients), len(weights.coefficients))
+
+    def test_selection_filters_unobserved_allowed_models_when_possible(self) -> None:
+        tasks = {
+            "sentiment": RegressionTask(
+                id="sentiment",
+                prompt="Classify sentiment as positive, neutral, or negative: I love it.",
+                domain="classification",
+                tier="cheap",
+            )
+        }
+        rows = [
+            _row("sentiment", "accounts/fireworks/models/minimax-m3", True, 0.00005, 1000),
+            _row("sentiment", "accounts/fireworks/models/kimi-k2p7-code", True, 0.00007, 700),
+        ]
+        weights = fit_matrix_regression(
+            rows,
+            tasks,
+            allowed_models=[
+                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
+            ],
+        )
+
+        selection = select_model_by_matrix_regression(
+            TaskEnvelope(input_text="Classify sentiment as positive, neutral, or negative: excellent."),
+            ["gemma-4-31b-it-nvfp4", "minimax-m3", "kimi-k2p7-code"],
+            weights,
+        )
+
+        ranked_models = {candidate["model"] for candidate in selection["ranked_candidates"]}
+        self.assertNotIn("accounts/fireworks/models/gemma-4-31b-it-nvfp4", ranked_models)
+        self.assertIn(selection["model"], weights.observed_models)
 
 
 def _row(task_id: str, model: str, valid: bool, cost: float, latency_ms: int) -> dict[str, object]:
@@ -147,7 +180,7 @@ class CheckedInTrack1WeightsTests(unittest.TestCase):
             (
                 "Fix this Python code: def add(a, b): return a - b",
                 "code_debug",
-                "accounts/fireworks/models/kimi-k2p7-code",
+                "accounts/fireworks/models/minimax-m3",
             ),
             (
                 "Write a Python function add(a, b) that returns the sum.",

@@ -69,6 +69,7 @@ class MatrixRegressionWeights:
     ridge_lambda: float
     training_rows: int
     target_mean: float
+    observed_models: list[str] | None = None
 
     def predict(self, features: list[float]) -> float:
         return sum(coefficient * value for coefficient, value in zip(self.coefficients, features))
@@ -84,6 +85,7 @@ class MatrixRegressionWeights:
             ridge_lambda=float(payload["ridge_lambda"]),
             training_rows=int(payload["training_rows"]),
             target_mean=float(payload["target_mean"]),
+            observed_models=[str(value) for value in payload.get("observed_models") or []] or None,
         )
 
 
@@ -101,6 +103,7 @@ def fit_matrix_regression(
     latency_bounds = _bounds(float(row.get("latency_ms") or 0.0) for row in rows)
     matrix: list[list[float]] = []
     targets: list[float] = []
+    observed_models: set[str] = set()
     for row in rows:
         task = tasks.get(str(row["id"]))
         if task is None:
@@ -108,6 +111,7 @@ def fit_matrix_regression(
         candidate = _candidate_for_training_row(row, task, models)
         if candidate is None:
             continue
+        observed_models.add(candidate.model)
         tier = task.tier or _task_profile(task.prompt).tier
         domain = _normalize_domain(task.domain or _task_profile(task.prompt).domain)
         reasoning_effort = _row_reasoning_effort(row)
@@ -122,6 +126,7 @@ def fit_matrix_regression(
         ridge_lambda=ridge_lambda,
         training_rows=len(matrix),
         target_mean=sum(targets) / len(targets),
+        observed_models=sorted(observed_models),
     )
 
 
@@ -132,6 +137,9 @@ def select_model_by_matrix_regression(
 ) -> dict[str, Any]:
     task_profile = _task_profile(task.input_text)
     normalized_models = rank_fireworks_models(allowed_models)
+    observed_allowed_models = _observed_allowed_models(normalized_models, weights)
+    if observed_allowed_models:
+        normalized_models = observed_allowed_models
     candidates = _build_candidates(normalized_models, task_profile)
     chat_candidates = [candidate for candidate in candidates if candidate.supports_chat]
     if not chat_candidates:
@@ -172,6 +180,7 @@ def select_model_by_matrix_regression(
         "selection_rule": "matrix_regression_plus_nash",
         "tier": task_profile.tier,
         "domain": task_profile.domain,
+        "observed_model_filter": weights.observed_models,
         "ranked_candidates": sorted(
             scored,
             key=lambda row: (row["hybrid_score"], -row["estimated_cost_usd"], row["model"]),
@@ -213,6 +222,14 @@ def save_weights(weights: MatrixRegressionWeights, path: Path) -> None:
 
 def load_weights(path: Path) -> MatrixRegressionWeights:
     return MatrixRegressionWeights.from_dict(json.loads(path.read_text(encoding="utf-8")))
+
+
+def _observed_allowed_models(models: list[str], weights: MatrixRegressionWeights) -> list[str]:
+    observed = set(weights.observed_models or [])
+    if not observed:
+        return []
+    filtered = [model for model in models if model in observed]
+    return filtered if filtered else []
 
 
 def _candidate_for_training_row(
