@@ -170,12 +170,18 @@ def _check_strict_artifacts(root: Path, errors: list[str], warnings: list[str], 
     demo_url = str(status.get("demo_url") or "")
     video_url = str(status.get("video_url") or "")
     ci_status = str(status.get("ci_status") or "")
+    docker_image = str(status.get("docker_image") or "")
+    image_audit_status = str(status.get("image_audit_status") or "")
     if not repo_url.startswith("https://"):
         errors.append("strict: repo_url must be a public https URL")
     if not demo_url.startswith("https://"):
         errors.append("strict: demo_url must be a public https URL")
     if ci_status != "green":
         errors.append("strict: ci_status must be green")
+    if not _is_explicit_ghcr_image(docker_image):
+        errors.append("strict: docker_image must be an explicit ghcr.io image tag or digest")
+    if image_audit_status != "green":
+        errors.append("strict: image_audit_status must be green")
 
     slides_pdf = final_root / "slides.pdf"
     if not slides_pdf.exists() or slides_pdf.stat().st_size < 100 or not slides_pdf.read_bytes().startswith(b"%PDF-"):
@@ -190,6 +196,19 @@ def _check_strict_artifacts(root: Path, errors: list[str], warnings: list[str], 
         errors.append("strict: provide video_url, video MP4, or approved video placeholder")
     if placeholder_ok and not video_url:
         warnings.append("strict: video placeholder is approved but must be replaced before final submission")
+
+
+def _is_explicit_ghcr_image(value: str) -> bool:
+    if not value.startswith("ghcr.io/"):
+        return False
+    if "@sha256:" in value:
+        return True
+    slash = value.rfind("/")
+    colon = value.rfind(":")
+    if colon <= slash:
+        return False
+    tag = value[colon + 1 :]
+    return bool(tag) and tag != "latest"
 
 
 def _load_status(path: Path, errors: list[str]) -> dict[str, object]:

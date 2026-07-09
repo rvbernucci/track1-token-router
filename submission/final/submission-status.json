@@ -1,6 +1,13 @@
 {
   "ci_status": "green",
   "demo_url": "https://rvbernucci.github.io/track1-token-router/",
+  "docker_image": "ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0229",
+  "image_audit_status": "green",
+  "image_compressed_size_bytes": 44939758,
+  "image_platform": "linux/amd64",
+  "release_status": "green",
+  "release_tag": "offline-rc-20260709-0229",
+  "commit_sha": "a41bdc7a8fb54e73ba243986fd6f0c80c3b89f8b",
   "repo_url": "https://github.com/rvbernucci/track1-token-router",
   "video_placeholder_approved": true,
   "video_url": ""

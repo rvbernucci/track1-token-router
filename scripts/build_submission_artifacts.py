@@ -216,7 +216,7 @@ def _write_final_readme(path: Path) -> None:
         "- `cover.png`: generated placeholder cover image.\n"
         "- `speaker-notes.md`: short notes generated from the slide outline.\n"
         "- `video-placeholder-approved.md`: temporary placeholder until final recording is uploaded.\n"
-        "- `submission-status.json`: strict readiness status for repo, demo, video and CI URLs.\n\n"
+        "- `submission-status.json`: strict readiness status for repo, demo, video, CI and public GHCR image.\n\n"
         "Replace visual placeholders before final submission if a designed deck or cover is available.\n",
         encoding="utf-8",
     )

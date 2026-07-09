@@ -444,7 +444,7 @@ Audit final da submissao, sem depender de Docker local:
 ```bash
 python3 scripts/competition_submission_audit.py --skip-network
 python3 scripts/competition_submission_audit.py \
-  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0215
+  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0229
 ```
 
 O primeiro comando valida contrato oficial, release workflow, README e gates offline. O segundo consulta o GHCR diretamente e confirma que a imagem final e publica, tem manifesto `linux/amd64` e fica abaixo do limite de 10GB.

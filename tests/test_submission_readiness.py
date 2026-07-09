@@ -72,6 +72,8 @@ class SubmissionReadinessTests(unittest.TestCase):
                 "{\n"
                 '  "ci_status": "pending-final-green",\n'
                 '  "demo_url": "",\n'
+                '  "docker_image": "",\n'
+                '  "image_audit_status": "pending",\n'
                 '  "repo_url": "https://github.com/rvbernucci/track1-token-router",\n'
                 '  "video_placeholder_approved": true,\n'
                 '  "video_url": ""\n'
@@ -84,6 +86,8 @@ class SubmissionReadinessTests(unittest.TestCase):
         self.assertFalse(readiness.ok)
         self.assertTrue(any("demo_url" in error for error in readiness.errors))
         self.assertTrue(any("ci_status" in error for error in readiness.errors))
+        self.assertTrue(any("docker_image" in error for error in readiness.errors))
+        self.assertTrue(any("image_audit_status" in error for error in readiness.errors))
 
     def test_strict_mode_passes_with_final_status_and_artifacts(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -106,6 +110,8 @@ class SubmissionReadinessTests(unittest.TestCase):
                 "{\n"
                 '  "ci_status": "green",\n'
                 '  "demo_url": "https://example.com/demo",\n'
+                '  "docker_image": "ghcr.io/rvbernucci/track1-token-router:offline-rc-test",\n'
+                '  "image_audit_status": "green",\n'
                 '  "repo_url": "https://github.com/rvbernucci/track1-token-router",\n'
                 '  "video_placeholder_approved": true,\n'
                 '  "video_url": ""\n'

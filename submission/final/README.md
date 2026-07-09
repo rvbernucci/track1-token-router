@@ -12,6 +12,6 @@ python3 scripts/build_submission_artifacts.py --check
 - `cover.png`: generated placeholder cover image.
 - `speaker-notes.md`: short notes generated from the slide outline.
 - `video-placeholder-approved.md`: temporary placeholder until final recording is uploaded.
-- `submission-status.json`: strict readiness status for repo, demo, video and CI URLs.
+- `submission-status.json`: strict readiness status for repo, demo, video, CI and public GHCR image.
 
 Replace visual placeholders before final submission if a designed deck or cover is available.
