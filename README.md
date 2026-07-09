@@ -202,12 +202,14 @@ python3 -m router ask "What is 2+2?"
 | `ALLOWED_MODELS` | vazio | Lista oficial de modelos permitidos injetada pelo harness ACT II; aceita CSV, espacos/quebras de linha ou JSON array. |
 | `FIREWORKS_MODEL` | vazio | Override local; se vazio, usa o primeiro item de `ALLOWED_MODELS`. |
 | `FIREWORKS_API_KEY` | vazio | API key Fireworks, usada apenas nas sprints remotas. |
-| `FIREWORKS_TIMEOUT_S` | `60` | Timeout por chamada Fireworks. |
-| `FIREWORKS_MAX_RETRIES` | `1` | Tentativas extras em falha Fireworks. |
+| `FIREWORKS_TIMEOUT_S` | `24` | Timeout por chamada Fireworks, mantido abaixo do limite oficial de 30s por request. |
+| `FIREWORKS_MAX_RETRIES` | `0` | Tentativas extras em falha Fireworks; no Track 1 evitamos cascata lenta por retry. |
 | `FIREWORKS_TEMPERATURE` | `0.0` | Temperatura do auditor remoto. |
 | `FIREWORKS_MAX_TOKENS` | `256` | Limite de output do auditor remoto. |
 | `FIREWORKS_SERVICE_TIER` | vazio | Vazio usa Standard; `priority` deve ser usado apenas como fallback manual de confiabilidade. |
 | `FIREWORKS_MATRIX_WEIGHTS` | vazio localmente; `/app/router/data/fireworks_track1_allowed_weights.json` no Docker | Caminho para pesos calibrados por microbench; quando presente, os runners Fireworks e hibrido usam regressao matricial + Nash para escolher o modelo. |
+| `TRACK1_MAX_RUNTIME_S` | `570` | Orçamento total do comando `submit-track1`, deixando margem abaixo dos 10 minutos oficiais. |
+| `TRACK1_RUNTIME_RESERVE_S` | `5` | Reserva final para escrever JSON valido em `/output/results.json` antes do limite. |
 
 ## Modo local M1
 

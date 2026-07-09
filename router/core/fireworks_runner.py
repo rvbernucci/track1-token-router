@@ -100,6 +100,8 @@ class FireworksDirectRunner:
                 except ModelClientError as exc:
                     error = str(exc)
                     attempt_errors.append({"model": selected_model, "error": error})
+                    if _is_timeout_error(error):
+                        break
                     if _is_unavailable_model_error(error):
                         self._unavailable_models.add(selected_model)
                     continue
@@ -285,6 +287,11 @@ def _is_unavailable_model_error(message: str) -> bool:
         or "inaccessible" in lowered
         or "not deployed" in lowered
     )
+
+
+def _is_timeout_error(message: str) -> bool:
+    lowered = message.lower()
+    return "timed out" in lowered or "timeout" in lowered
 
 
 class _RequestOptionsFallback(Exception):

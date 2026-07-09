@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
+from time import perf_counter
 from typing import Sequence
 
 from router.adapters.official import get_adapter
@@ -108,11 +110,50 @@ def _handle_submit_track1(args: argparse.Namespace, runner: TaskRunner) -> int:
     adapter = get_adapter("lablab_track1")
     raw = args.input.read_text(encoding="utf-8")
     tasks = adapter.parse(raw)
-    results = [runner.run(task) for task in tasks]
+    started_at = perf_counter()
+    max_runtime_s = _float_env("TRACK1_MAX_RUNTIME_S", 570.0)
+    reserve_s = _float_env("TRACK1_RUNTIME_RESERVE_S", 5.0)
+    results = []
+    for task in tasks:
+        if _runtime_budget_exhausted(started_at, max_runtime_s, reserve_s):
+            results.append(_track1_timeout_result(task, started_at, max_runtime_s, reserve_s))
+            continue
+        results.append(runner.run(task))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(adapter.format(results), encoding="utf-8")
     print(json.dumps({"tasks": len(results), "out": str(args.output)}, ensure_ascii=False), file=sys.stderr)
     return 0
+
+
+def _runtime_budget_exhausted(started_at: float, max_runtime_s: float, reserve_s: float) -> bool:
+    return (perf_counter() - started_at) >= max(0.0, max_runtime_s - reserve_s)
+
+
+def _track1_timeout_result(
+    task: TaskEnvelope,
+    started_at: float,
+    max_runtime_s: float,
+    reserve_s: float,
+) -> AnswerResult:
+    return AnswerResult(
+        id=task.id,
+        answer="Unable to complete the task within the available time budget.",
+        route="track1_time_budget_exhausted",
+        metadata={
+            "runner": "submit_track1",
+            "reason": "track1_total_runtime_budget_exhausted",
+            "elapsed_run_ms": round((perf_counter() - started_at) * 1000),
+            "max_runtime_s": max_runtime_s,
+            "reserve_s": reserve_s,
+        },
+    )
+
+
+def _float_env(name: str, default: float) -> float:
+    raw = os.getenv(name)
+    if raw is None or not raw.strip():
+        return default
+    return float(raw)
 
 
 def _handle_eval(args: argparse.Namespace, runner: TaskRunner) -> int:

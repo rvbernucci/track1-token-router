@@ -106,6 +106,8 @@ Official partner statement:
 - Gemma can be used in routing, captioning and agent workflows.
 - Track 1 has a specific partner prize: Best Use of Gemma via Fireworks.
 - The same official page says model restrictions vary by track, so choices must be checked against Track 1 requirements.
+- Hackathon credits or the USD 50 Fireworks credits from the AMD AI Developer Program can be used to call Gemma directly through the Fireworks API.
+- The application can also run on AMD Developer Cloud using the allocated GPU access.
 
 Current practical interpretation:
 
@@ -202,11 +204,13 @@ Immediate implications:
 - CLI: `router submit-track1 --input /input/tasks.json --output /output/results.json`
 - Docker default command: `router submit-track1`
 - Docker default mode: `ROUTER_MODE=fireworks`
+- Default Fireworks timeout: `24s`, with `0` automatic retries to stay under the official 30s request limit.
+- Total Track 1 runtime guard: `TRACK1_MAX_RUNTIME_S=570` with `TRACK1_RUNTIME_RESERVE_S=5`, so the runner still writes valid JSON before the 10-minute cap.
 - Model router: ranks `ALLOWED_MODELS` and selects cheap/medium/strong per task
 - CI smoke test: mounted `/input` and `/output` with valid JSON output
 
 ## Remaining Work
 
-- Add timeout budget around per-task execution.
 - Extend mechanical validation fixtures to all eight official categories.
 - Calibrate model tiers against the real `ALLOWED_MODELS` list when available.
+- Re-test Gemma access from inside AMD Developer Cloud and the final harness because local Fireworks credits have shown 404 for current Gemma serverless IDs.

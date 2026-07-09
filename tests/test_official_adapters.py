@@ -172,6 +172,50 @@ class OfficialAdapterTests(unittest.TestCase):
         self.assertEqual([row["task_id"] for row in payload], ["t1", "t2"])
         self.assertTrue(all(isinstance(row["answer"], str) and row["answer"] for row in payload))
 
+    def test_lablab_track1_cli_writes_fallbacks_when_runtime_budget_is_exhausted(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            input_path = root / "tasks.json"
+            output_path = root / "results.json"
+            input_path.write_text(
+                json.dumps(
+                    [
+                        {"task_id": "late-1", "prompt": "Summarise this: one."},
+                        {"task_id": "late-2", "prompt": "Summarise this: two."},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            env = {
+                **os.environ,
+                "ROUTER_MODE": "mock",
+                "TRACK1_MAX_RUNTIME_S": "0",
+                "TRACK1_RUNTIME_RESERVE_S": "0",
+                "ROUTER_LOG_PATH": str(root / "run.jsonl"),
+            }
+
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "router",
+                    "submit-track1",
+                    "--input",
+                    str(input_path),
+                    "--output",
+                    str(output_path),
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+            payload = json.loads(output_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(completed.stdout, "")
+        self.assertEqual([row["task_id"] for row in payload], ["late-1", "late-2"])
+        self.assertTrue(all(row["answer"].startswith("Unable to complete") for row in payload))
+
     def test_file_payload_round_trip(self) -> None:
         adapter = get_adapter("file_payload")
         tasks = adapter.parse((FIXTURES / "file_payload.json").read_text(encoding="utf-8"))

@@ -105,6 +105,13 @@ class RouterConfigTests(unittest.TestCase):
         self.assertIsNone(default_config.fireworks_matrix_weights)
         self.assertEqual(calibrated_config.fireworks_matrix_weights, Path("reports/generated/weights.json"))
 
+    def test_fireworks_defaults_fit_track1_latency_envelope(self) -> None:
+        with patched_env(FIREWORKS_TIMEOUT_S=None, FIREWORKS_MAX_RETRIES=None):
+            config = RouterConfig.from_env()
+
+        self.assertLess(config.fireworks_timeout_s, 30)
+        self.assertEqual(config.fireworks_max_retries, 0)
+
 
 class patched_env:
     def __init__(self, **values: str | None) -> None:

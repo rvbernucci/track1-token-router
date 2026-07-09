@@ -152,6 +152,27 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertTrue(result.metadata["fireworks_attempt_errors"])
         self.assertEqual(client.model, "fallback-model")
 
+    def test_timeout_error_does_not_cascade_across_allowed_models(self) -> None:
+        with FakeOpenAIServer(response_text="too late", delay_s=0.2) as server:
+            client = FireworksClient(
+                base_url=server.url,
+                model="fallback-model",
+                api_key="test",
+                timeout_s=0.01,
+                max_retries=0,
+            )
+            runner = FireworksDirectRunner(
+                client,
+                allowed_models=["minimax-m3", "kimi-k2p7-code"],
+            )
+
+            result = runner.run(TaskEnvelope(id="summary", input_text="Summarise this: token routing matters."))
+
+        self.assertEqual(result.route, "fireworks_error")
+        self.assertEqual(result.answer, "Unable to complete the task.")
+        self.assertEqual(len(server.requests), 1)
+        self.assertIn("timed out", result.metadata["fireworks_attempt_errors"][0]["error"].lower())
+
     def test_unavailable_model_is_skipped_after_first_404(self) -> None:
         with FakeOpenAIServer(
             responses=["First fallback.", "Second fallback."],

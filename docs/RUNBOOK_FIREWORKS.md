@@ -197,7 +197,8 @@ Politica atual para o caminho oficial:
 
 - cheap/medium linguagem: Gemma-first quando Gemma estiver acessivel no harness;
 - strong math/logic/code/debug: `minimax-m3` first;
-- fallback entre modelos permitidos se o modelo escolhido retornar erro de API, 404, timeout ou resposta sem `message.content`;
+- fallback entre modelos permitidos se o modelo escolhido retornar erro rapido de API, 404 ou resposta sem `message.content`;
+- timeout nao cascata para outro modelo no mesmo request, porque o envelope oficial exige resposta abaixo de 30s;
 - `kimi-k2p7-code` permanece como fallback/candidato, especialmente para codigo/logica, mas nao como default atual.
 - se um modelo local confiavel estiver disponivel, `ROUTER_MODE=hybrid` deve ser comparado contra `ROUTER_MODE=fireworks`, porque respostas locais corretas custam zero Fireworks tokens.
 
