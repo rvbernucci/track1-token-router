@@ -48,6 +48,21 @@ PROFILE_REQUIREMENTS = {
             "GEMMA_PROMPT_FORMAT",
         },
     },
+    "gemma-small-local.env.example": {
+        "runbook": "docs/RUNBOOK_GEMMA.md",
+        "required": {
+            "ROUTER_MODE",
+            "COMPETITION_DRY_RUN",
+            "LOCAL_BASE_URL",
+            "LOCAL_MODEL",
+            "LOCAL_CONTEXT_TOKENS",
+            "LOCAL_MEMORY_BUDGET_MB",
+            "GEMMA_MODEL_FAMILY",
+            "GEMMA_MODEL_SIZE",
+            "GEMMA_QUANTIZATION",
+            "GEMMA_PROMPT_FORMAT",
+        },
+    },
     "fireworks-serverless.env.example": {
         "runbook": "docs/RUNBOOK_FIREWORKS.md",
         "required": {
@@ -155,6 +170,24 @@ def _check_safe_defaults(filename: str, values: dict[str, str], errors: list[str
         errors.append("LOCAL_BASE_URL must default to localhost/127.0.0.1 in examples")
     if filename.startswith("amd-mi300x") and values.get("COMPETITION_DRY_RUN") != "0":
         errors.append("AMD runtime profile must show COMPETITION_DRY_RUN=0 for credit activation")
+    if filename == "gemma-small-local.env.example":
+        if values.get("ROUTER_MODE") != "hybrid":
+            errors.append("Small Gemma profile must use ROUTER_MODE=hybrid")
+        if values.get("LOCAL_MODEL", "").lower() != "local-gemma-small":
+            errors.append("Small Gemma profile must use LOCAL_MODEL=local-gemma-small placeholder")
+        if values.get("GEMMA_MODEL_SIZE", "").upper() not in {"E2B", "2B", "3B"}:
+            errors.append("Small Gemma profile must stay in the E2B/2B/3B class")
+        try:
+            if int(values.get("LOCAL_MEMORY_BUDGET_MB", "0")) > 3400:
+                errors.append("Small Gemma memory budget must leave margin below 4 GB")
+        except ValueError:
+            errors.append("LOCAL_MEMORY_BUDGET_MB must be an integer")
+        for key in ("M1_MAX_TOKENS", "M2A_MAX_TOKENS", "M2B_MAX_TOKENS"):
+            try:
+                if int(values.get(key, "9999")) > 128:
+                    errors.append(f"{key} must stay <= 128 for small Gemma profile")
+            except ValueError:
+                errors.append(f"{key} must be an integer")
     if filename == "fireworks-serverless.env.example":
         if values.get("ROUTER_MODE") != "fireworks":
             errors.append("Fireworks serverless profile must default to ROUTER_MODE=fireworks")

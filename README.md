@@ -81,6 +81,7 @@ Leitura atual do Participant Guide:
 - O container final roda em ambiente padronizado de `4 GB` RAM e `2 vCPU`.
 - Modelos locais contam para accuracy e usam zero Fireworks tokens, mas precisam caber nesse envelope; o guia chama `2B-3B` 4-bit de seguro e alerta que `7B` 4-bit pode consumir quase toda a RAM.
 - Gemma 26B/31B e uma trilha forte para AMD pod, calibracao, demo, fine-tuning e uso via Fireworks quando aparecer em `ALLOWED_MODELS`, mas nao deve ser presumido como modelo local dentro da imagem final.
+- Gemma pequeno, especialmente classe E2B/2B-3B 4-bit, agora e um candidato serio para triagem/verificacao local se passar memoria, latencia e accuracy.
 - O Docker default fica `ROUTER_MODE=fireworks` para respeitar `FIREWORKS_BASE_URL` e `ALLOWED_MODELS`; `ROUTER_MODE=hybrid` so vira candidato final se um modelo local compacto for provado no mesmo envelope.
 
 ## Pastas
@@ -98,6 +99,7 @@ Leitura atual do Participant Guide:
 | [`docs/NEXT_NO_CREDIT_IMPROVEMENTS.md`](./docs/NEXT_NO_CREDIT_IMPROVEMENTS.md) | Terceira onda sem credito: deploy publico, caos de modelo local, validacao semantica, batch stress e redaction. |
 | [`docs/NO_CREDIT_WAVE_3_PLAN.md`](./docs/NO_CREDIT_WAVE_3_PLAN.md) | Plano executivo das Sprints 32-36, com dependencias, gates e anti-escopo. |
 | [`docs/TRACK1_FINAL_ENVIRONMENT_STRATEGY.md`](./docs/TRACK1_FINAL_ENVIRONMENT_STRATEGY.md) | Correcao operacional do guia atual: Docker final `4 GB`/`2 vCPU`, Gemma grande via Fireworks/pod, e validadores como camada de seguranca. |
+| [`docs/GEMMA_SMALL_LOCAL_STRATEGY.md`](./docs/GEMMA_SMALL_LOCAL_STRATEGY.md) | Trilha challenger para Gemma pequeno local dentro do envelope final, com gates de memoria, latencia, accuracy e tokens. |
 
 ## Roadmap atual
 

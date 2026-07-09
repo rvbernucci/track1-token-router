@@ -4,13 +4,13 @@
 
 Track 1 allows local models as a scoring strategy. A local answer produced inside the container counts toward accuracy, and local inference contributes zero Fireworks tokens. This makes local-first routing the best theoretical strategy when local quality and latency are good enough.
 
-The latest Track 1 guide adds a hard practical limit: final grading runs with `4 GB` RAM and `2 vCPU`. It explicitly says `2B-3B` 4-bit quantized local models are safe, while `7B` 4-bit can consume the whole RAM budget. Therefore Gemma 26B/31B should not be treated as a local model inside the final submitted image.
+The latest Track 1 guide adds a hard practical limit: final grading runs with `4 GB` RAM and `2 vCPU`. It explicitly says `2B-3B` 4-bit quantized local models are safe, while `7B` 4-bit can consume the whole RAM budget. Therefore Gemma 26B/31B should not be treated as a local model inside the final submitted image, but Gemma E2B-class local inference is now a serious challenger path.
 
 The AMD/Gemma partner wording still matters, but its role is different:
 
 - AMD GPU pod: development, calibration, prompt design, fine-tuning experiments and Gemma demo lane;
 - Fireworks: judged remote path through `FIREWORKS_BASE_URL` and `ALLOWED_MODELS`;
-- final local inference: only compact models that fit the grading envelope;
+- final local inference: only compact models that fit the grading envelope, preferably a small Gemma candidate if it passes gates;
 - code validators: mechanical safety checks around the agent, not a substitute for the AI agent.
 
 ## Two Final Modes
@@ -62,8 +62,9 @@ Local-first only wins if all of these are true:
 ## Current Project Decision
 
 - Keep Docker default as `ROUTER_MODE=fireworks`.
-- Treat `ROUTER_MODE=hybrid` as an experimental/championship candidate only after a compact local model is proven under the final resource envelope.
+- Treat `ROUTER_MODE=hybrid` as an experimental/championship candidate only after a compact local model, ideally small Gemma, is proven under the final resource envelope.
 - Treat Gemma-on-AMD-pod as the primary research/demo/fine-tuning lane for the Best Use of Gemma story, not as an assumed final local runtime.
+- Add small Gemma as a separate final-container challenger lane; see [`docs/GEMMA_SMALL_LOCAL_STRATEGY.md`](./GEMMA_SMALL_LOCAL_STRATEGY.md).
 - Keep mechanical validators enabled in both paths, but describe them as safety/economy layers around the AI agent.
 - Use Fireworks as the authoritative final remote path whenever the local compact path is not proven.
 

@@ -8,6 +8,8 @@ Perfil recomendado: `runtime-profiles/gemma-local.env.example`.
 
 Contexto Track 1: respostas locais corretas contam para accuracy e custam zero Fireworks tokens, mas o guia atual informa que o ambiente final tem `4 GB` RAM e `2 vCPU`. Portanto Gemma 26B/31B no AMD GPU pod e uma trilha de pesquisa/calibracao/demo, nao uma premissa para o container final. No scoring final, Gemma grande so deve entrar se aparecer em `ALLOWED_MODELS` e for chamado por `FIREWORKS_BASE_URL`, ou se o organizador fornecer explicitamente um endpoint local.
 
+Correcao importante: isso nao elimina Gemma local. Elimina Gemma grande local. Gemma E2B-class 4-bit agora e um candidato real para verificador/triador local no container final, desde que passe os gates de memoria, latencia e accuracy descritos em [`docs/GEMMA_SMALL_LOCAL_STRATEGY.md`](./GEMMA_SMALL_LOCAL_STRATEGY.md).
+
 ## AMD GPU Pod
 
 Antes de rodar Gemma no pod AMD:
@@ -47,8 +49,30 @@ Para o container final:
 
 - nao embutir Gemma 26B/31B;
 - nao depender do notebook AMD estar disponivel no avaliador;
-- se houver local model final, limitar a classe `2B-3B` 4-bit ou menor;
+- se houver local model final, limitar a classe `2B-3B` 4-bit ou menor, preferencialmente Gemma E2B-class;
+- usar o modelo pequeno primeiro como M2A/verificador ou triador, nao como resolvedor universal;
 - se Gemma aparecer em `ALLOWED_MODELS`, chamar via Fireworks e medir tokens normalmente.
+
+## Perfil pequeno local
+
+Perfil recomendado para laboratorio:
+
+```bash
+cp runtime-profiles/gemma-small-local.env.example .env.gemma-small-local
+set -a
+. ./.env.gemma-small-local
+set +a
+```
+
+Esse perfil e intencionalmente conservador:
+
+- `M1_MAX_TOKENS=128`;
+- `M2A_MAX_TOKENS=96`;
+- `M2B_MAX_TOKENS=128`;
+- `LOCAL_CONTEXT_TOKENS=2048`;
+- `LOCAL_MEMORY_BUDGET_MB=3400`.
+
+Ele existe para testar a hipotese pequena, nao para rodar Gemma 31B.
 
 ## Prompt/runtime
 

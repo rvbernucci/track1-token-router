@@ -46,13 +46,29 @@ The AMD notebook/pod is a development and calibration environment. It can run he
 
 The final scoring container must survive the official `4 GB` RAM / `2 vCPU` environment unless the organizers explicitly provide another endpoint. Therefore, Gemma 26B/31B should not be treated as a local final-container model.
 
+## Small Gemma Correction
+
+The final-container restriction does not eliminate local Gemma. It eliminates large local Gemma.
+
+The attached Gemma material introduces smaller Gemma 4 variants such as E2B and E4B, and the Track 1 guide explicitly allows local models sized for the `4 GB` RAM / `2 vCPU` environment. Therefore, a Gemma E2B-class 4-bit local model is a legitimate challenger path.
+
+The correct posture:
+
+- evaluate small Gemma locally as a verifier, triage classifier or short-answer draft model;
+- keep Fireworks as the safe default until the small model passes memory, latency and accuracy gates;
+- do not promote E4B, 12B, 26B or 31B to final local runtime without proof under the official envelope;
+- prefer short context and short output budgets for local inference.
+
+Detailed strategy: [`docs/GEMMA_SMALL_LOCAL_STRATEGY.md`](./GEMMA_SMALL_LOCAL_STRATEGY.md).
+
 ## Where Gemma Still Fits
 
-Gemma remains strategically important, but there are three separate lanes:
+Gemma remains strategically important, but there are four separate lanes:
 
 1. Fireworks allowed lane: use Gemma directly if a Gemma model or deployment ID appears in `ALLOWED_MODELS` and works through `FIREWORKS_BASE_URL`.
 2. AMD development lane: use the GPU pod to benchmark Gemma, design prompts, create calibration data, test verifier rubrics and produce the Best Use of Gemma story.
-3. Fine-tuning / distillation lane: fine-tune or distill behavior only if the output path remains compatible with `ALLOWED_MODELS` or produces a compact final component that fits the official environment.
+3. Small local lane: test Gemma E2B-class 4-bit inference inside the final CPU/RAM envelope.
+4. Fine-tuning / distillation lane: fine-tune or distill behavior only if the output path remains compatible with `ALLOWED_MODELS` or produces a compact final component that fits the official environment.
 
 Do not assume that a Fireworks Model Library page marked `Deploy on Demand` is automatically valid for Track 1 scoring. A dedicated deployment can be useful for experiments, but the final route must still comply with `FIREWORKS_BASE_URL` and `ALLOWED_MODELS`.
 
@@ -119,7 +135,7 @@ final Docker image as bundled local weights
 ## Current Decision
 
 - Keep Docker default as `ROUTER_MODE=fireworks`.
-- Keep `ROUTER_MODE=hybrid` for lab work and only promote it if a compact local model passes the final envelope.
+- Keep `ROUTER_MODE=hybrid` for lab work and promote it only if a compact local model, ideally small Gemma, passes the final envelope.
 - Keep Gemma support in routing logic, tags, docs and calibration.
 - Do not create or depend on an on-demand Gemma deployment in the final judged path unless organizers confirm it appears in `ALLOWED_MODELS` and is counted correctly.
 - Reframe deterministic solvers as mechanical validators and not the heart of the agent.
@@ -128,6 +144,6 @@ final Docker image as bundled local weights
 
 - Calibrate the Fireworks router against the actual `ALLOWED_MODELS` injected by the harness.
 - Test Gemma access through the official `FIREWORKS_BASE_URL` when available.
-- Explore a tiny local semantic triage/verifier only if it can fit `4 GB` RAM and improves token count without harming accuracy.
+- Explore small Gemma as a local semantic triage/verifier only if it can fit `4 GB` RAM and improves token count without harming accuracy.
 - Update pitch materials to emphasize general-purpose routing, Gemma readiness and Fireworks model selection.
 - Keep every final submission path reproducible without private `.env` files or hardcoded model IDs.

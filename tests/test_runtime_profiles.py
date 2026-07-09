@@ -39,6 +39,8 @@ class RuntimeProfileTests(unittest.TestCase):
                     "COMPETITION_DRY_RUN=0\n"
                     "LOCAL_BASE_URL=http://127.0.0.1:8000/v1\n"
                     "LOCAL_MODEL=local-gemma\n"
+                    "LOCAL_CONTEXT_TOKENS=2048\n"
+                    "LOCAL_MEMORY_BUDGET_MB=3400\n"
                     "FIREWORKS_BASE_URL=https://api.fireworks.ai/inference/v1\n"
                     "FIREWORKS_MODEL=accounts/fireworks/models/replace-me\n"
                     "FIREWORKS_API_KEY=\n"
@@ -47,6 +49,8 @@ class RuntimeProfileTests(unittest.TestCase):
                     "SGLANG_MODEL=local-gemma\n"
                     "SGLANG_PORT=30000\n"
                     "GEMMA_MODEL_FAMILY=Gemma\n"
+                    "GEMMA_MODEL_SIZE=E2B\n"
+                    "GEMMA_QUANTIZATION=qat-q4_0\n"
                     "GEMMA_PROMPT_FORMAT=gemma4\n",
                     encoding="utf-8",
                 )
