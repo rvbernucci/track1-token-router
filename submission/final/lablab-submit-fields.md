@@ -51,25 +51,25 @@ Local MP4 included in repository: submission/final/demo.mp4
 
 ## Public Docker Image
 
-ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0918
+ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0939
 
 ## Release Evidence
 
-- release_tag: `offline-rc-20260709-0918`
-- commit_sha: `5541d79bf14b151b4f2de88ad10184a022b63266`
+- release_tag: `offline-rc-20260709-0939`
+- commit_sha: `f3bcd297b8200991fe5f1d7988816c0e995a6709`
 - ci_status: `green`
 - release_status: `green`
 - image_audit_status: `green`
 - image_platform: `linux/amd64`
-- image_compressed_size_bytes: `44953687`
+- image_compressed_size_bytes: `44957895`
 
 ## Image Audit Command
 
 ```bash
 python3 scripts/competition_submission_audit.py \
-  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0918 \
-  --expected-revision 5541d79bf14b151b4f2de88ad10184a022b63266 \
-  --expected-version offline-rc-20260709-0918
+  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0939 \
+  --expected-revision f3bcd297b8200991fe5f1d7988816c0e995a6709 \
+  --expected-version offline-rc-20260709-0939
 ```
 
 ## Notes
