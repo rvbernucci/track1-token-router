@@ -37,6 +37,8 @@ class SolverPackTests(unittest.TestCase):
             "What is 6 * 7? Return only the number.": "42",
             "Calculate 18 / 3": "6",
             "Compute 10 - 12": "-2",
+            "Compute 17 * 6 + 4. Return only the number.": "106",
+            "Evaluate (8 + 4) / 3. Return only the number.": "4",
             "8 + 9": "17",
         }
         for prompt, answer in cases.items():
@@ -108,6 +110,9 @@ class SolverPackTests(unittest.TestCase):
                 "email": "ops@example.com",
                 "url": "https://example.com/help",
             },
+            "Extract the names from this sentence as minified JSON with key names: Ana met Bruno in Recife.": {
+                "names": ["Ana", "Bruno"],
+            },
         }
         for prompt, expected in cases.items():
             with self.subTest(prompt=prompt):
@@ -130,6 +135,8 @@ class SolverPackTests(unittest.TestCase):
             "Ava is taller than Bea. Bea is taller than Cora. Who is the shortest? Return only the name.": "Cora",
             "Ava is taller than Bea. Bea is taller than Cora. Who is the tallest? Return only the name.": "Ava",
             "If the alarm is armed, the door locks. The alarm is armed. Is the door locked? Return exactly yes or no.": "yes",
+            "All merls are tivas. Some tivas are roons. Is it guaranteed that some merls are roons? Return exactly yes or no.": "no",
+            "All daxes are wugs. No wugs are plims. Can a daxes be a plims? Return exactly yes or no.": "no",
         }
         for prompt, answer in cases.items():
             with self.subTest(prompt=prompt):
@@ -149,6 +156,14 @@ class SolverPackTests(unittest.TestCase):
 
     def test_solves_safe_python_debug_templates(self) -> None:
         cases = {
+            "Fix this Python code so it returns the sum. Return only corrected Python code: def add(a, b):\n    return a - b": {
+                "type": "python_function_cases",
+                "function_name": "add",
+                "cases": [
+                    {"args": [2, 3], "expected": 5},
+                    {"args": [-4, 10], "expected": 6},
+                ],
+            },
             "Return only corrected Python code. Debug this function so it checks every item: def first_even(nums):\n    for i in range(1, len(nums)):\n        if nums[i] % 2 == 0:\n            return nums[i]\n    return None": {
                 "type": "python_function_cases",
                 "function_name": "first_even",
@@ -177,6 +192,14 @@ class SolverPackTests(unittest.TestCase):
 
     def test_solves_safe_python_generation_templates(self) -> None:
         cases = {
+            "Write a Python function add(a, b) that returns the sum. Return only Python code.": {
+                "type": "python_function_cases",
+                "function_name": "add",
+                "cases": [
+                    {"args": [2, 3], "expected": 5},
+                    {"args": [-4, 10], "expected": 6},
+                ],
+            },
             "Return only Python code. Define a function clamp(value, low, high) that returns value bounded inclusively between low and high.": {
                 "type": "python_function_cases",
                 "function_name": "clamp",
@@ -239,6 +262,14 @@ class SolverPackTests(unittest.TestCase):
             result = solve_deterministic(TaskEnvelope(input_text=prompt))
             self.assertIsNotNone(result)
             self.assertEqual(result.answer, answer)
+
+    def test_solves_json_minmax(self) -> None:
+        result = solve_deterministic(
+            TaskEnvelope(input_text="Return only minified JSON. Given values [17, 4, 23, 9], return min and max.")
+        )
+
+        self.assertIsNotNone(result)
+        self.assertEqual(json.loads(result.answer), {"min": 4, "max": 23})
 
     def test_solves_counts_and_text_transforms(self) -> None:
         cases = {

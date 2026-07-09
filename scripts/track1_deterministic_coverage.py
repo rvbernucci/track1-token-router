@@ -20,6 +20,7 @@ from scripts.fireworks_microbench import _load_tasks, _validate
 DEFAULT_DATASETS = (
     Path("evals/fireworks-pareto/track1-category-microbench.jsonl"),
     Path("evals/fireworks-pareto/championship-microbench.jsonl"),
+    Path("evals/fireworks-pareto/hidden-variant-microbench.jsonl"),
 )
 DEFAULT_REPORT = Path("reports/generated/track1-deterministic-coverage.md")
 
