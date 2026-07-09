@@ -244,12 +244,18 @@ def _task_tier(prompt: str) -> tuple[str, str]:
         return "strong", "code_task_requires_stronger_model"
     if _looks_like_syllogism(lowered):
         return "strong", "deductive_reasoning_requires_stronger_model"
+    if _looks_like_ordering_logic(lowered) or _looks_like_modus_ponens(lowered):
+        return "strong", "deductive_reasoning_requires_stronger_model"
     if _has_any(lowered, ["logical", "deductive", "constraint", "puzzle", "all conditions", "prove"]):
         return "strong", "deductive_reasoning_requires_stronger_model"
-    if _has_any(lowered, ["multi-step", "word problem", "projection", "percentage", "percent", "rate", "average", "reasoning"]):
+    if _looks_like_quantitative_word_problem(lowered):
         return "strong", "multi_step_reasoning_requires_stronger_model"
-    if _has_any(lowered, ["current", "latest", "today", "now", "price", "ceo", "version"]):
+    if _has_any_keyword(lowered, ["multi-step", "word problem", "projection", "percentage", "percent", "rate", "average", "reasoning"]):
+        return "strong", "multi_step_reasoning_requires_stronger_model"
+    if _has_any_keyword(lowered, ["current", "latest", "today", "now", "price", "ceo", "version"]):
         return "strong", "time_sensitive_factuality_requires_stronger_model"
+    if _looks_like_factual_question(lowered):
+        return "medium", "language_extraction_or_factual_task"
     if _has_any(lowered, ["summaris", "summariz", "named entity", "extract", "entity", "entities", "factual", "explain", "definition"]):
         return "medium", "language_extraction_or_factual_task"
     if _has_any(lowered, ["sentiment", "classify", "label", "positive", "negative", "neutral"]):
@@ -267,11 +273,17 @@ def _task_domain(prompt: str) -> str:
         return "code_generation"
     if _looks_like_syllogism(lowered):
         return "logic"
+    if _looks_like_ordering_logic(lowered) or _looks_like_modus_ponens(lowered):
+        return "logic"
     if _has_any(lowered, ["logical", "deductive", "constraint", "puzzle", "prove"]):
         return "logic"
-    if _has_any(lowered, ["multi-step", "word problem", "percentage", "percent", "rate", "average", "reasoning"]):
+    if _looks_like_quantitative_word_problem(lowered):
         return "math_reasoning"
-    if _has_any(lowered, ["current", "latest", "today", "now", "price", "ceo", "version"]):
+    if _has_any_keyword(lowered, ["multi-step", "word problem", "percentage", "percent", "rate", "average", "reasoning"]):
+        return "math_reasoning"
+    if _has_any_keyword(lowered, ["current", "latest", "today", "now", "price", "ceo", "version"]):
+        return "current_factual"
+    if _looks_like_factual_question(lowered):
         return "current_factual"
     if _has_any(lowered, ["summaris", "summariz"]):
         return "summarization"
@@ -286,6 +298,26 @@ def _task_domain(prompt: str) -> str:
 
 def _looks_like_syllogism(lowered_prompt: str) -> bool:
     return "all " in lowered_prompt and " no " in f" {lowered_prompt} " and "can " in lowered_prompt
+
+
+def _looks_like_ordering_logic(lowered_prompt: str) -> bool:
+    ordering_targets = ["shortest", "tallest", "smallest", "largest", "youngest", "oldest", "lightest", "heaviest"]
+    ordering_relations = ["taller than", "shorter than", "older than", "younger than", "heavier than", "lighter than"]
+    return _has_any(lowered_prompt, ordering_targets) and _has_any(lowered_prompt, ordering_relations)
+
+
+def _looks_like_modus_ponens(lowered_prompt: str) -> bool:
+    if re.search(r"\bhow\s+(many|much)\b|\d", lowered_prompt):
+        return False
+    return bool(re.search(r"\bif\b.+\bthen\b", lowered_prompt) or (re.search(r"\bif\b.+,", lowered_prompt) and "." in lowered_prompt))
+
+
+def _looks_like_quantitative_word_problem(lowered_prompt: str) -> bool:
+    return bool(re.search(r"\d", lowered_prompt) and re.search(r"\bhow\s+(many|much)\b", lowered_prompt))
+
+
+def _looks_like_factual_question(lowered_prompt: str) -> bool:
+    return bool(re.search(r"^\s*(who|what|which|when|where)\b", lowered_prompt))
 
 
 def _model_cost_score(model: str) -> tuple[float, str]:
@@ -321,6 +353,17 @@ def _extract_parameter_billions(model: str) -> float | None:
 
 def _has_any(value: str, needles: list[str]) -> bool:
     return any(needle in value for needle in needles)
+
+
+def _has_any_keyword(value: str, needles: list[str]) -> bool:
+    return any(_has_keyword(value, needle) for needle in needles)
+
+
+def _has_keyword(value: str, needle: str) -> bool:
+    escaped = re.escape(needle)
+    if " " in needle or "-" in needle:
+        return bool(re.search(rf"(?<![a-z0-9]){escaped}(?![a-z0-9])", value))
+    return bool(re.search(rf"\b{escaped}\b", value))
 
 
 def _build_candidates(models: list[str], task: _TaskProfile) -> list[FireworksCandidate]:

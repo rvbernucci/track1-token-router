@@ -129,6 +129,61 @@ class FireworksModelRouterTests(unittest.TestCase):
         self.assertEqual(selection.tier, "cheap")
         self.assertEqual(selection.domain, "formatting")
 
+    def test_known_does_not_trigger_now_keyword(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(input_text="Which planet is known as the Red Planet? Return only the planet name."),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertEqual(selection.tier, "medium")
+        self.assertEqual(selection.domain, "current_factual")
+
+    def test_accurate_does_not_trigger_rate_keyword(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(
+                input_text=(
+                    "Summarize in at most 7 words: "
+                    "A routing agent should choose the cheapest accurate model for each task."
+                )
+            ),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertEqual(selection.tier, "medium")
+        self.assertEqual(selection.domain, "summarization")
+
+    def test_ordering_logic_with_return_only_is_logic_domain(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(input_text="Ava is taller than Bea. Bea is taller than Cora. Who is the shortest? Return only the name."),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertEqual(selection.tier, "strong")
+        self.assertEqual(selection.domain, "logic")
+
+    def test_modus_ponens_with_return_exactly_is_logic_domain(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(input_text="If the alarm is armed, the door locks. The alarm is armed. Return exactly yes or no."),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertEqual(selection.tier, "strong")
+        self.assertEqual(selection.domain, "logic")
+
+    def test_if_word_problem_with_numbers_stays_math_reasoning(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(
+                input_text=(
+                    "If 3 identical machines produce 18 widgets per hour, "
+                    "how many widgets per hour do 2 machines produce? Return only the number."
+                )
+            ),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertEqual(selection.tier, "strong")
+        self.assertEqual(selection.domain, "math_reasoning")
+
     def test_define_function_is_code_generation_domain(self) -> None:
         selection = select_fireworks_model(
             TaskEnvelope(input_text="Return only Python code. Define a function is_palindrome(text)."),
