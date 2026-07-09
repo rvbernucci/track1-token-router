@@ -111,9 +111,9 @@ Replay atual:
 | --- | --- |
 | `factual_author` | `kimi-k2p7-code` |
 | `summarization_tokens` | `kimi-k2p7-code` |
-| `debug_first_even` | `minimax-m3` |
-| `debug_is_adult` | `minimax-m3` |
-| `code_gen_clamp` | `minimax-m3` |
+| `debug_first_even` | `kimi-k2p7-code` |
+| `debug_is_adult` | `kimi-k2p7-code` |
+| `code_gen_clamp` | `kimi-k2p7-code` |
 | `math_discount_fee` | `minimax-m3` |
 | `ner_money_date` | `minimax-m3` |
 | `sentiment_positive` | `kimi-k2p7-code` |
@@ -122,8 +122,8 @@ Replay atual:
 
 A regressao confirmou alguns sinais fortes:
 
-- `minimax-m3` continua forte em math, logic, code generation, code debugging e extraction quando o score calibrado favorece robustez/custo;
-- `kimi-k2p7-code` deve vencer em factual QA, summarization e classificacoes curtas quando ambos passam, porque os resultados pagos observaram menor `usage.total` e respostas mais concisas nesses dominios;
+- `kimi-k2p7-code` deve vencer quando a validade observada e comparavel e o `usage.total` observado por dominio/modelo e menor, especialmente em respostas curtas de language, formatting, logic e code;
+- `minimax-m3` continua forte como fallback de robustez, especialmente em extraction e em math mais composto, onde o score calibrado ainda pode superar a economia de tokens;
 - Gemma serverless segue indisponivel na chave local, entao o runner precisa tentar, cachear 404 e seguir sem travar;
 - interacoes familia x dominio sao necessarias, porque uma media global por modelo esconde especializacoes.
 
@@ -133,19 +133,19 @@ O dataset ainda e pequeno, mas a regressao agora esta ativa como camada de calib
 
 Principal lacuna:
 
-- a estimativa runtime de tokens ainda e aproximada por perfil, apesar de agora haver stats reais por dominio/modelo;
+- a estimativa runtime de tokens ja mistura perfil teorico com `avg_total_tokens` observado por dominio/modelo, ponderado pela confianca da amostra;
 - o microbench frontier mostrou que verbosidade real varia por familia e por formato de pergunta;
-- proximo passo e regressao dedicada de `observed_completion_tokens` por modelo/dominio/modo de reasoning.
+- proximo passo e separar `prompt_tokens` e `completion_tokens` quando o provedor retornar esses campos de forma estavel, para calibrar melhor respostas longas.
 
 ## Proximo Passo
 
-Implementar uma segunda regressao:
+Implementar uma segunda regressao quando houver amostra suficiente:
 
 ```text
 predicted_completion_tokens = f(model_family, domain, tier, reasoning_mode)
 ```
 
-Com isso, o Pareto deixa de usar apenas preco oficial e passa a estimar custo real esperado:
+Com isso, o Pareto deixa de usar apenas `avg_total_tokens` observado e passa a estimar custo real esperado por componente:
 
 ```text
 expected_cost =

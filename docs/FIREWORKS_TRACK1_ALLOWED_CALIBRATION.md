@@ -52,7 +52,7 @@ Total aggregated historical result spend in the leaderboard is `$0.04465962`.
 - `minimax-m3` is the current cheapest high-accuracy Fireworks fallback among accessible Track 1 allowed models.
 - `kimi-k2p7-code` is more expensive and slower, but it was the only accessible model with `16/16` valid answers in this run.
 - Frontier rerun with 28 focused calls passed `27/28`; `kimi-k2p7-code` passed `14/14` with `1397` tokens, while `minimax-m3` passed `13/14` with `2846` tokens.
-- Domain policy changed again after frontier: `kimi-k2p7-code` is preferred for factual QA, summarization, classification and compact formatting; `minimax-m3` remains preferred for math, logic, code generation, code debugging and extraction unless future calibration says otherwise.
+- Domain policy changed again after observed-token calibration: `kimi-k2p7-code` is preferred whenever observed validity is comparable and domain/model `usage.total` is lower, including current short math, logic and code probes; `minimax-m3` remains a competitive fallback where empirical risk or composed-math robustness outweighs token savings.
 - Hidden-variant rerun: both accessible models passed `8/8`; `minimax-m3` cost `$0.00070650`, while `kimi-k2p7-code` cost `$0.00142610`.
 - The three Gemma serverless IDs returned `HTTP 404 Not Found` with the current local Fireworks key.
 - Gemma should remain in the architecture through AMD local inference and should still be attempted when the official harness exposes it, but repeated 404s should be cached and skipped within a batch.
@@ -66,9 +66,10 @@ After tightening the `ner_money_date` prompt to require date and amount exactly 
 - In Fireworks-only mode, the Docker image now enables `FIREWORKS_MATRIX_WEIGHTS=/app/router/data/fireworks_track1_allowed_weights.json` by default.
 - The checked-in matrix weights now use `104` completed, deduplicated, observed Track 1 rows from category, hidden-variant, championship, and frontier result files.
 - Transport/access failures such as Gemma `404` are excluded from quality fitting by default. The weights record `observed_models`, and the matrix selector filters unobserved allowed models when observed alternatives exist.
-- The matrix selector uses ridge-regression utility plus Nash welfare, explicit token-efficiency utility, and smoothed empirical validity by domain/model because Track 1 ranks by Fireworks token count after the accuracy gate.
-- Keep `minimax-m3` as the preferred remote candidate for math, code, and logic domains where the calibrated score still favors robustness/cost balance.
-- Prefer `kimi-k2p7-code` for factual QA, summarization, classification and compact formatting when both observed models are valid, because the paid microbenches showed lower `usage.total` and concise outputs in those domains.
+- The matrix selector uses ridge-regression utility plus Nash welfare, predicted token-efficiency utility, and smoothed empirical validity by domain/model because Track 1 ranks by Fireworks token count after the accuracy gate.
+- The runtime token utility now blends static profile estimates with observed `avg_total_tokens` by domain/model, weighted by sample confidence.
+- Prefer `kimi-k2p7-code` when both observed models are valid and Kimi's predicted Fireworks token use is materially lower, including the current short math, logic, code, factual QA, summarization, classification and compact-formatting probes.
+- Keep `minimax-m3` as the preferred remote fallback where empirical validity, extraction behavior, composed math, or future hidden-evaluator data shows higher robustness than Kimi.
 - Keep Gemma IDs in `ALLOWED_MODELS` support, but cache unavailable-model errors per runner instance so one inaccessible Gemma endpoint does not cause repeated latency across the whole evaluator batch.
 
 ## Classifier Hardening
@@ -77,8 +78,8 @@ The pre-routing classifier now treats common hidden-evaluator variants as their 
 
 - direct arithmetic prompts such as `Compute 17 * 6 + 4` map to `math_reasoning` instead of `formatting`;
 - numeric JSON prompts such as `Given values [...], return min and max` map to `math_reasoning` even when they request minified JSON;
-- `Fix this Python code...` maps to `code_debug`, preserving the calibrated Minimax preference;
-- `Write a Python function...` maps to `code_generation`, preserving the calibrated Minimax preference.
+- `Fix this Python code...` maps to `code_debug`, preserving the calibrated domain feature before observed-token scoring;
+- `Write a Python function...` maps to `code_generation`, preserving the calibrated domain feature before observed-token scoring.
 - quantified logic prompts such as `All merls are... Is it guaranteed... Return exactly yes or no` map to `logic` instead of `formatting`.
 
 This does not answer tasks by regex. It only prevents format words like `Return only` or `JSON` from polluting the model-selection feature vector.

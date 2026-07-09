@@ -158,20 +158,26 @@ def select_model_by_matrix_regression(
         if candidate.capability >= task_profile.required_capability
     ]
     pool = eligible or chat_candidates
-    scored = []
+    prepared = []
     for candidate in pool:
+        empirical = _empirical_stats_for(weights, task_profile.domain, candidate.model)
+        predicted_total_tokens = _predicted_total_tokens(candidate.estimated_total_tokens, empirical)
+        prepared.append((candidate, empirical, predicted_total_tokens))
+    token_bounds = _bounds(predicted_total_tokens for _, _, predicted_total_tokens in prepared)
+    scored = []
+    for candidate, empirical, predicted_total_tokens in prepared:
         reasoning_effort = select_reasoning_effort(candidate.model, task_profile.tier)
         features = _feature_vector(candidate, task_profile.tier, task_profile.domain, reasoning_effort)
         regression_score = weights.predict(features)
         regression_utility = _clamp(regression_score, 0.0, 1.0)
         score_weights = _hybrid_score_weights(task_profile.tier)
-        empirical = _empirical_stats_for(weights, task_profile.domain, candidate.model)
         empirical_utility = empirical["valid_rate_smoothed"]
         empirical_confidence = empirical["confidence"]
+        predicted_token_utility = _inverse_range(predicted_total_tokens, *token_bounds)
         base_hybrid_score = (
             (score_weights["regression"] * regression_utility)
             + (score_weights["nash"] * candidate.nash_product)
-            + (score_weights["token"] * candidate.token_utility)
+            + (score_weights["token"] * predicted_token_utility)
             + (score_weights["cost"] * candidate.cost_utility)
         )
         hybrid_score = _risk_adjusted_score(base_hybrid_score, empirical_utility, empirical_confidence)
@@ -186,11 +192,14 @@ def select_model_by_matrix_regression(
                 "nash_product": candidate.nash_product,
                 "estimated_total_tokens": candidate.estimated_total_tokens,
                 "token_utility": candidate.token_utility,
+                "predicted_total_tokens": predicted_total_tokens,
+                "predicted_token_utility": predicted_token_utility,
                 "estimated_cost_usd": candidate.estimated_cost_usd,
                 "empirical_valid_rate": empirical["valid_rate"],
                 "empirical_valid_rate_smoothed": empirical_utility,
                 "empirical_confidence": empirical_confidence,
                 "empirical_calls": empirical["calls"],
+                "empirical_avg_total_tokens": empirical["avg_total_tokens"],
                 "features": dict(zip(FEATURE_NAMES, features)),
             }
         )
@@ -474,6 +483,14 @@ def _risk_adjusted_score(base_score: float, empirical_utility: float, empirical_
     reward = 0.08 * confidence * max(0.0, utility - 0.90)
     penalty = 0.18 * confidence * max(0.0, 0.92 - utility)
     return base_score + reward - penalty
+
+
+def _predicted_total_tokens(estimated_total_tokens: int, empirical: dict[str, float]) -> float:
+    observed = float(empirical.get("avg_total_tokens") or 0.0)
+    confidence = _clamp(float(empirical.get("confidence") or 0.0), 0.0, 1.0)
+    if observed <= 0.0 or confidence <= 0.0:
+        return float(estimated_total_tokens)
+    return max(1.0, ((1.0 - confidence) * float(estimated_total_tokens)) + (confidence * observed))
 
 
 def _coerce_domain_model_stats(value: object) -> dict[str, dict[str, dict[str, float]]] | None:

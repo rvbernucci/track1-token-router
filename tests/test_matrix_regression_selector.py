@@ -243,6 +243,51 @@ class MatrixRegressionSelectorTests(unittest.TestCase):
         )
         self.assertEqual(selection["ranked_candidates"][0]["empirical_calls"], 12.0)
 
+    def test_empirical_token_prediction_overrides_static_token_profile(self) -> None:
+        weights = MatrixRegressionWeights(
+            feature_names=FEATURE_NAMES,
+            coefficients=[0.0 for _ in FEATURE_NAMES],
+            ridge_lambda=0.35,
+            training_rows=40,
+            target_mean=0.95,
+            observed_models=[
+                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
+            ],
+            domain_model_stats={
+                "classification": {
+                    "accounts/fireworks/models/minimax-m3": {
+                        "calls": 20.0,
+                        "valid": 20.0,
+                        "valid_rate": 1.0,
+                        "valid_rate_smoothed": 0.99,
+                        "confidence": 0.83,
+                        "avg_total_tokens": 35.0,
+                    },
+                    "accounts/fireworks/models/kimi-k2p7-code": {
+                        "calls": 20.0,
+                        "valid": 20.0,
+                        "valid_rate": 1.0,
+                        "valid_rate_smoothed": 0.99,
+                        "confidence": 0.83,
+                        "avg_total_tokens": 400.0,
+                    },
+                }
+            },
+        )
+
+        selection = select_model_by_matrix_regression(
+            TaskEnvelope(input_text="Classify the sentiment as positive, neutral, or negative. Text: Great."),
+            ["minimax-m3", "kimi-k2p7-code"],
+            weights,
+        )
+        ranked = selection["ranked_candidates"]
+
+        self.assertEqual(selection["model"], "accounts/fireworks/models/minimax-m3")
+        self.assertGreater(ranked[0]["predicted_token_utility"], ranked[1]["predicted_token_utility"])
+        self.assertLess(ranked[0]["token_utility"], ranked[1]["token_utility"])
+        self.assertGreater(ranked[1]["predicted_total_tokens"], ranked[0]["predicted_total_tokens"])
+
 
 def _row(task_id: str, model: str, valid: bool, cost: float, latency_ms: int, *, tokens: int = 100) -> dict[str, object]:
     return {
@@ -307,27 +352,27 @@ class CheckedInTrack1WeightsTests(unittest.TestCase):
             (
                 "Compute 17 * 6 + 4. Return only the number.",
                 "math_reasoning",
-                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
             ),
             (
                 "Return only minified JSON. Given values [17, 4, 23, 9], return min and max.",
                 "math_reasoning",
-                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
             ),
             (
                 "Fix this Python code: def add(a, b): return a - b",
                 "code_debug",
-                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
             ),
             (
                 "Write a Python function add(a, b) that returns the sum.",
                 "code_generation",
-                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
             ),
             (
                 "All merls are tivas. Some tivas are roons. Is it guaranteed that some merls are roons? Return exactly yes or no.",
                 "logic",
-                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
             ),
         ]
 
@@ -337,6 +382,8 @@ class CheckedInTrack1WeightsTests(unittest.TestCase):
 
                 self.assertEqual(selection["domain"], expected_domain)
                 self.assertEqual(selection["model"], expected_model)
+                self.assertIn("predicted_total_tokens", selection["ranked_candidates"][0])
+                self.assertIn("predicted_token_utility", selection["ranked_candidates"][0])
 
     def test_dockerfile_enables_checked_in_track1_weights(self) -> None:
         dockerfile = Path("Dockerfile").read_text(encoding="utf-8")
