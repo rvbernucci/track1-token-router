@@ -75,6 +75,14 @@ python3 -m router submit-track1 \
   --output reports/generated/official-smoke-results.json
 ```
 
+Leitura atual do Participant Guide:
+
+- Track 1 e um agente general-purpose em 8 categorias: factual, matematica, sentimento, resumo, NER, debug de codigo, logica e geracao de codigo.
+- O container final roda em ambiente padronizado de `4 GB` RAM e `2 vCPU`.
+- Modelos locais contam para accuracy e usam zero Fireworks tokens, mas precisam caber nesse envelope; o guia chama `2B-3B` 4-bit de seguro e alerta que `7B` 4-bit pode consumir quase toda a RAM.
+- Gemma 26B/31B e uma trilha forte para AMD pod, calibracao, demo, fine-tuning e uso via Fireworks quando aparecer em `ALLOWED_MODELS`, mas nao deve ser presumido como modelo local dentro da imagem final.
+- O Docker default fica `ROUTER_MODE=fireworks` para respeitar `FIREWORKS_BASE_URL` e `ALLOWED_MODELS`; `ROUTER_MODE=hybrid` so vira candidato final se um modelo local compacto for provado no mesmo envelope.
+
 ## Pastas
 
 | Pasta | Papel |
@@ -89,6 +97,7 @@ python3 -m router submit-track1 \
 | [`docs/COMPETITION_GAP_ANALYSIS.md`](./docs/COMPETITION_GAP_ANALYSIS.md) | Lacunas restantes sem credito e trilha de Sprints 22-26. |
 | [`docs/NEXT_NO_CREDIT_IMPROVEMENTS.md`](./docs/NEXT_NO_CREDIT_IMPROVEMENTS.md) | Terceira onda sem credito: deploy publico, caos de modelo local, validacao semantica, batch stress e redaction. |
 | [`docs/NO_CREDIT_WAVE_3_PLAN.md`](./docs/NO_CREDIT_WAVE_3_PLAN.md) | Plano executivo das Sprints 32-36, com dependencias, gates e anti-escopo. |
+| [`docs/TRACK1_FINAL_ENVIRONMENT_STRATEGY.md`](./docs/TRACK1_FINAL_ENVIRONMENT_STRATEGY.md) | Correcao operacional do guia atual: Docker final `4 GB`/`2 vCPU`, Gemma grande via Fireworks/pod, e validadores como camada de seguranca. |
 
 ## Roadmap atual
 
@@ -135,12 +144,12 @@ Detalhes em [`sprints`](./sprints/README.md).
 
 ```text
 TaskEnvelope
--> Modelo 1 local sem reasoning gera resposta livre
--> Modelo 2A local com reasoning valida em JSON pequeno
--> se approve: entrega resposta do Modelo 1
--> se escalate: Modelo 2B local com reasoning gera alternativa livre
--> Fireworks audita alternativa em approve-or-replace
--> resposta final limpa
+-> validadores mecanicos seguros protegem formato, contas simples e schema
+-> se houver modelo local compacto aprovado: M1 gera resposta livre
+-> M2A valida em JSON pequeno
+-> se approve: entrega resposta local
+-> se escalate ou sem local compacto: Fireworks escolhe menor modelo suficiente em ALLOWED_MODELS
+-> resposta final limpa em /output/results.json
 ```
 
 ## CLI alvo
@@ -244,6 +253,8 @@ Nesse modo, Fireworks so e chamado quando o M2A escala a tarefa.
 
 No Track 1 atual, esse e o modo campeonato quando ha um modelo local confiavel: respostas locais corretas contam para accuracy e usam zero Fireworks tokens. Se nao houver endpoint local estavel no ambiente final, use `ROUTER_MODE=fireworks`.
 
+Nota importante: o guia atual informa que o ambiente final tem `4 GB` RAM e `2 vCPU`. Portanto, neste projeto `hybrid` nao significa empacotar Gemma 26B/31B dentro do Docker final; significa usar um modelo compacto provado no envelope oficial, ou um endpoint local explicitamente fornecido pelo avaliador.
+
 ## Modo oficial Fireworks direto
 
 ```bash
@@ -254,7 +265,7 @@ ALLOWED_MODELS=accounts/fireworks/models/... \
 python3 -m router submit-track1 --input /input/tasks.json --output /output/results.json
 ```
 
-Esse modo implementa o contrato oficial ACT II: le `/input/tasks.json`, escreve `/output/results.json`, usa solvers deterministicos antes de Fireworks e escolhe entre modelos de `ALLOWED_MODELS` por tier de tarefa.
+Esse modo implementa o contrato oficial ACT II: le `/input/tasks.json`, escreve `/output/results.json`, usa validadores mecanicos conservadores antes de Fireworks e escolhe entre modelos de `ALLOWED_MODELS` por tier de tarefa. Esses validadores existem para proteger schema, formato e casos mecanicos seguros; a inteligencia general-purpose continua no roteamento e nos modelos permitidos.
 
 No Docker de submissao, `FIREWORKS_MATRIX_WEIGHTS` ja aponta para `router/data/fireworks_track1_allowed_weights.json`, treinado com microbench real dos modelos permitidos Track 1 em 2026-07-09. A politica atual combina regressao ridge, Nash welfare, eficiencia de tokens, tokens observados por dominio/estrutura/modelo e risco empirico: `kimi-k2p7-code` vence quando sua validade observada e comparavel e ele economiza tokens; `minimax-m3` vence quando robustez empirica supera a economia, especialmente em escapes de codigo, extracao e sentimento misto. O runtime tambem aplica um completion budget por formato esperado: yes/no, numero e literal recebem caps curtos; JSON, resumo e codigo mantem folga maior. Se a primeira resposta Fireworks falhar validacao mecanica e nao puder ser reparada, o runner tenta o proximo candidato ranqueado e soma os tokens das tentativas, protegendo o accuracy gate sem esconder custo.
 

@@ -2,7 +2,7 @@
 
 ## Slide 1 - Title
 
-Track 1 Token Router: Local-first accuracy with selective remote audit.
+Track 1 Token Router: General-purpose accuracy with token-efficient Fireworks routing.
 
 ## Slide 2 - Challenge
 
@@ -14,7 +14,7 @@ Do not route everything to the strongest model. Route only when risk signals jus
 
 ## Slide 4 - Architecture
 
-Guardrails and solvers first, then M1 local generation, M2A local verification, M2B local repair and Fireworks approve-or-replace audit.
+Mechanical validators protect schema and high-confidence cases, then the router selects the cheapest sufficient Fireworks/Gemma-capable path for each task.
 
 ## Slide 5 - Competition Mode
 
@@ -26,15 +26,15 @@ Fuzz pack, battle drill, scoring simulator, Docker, CI, secret scan and runtime 
 
 ## Slide 7 - AMD/Fireworks Activation
 
-Runtime profiles are ready for AMD/DigitalOcean MI300X with vLLM or SGLang, Gemma local models and Fireworks serverless audit.
+Runtime profiles are ready for AMD/Gemma development and Fireworks calibration, while the submitted Docker image stays compatible with the official CPU/RAM grading envelope.
 
 ## Slide 8 - Demo
 
-Show CLI `ask`, JSON output, route trace, zero remote tokens for solver path and battle drill readiness.
+Show CLI `ask`, JSON output, route trace, model selection and battle drill readiness.
 
 ## Slide 9 - Why It Can Win
 
-Mechanical tasks avoid models, easy tasks stay local, risky tasks escalate with compact remote packets.
+The router avoids unnecessary token spend, keeps prompts compact and escalates only when the expected accuracy gain justifies the Fireworks cost.
 
 ## Slide 10 - Remaining Kickoff Work
 

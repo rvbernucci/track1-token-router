@@ -2,11 +2,11 @@
 
 Last checked: 2026-07-09
 
-Source of truth: <https://lablab.ai/ai-hackathons/amd-developer-hackathon-act-ii>
+Source of truth: <https://lablab.ai/ai-hackathons/amd-developer-hackathon-act-ii> and the latest attached Track 1 participant guide excerpt.
 
 ## Track Choice
 
-We are targeting Track 1: Hybrid Token-Efficient Routing Agent.
+We are targeting Track 1: General-Purpose AI Agent / Hybrid Token-Efficient Routing Agent.
 
 Official objective:
 
@@ -22,6 +22,10 @@ Official objective:
 - Only tokens routed through `FIREWORKS_BASE_URL` count toward the token score.
 - Local inference uses zero Fireworks tokens, so local-first routing is the strongest ranking path if quality is controlled.
 - Prompt-based and fine-tuned approaches are scored the same way: token count and output accuracy.
+- Final grading resource envelope is `4 GB` RAM and `2 vCPU`.
+- A final local model must fit that envelope; the guide calls `2B-3B` 4-bit safe and warns that `7B` 4-bit can consume the whole RAM budget.
+- Gemma 26B/31B should not be assumed as a local final-container model; use it through Fireworks when allowed, or in the AMD GPU pod for development/calibration/demo.
+- Deterministic code should be framed as validation, formatting and mechanical safety around the agent, not as the primary AI capability.
 
 ## Submission Requirements
 
@@ -29,6 +33,9 @@ Official objective:
 - The GitHub repository must be public.
 - The repository must include setup and usage instructions.
 - The application must be runnable using the provided instructions.
+- The container must read `/input/tasks.json` on startup and write valid `/output/results.json` before exit.
+- The container must finish within 10 minutes and exit `0` on success.
+- The compressed image must stay below `10 GB` and include a `linux/amd64` manifest.
 - The lablab.ai submission should include title, short description, long description, tags, cover image, video presentation, slide presentation, repository URL, demo platform, and application URL when applicable.
 
 ## Access And Credits
@@ -49,8 +56,8 @@ Official objective:
 
 - `Dockerfile` provides the container entrypoint for Track 1.
 - `router submit-track1` implements the file contract used by the container default command.
-- `ROUTER_MODE=hybrid` is the championship profile when a local OpenAI-compatible model endpoint is available.
-- `ROUTER_MODE=fireworks` remains the safest fallback when no local endpoint is available.
+- `ROUTER_MODE=fireworks` is the safest official default for the current final grading envelope.
+- `ROUTER_MODE=hybrid` remains an experimental/championship profile only if a compact local model is proven under the final envelope or an official local endpoint is provided.
 - `scripts/amd_pod_doctor.py` verifies the AMD pod before model downloads.
 - `scripts/bootstrap_amd_pod.sh` validates clone-to-smoke bootstrap on the AMD notebook.
 - `FIREWORKS_MATRIX_WEIGHTS` can enable microbench-calibrated model selection for Fireworks fallback.

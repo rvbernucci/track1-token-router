@@ -4,7 +4,7 @@ Target length: 4 to 5 minutes.
 
 ## 0:00 - Hook
 
-Track 1 is not won by calling the strongest model every time. It is won by knowing when not to call it. Track 1 Token Router is a local-first routing agent that spends remote Fireworks tokens only when local confidence breaks.
+Track 1 is not won by calling the strongest model every time. It is won by knowing which model is sufficient. Track 1 Token Router is a general-purpose routing agent that spends Fireworks tokens only when the expected accuracy gain justifies the cost.
 
 ## 0:30 - Problem
 
@@ -12,11 +12,11 @@ The official evaluator can send broad tasks, strict formats and unexpected input
 
 ## 1:00 - Architecture
 
-The runner receives a `TaskEnvelope` and first checks deterministic paths: guardrails and solvers. If code can answer safely, the model is skipped. Otherwise M1 generates a local candidate. M2A verifies it locally. If confidence is high, the answer returns with zero remote tokens. If risk is high, M2B creates a local repair and Fireworks audits a compact packet in approve-or-replace mode.
+The runner receives a `TaskEnvelope` and first applies mechanical validators: schema checks, output constraints, high-confidence arithmetic and format safety. Then the router reads `ALLOWED_MODELS`, estimates category and risk, and chooses the cheapest sufficient Fireworks model. A compact local model can be added only if it fits the official `4 GB` RAM and `2 vCPU` grading envelope.
 
 ## 2:00 - Competition Mode
 
-`ROUTER_MODE=competition` integrates guardrails, deterministic solvers, risk signals, budget policy, prompt packet estimation, final validation and state traces. It runs in dry-run mode without credits, so the team can test the full path before AMD or Fireworks access is active.
+`ROUTER_MODE=competition` integrates validators, risk signals, budget policy, prompt packet estimation, final validation and state traces. It runs in dry-run mode without credits, so the team can test the full path before AMD or Fireworks access is active.
 
 ## 2:45 - Demo
 
@@ -26,7 +26,7 @@ Run:
 ROUTER_MODE=competition COMPETITION_DRY_RUN=1 python3 -m router ask "What is 6 * 7? Return only the number." --json
 ```
 
-The route is `solver_arithmetic`, answer is `42`, and remote tokens are zero. Then run the battle drill:
+The route is a mechanical arithmetic validator, answer is `42`, and remote tokens are zero. Then run the battle drill:
 
 ```bash
 scripts/battle_drill.py
@@ -40,12 +40,12 @@ Then show one readable replay:
 python3 scripts/replay_decision.py --text "Who is the CEO of AMD today?"
 ```
 
-This exposes risk signals, budget decision, policy decision and final validation. The contrast is the point: arithmetic stays deterministic, current knowledge becomes a remote-audit candidate in dry-run.
+This exposes risk signals, budget decision, policy decision and final validation. The contrast is the point: mechanical cases stay safe and cheap, while open-ended knowledge becomes a model-routing decision.
 
 ## 3:45 - Readiness
 
-The repo includes Docker, CI, offline release checks, fuzz tests, runtime profiles for AMD MI300X with vLLM or SGLang, Gemma runbooks and Fireworks activation steps. This makes credits an activation step, not a blocker.
+The repo includes Docker, CI, offline release checks, fuzz tests, Fireworks calibration, Gemma runbooks and AMD pod profiles for development. The final image remains small enough for the official CPU/RAM grading environment.
 
 ## 4:30 - Close
 
-The thesis is simple: use local intelligence by default, deterministic code when possible, and remote power only when it materially improves correctness. That is how we chase high accuracy with low remote token spend.
+The thesis is simple: use model intelligence deliberately, keep prompts compact, validate mechanically where it is safe, and route to the smallest sufficient Fireworks model. That is how we chase high accuracy with low token spend.

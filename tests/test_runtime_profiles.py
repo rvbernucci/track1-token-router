@@ -52,11 +52,10 @@ class RuntimeProfileTests(unittest.TestCase):
                 )
             (root / "fireworks-serverless.env.example").write_text(
                 "# Source runbook: docs/RUNBOOK_FIREWORKS.md\n"
-                "ROUTER_MODE=hybrid\n"
-                "LOCAL_BASE_URL=http://127.0.0.1:8000/v1\n"
-                "LOCAL_MODEL=local-gemma\n"
+                "ROUTER_MODE=fireworks\n"
                 "FIREWORKS_BASE_URL=https://api.fireworks.ai/inference/v1\n"
                 "FIREWORKS_MODEL=accounts/fireworks/models/replace-me\n"
+                "FIREWORKS_MAX_RETRIES=0\n"
                 "FIREWORKS_API_KEY=THIS_IS_A_FAKE_SECRET_VALUE\n",
                 encoding="utf-8",
             )

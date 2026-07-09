@@ -52,8 +52,6 @@ PROFILE_REQUIREMENTS = {
         "runbook": "docs/RUNBOOK_FIREWORKS.md",
         "required": {
             "ROUTER_MODE",
-            "LOCAL_BASE_URL",
-            "LOCAL_MODEL",
             "FIREWORKS_BASE_URL",
             "FIREWORKS_MODEL",
             "FIREWORKS_API_KEY",
@@ -158,10 +156,14 @@ def _check_safe_defaults(filename: str, values: dict[str, str], errors: list[str
     if filename.startswith("amd-mi300x") and values.get("COMPETITION_DRY_RUN") != "0":
         errors.append("AMD runtime profile must show COMPETITION_DRY_RUN=0 for credit activation")
     if filename == "fireworks-serverless.env.example":
+        if values.get("ROUTER_MODE") != "fireworks":
+            errors.append("Fireworks serverless profile must default to ROUTER_MODE=fireworks")
         if values.get("FIREWORKS_BASE_URL") != "https://api.fireworks.ai/inference/v1":
             errors.append("Fireworks base URL must be the OpenAI-compatible endpoint")
         if values.get("FIREWORKS_API_KEY"):
             errors.append("FIREWORKS_API_KEY must be empty in example profile")
+        if values.get("FIREWORKS_MAX_RETRIES") not in {"0", ""}:
+            errors.append("Fireworks serverless profile should default to FIREWORKS_MAX_RETRIES=0")
 
 
 if __name__ == "__main__":

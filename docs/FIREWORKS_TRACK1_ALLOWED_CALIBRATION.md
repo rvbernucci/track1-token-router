@@ -94,7 +94,7 @@ After tightening the `ner_money_date` prompt to require date and amount exactly 
 
 ## Operational Policy
 
-- Use local Gemma first when an AMD pod endpoint is available and validated.
+- Use local Gemma first for AMD pod development/calibration when an endpoint is available and validated; do not assume Gemma 26B/31B fits the final `4 GB` RAM / `2 vCPU` grading container.
 - In Fireworks-only mode, the Docker image now enables `FIREWORKS_MATRIX_WEIGHTS=/app/router/data/fireworks_track1_allowed_weights.json` by default.
 - The checked-in matrix weights now use `183` completed, deduplicated, observed Track 1 rows from category, hidden-variant, championship, frontier, structure-heldout, and escape result files.
 - Transport/access failures such as Gemma `404` are excluded from quality fitting by default. The weights record `observed_models`, and the matrix selector filters unobserved allowed models when observed alternatives exist.
@@ -127,4 +127,4 @@ This does not answer tasks by regex. It only prevents format words like `Return 
 
 - Re-run this benchmark if the official page, Participant Guide, or Discord announces a model-access change.
 - If Gemma becomes available through Fireworks serverless, repeat this run and fit `FIREWORKS_MATRIX_WEIGHTS` from the new result file.
-- If local Gemma is served from AMD pod, compare `ROUTER_MODE=hybrid` against `ROUTER_MODE=fireworks` on the same dataset and rank by accuracy first, then Fireworks token count.
+- If local Gemma is served from AMD pod, compare `ROUTER_MODE=hybrid` against `ROUTER_MODE=fireworks` for calibration and demo. Promote local-first to the final path only if the local model also fits the official grading envelope or the harness provides an endpoint.

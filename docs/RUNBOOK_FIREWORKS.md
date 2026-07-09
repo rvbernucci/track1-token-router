@@ -2,11 +2,11 @@
 
 ## Objetivo
 
-Ativar Fireworks como auditor remoto compacto somente quando a cascata local escala.
+Ativar Fireworks como o caminho oficial seguro para o Track 1, usando o menor modelo permitido suficiente para cada tarefa e mantendo qualquer inferencia local dentro do envelope final.
 
 Perfil recomendado: `runtime-profiles/fireworks-serverless.env.example`.
 
-Nota Track 1 atual: local models sao uma estrategia valida de scoring. Respostas locais contam para accuracy e usam zero Fireworks tokens. Portanto Fireworks deve ser tratado como fallback/auditor no modo campeonato, nao necessariamente como caminho default.
+Nota Track 1 atual: local models sao uma estrategia valida de scoring. Respostas locais contam para accuracy e usam zero Fireworks tokens. Porem o guia atual tambem define o ambiente final como `4 GB` RAM e `2 vCPU`; logo, Fireworks continua sendo o caminho oficial mais seguro quando nao ha um modelo local compacto provado dentro desse limite.
 
 Nota LoRA/model fine-tuning: fine-tunar a decisao do roteador e permitido; usar um LoRA/deployment Fireworks como modelo respondedor nao entra no caminho principal sem confirmacao explicita do avaliador. A decisao operacional esta em [`docs/FIREWORKS_LORA_FINE_TUNING_STRATEGY.md`](./FIREWORKS_LORA_FINE_TUNING_STRATEGY.md).
 
@@ -197,12 +197,12 @@ Falhas observadas:
 
 Politica atual para o caminho oficial:
 
-- cheap/medium linguagem: Gemma-first quando Gemma estiver acessivel no harness;
+- cheap/medium linguagem: Gemma-first quando Gemma estiver acessivel no harness via `ALLOWED_MODELS`;
 - strong math/logic/code/debug: `minimax-m3` first;
 - fallback entre modelos permitidos se o modelo escolhido retornar erro rapido de API, 404 ou resposta sem `message.content`;
 - timeout nao cascata para outro modelo no mesmo request, porque o envelope oficial exige resposta abaixo de 30s;
 - `kimi-k2p7-code` permanece como fallback/candidato, especialmente para codigo/logica, mas nao como default atual.
-- se um modelo local confiavel estiver disponivel, `ROUTER_MODE=hybrid` deve ser comparado contra `ROUTER_MODE=fireworks`, porque respostas locais corretas custam zero Fireworks tokens.
+- se um modelo local compacto e confiavel estiver disponivel dentro do envelope `4 GB` RAM / `2 vCPU`, `ROUTER_MODE=hybrid` deve ser comparado contra `ROUTER_MODE=fireworks`, porque respostas locais corretas custam zero Fireworks tokens.
 
 Calibracao complementar de 2026-07-09 com todos os modelos permitidos esta em [`docs/FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md`](./FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md).
 
@@ -290,6 +290,7 @@ Decisao operacional:
 - final Track 1: `ALLOWED_MODELS` serverless-first, com fallback entre modelos permitidos;
 - Gemma serverless liberado no harness: ativar Gemma-first em cheap/medium linguagem;
 - Gemma apenas via On-Demand: usar como trilha de pesquisa/demo ate confirmacao explicita;
+- Gemma local 26B/31B no AMD pod: usar para desenvolvimento/calibracao/demo, nao assumir como final-container runtime;
 - nunca criar deployment automaticamente em script de teste sem aprovacao humana, porque pode abrir custo recorrente.
 
 ## Smoke hibrido
@@ -321,7 +322,7 @@ Esperado:
 
 ## Modo oficial sem endpoint local
 
-O Participant Guide injeta Fireworks, nao um endpoint local. Para o caminho oficial:
+O Participant Guide injeta Fireworks, nao um endpoint local. Com o ambiente final de `4 GB` RAM e `2 vCPU`, este e o caminho oficial seguro:
 
 ```bash
 ROUTER_MODE=fireworks \
@@ -331,7 +332,7 @@ ALLOWED_MODELS=<comma-separated-models> \
 python3 -m router submit-track1 --input /input/tasks.json --output /output/results.json
 ```
 
-Nesse modo, solvers deterministicos rodam antes da chamada remota e o primeiro modelo de `ALLOWED_MODELS` e usado quando `FIREWORKS_MODEL` estiver vazio.
+Nesse modo, validadores mecanicos conservadores rodam antes da chamada remota e o primeiro modelo de `ALLOWED_MODELS` e usado quando `FIREWORKS_MODEL` estiver vazio.
 
 ## Budget guard
 

@@ -133,9 +133,9 @@ def _write_pdf_objects(path: Path, objects: list[bytes]) -> None:
         offsets.append(sum(len(chunk) for chunk in chunks))
         chunks.append(f"{index} 0 obj\n".encode("ascii") + obj + b"\nendobj\n")
     xref_offset = sum(len(chunk) for chunk in chunks)
-    chunks.append(f"xref\n0 {len(objects) + 1}\n0000000000 65535 f \n".encode("ascii"))
+    chunks.append(f"xref\n0 {len(objects) + 1}\n0000000000 65535 f\n".encode("ascii"))
     for offset in offsets[1:]:
-        chunks.append(f"{offset:010d} 00000 n \n".encode("ascii"))
+        chunks.append(f"{offset:010d} 00000 n\n".encode("ascii"))
     chunks.append(
         (
             f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\n"

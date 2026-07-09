@@ -1,6 +1,6 @@
 # Participant Guide Track 1 Map
 
-Source: `Participant Guide: AMD Developer Hackathon (ACT II)`, current attached PDF.
+Source: `Participant Guide: AMD Developer Hackathon (ACT II)`, current attached PDF, plus the Track 1 pasted guide shared in this workspace.
 
 Current PDF evidence:
 
@@ -11,11 +11,11 @@ Current PDF evidence:
 
 ## Confirmed Track 1 Contract
 
-Track 1 is now described as a general-purpose AI agent benchmark. Exact evaluation inputs are intentionally omitted and hidden variants are used.
+Track 1 is now described as a general-purpose AI agent benchmark. Exact evaluation inputs are intentionally omitted and hidden variants are used. The current guide names the track `General-Purpose AI Agent`, not a narrow regex/solver contest.
 
 Update from the Track 1 page shared on 2026-07-08: final scoring rewards routing intelligence across Fireworks models and local inference. Local models are a valid scoring strategy: answers produced by local models inside the container count fully toward accuracy, while only calls routed through `FIREWORKS_BASE_URL` count toward the Fireworks token score. Local inference therefore has zero Fireworks-token cost.
 
-Update from the Track 1 guide shared on 2026-07-08: Track 1 is constrained to this model set:
+Earlier Track 1 page snapshots listed this candidate model set:
 
 - `minimax-m3`;
 - `kimi-k2p7-code`;
@@ -23,7 +23,7 @@ Update from the Track 1 guide shared on 2026-07-08: Track 1 is constrained to th
 - `gemma-4-26b-a4b-it`;
 - `gemma-4-31b-it-nvfp4`.
 
-The router accepts both these short names and full Fireworks IDs like `accounts/fireworks/models/minimax-m3`.
+The latest pasted guide says the harness publishes the exact permitted model IDs through `ALLOWED_MODELS` at runtime. The router must therefore treat this list as authoritative, and only use the snapshot above as local development context. The router accepts both these short names and full Fireworks IDs like `accounts/fireworks/models/minimax-m3`.
 
 The container must:
 
@@ -45,6 +45,8 @@ Judging environment constraints:
 - local models are permitted, but must fit inside that envelope;
 - the guide calls `2B-3B` 4-bit quantized local models safe;
 - `7B` 4-bit can fill the full RAM budget and leave little room for agent code.
+
+Important implication: Gemma 26B/31B cannot be assumed to run locally inside the final judged container. The AMD GPU pod is a development/calibration environment, while the final scoring container must survive the CPU/RAM envelope above unless the organizer provides a separate local endpoint, which the guide does not promise.
 
 GPU/team access:
 
@@ -111,7 +113,9 @@ Official partner statement:
 
 Current practical interpretation:
 
-- Gemma on the AMD GPU pod is the strongest local-first path and supports the Best Use of Gemma narrative.
+- Gemma on the AMD GPU pod is the strongest development, calibration and demo path, and supports the Best Use of Gemma narrative.
+- Gemma in final scoring should be used through Fireworks only when the model/deployment ID appears in `ALLOWED_MODELS` and calls route through `FIREWORKS_BASE_URL`.
+- A final local model, if used, must be small enough for `4 GB` RAM and `2 vCPU`; the guide calls `2B-3B` 4-bit safe.
 - Gemma through Fireworks serverless is still not accessible with the current local credit key.
 - Fireworks remains necessary as fallback/router path through `FIREWORKS_BASE_URL`.
 
@@ -139,7 +143,9 @@ Implication: Gemma is official for Track 1, but our current Fireworks credit key
 
 Practical strategy:
 
-- Use Gemma-first only for cheap/medium language tasks: classification, formatting, summarization and extraction.
+- Use Gemma-first only when Gemma is actually present in `ALLOWED_MODELS` or exposed by the official `FIREWORKS_BASE_URL`.
+- Use the AMD GPU pod to benchmark, fine-tune, prompt-calibrate and demonstrate Gemma, but do not assume that a 26B/31B local endpoint exists in final scoring.
+- If using local inference in the submitted image, prefer a compact model class that fits `4 GB` RAM; use it for semantic triage/verification, not as a giant Gemma replacement.
 - Use `minimax-m3` first for strong math, logic, code debugging and code generation because it is accessible and benchmarked.
 - Keep `kimi-k2p7-code` as an allowed fallback/candidate for code and logic, but do not make it default on current evidence because it is slower and more expensive.
 - If Gemma is not accessible in local Fireworks credits, fallback to `minimax-m3` without failing the run.
@@ -196,6 +202,8 @@ Immediate implications:
 - Fireworks client must prefer `ALLOWED_MODELS` rather than a hardcoded model when in official mode;
 - official mode must choose the cheapest sufficient Fireworks model per task, not always the first allowed model;
 - logs must not pollute stdout or output JSON.
+- deterministic solvers should be positioned as mechanical validators, format guards and safe calculators, not as the main AI agent;
+- the narrative should be Gemma/Fireworks-first for intelligence, with code enforcing contracts and reducing waste.
 
 ## Implemented Local Mapping
 

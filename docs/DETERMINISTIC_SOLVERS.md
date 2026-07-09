@@ -1,10 +1,12 @@
-# Deterministic Solver Pack
+# Mechanical Validator And Solver Pack
 
 ## Papel
 
-O solver pack resolve tarefas mecanicas antes do M1 no `ROUTER_MODE=competition`.
+O solver pack resolve tarefas mecanicas antes do caminho de modelo no `ROUTER_MODE=competition`.
 
 Ele existe para economizar latencia e reduzir risco quando a resposta pode ser calculada ou transformada com confianca alta por codigo.
+
+Ele nao e o nucleo de inteligencia do Track 1. O nucleo e o agente general-purpose que interpreta a tarefa, escolhe o menor modelo suficiente em `ALLOWED_MODELS` e preserva accuracy. Este pack e a camada de seguranca: schema, formato, calculos estreitos e verificacoes mecanicas.
 
 ## Solvers ativos
 
@@ -60,7 +62,7 @@ Este pack nao tenta substituir os modelos nessas oito categorias. Ele remove do 
 - code debugging/code generation em templates Python pequenos e executaveis;
 - transformacoes de formato e contagem.
 
-O ganho esperado e reduzir chamadas Fireworks sem derrubar o accuracy gate. Quando o padrao nao e claro, `solve_deterministic` retorna `None` e a cascata/model router continua normalmente.
+O ganho esperado e reduzir chamadas Fireworks sem derrubar o accuracy gate. Quando o padrao nao e claro, `solve_deterministic` retorna `None` e o model router continua normalmente.
 
 ## Gate de regressao
 

@@ -9,7 +9,7 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj
 4 0 obj
-<< /Length 142 >>
+<< /Length 157 >>
 stream
 BT
 /F1 34 Tf
@@ -17,7 +17,7 @@ BT
 (Slide 1 - Title) Tj
 /F1 20 Tf
 0 -34 Td
-(Track 1 Token Router: Local-first accuracy with selective remote audit.) Tj
+(Track 1 Token Router: General-purpose accuracy with token-efficient Fireworks routing.) Tj
 ET
 endstream
 endobj
@@ -65,7 +65,7 @@ BT
 (Slide 4 - Architecture) Tj
 /F1 20 Tf
 0 -34 Td
-(Guardrails and solvers first, then M1 local generation, M2A local verification, M2B local repair and Fireworks approve-o) Tj
+(Mechanical validators protect schema and high-confidence cases, then the router selects the cheapest sufficient Firework) Tj
 ET
 endstream
 endobj
@@ -113,7 +113,7 @@ BT
 (Slide 7 - AMD/Fireworks Activation) Tj
 /F1 20 Tf
 0 -34 Td
-(Runtime profiles are ready for AMD/DigitalOcean MI300X with vLLM or SGLang, Gemma local models and Fireworks serverless ) Tj
+(Runtime profiles are ready for AMD/Gemma development and Fireworks calibration, while the submitted Docker image stays c) Tj
 ET
 endstream
 endobj
@@ -121,7 +121,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 1280 720] /Resources << /Font << /F1 3 0 R >> >> /Contents 16 0 R >>
 endobj
 18 0 obj
-<< /Length 174 >>
+<< /Length 155 >>
 stream
 BT
 /F1 34 Tf
@@ -129,7 +129,7 @@ BT
 (Slide 8 - Demo) Tj
 /F1 20 Tf
 0 -34 Td
-(Show CLI `ask`, JSON output, route trace, zero remote tokens for solver path and battle drill readiness.) Tj
+(Show CLI `ask`, JSON output, route trace, model selection and battle drill readiness.) Tj
 ET
 endstream
 endobj
@@ -137,7 +137,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 1280 720] /Resources << /Font << /F1 3 0 R >> >> /Contents 18 0 R >>
 endobj
 20 0 obj
-<< /Length 183 >>
+<< /Length 200 >>
 stream
 BT
 /F1 34 Tf
@@ -145,7 +145,7 @@ BT
 (Slide 9 - Why It Can Win) Tj
 /F1 20 Tf
 0 -34 Td
-(Mechanical tasks avoid models, easy tasks stay local, risky tasks escalate with compact remote packets.) Tj
+(The router avoids unnecessary token spend, keeps prompts compact and escalates only when the expected accuracy gain just) Tj
 ET
 endstream
 endobj
@@ -170,32 +170,32 @@ endobj
 endobj
 xref
 0 24
-0000000000 65535 f 
-0000000009 00000 n 
-0000000058 00000 n 
-0000000177 00000 n 
-0000000247 00000 n 
-0000000440 00000 n 
-0000000567 00000 n 
-0000000799 00000 n 
-0000000926 00000 n 
-0000001152 00000 n 
-0000001279 00000 n 
-0000001529 00000 n 
-0000001658 00000 n 
-0000001895 00000 n 
-0000002024 00000 n 
-0000002278 00000 n 
-0000002407 00000 n 
-0000002669 00000 n 
-0000002798 00000 n 
-0000003024 00000 n 
-0000003153 00000 n 
-0000003388 00000 n 
-0000003517 00000 n 
-0000003764 00000 n 
+0000000000 65535 f
+0000000009 00000 n
+0000000058 00000 n
+0000000177 00000 n
+0000000247 00000 n
+0000000455 00000 n
+0000000582 00000 n
+0000000814 00000 n
+0000000941 00000 n
+0000001167 00000 n
+0000001294 00000 n
+0000001544 00000 n
+0000001673 00000 n
+0000001910 00000 n
+0000002039 00000 n
+0000002293 00000 n
+0000002422 00000 n
+0000002684 00000 n
+0000002813 00000 n
+0000003020 00000 n
+0000003149 00000 n
+0000003401 00000 n
+0000003530 00000 n
+0000003777 00000 n
 trailer
 << /Size 24 /Root 1 0 R >>
 startxref
-3893
+3906
 %%EOF
