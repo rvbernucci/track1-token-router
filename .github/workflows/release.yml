@@ -5,6 +5,7 @@ on:
     tags:
       - "v*"
       - "offline-*"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -32,11 +33,23 @@ jobs:
       - name: Run offline release check
         run: scripts/offline_release_check.sh
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build tagged image
-        run: docker build -t "${IMAGE_NAME}:${GITHUB_REF_NAME}" .
-
-      - name: Push tagged image
-        run: docker push "${IMAGE_NAME}:${GITHUB_REF_NAME}"
+      - name: Build and push linux/amd64 image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.description=AMD Developer Hackathon ACT II Track 1 token-efficient router

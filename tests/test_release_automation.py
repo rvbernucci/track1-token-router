@@ -12,10 +12,16 @@ class ReleaseAutomationTests(unittest.TestCase):
         self.assertIn("tags:", content)
         self.assertIn('"v*"', content)
         self.assertIn('"offline-*"', content)
+        self.assertIn("workflow_dispatch:", content)
         self.assertNotIn("branches:", content)
         self.assertIn("packages: write", content)
         self.assertIn("ghcr.io/${{ github.repository }}", content)
         self.assertIn("secrets.GITHUB_TOKEN", content)
+        self.assertIn("docker/setup-buildx-action@v3", content)
+        self.assertIn("docker/build-push-action@v6", content)
+        self.assertIn("platforms: linux/amd64", content)
+        self.assertIn("push: true", content)
+        self.assertIn("org.opencontainers.image.source", content)
         self.assertNotIn("FIREWORKS_API_KEY", content)
 
     def test_release_notes_dry_run_writes_markdown(self) -> None:

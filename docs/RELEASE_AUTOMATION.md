@@ -25,10 +25,32 @@ The workflow `.github/workflows/release.yml` publishes to:
 ghcr.io/<owner>/<repo>:<tag>
 ```
 
-It only runs on tag pushes and uses the built-in `GITHUB_TOKEN`.
+It runs on tag pushes, can also be started manually with `workflow_dispatch`, and uses the built-in `GITHUB_TOKEN`.
+
+The Docker image is built with Buildx for the required judging architecture:
+
+```text
+linux/amd64
+```
+
+## Publish an offline RC image
+
+```bash
+git tag offline-rc-YYYYMMDD-HHMM
+git push origin offline-rc-YYYYMMDD-HHMM
+```
+
+After the Release workflow succeeds, the image should be pullable as:
+
+```bash
+docker pull ghcr.io/rvbernucci/track1-token-router:offline-rc-YYYYMMDD-HHMM
+```
+
+If GHCR shows the package as private, make the package public in GitHub Packages before submitting the image URL.
 
 ## Safety rules
 
 - Normal pushes to `main` do not publish an image.
 - No AMD, Fireworks or manual registry secret is required.
 - The offline release check runs before Docker login/build/push.
+- The image is labelled with `org.opencontainers.image.source` so GHCR links it back to the public repository.

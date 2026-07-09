@@ -14,6 +14,22 @@ Official judging runs on `linux/amd64`. If building on Apple Silicon, use:
 docker buildx build --platform linux/amd64 -t track1-token-router .
 ```
 
+## Public GHCR image
+
+Release tags publish a `linux/amd64` image to GHCR:
+
+```text
+ghcr.io/rvbernucci/track1-token-router:<tag>
+```
+
+For an offline release candidate:
+
+```bash
+git tag offline-rc-YYYYMMDD-HHMM
+git push origin offline-rc-YYYYMMDD-HHMM
+docker pull ghcr.io/rvbernucci/track1-token-router:offline-rc-YYYYMMDD-HHMM
+```
+
 ## Smoke tests
 
 ```bash
