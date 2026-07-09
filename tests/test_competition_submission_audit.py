@@ -5,6 +5,8 @@ from pathlib import Path
 
 from scripts.competition_submission_audit import (
     IMAGE_SIZE_LIMIT_BYTES,
+    _validate_traceability,
+    inspect_image_config,
     inspect_image_manifest,
     inspect_manifest_index,
     parse_image_ref,
@@ -69,12 +71,13 @@ class CompetitionSubmissionAuditTests(unittest.TestCase):
             {
                 "schemaVersion": 2,
                 "mediaType": "application/vnd.oci.image.manifest.v1+json",
-                "config": {"size": 100},
+                "config": {"digest": "sha256:config", "size": 100},
                 "layers": [{"size": 200}, {"size": 300}],
             }
         )
 
         self.assertEqual(result["compressed_size_bytes"], 600)
+        self.assertEqual(result["config_digest"], "sha256:config")
         self.assertTrue(result["under_10gb"])
 
     def test_inspect_image_manifest_detects_10gb_limit(self) -> None:
@@ -87,6 +90,33 @@ class CompetitionSubmissionAuditTests(unittest.TestCase):
         )
 
         self.assertFalse(result["under_10gb"])
+
+    def test_inspect_image_config_extracts_oci_traceability_labels(self) -> None:
+        result = inspect_image_config(
+            {
+                "config": {
+                    "Labels": {
+                        "org.opencontainers.image.source": "https://github.com/owner/repo",
+                        "org.opencontainers.image.revision": "abc123",
+                        "org.opencontainers.image.version": "offline-rc-1",
+                    }
+                }
+            }
+        )
+
+        self.assertEqual(result["source"], "https://github.com/owner/repo")
+        self.assertEqual(result["revision"], "abc123")
+        self.assertEqual(result["version"], "offline-rc-1")
+
+    def test_traceability_validation_fails_on_expected_label_mismatch(self) -> None:
+        result = _validate_traceability(
+            {"revision": "abc123", "version": "offline-rc-1", "source": "https://github.com/owner/repo"},
+            expected_revision="other",
+            expected_version="offline-rc-2",
+        )
+
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["errors"], ["revision_mismatch", "version_mismatch"])
 
     def test_repository_fast_audit_passes_without_network_or_gates(self) -> None:
         report = run_audit(Path("."), skip_network=True, run_gates=False)

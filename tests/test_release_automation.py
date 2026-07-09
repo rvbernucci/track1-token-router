@@ -22,6 +22,8 @@ class ReleaseAutomationTests(unittest.TestCase):
         self.assertIn("platforms: linux/amd64", content)
         self.assertIn("push: true", content)
         self.assertIn("org.opencontainers.image.source", content)
+        self.assertIn("org.opencontainers.image.revision", content)
+        self.assertIn("org.opencontainers.image.version", content)
         self.assertNotIn("FIREWORKS_API_KEY", content)
 
     def test_release_notes_dry_run_writes_markdown(self) -> None:

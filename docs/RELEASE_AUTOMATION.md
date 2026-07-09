@@ -57,9 +57,20 @@ python3 scripts/competition_submission_audit.py \
 
 This validates the public registry manifest, `linux/amd64`, and the 10GB compressed image limit.
 
+For final traceability, also verify the OCI labels written by the Release workflow:
+
+```bash
+python3 scripts/competition_submission_audit.py \
+  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-YYYYMMDD-HHMM \
+  --expected-revision "$(git rev-list -n 1 offline-rc-YYYYMMDD-HHMM)" \
+  --expected-version offline-rc-YYYYMMDD-HHMM
+```
+
+The image labels include `org.opencontainers.image.source`, `org.opencontainers.image.revision`, and `org.opencontainers.image.version`.
+
 ## Safety rules
 
 - Normal pushes to `main` do not publish an image.
 - No AMD, Fireworks or manual registry secret is required.
 - The offline release check runs before Docker login/build/push.
-- The image is labelled with `org.opencontainers.image.source` so GHCR links it back to the public repository.
+- The image is labelled with OCI source, revision and version metadata so GHCR links it back to the public repository and release commit.

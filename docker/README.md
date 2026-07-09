@@ -37,7 +37,16 @@ python3 scripts/competition_submission_audit.py \
   --image ghcr.io/rvbernucci/track1-token-router:offline-rc-YYYYMMDD-HHMM
 ```
 
-The audit checks public pullability, `linux/amd64`, and the 10GB image limit.
+For final traceability, include the release commit and tag:
+
+```bash
+python3 scripts/competition_submission_audit.py \
+  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-YYYYMMDD-HHMM \
+  --expected-revision "$(git rev-list -n 1 offline-rc-YYYYMMDD-HHMM)" \
+  --expected-version offline-rc-YYYYMMDD-HHMM
+```
+
+The audit checks public pullability, `linux/amd64`, the 10GB image limit, and OCI source/revision/version labels.
 
 ## Smoke tests
 

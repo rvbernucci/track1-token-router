@@ -85,6 +85,8 @@ def main() -> int:
     )
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--image", help="Optional public GHCR image ref, for example ghcr.io/owner/repo:tag.")
+    parser.add_argument("--expected-revision", help="Optional expected OCI revision label, usually the release commit SHA.")
+    parser.add_argument("--expected-version", help="Optional expected OCI version label, usually the release tag.")
     parser.add_argument("--skip-network", action="store_true", help="Skip remote registry checks even when --image is set.")
     parser.add_argument("--skip-gates", action="store_true", help="Skip subprocess smoke gates; useful for fast unit tests.")
     parser.add_argument("--report", type=Path, default=Path("reports/generated/competition-submission-audit.md"))
@@ -94,6 +96,8 @@ def main() -> int:
     report = run_audit(
         args.root,
         image=args.image,
+        expected_revision=args.expected_revision,
+        expected_version=args.expected_version,
         skip_network=args.skip_network,
         run_gates=not args.skip_gates,
     )
@@ -107,6 +111,8 @@ def run_audit(
     root: Path = ROOT,
     *,
     image: str | None = None,
+    expected_revision: str | None = None,
+    expected_version: str | None = None,
     skip_network: bool = False,
     run_gates: bool = True,
 ) -> AuditReport:
@@ -115,6 +121,8 @@ def run_audit(
     metrics: dict[str, object] = {
         "root": str(root),
         "image": image or "",
+        "expected_revision": expected_revision or "",
+        "expected_version": expected_version or "",
         "image_size_limit_bytes": IMAGE_SIZE_LIMIT_BYTES,
     }
 
@@ -128,7 +136,13 @@ def run_audit(
         checks.append(_check_deterministic_coverage_gate(root))
 
     if image and not skip_network:
-        checks.append(_check_public_ghcr_image(image))
+        checks.append(
+            _check_public_ghcr_image(
+                image,
+                expected_revision=expected_revision,
+                expected_version=expected_version,
+            )
+        )
     elif not image:
         checks.append(
             Check(
@@ -162,6 +176,8 @@ def write_markdown_report(path: Path, report: AuditReport) -> None:
         f"- ok: `{report.ok}`",
         f"- root: `{report.metrics['root']}`",
         f"- image: `{report.metrics['image'] or 'not provided'}`",
+        f"- expected_revision: `{report.metrics['expected_revision'] or 'not provided'}`",
+        f"- expected_version: `{report.metrics['expected_version'] or 'not provided'}`",
         f"- image_size_limit_bytes: `{report.metrics['image_size_limit_bytes']}`",
         "",
         "## Checks",
@@ -230,10 +246,28 @@ def inspect_manifest_index(index: dict[str, Any]) -> dict[str, object]:
 
 def inspect_image_manifest(manifest: dict[str, Any]) -> dict[str, object]:
     size = _manifest_size(manifest)
+    config = manifest.get("config")
     return {
         "compressed_size_bytes": size,
         "under_10gb": size <= IMAGE_SIZE_LIMIT_BYTES,
         "layers": len(manifest.get("layers") or []),
+        "config_digest": str(config.get("digest") or "") if isinstance(config, dict) else "",
+    }
+
+
+def inspect_image_config(config: dict[str, Any]) -> dict[str, object]:
+    image_config = config.get("config") if isinstance(config.get("config"), dict) else {}
+    raw_labels = image_config.get("Labels") if isinstance(image_config, dict) else {}
+    labels = {
+        str(key): str(value)
+        for key, value in (raw_labels or {}).items()
+        if value is not None
+    } if isinstance(raw_labels, dict) else {}
+    return {
+        "labels": labels,
+        "source": labels.get("org.opencontainers.image.source", ""),
+        "revision": labels.get("org.opencontainers.image.revision", ""),
+        "version": labels.get("org.opencontainers.image.version", ""),
     }
 
 
@@ -279,6 +313,9 @@ def _check_release_workflow(path: Path) -> Check:
         "push: true",
         "packages: write",
         "ghcr.io/${{ github.repository }}",
+        "org.opencontainers.image.source",
+        "org.opencontainers.image.revision",
+        "org.opencontainers.image.version",
     ]
     missing = [token for token in required_tokens if token not in content]
     return Check(
@@ -369,7 +406,12 @@ def _check_deterministic_coverage_gate(root: Path) -> Check:
     )
 
 
-def _check_public_ghcr_image(image: str) -> Check:
+def _check_public_ghcr_image(
+    image: str,
+    *,
+    expected_revision: str | None = None,
+    expected_version: str | None = None,
+) -> Check:
     try:
         image_ref = parse_image_ref(image)
         token = _ghcr_pull_token(image_ref.repository)
@@ -385,12 +427,19 @@ def _check_public_ghcr_image(image: str) -> Check:
         digest = str(platform["digest"])
         manifest = _registry_json(image_ref, token, digest or image_ref.reference, MANIFEST_ACCEPT)
         size = inspect_image_manifest(manifest)
-        ok = bool(size["under_10gb"])
-        evidence = {"image": image, "platform": platform, "size": size}
+        config_digest = str(size.get("config_digest") or "")
+        config = inspect_image_config(_registry_blob_json(image_ref, token, config_digest)) if config_digest else {}
+        traceability = _validate_traceability(
+            config,
+            expected_revision=expected_revision,
+            expected_version=expected_version,
+        )
+        ok = bool(size["under_10gb"]) and traceability["ok"]
+        evidence = {"image": image, "platform": platform, "size": size, "config": config, "traceability": traceability}
         return Check(
             "public_ghcr_image",
             ok,
-            "GHCR image is public, linux/amd64 and under 10GB." if ok else "GHCR image exceeds the 10GB limit.",
+            "GHCR image is public, linux/amd64, under 10GB and traceable." if ok else "GHCR image failed size or OCI traceability checks.",
             evidence,
         )
     except Exception as exc:
@@ -419,6 +468,36 @@ def _ghcr_pull_token(repository: str) -> str:
 def _registry_json(image: ImageRef, token: str, reference: str, accept: str) -> dict[str, Any]:
     url = f"https://{image.registry}/v2/{image.repository}/manifests/{reference}"
     return _http_json(url, headers={"Authorization": f"Bearer {token}", "Accept": accept})
+
+
+def _registry_blob_json(image: ImageRef, token: str, digest: str) -> dict[str, Any]:
+    url = f"https://{image.registry}/v2/{image.repository}/blobs/{digest}"
+    return _http_json(url, headers={"Authorization": f"Bearer {token}"})
+
+
+def _validate_traceability(
+    config: dict[str, object],
+    *,
+    expected_revision: str | None,
+    expected_version: str | None,
+) -> dict[str, object]:
+    errors: list[str] = []
+    revision = str(config.get("revision") or "")
+    version = str(config.get("version") or "")
+    source = str(config.get("source") or "")
+    if expected_revision and revision != expected_revision:
+        errors.append("revision_mismatch")
+    if expected_version and version != expected_version:
+        errors.append("version_mismatch")
+    return {
+        "ok": not errors,
+        "errors": errors,
+        "source": source,
+        "revision": revision,
+        "version": version,
+        "expected_revision": expected_revision or "",
+        "expected_version": expected_version or "",
+    }
 
 
 def _http_json(url: str, *, headers: dict[str, str]) -> dict[str, Any]:
