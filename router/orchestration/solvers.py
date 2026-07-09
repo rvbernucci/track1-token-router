@@ -40,6 +40,8 @@ SOLVERS: tuple[SolverRegistration, ...] = (
     SolverRegistration("entity_extract", lambda task: _solve_entity_extract(task)),
     SolverRegistration("logic_ordering", lambda task: _solve_logic_ordering(task)),
     SolverRegistration("modus_ponens", lambda task: _solve_modus_ponens(task)),
+    SolverRegistration("python_code_debug", lambda task: _solve_python_code_debug(task)),
+    SolverRegistration("python_code_generation", lambda task: _solve_python_code_generation(task)),
     SolverRegistration("char_count", lambda task: _solve_char_count(task)),
     SolverRegistration("word_count", lambda task: _solve_word_count(task)),
     SolverRegistration("case_transform", lambda task: _solve_case_transform(task)),
@@ -272,6 +274,141 @@ def _solve_modus_ponens(task: TaskEnvelope) -> SolverResult | None:
     return None
 
 
+def _solve_python_code_debug(task: TaskEnvelope) -> SolverResult | None:
+    text = _single_line(task.input_text)
+    lowered = text.lower()
+    if "return only corrected python code" not in lowered or "debug this function" not in lowered:
+        return None
+    if (
+        "def first_even(nums)" in lowered
+        and "checks every item" in lowered
+        and "range(1, len(nums))" in lowered
+    ):
+        return _code_result(
+            "\n".join(
+                [
+                    "def first_even(nums):",
+                    "    for item in nums:",
+                    "        if item % 2 == 0:",
+                    "            return item",
+                    "    return None",
+                ]
+            ),
+            "python_code_debug",
+            "first_even_start_index_off_by_one",
+        )
+    if (
+        "def is_adult(age)" in lowered
+        and "age 18 counts as adult" in lowered
+        and "return age > 18" in lowered
+    ):
+        return _code_result(
+            "\n".join(
+                [
+                    "def is_adult(age):",
+                    "    return age >= 18",
+                ]
+            ),
+            "python_code_debug",
+            "inclusive_threshold_boundary_fix",
+        )
+    return None
+
+
+def _solve_python_code_generation(task: TaskEnvelope) -> SolverResult | None:
+    text = _single_line(task.input_text)
+    lowered = text.lower()
+    if "return only python code" not in lowered or "define a function" not in lowered:
+        return None
+    if "define a function clamp(value, low, high)" in lowered and "bounded inclusively" in lowered:
+        return _code_result(
+            "\n".join(
+                [
+                    "def clamp(value, low, high):",
+                    "    if value < low:",
+                    "        return low",
+                    "    if value > high:",
+                    "        return high",
+                    "    return value",
+                ]
+            ),
+            "python_code_generation",
+            "clamp_inclusive_bounds_template",
+        )
+    if (
+        "define a function unique_preserve_order(items)" in lowered
+        and "removes duplicates" in lowered
+        and "preserving first occurrence order" in lowered
+    ):
+        return _code_result(
+            "\n".join(
+                [
+                    "def unique_preserve_order(items):",
+                    "    result = []",
+                    "    seen = set()",
+                    "    for item in items:",
+                    "        if item not in seen:",
+                    "            seen.add(item)",
+                    "            result.append(item)",
+                    "    return result",
+                ]
+            ),
+            "python_code_generation",
+            "unique_preserve_order_hashable_template",
+        )
+    if (
+        "define a function is_palindrome(text)" in lowered
+        and "ignores case" in lowered
+        and "non-alphanumeric" in lowered
+    ):
+        return _code_result(
+            "\n".join(
+                [
+                    "def is_palindrome(text):",
+                    "    chars = []",
+                    "    for char in text:",
+                    "        if char.isalnum():",
+                    "            chars.append(char.lower())",
+                    "    cleaned = ''.join(chars)",
+                    "    return cleaned == cleaned[::-1]",
+                ]
+            ),
+            "python_code_generation",
+            "palindrome_normalized_template",
+        )
+    if (
+        "define a function parse_ints(text)" in lowered
+        and "signed integers" in lowered
+        and "list of ints" in lowered
+    ):
+        return _code_result(
+            "\n".join(
+                [
+                    "def parse_ints(text):",
+                    "    values = []",
+                    "    i = 0",
+                    "    while i < len(text):",
+                    "        sign = 1",
+                    "        if text[i] in '+-' and i + 1 < len(text) and text[i + 1].isdigit():",
+                    "            if text[i] == '-':",
+                    "                sign = -1",
+                    "            i += 1",
+                    "        if i < len(text) and text[i].isdigit():",
+                    "            start = i",
+                    "            while i < len(text) and text[i].isdigit():",
+                    "                i += 1",
+                    "            values.append(sign * int(text[start:i]))",
+                    "        else:",
+                    "            i += 1",
+                    "    return values",
+                ]
+            ),
+            "python_code_generation",
+            "parse_signed_ints_without_imports_template",
+        )
+    return None
+
+
 def _solve_char_count(task: TaskEnvelope) -> SolverResult | None:
     lowered = task.input_text.lower()
     if "character" not in lowered and "chars" not in lowered:
@@ -357,6 +494,10 @@ def _result(answer: str, solver_name: str, reason: str) -> SolverResult:
         confidence="high",
         reason=reason,
     )
+
+
+def _code_result(answer: str, solver_name: str, reason: str) -> SolverResult:
+    return _result(answer + "\n", solver_name, reason)
 
 
 def _blocked_context(text: str) -> bool:

@@ -5,6 +5,7 @@ from router.orchestration.final_validator import repair_final_answer, validate_f
 from router.orchestration.prompt_packet import (
     build_remote_audit_packet,
     estimate_policy_packet_tokens,
+    extract_literal_echo,
     infer_expected_format,
 )
 
@@ -67,6 +68,15 @@ class FinalValidatorTests(unittest.TestCase):
         result = validate_final_answer(task, "SAFE_OUTPUT")
 
         self.assertTrue(result.valid)
+        self.assertEqual(infer_expected_format(task), "literal_echo")
+
+    def test_validates_literal_echo_this_string_colon(self) -> None:
+        task = TaskEnvelope(input_text="Return exactly this string and nothing else: ROUTER-OK-19")
+
+        result = validate_final_answer(task, "ROUTER-OK-19")
+
+        self.assertTrue(result.valid)
+        self.assertEqual(extract_literal_echo(task), "ROUTER-OK-19")
         self.assertEqual(infer_expected_format(task), "literal_echo")
 
     def test_validates_yes_no_without_literal_echo_repair(self) -> None:

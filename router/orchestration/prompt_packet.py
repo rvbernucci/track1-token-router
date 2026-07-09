@@ -85,8 +85,15 @@ def infer_expected_format(task: TaskEnvelope) -> str:
 
 
 def extract_literal_echo(task: TaskEnvelope) -> str:
-    match = re.search(r"return exactly (.+?)(?: and nothing else)?[.!]?$", task.input_text, re.IGNORECASE)
-    if not match:
+    patterns = [
+        r"return exactly this string and nothing else\s*:\s*(.+?)[.!]?$",
+        r"return exactly (.+?)(?: and nothing else)?[.!]?$",
+    ]
+    match = next(
+        (re.search(pattern, task.input_text, re.IGNORECASE) for pattern in patterns if re.search(pattern, task.input_text, re.IGNORECASE)),
+        None,
+    )
+    if match is None:
         return ""
     return match.group(1).strip().strip("\"'")
 

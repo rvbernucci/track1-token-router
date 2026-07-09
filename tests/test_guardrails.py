@@ -37,6 +37,13 @@ class DeterministicGuardrailTests(unittest.TestCase):
         self.assertEqual(decision.answer, "SAFE_OUTPUT_01")
         self.assertEqual(decision.route, "guardrail_echo")
 
+    def test_literal_echo_this_string_colon_is_handled(self) -> None:
+        decision = evaluate_guardrail(TaskEnvelope(input_text="Return exactly this string and nothing else: ROUTER-OK-19"))
+
+        self.assertIsNotNone(decision)
+        self.assertEqual(decision.answer, "ROUTER-OK-19")
+        self.assertEqual(decision.route, "guardrail_echo")
+
     def test_complex_math_is_not_handled(self) -> None:
         decision = evaluate_guardrail(TaskEnvelope(input_text="What is 12 * 5 + 3?"))
 

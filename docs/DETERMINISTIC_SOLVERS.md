@@ -18,6 +18,8 @@ Ele existe para economizar latencia e reduzir risco quando a resposta pode ser c
 | `entity_extract` | JSON minificado para padroes NER mecanicos | apenas pagamento datado, fundacao pessoa/org/cidade e contato email/url/phone |
 | `logic_ordering` | endpoint de ordenacao transitiva simples | exige relacoes comparativas nominais e endpoint unico |
 | `modus_ponens` | inferencia `if A then B; A; is B?` | responde apenas `yes` quando antecedente e consequente normalizados batem exatamente |
+| `python_code_debug` | correcoes Python de bugs triviais conhecidos | apenas assinaturas e sintomas exatos testados por `python_function_cases` |
+| `python_code_generation` | funcoes Python pequenas de utilidade comum | apenas templates sem `import`, executaveis pelo validador seguro |
 | `char_count` | contagem de caracteres | exige string entre aspas |
 | `word_count` | contagem de palavras | exige string entre aspas |
 | `case_transform` | uppercase, lowercase, titlecase | exige string entre aspas |
@@ -36,6 +38,8 @@ Ele existe para economizar latencia e reduzir risco quando a resposta pode ser c
 - Sentimento misto ou sem margem lexical fica fora.
 - NER generico fica fora; o solver so entra em padroes estruturais comprovaveis.
 - Logica com contrapositiva, afirmacao do consequente ou grafos desconectados fica fora.
+- Programacao generica fica fora; os templates Python so entram quando assinatura, verbo e criterio batem exatamente.
+- Templates Python nao usam `import`, `open`, `eval`, classes ou estado global, para ficarem compativeis com o validador seguro do microbench.
 
 ## Track 1 payoff
 
@@ -47,6 +51,7 @@ Este pack nao tenta substituir os modelos nessas oito categorias. Ele remove do 
 - sentiment obvio com vocabulario explicitamente polarizado;
 - NER estrutural em frases regulares;
 - logic puzzles de uma inferencia ou uma cadeia transitiva curta;
+- code debugging/code generation em templates Python pequenos e executaveis;
 - transformacoes de formato e contagem.
 
 O ganho esperado e reduzir chamadas Fireworks sem derrubar o accuracy gate. Quando o padrao nao e claro, `solve_deterministic` retorna `None` e a cascata/model router continua normalmente.

@@ -3,6 +3,7 @@ import unittest
 
 from router.core.contracts import TaskEnvelope
 from router.orchestration.solvers import SOLVERS, solve_deterministic
+from scripts.fireworks_microbench import _validate
 
 
 class SolverPackTests(unittest.TestCase):
@@ -20,6 +21,8 @@ class SolverPackTests(unittest.TestCase):
                 "entity_extract",
                 "logic_ordering",
                 "modus_ponens",
+                "python_code_debug",
+                "python_code_generation",
                 "char_count",
                 "word_count",
                 "case_transform",
@@ -139,6 +142,89 @@ class SolverPackTests(unittest.TestCase):
             "Ava is taller than Bea. Cora is taller than Dani. Who is the shortest?",
             "If the alarm is armed, the door locks. The alarm is not armed. Is the door locked?",
             "If it rains, the ground is wet. The ground is wet. Did it rain?",
+        ]
+        for prompt in blocked:
+            with self.subTest(prompt=prompt):
+                self.assertIsNone(solve_deterministic(TaskEnvelope(input_text=prompt)))
+
+    def test_solves_safe_python_debug_templates(self) -> None:
+        cases = {
+            "Return only corrected Python code. Debug this function so it checks every item: def first_even(nums):\n    for i in range(1, len(nums)):\n        if nums[i] % 2 == 0:\n            return nums[i]\n    return None": {
+                "type": "python_function_cases",
+                "function_name": "first_even",
+                "cases": [
+                    {"args": [[2, 3, 5]], "expected": 2},
+                    {"args": [[1, 4, 6]], "expected": 4},
+                    {"args": [[1, 3, 5]], "expected": None},
+                ],
+            },
+            "Return only corrected Python code. Debug this function so age 18 counts as adult: def is_adult(age):\n    return age > 18": {
+                "type": "python_function_cases",
+                "function_name": "is_adult",
+                "cases": [
+                    {"args": [18], "expected": True},
+                    {"args": [17], "expected": False},
+                    {"args": [21], "expected": True},
+                ],
+            },
+        }
+        for prompt, validator in cases.items():
+            with self.subTest(prompt=prompt):
+                result = solve_deterministic(TaskEnvelope(input_text=prompt))
+                self.assertIsNotNone(result)
+                self.assertEqual(result.solver_name, "python_code_debug")
+                self.assertTrue(_validate(validator, result.answer)["valid"])
+
+    def test_solves_safe_python_generation_templates(self) -> None:
+        cases = {
+            "Return only Python code. Define a function clamp(value, low, high) that returns value bounded inclusively between low and high.": {
+                "type": "python_function_cases",
+                "function_name": "clamp",
+                "cases": [
+                    {"args": [5, 1, 10], "expected": 5},
+                    {"args": [-3, 0, 10], "expected": 0},
+                    {"args": [22, 0, 10], "expected": 10},
+                ],
+            },
+            "Return only Python code. Define a function unique_preserve_order(items) that removes duplicates while preserving first occurrence order.": {
+                "type": "python_function_cases",
+                "function_name": "unique_preserve_order",
+                "cases": [
+                    {"args": [["a", "b", "a", "c", "b"]], "expected": ["a", "b", "c"]},
+                    {"args": [[3, 3, 2, 1, 2]], "expected": [3, 2, 1]},
+                ],
+            },
+            "Return only Python code. Define a function is_palindrome(text) that ignores case and non-alphanumeric characters and returns a boolean.": {
+                "type": "python_function_cases",
+                "function_name": "is_palindrome",
+                "cases": [
+                    {"args": ["A man, a plan, a canal: Panama"], "expected": True},
+                    {"args": ["router"], "expected": False},
+                    {"args": ["No lemon, no melon"], "expected": True},
+                ],
+            },
+            "Return only Python code. Define a function parse_ints(text) that returns all signed integers in the text as a list of ints, in order.": {
+                "type": "python_function_cases",
+                "function_name": "parse_ints",
+                "cases": [
+                    {"args": ["a -2 b 10 c 0"], "expected": [-2, 10, 0]},
+                    {"args": ["none"], "expected": []},
+                    {"args": ["x7y -8"], "expected": [7, -8]},
+                ],
+            },
+        }
+        for prompt, validator in cases.items():
+            with self.subTest(prompt=prompt):
+                result = solve_deterministic(TaskEnvelope(input_text=prompt))
+                self.assertIsNotNone(result)
+                self.assertEqual(result.solver_name, "python_code_generation")
+                self.assertTrue(_validate(validator, result.answer)["valid"])
+
+    def test_blocks_unknown_python_code_templates(self) -> None:
+        blocked = [
+            "Return only Python code. Define a function sort_items(items) that sorts the list.",
+            "Return only corrected Python code. Debug this function: def f(x):\n    return x + 1",
+            "Define a function clamp(value, low, high).",
         ]
         for prompt in blocked:
             with self.subTest(prompt=prompt):

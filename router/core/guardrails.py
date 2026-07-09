@@ -110,11 +110,12 @@ def _simple_add_sub(text: str) -> int | None:
 def _literal_echo(text: str) -> str | None:
     if "\n" in text:
         return None
-    match = re.fullmatch(
-        r'(?i)\s*(?:return|output|respond with)\s+exactly\s+(.+?)(?:\s+and nothing else)?[.!]?\s*',
-        text,
-    )
-    if not match:
+    patterns = [
+        r"(?i)\s*(?:return|output|respond with)\s+exactly\s+this\s+string\s+and\s+nothing\s+else\s*:\s*(.+?)\s*[.!]?\s*",
+        r"(?i)\s*(?:return|output|respond with)\s+exactly\s+(.+?)(?:\s+and nothing else)?[.!]?\s*",
+    ]
+    match = next((re.fullmatch(pattern, text) for pattern in patterns if re.fullmatch(pattern, text)), None)
+    if match is None:
         return None
     value = match.group(1).strip()
     if len(value) > 200:
