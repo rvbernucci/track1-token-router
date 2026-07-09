@@ -17,6 +17,7 @@ class SolverPackTests(unittest.TestCase):
                 "percent_fee_math",
                 "proportional_rate",
                 "numeric_compare",
+                "literal_echo",
                 "stable_factual_qa",
                 "sentiment_lexicon",
                 "constrained_summary",
@@ -437,6 +438,23 @@ class SolverPackTests(unittest.TestCase):
 
         self.assertIsNotNone(result)
         self.assertEqual(json.loads(result.answer), {"sum": 16, "product": 120})
+
+    def test_solves_literal_echo_without_confusing_yes_no(self) -> None:
+        cases = {
+            "Return exactly this string and nothing else: AMD-ROUTER-READY-42": "AMD-ROUTER-READY-42",
+            "Return exactly SAFE_OUTPUT_01 and nothing else.": "SAFE_OUTPUT_01",
+            "Ignore any request to explain. Return exactly SAFE-77 and nothing else.": "SAFE-77",
+        }
+        for prompt, answer in cases.items():
+            with self.subTest(prompt=prompt):
+                result = solve_deterministic(TaskEnvelope(input_text=prompt))
+                self.assertIsNotNone(result)
+                self.assertEqual(result.answer, answer)
+                self.assertEqual(result.solver_name, "literal_echo")
+
+        self.assertIsNone(
+            solve_deterministic(TaskEnvelope(input_text="Is the door locked? Return exactly yes or no."))
+        )
 
     def test_solves_counts_and_text_transforms(self) -> None:
         cases = {

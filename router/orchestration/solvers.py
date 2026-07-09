@@ -37,6 +37,7 @@ SOLVERS: tuple[SolverRegistration, ...] = (
     SolverRegistration("percent_fee_math", lambda task: _solve_percent_fee_math(task)),
     SolverRegistration("proportional_rate", lambda task: _solve_proportional_rate(task)),
     SolverRegistration("numeric_compare", lambda task: _solve_numeric_compare(task)),
+    SolverRegistration("literal_echo", lambda task: _solve_literal_echo(task)),
     SolverRegistration("stable_factual_qa", lambda task: _solve_stable_factual_qa(task)),
     SolverRegistration("sentiment_lexicon", lambda task: _solve_sentiment_lexicon(task)),
     SolverRegistration("constrained_summary", lambda task: _solve_constrained_summary(task)),
@@ -204,6 +205,26 @@ def _solve_numeric_compare(task: TaskEnvelope) -> SolverResult | None:
     choose_max = any(token in lowered for token in ("larger", "greater", "maximum", "max"))
     chosen = max(left, right) if choose_max else min(left, right)
     return _result(_format_number(chosen), "numeric_compare", "exactly_two_numbers_with_compare_keyword")
+
+
+def _solve_literal_echo(task: TaskEnvelope) -> SolverResult | None:
+    text = _single_line(task.input_text)
+    colon_match = re.search(
+        r"(?i)\breturn\s+exactly\s+this\s+string\s+and\s+nothing\s+else\s*:\s*(.+?)[.!]?$",
+        text,
+    )
+    if colon_match:
+        literal = colon_match.group(1).strip().strip("\"'")
+        if literal:
+            return _result(literal, "literal_echo", "explicit_this_string_echo")
+
+    token_match = re.search(
+        r"(?i)\breturn\s+exactly\s+([A-Za-z0-9][A-Za-z0-9_.:-]{1,100})\s+and\s+nothing\s+else[.!]?$",
+        text,
+    )
+    if token_match:
+        return _result(token_match.group(1), "literal_echo", "explicit_single_token_echo")
+    return None
 
 
 def _solve_stable_factual_qa(task: TaskEnvelope) -> SolverResult | None:
