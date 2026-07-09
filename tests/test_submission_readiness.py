@@ -45,10 +45,43 @@ class SubmissionReadinessTests(unittest.TestCase):
         self.assertIn('"ok": true', payload)
         self.assertTrue(Path("submission/final/slides.pdf").exists())
         self.assertTrue(Path("submission/final/cover.png").exists())
+        self.assertTrue(Path("submission/final/demo.mp4").exists())
         self.assertTrue(Path("submission/final/lablab-submit-fields.md").exists())
 
-    def test_checked_in_strict_mode_is_ok_with_approved_video_placeholder(self) -> None:
+    def test_checked_in_strict_mode_is_ok_with_local_demo_video(self) -> None:
         readiness = check_submission_readiness(Path("."), strict=True)
+
+        self.assertTrue(readiness.ok, readiness.errors)
+        self.assertIn("submission/final/demo.mp4", readiness.metrics["strict_video_files"])
+        self.assertFalse(any("video placeholder" in warning for warning in readiness.warnings))
+
+    def test_strict_mode_warns_when_only_video_placeholder_is_available(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            shutil.copytree("submission", tmp_root / "submission")
+            demo_mp4 = tmp_root / "submission" / "final" / "demo.mp4"
+            if demo_mp4.exists():
+                demo_mp4.unlink()
+            status_path = tmp_root / "submission" / "final" / "submission-status.json"
+            status_path.write_text(
+                status_path.read_text(encoding="utf-8")
+                .replace('"video_file": "submission/final/demo.mp4"', '"video_file": ""')
+                .replace('"video_placeholder_approved": false', '"video_placeholder_approved": true'),
+                encoding="utf-8",
+            )
+            for relative in (
+                ".github",
+            ):
+                shutil.copytree(relative, tmp_root / relative)
+            for relative in (
+                "README.md",
+                "SUBMISSION.md",
+                "CREDIT_ACTIVATION.md",
+                "Dockerfile",
+            ):
+                shutil.copy2(relative, tmp_root / relative)
+
+            readiness = check_submission_readiness(tmp_root, strict=True)
 
         self.assertTrue(readiness.ok, readiness.errors)
         self.assertTrue(any("video placeholder" in warning for warning in readiness.warnings))

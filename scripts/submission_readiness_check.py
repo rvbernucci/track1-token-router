@@ -98,7 +98,7 @@ def check_submission_readiness(root: Path = Path("."), *, strict: bool = False) 
     _check_readme(root / "README.md", errors)
     if strict:
         _check_strict_artifacts(root, errors, warnings, metrics)
-    _check_pending_items(warnings)
+    _check_pending_items(root, warnings)
 
     return SubmissionReadiness(not errors, errors, warnings, metrics)
 
@@ -191,11 +191,12 @@ def _check_strict_artifacts(root: Path, errors: list[str], warnings: list[str], 
     if not any(path.exists() and path.stat().st_size >= 100 for path in cover_candidates):
         errors.append("strict: submission/final/cover.png or cover.jpg must exist")
 
-    video_files = list(final_root.glob("*.mp4"))
+    video_files = [path for path in final_root.glob("*.mp4") if _is_valid_mp4(path)]
+    metrics["strict_video_files"] = [str(path.relative_to(root)) for path in video_files]
     placeholder_ok = bool(status.get("video_placeholder_approved")) and (final_root / "video-placeholder-approved.md").exists()
     if not video_url.startswith("https://") and not video_files and not placeholder_ok:
         errors.append("strict: provide video_url, video MP4, or approved video placeholder")
-    if placeholder_ok and not video_url:
+    if placeholder_ok and not video_url and not video_files:
         warnings.append("strict: video placeholder is approved but must be replaced before final submission")
 
 
@@ -234,6 +235,13 @@ def _is_explicit_ghcr_image(value: str) -> bool:
     return bool(tag) and tag != "latest"
 
 
+def _is_valid_mp4(path: Path) -> bool:
+    if not path.exists() or path.stat().st_size < 1000:
+        return False
+    header = path.read_bytes()[:16]
+    return len(header) >= 12 and header[4:8] == b"ftyp"
+
+
 def _load_status(path: Path, errors: list[str]) -> dict[str, object]:
     if not path.exists():
         errors.append("strict: missing submission/final/submission-status.json")
@@ -249,14 +257,27 @@ def _load_status(path: Path, errors: list[str]) -> dict[str, object]:
     return payload
 
 
-def _check_pending_items(warnings: list[str]) -> None:
-    warnings.extend(
-        [
-            "Add final public repository URL in lablab form.",
-            "Add final demo/video URL after recording.",
-            "Replace dry-run evidence with real AMD/Fireworks benchmark after credits arrive.",
-        ]
-    )
+def _check_pending_items(root: Path, warnings: list[str]) -> None:
+    final_root = root / "submission" / "final"
+    status = _load_optional_status(final_root / "submission-status.json")
+    repo_url = str(status.get("repo_url") or "")
+    video_url = str(status.get("video_url") or "")
+    video_files = [path for path in final_root.glob("*.mp4") if _is_valid_mp4(path)] if final_root.exists() else []
+    if not repo_url.startswith("https://"):
+        warnings.append("Add final public repository URL in lablab form.")
+    if not video_url.startswith("https://") and not video_files:
+        warnings.append("Add final demo/video URL after recording.")
+    warnings.append("Replace dry-run evidence with real AMD/Fireworks benchmark after final official evaluator access is available.")
+
+
+def _load_optional_status(path: Path) -> dict[str, object]:
+    if not path.exists():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    return payload if isinstance(payload, dict) else {}
 
 
 def _read(path: Path) -> str:

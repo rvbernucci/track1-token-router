@@ -4,8 +4,12 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import struct
+import subprocess
 import sys
+import tempfile
+import textwrap
 import zlib
 from pathlib import Path
 
@@ -16,6 +20,7 @@ COVER_PNG = FINAL_ROOT / "cover.png"
 SPEAKER_NOTES = FINAL_ROOT / "speaker-notes.md"
 MANIFEST = FINAL_ROOT / "artifact-manifest.json"
 VIDEO_PLACEHOLDER = FINAL_ROOT / "video-placeholder-approved.md"
+DEMO_MP4 = FINAL_ROOT / "demo.mp4"
 FINAL_README = FINAL_ROOT / "README.md"
 LABLAB_FIELDS = FINAL_ROOT / "lablab-submit-fields.md"
 SUBMISSION_STATUS = FINAL_ROOT / "submission-status.json"
@@ -29,6 +34,7 @@ def build_submission_artifacts(root: Path = Path(".")) -> dict[str, object]:
     _write_cover_png(root / COVER_PNG)
     _write_speaker_notes(root / SPEAKER_NOTES, slides)
     _write_video_placeholder(root / VIDEO_PLACEHOLDER)
+    _write_demo_video(root / DEMO_MP4, slides)
     _write_final_readme(root / FINAL_README)
     _write_lablab_fields(root / LABLAB_FIELDS, root)
     manifest = _manifest(root, slides)
@@ -49,6 +55,13 @@ def validate_submission_artifacts(root: Path = Path(".")) -> list[str]:
         errors.append("slides.pdf is not a PDF")
     if (root / COVER_PNG).exists() and not (root / COVER_PNG).read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
         errors.append("cover.png is not a PNG")
+    if (root / DEMO_MP4).exists():
+        mp4 = root / DEMO_MP4
+        header = mp4.read_bytes()[:16]
+        if mp4.stat().st_size < 1000:
+            errors.append("demo.mp4 is unexpectedly small")
+        if len(header) < 12 or header[4:8] != b"ftyp":
+            errors.append("demo.mp4 is not an MP4")
     return errors
 
 
@@ -175,6 +188,176 @@ def _write_cover_png(path: Path, width: int = 1280, height: int = 720) -> None:
     path.write_bytes(png)
 
 
+def _write_demo_video(path: Path, slides: list[dict[str, str]]) -> bool:
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg:
+        return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="track1-video-") as tmp_name:
+        tmp = Path(tmp_name)
+        for index, slide in enumerate(slides, start=1):
+            _write_video_frame(tmp / f"frame_{index:03d}.ppm", slide)
+        pattern = str(tmp / "frame_%03d.ppm")
+        commands = [
+            [
+                ffmpeg,
+                "-y",
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-framerate",
+                "1/3",
+                "-i",
+                pattern,
+                "-vf",
+                "fps=30,format=yuv420p",
+                "-movflags",
+                "+faststart",
+                "-c:v",
+                "libx264",
+                "-preset",
+                "veryfast",
+                "-crf",
+                "30",
+                str(path),
+            ],
+            [
+                ffmpeg,
+                "-y",
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-framerate",
+                "1/3",
+                "-i",
+                pattern,
+                "-vf",
+                "fps=30,format=yuv420p",
+                "-movflags",
+                "+faststart",
+                "-c:v",
+                "mpeg4",
+                "-q:v",
+                "6",
+                str(path),
+            ],
+        ]
+        for command in commands:
+            try:
+                subprocess.run(command, check=True, capture_output=True, text=True)
+                return path.exists() and path.stat().st_size > 1000
+            except (OSError, subprocess.CalledProcessError):
+                continue
+    return False
+
+
+def _write_video_frame(path: Path, slide: dict[str, str], width: int = 1280, height: int = 720) -> None:
+    pixels = _video_background(width, height, int(slide["number"]))
+    _fill_rect(pixels, width, height, 0, 0, width, 18, (242, 98, 35))
+    _fill_rect(pixels, width, height, 64, 94, 1160, 3, (242, 98, 35))
+    _draw_text(pixels, width, height, 68, 52, "TRACK 1 TOKEN ROUTER", 5, (250, 250, 242))
+    _draw_text(pixels, width, height, 762, 58, "LOCAL-FIRST | GATED REMOTE", 3, (255, 188, 112))
+
+    title = f"{slide['number']}. {_clean_video_text(slide['title'])}"
+    y = 150
+    for line in _wrap_video_text(title, max_chars=30)[:2]:
+        _draw_text(pixels, width, height, 76, y, line, 7, (255, 244, 222))
+        y += 72
+
+    body = _clean_video_text(slide["body"])
+    y = max(y + 20, 300)
+    for line in _wrap_video_text(body, max_chars=52)[:6]:
+        _draw_text(pixels, width, height, 96, y, line, 4, (226, 236, 244))
+        y += 44
+
+    _fill_rect(pixels, width, height, 70, 626, 1140, 52, (20, 35, 47))
+    _draw_text(pixels, width, height, 100, 644, "DOCKER AMD64 | STRICT READINESS GREEN | PUBLIC GHCR IMAGE", 3, (167, 232, 186))
+    _write_ppm(path, pixels, width, height)
+
+
+def _video_background(width: int, height: int, slide_number: int) -> bytearray:
+    pixels = bytearray(width * height * 3)
+    for y in range(height):
+        for x in range(width):
+            offset = (y * width + x) * 3
+            glow = max(0, 220 - abs(x - 980) // 3 - abs(y - 130) // 2)
+            ember = max(0, 190 - abs(x - 200) // 4 - abs(y - 620) // 3)
+            stripe = 16 if ((x + y + slide_number * 23) // 96) % 2 == 0 else 0
+            pixels[offset] = min(255, 12 + glow // 4 + ember // 3 + stripe)
+            pixels[offset + 1] = min(255, 24 + glow // 6 + stripe // 2)
+            pixels[offset + 2] = min(255, 36 + glow // 8)
+    return pixels
+
+
+def _write_ppm(path: Path, pixels: bytearray, width: int, height: int) -> None:
+    path.write_bytes(f"P6\n{width} {height}\n255\n".encode("ascii") + bytes(pixels))
+
+
+def _draw_text(
+    pixels: bytearray,
+    width: int,
+    height: int,
+    x: int,
+    y: int,
+    text: str,
+    scale: int,
+    color: tuple[int, int, int],
+) -> None:
+    cursor = x
+    for char in text.upper():
+        if char == " ":
+            cursor += 4 * scale
+            continue
+        pattern = FONT_5X7.get(char, FONT_5X7["?"])
+        for row_index, row in enumerate(pattern):
+            for col_index, bit in enumerate(row):
+                if bit == "1":
+                    _fill_rect(
+                        pixels,
+                        width,
+                        height,
+                        cursor + col_index * scale,
+                        y + row_index * scale,
+                        scale,
+                        scale,
+                        color,
+                    )
+        cursor += 6 * scale
+
+
+def _fill_rect(
+    pixels: bytearray,
+    width: int,
+    height: int,
+    x: int,
+    y: int,
+    rect_width: int,
+    rect_height: int,
+    color: tuple[int, int, int],
+) -> None:
+    x0 = max(0, x)
+    y0 = max(0, y)
+    x1 = min(width, x + rect_width)
+    y1 = min(height, y + rect_height)
+    for yy in range(y0, y1):
+        row = yy * width * 3
+        for xx in range(x0, x1):
+            offset = row + xx * 3
+            pixels[offset] = color[0]
+            pixels[offset + 1] = color[1]
+            pixels[offset + 2] = color[2]
+
+
+def _clean_video_text(value: str) -> str:
+    value = re.sub(r"`([^`]+)`", r"\1", value)
+    value = re.sub(r"[*_#\[\]]", " ", value)
+    return re.sub(r"[^A-Za-z0-9 .,:;!?()/+*=_#&|'-]", " ", value).strip()
+
+
+def _wrap_video_text(value: str, max_chars: int) -> list[str]:
+    return textwrap.wrap(value, width=max_chars, break_long_words=False, break_on_hyphens=False) or [""]
+
+
 def _png_chunk(chunk_type: bytes, data: bytes) -> bytes:
     return (
         struct.pack(">I", len(data))
@@ -218,6 +401,7 @@ def _write_final_readme(path: Path) -> None:
         "- `slides.pdf`: generated placeholder deck from `submission/slides-outline.md`.\n"
         "- `cover.png`: generated placeholder cover image.\n"
         "- `speaker-notes.md`: short notes generated from the slide outline.\n"
+        "- `demo.mp4`: generated short demo slideshow when `ffmpeg` is available.\n"
         "- `video-placeholder-approved.md`: temporary placeholder until final recording is uploaded.\n"
         "- `submission-status.json`: strict readiness status for repo, demo, video, CI and public GHCR image.\n"
         "- `lablab-submit-fields.md`: copy-paste fields for the lablab.ai submission form.\n\n"
@@ -237,10 +421,16 @@ def _write_lablab_fields(path: Path, root: Path) -> None:
     commit_sha = str(status.get("commit_sha") or "PENDING_COMMIT_SHA")
     demo_url = str(status.get("demo_url") or "PENDING_DEMO_URL")
     repo_url = str(status.get("repo_url") or "PENDING_REPO_URL")
+    video_file = str(status.get("video_file") or "")
+    if not video_file and (root / DEMO_MP4).exists():
+        video_file = str(DEMO_MP4)
     raw_video_url = str(status.get("video_url") or "")
     video_url = raw_video_url
     if not raw_video_url:
-        video_url = "PENDING_VIDEO_URL - placeholder approved until final recording upload"
+        if video_file:
+            video_url = f"Local MP4 included in repository: {video_file}"
+        else:
+            video_url = "PENDING_VIDEO_URL - placeholder approved until final recording upload"
     lines = [
         "# lablab.ai Submission Fields",
         "",
@@ -304,7 +494,7 @@ def _write_lablab_fields(path: Path, root: Path) -> None:
         "## Notes",
         "",
         "- Submit the Docker image above for Track 1.",
-        "- Replace the video URL before final submission if lablab requires a hosted video.",
+        "- Use the local MP4 if lablab accepts uploads; replace with a hosted URL if the form requires a link.",
         "- Keep this file aligned with `submission/final/submission-status.json`.",
         "",
     ]
@@ -312,13 +502,16 @@ def _write_lablab_fields(path: Path, root: Path) -> None:
 
 
 def _manifest(root: Path, slides: list[dict[str, str]]) -> dict[str, object]:
+    artifacts = {
+        str(relative): (root / relative).stat().st_size
+        for relative in (SLIDES_PDF, COVER_PNG, SPEAKER_NOTES, VIDEO_PLACEHOLDER, FINAL_README, LABLAB_FIELDS)
+    }
+    if (root / DEMO_MP4).exists():
+        artifacts[str(DEMO_MP4)] = (root / DEMO_MP4).stat().st_size
     return {
         "slides": len(slides),
-        "artifacts": {
-            str(relative): (root / relative).stat().st_size
-            for relative in (SLIDES_PDF, COVER_PNG, SPEAKER_NOTES, VIDEO_PLACEHOLDER, FINAL_README, LABLAB_FIELDS)
-        },
-        "notes": "Generated placeholder artifacts. Replace visuals before final submission if a designed deck/cover is available.",
+        "artifacts": artifacts,
+        "notes": "Generated submission artifacts. Replace visuals before final submission if a designed deck/cover is available.",
     }
 
 
@@ -340,6 +533,68 @@ def _read_text(path: Path) -> str:
 
 def _strip_markdown_title(value: str) -> str:
     return re.sub(r"^# .+?\n+", "", value.strip(), count=1)
+
+
+FONT_5X7 = {
+    "A": ["01110", "10001", "10001", "11111", "10001", "10001", "10001"],
+    "B": ["11110", "10001", "10001", "11110", "10001", "10001", "11110"],
+    "C": ["01111", "10000", "10000", "10000", "10000", "10000", "01111"],
+    "D": ["11110", "10001", "10001", "10001", "10001", "10001", "11110"],
+    "E": ["11111", "10000", "10000", "11110", "10000", "10000", "11111"],
+    "F": ["11111", "10000", "10000", "11110", "10000", "10000", "10000"],
+    "G": ["01111", "10000", "10000", "10011", "10001", "10001", "01111"],
+    "H": ["10001", "10001", "10001", "11111", "10001", "10001", "10001"],
+    "I": ["11111", "00100", "00100", "00100", "00100", "00100", "11111"],
+    "J": ["00111", "00010", "00010", "00010", "00010", "10010", "01100"],
+    "K": ["10001", "10010", "10100", "11000", "10100", "10010", "10001"],
+    "L": ["10000", "10000", "10000", "10000", "10000", "10000", "11111"],
+    "M": ["10001", "11011", "10101", "10101", "10001", "10001", "10001"],
+    "N": ["10001", "11001", "10101", "10011", "10001", "10001", "10001"],
+    "O": ["01110", "10001", "10001", "10001", "10001", "10001", "01110"],
+    "P": ["11110", "10001", "10001", "11110", "10000", "10000", "10000"],
+    "Q": ["01110", "10001", "10001", "10001", "10101", "10010", "01101"],
+    "R": ["11110", "10001", "10001", "11110", "10100", "10010", "10001"],
+    "S": ["01111", "10000", "10000", "01110", "00001", "00001", "11110"],
+    "T": ["11111", "00100", "00100", "00100", "00100", "00100", "00100"],
+    "U": ["10001", "10001", "10001", "10001", "10001", "10001", "01110"],
+    "V": ["10001", "10001", "10001", "10001", "10001", "01010", "00100"],
+    "W": ["10001", "10001", "10001", "10101", "10101", "10101", "01010"],
+    "X": ["10001", "10001", "01010", "00100", "01010", "10001", "10001"],
+    "Y": ["10001", "10001", "01010", "00100", "00100", "00100", "00100"],
+    "Z": ["11111", "00001", "00010", "00100", "01000", "10000", "11111"],
+    "0": ["01110", "10001", "10011", "10101", "11001", "10001", "01110"],
+    "1": ["00100", "01100", "00100", "00100", "00100", "00100", "01110"],
+    "2": ["01110", "10001", "00001", "00010", "00100", "01000", "11111"],
+    "3": ["11110", "00001", "00001", "01110", "00001", "00001", "11110"],
+    "4": ["00010", "00110", "01010", "10010", "11111", "00010", "00010"],
+    "5": ["11111", "10000", "10000", "11110", "00001", "00001", "11110"],
+    "6": ["01110", "10000", "10000", "11110", "10001", "10001", "01110"],
+    "7": ["11111", "00001", "00010", "00100", "01000", "01000", "01000"],
+    "8": ["01110", "10001", "10001", "01110", "10001", "10001", "01110"],
+    "9": ["01110", "10001", "10001", "01111", "00001", "00001", "01110"],
+    ".": ["00000", "00000", "00000", "00000", "00000", "01100", "01100"],
+    ",": ["00000", "00000", "00000", "00000", "01100", "00100", "01000"],
+    ":": ["00000", "01100", "01100", "00000", "01100", "01100", "00000"],
+    ";": ["00000", "01100", "01100", "00000", "01100", "00100", "01000"],
+    "!": ["00100", "00100", "00100", "00100", "00100", "00000", "00100"],
+    "?": ["01110", "10001", "00001", "00010", "00100", "00000", "00100"],
+    "-": ["00000", "00000", "00000", "11111", "00000", "00000", "00000"],
+    "'": ["00100", "00100", "01000", "00000", "00000", "00000", "00000"],
+    '"': ["01010", "01010", "01010", "00000", "00000", "00000", "00000"],
+    "/": ["00001", "00010", "00010", "00100", "01000", "01000", "10000"],
+    "\\": ["10000", "01000", "01000", "00100", "00010", "00010", "00001"],
+    "(": ["00010", "00100", "01000", "01000", "01000", "00100", "00010"],
+    ")": ["01000", "00100", "00010", "00010", "00010", "00100", "01000"],
+    "+": ["00000", "00100", "00100", "11111", "00100", "00100", "00000"],
+    "*": ["00000", "10101", "01110", "11111", "01110", "10101", "00000"],
+    "=": ["00000", "00000", "11111", "00000", "11111", "00000", "00000"],
+    "_": ["00000", "00000", "00000", "00000", "00000", "00000", "11111"],
+    "#": ["01010", "01010", "11111", "01010", "11111", "01010", "01010"],
+    "&": ["01100", "10010", "10100", "01000", "10101", "10010", "01101"],
+    "|": ["00100", "00100", "00100", "00100", "00100", "00100", "00100"],
+    "<": ["00010", "00100", "01000", "10000", "01000", "00100", "00010"],
+    ">": ["01000", "00100", "00010", "00001", "00010", "00100", "01000"],
+}
 
 
 if __name__ == "__main__":

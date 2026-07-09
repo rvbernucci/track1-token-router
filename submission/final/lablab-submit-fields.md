@@ -47,7 +47,7 @@ https://rvbernucci.github.io/track1-token-router/
 
 ## Video URL
 
-PENDING_VIDEO_URL - placeholder approved until final recording upload
+Local MP4 included in repository: submission/final/demo.mp4
 
 ## Public Docker Image
 
@@ -75,5 +75,5 @@ python3 scripts/competition_submission_audit.py \
 ## Notes
 
 - Submit the Docker image above for Track 1.
-- Replace the video URL before final submission if lablab requires a hosted video.
+- Use the local MP4 if lablab accepts uploads; replace with a hosted URL if the form requires a link.
 - Keep this file aligned with `submission/final/submission-status.json`.

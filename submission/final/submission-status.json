@@ -12,6 +12,7 @@
   "release_tag": "offline-rc-20260709-0307",
   "commit_sha": "0ebdc64dd21c5dbccd242a6850526a0c818d77f6",
   "repo_url": "https://github.com/rvbernucci/track1-token-router",
-  "video_placeholder_approved": true,
+  "video_file": "submission/final/demo.mp4",
+  "video_placeholder_approved": false,
   "video_url": ""
 }

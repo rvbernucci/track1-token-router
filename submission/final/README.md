@@ -11,6 +11,7 @@ python3 scripts/build_submission_artifacts.py --check
 - `slides.pdf`: generated placeholder deck from `submission/slides-outline.md`.
 - `cover.png`: generated placeholder cover image.
 - `speaker-notes.md`: short notes generated from the slide outline.
+- `demo.mp4`: generated short demo slideshow when `ffmpeg` is available.
 - `video-placeholder-approved.md`: temporary placeholder until final recording is uploaded.
 - `submission-status.json`: strict readiness status for repo, demo, video, CI and public GHCR image.
 - `lablab-submit-fields.md`: copy-paste fields for the lablab.ai submission form.

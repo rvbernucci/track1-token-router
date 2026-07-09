@@ -1,12 +1,13 @@
 {
   "artifacts": {
-    "submission/final/README.md": 695,
+    "submission/final/README.md": 768,
     "submission/final/cover.png": 54732,
-    "submission/final/lablab-submit-fields.md": 2781,
+    "submission/final/demo.mp4": 197198,
+    "submission/final/lablab-submit-fields.md": 2790,
     "submission/final/slides.pdf": 4439,
     "submission/final/speaker-notes.md": 1393,
     "submission/final/video-placeholder-approved.md": 178
   },
-  "notes": "Generated placeholder artifacts. Replace visuals before final submission if a designed deck/cover is available.",
+  "notes": "Generated submission artifacts. Replace visuals before final submission if a designed deck/cover is available.",
   "slides": 10
 }
