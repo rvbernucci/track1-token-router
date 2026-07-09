@@ -64,6 +64,9 @@ def solve_deterministic(task: TaskEnvelope) -> SolverResult | None:
 
 def _solve_arithmetic(task: TaskEnvelope) -> SolverResult | None:
     text = _single_line(task.input_text)
+    aggregate = _solve_arithmetic_aggregate(text)
+    if aggregate is not None:
+        return aggregate
     match = re.fullmatch(
         r"(?i)(?:what is|calculate|compute|solve)?\s*"
         r"(-?\d{1,9})\s*([+\-*/])\s*(-?\d{1,9})"
@@ -102,6 +105,9 @@ def _solve_arithmetic(task: TaskEnvelope) -> SolverResult | None:
 def _solve_percent_fee_math(task: TaskEnvelope) -> SolverResult | None:
     text = _single_line(task.input_text)
     lowered = text.lower()
+    compound = _solve_compound_percent_increase(text)
+    if compound is not None:
+        return compound
     if not any(token in lowered for token in ("discount", "percent", "%", "fee")):
         return None
     match = re.search(
@@ -218,12 +224,23 @@ def _solve_sentiment_lexicon(task: TaskEnvelope) -> SolverResult | None:
         return _result("negative", "sentiment_lexicon", "explicit_negative_lexicon_margin")
     if neutral and positive == 0 and negative == 0:
         return _result("neutral", "sentiment_lexicon", "explicit_neutral_lexicon")
+    if positive == 0 and negative == 0 and _looks_like_factual_neutral_text(text):
+        return _result("neutral", "sentiment_lexicon", "factual_statement_without_sentiment_terms")
     return None
 
 
 def _solve_entity_extract(task: TaskEnvelope) -> SolverResult | None:
     lowered = task.input_text.lower()
+    key_values = _extract_key_value_pairs(task.input_text)
+    if key_values is not None and "json" in lowered:
+        return _json_result(key_values, "entity_extract", "explicit_key_value_pairs")
     if "extract" not in lowered or "json" not in lowered:
+        title = _extract_record_title(task.input_text)
+        if title is not None:
+            return _result(title, "entity_extract", "record_title_field")
+        invoice_code = _extract_invoice_code(task.input_text)
+        if invoice_code is not None:
+            return _result(invoice_code, "entity_extract", "invoice_code_pattern")
         return None
     names = _extract_name_list_entities(task.input_text)
     if names is not None and "names" in lowered:
@@ -237,6 +254,9 @@ def _solve_entity_extract(task: TaskEnvelope) -> SolverResult | None:
     founding = _extract_founding_entities(text)
     if founding is not None and all(key in lowered for key in ("person", "organization", "city")):
         return _json_result(founding, "entity_extract", "founding_sentence_entities")
+    purchase = _extract_customer_purchase_entities(text)
+    if purchase is not None and all(key in lowered for key in ("customer", "quantity", "item", "city")):
+        return _json_result(purchase, "entity_extract", "customer_purchase_sentence_entities")
     contact = _extract_contact_entities(text, lowered)
     if contact is not None:
         return _json_result(contact, "entity_extract", "contact_pattern_entities")
@@ -485,6 +505,8 @@ def _solve_case_transform(task: TaskEnvelope) -> SolverResult | None:
     lowered = task.input_text.lower()
     value = _quoted_value(task.input_text)
     if value is None:
+        value = _text_after_unquoted_transform_marker(task.input_text)
+    if value is None:
         return None
     if "uppercase" in lowered or "upper case" in lowered:
         return _result(value.upper(), "case_transform", "quoted_uppercase_transform")
@@ -574,6 +596,8 @@ def _single_line(text: str) -> str:
 
 
 def _format_number(value: float) -> str:
+    if abs(value - round(value)) < 1e-9:
+        return str(int(round(value)))
     if value.is_integer():
         return str(int(value))
     return str(value).rstrip("0").rstrip(".")
@@ -625,6 +649,35 @@ def _eval_integer_ast(node: ast.AST) -> int | None:
     return None
 
 
+def _solve_arithmetic_aggregate(text: str) -> SolverResult | None:
+    mean_match = re.fullmatch(
+        r"(?i)the\s+scores\s+are\s+(.+?)\.\s+return\s+only\s+their\s+arithmetic\s+mean\.?",
+        text,
+    )
+    if mean_match:
+        numbers = [int(value) for value in re.findall(r"-?\d{1,9}", mean_match.group(1))]
+        if 2 <= len(numbers) <= 20 and sum(numbers) % len(numbers) == 0:
+            return _result(str(sum(numbers) // len(numbers)), "arithmetic", "explicit_integer_arithmetic_mean")
+    return None
+
+
+def _solve_compound_percent_increase(text: str) -> SolverResult | None:
+    match = re.fullmatch(
+        r"(?i)start\s+with\s+(-?\d+(?:\.\d+)?),\s+increase\s+by\s+(\d+(?:\.\d+)?)\s+percent,\s+"
+        r"then\s+increase\s+the\s+result\s+by\s+another\s+\2\s+percent\.\s+"
+        r"return\s+only\s+the\s+final\s+number\.?",
+        text,
+    )
+    if not match:
+        return None
+    base = float(match.group(1))
+    percent = float(match.group(2))
+    if base < 0 or not 0 <= percent <= 100:
+        return None
+    answer = base * ((1 + percent / 100) ** 2)
+    return _result(_format_number(answer), "percent_fee_math", "explicit_repeated_percent_increase")
+
+
 def _quoted_value(text: str) -> str | None:
     match = re.search(r'"([^"]*)"', text, flags=re.DOTALL)
     if match:
@@ -644,6 +697,17 @@ def _text_after_marker(text: str, marker: str) -> str | None:
     if extract_index != -1:
         value = value[:extract_index]
     return value.strip(" .\n\t") or None
+
+
+def _text_after_unquoted_transform_marker(text: str) -> str | None:
+    match = re.search(
+        r"(?i)\b(?:lowercase|uppercase|titlecase)\s+(?:only\s+)?(?:the\s+)?(?:version\s+of\s+)?(?:this\s+)?text:\s*(.+)$",
+        text,
+        flags=re.DOTALL,
+    )
+    if not match:
+        return None
+    return match.group(1).strip(" .\n\t") or None
 
 
 def _json_result(payload: dict[str, object], solver_name: str, reason: str) -> SolverResult:
@@ -678,6 +742,28 @@ def _json_number(value: int | float) -> int | float:
     if isinstance(value, float) and value.is_integer():
         return int(value)
     return value
+
+
+def _extract_key_value_pairs(text: str) -> dict[str, object] | None:
+    if "key/value pairs" not in text.lower():
+        return None
+    match = re.search(r"(?i)key/value pairs:\s*(.+?)\.?$", text)
+    if not match:
+        return None
+    fields: dict[str, object] = {}
+    for raw_pair in match.group(1).split(","):
+        pair = raw_pair.strip().strip(".")
+        if not pair:
+            continue
+        key_value = re.fullmatch(r"([a-z][a-z0-9_-]*)\s*=\s*([A-Za-z0-9_-]+)", pair)
+        if not key_value:
+            return None
+        raw_value = key_value.group(2)
+        value: object = int(raw_value) if re.fullmatch(r"-?\d+", raw_value) else raw_value
+        fields[key_value.group(1)] = value
+    if not 1 <= len(fields) <= 10:
+        return None
+    return fields
 
 
 def _extract_payment_entities(text: str) -> dict[str, str] | None:
@@ -731,6 +817,55 @@ def _extract_contact_entities(text: str, lowered_prompt: str) -> dict[str, str] 
     return fields or None
 
 
+def _extract_customer_purchase_entities(text: str) -> dict[str, object] | None:
+    match = re.fullmatch(
+        r"Customer\s+([A-Z][a-zA-Z'-]+)\s+bought\s+(\d{1,6})\s+(.+?)\s+in\s+([A-Z][A-Za-zÀ-ÖØ-öø-ÿ.'-]+)\.?",
+        text,
+    )
+    if not match:
+        return None
+    return {
+        "customer": match.group(1),
+        "quantity": int(match.group(2)),
+        "item": match.group(3),
+        "city": match.group(4),
+    }
+
+
+def _extract_record_title(text: str) -> str | None:
+    lowered = text.lower()
+    if "return only the title" not in lowered or "title:" not in lowered:
+        return None
+    match = re.search(r"\bTitle:\s*(.+?)\.\s+Author:", text, flags=re.DOTALL)
+    if not match:
+        return None
+    return match.group(1).strip()
+
+
+def _extract_invoice_code(text: str) -> str | None:
+    lowered = text.lower()
+    if "return only the invoice code" not in lowered:
+        return None
+    match = re.search(r"\binvoice\s+([A-Z]{2,10}-\d{2,8}-\d{2,8})\b", text)
+    if not match:
+        return None
+    return match.group(1)
+
+
+def _looks_like_factual_neutral_text(text: str) -> bool:
+    lowered = text.lower()
+    if any(mark in lowered for mark in ("!", "?", "love", "hate", "amazing", "terrible")):
+        return False
+    factual_markers = [
+        r"\bstarts?\s+at\b",
+        r"\bends?\s+at\b",
+        r"\bmeeting\b",
+        r"\bscheduled\b",
+        r"\bfrom\s+\d+\s+to\s+\d+\b",
+    ]
+    return any(re.search(pattern, lowered) for pattern in factual_markers)
+
+
 def _extract_name_list_entities(text: str) -> list[str] | None:
     marker = "key names:"
     lowered = text.lower()
@@ -761,13 +896,24 @@ def _solve_quantified_syllogism(text: str) -> SolverResult | None:
     all_no_match = re.fullmatch(
         r"(?i)all\s+([a-z][a-z-]*)\s+are\s+([a-z][a-z-]*)\.\s+"
         r"no\s+\2\s+are\s+([a-z][a-z-]*)\.\s+"
-        r"can\s+(?:a|an)\s+\1\s+be\s+(?:a|an)\s+\3\?\s+"
+        r"can\s+(?:a|an)\s+([a-z][a-z-]*)\s+be\s+(?:a|an)\s+([a-z][a-z-]*)\?\s+"
         r"return\s+exactly\s+yes\s+or\s+no\.?",
         text,
     )
-    if all_no_match:
+    if all_no_match and _same_singular_or_plural(all_no_match.group(1), all_no_match.group(4)) and _same_singular_or_plural(all_no_match.group(3), all_no_match.group(5)):
         return _result("no", "logic_ordering", "all_no_quantifier_exclusion")
     return None
+
+
+def _same_singular_or_plural(left: str, right: str) -> bool:
+    def normalize(value: str) -> str:
+        if value.endswith("es") and len(value) > 3:
+            return value[:-2]
+        if value.endswith("s") and len(value) > 3:
+            return value[:-1]
+        return value
+
+    return normalize(left.lower()) == normalize(right.lower())
 
 
 def _normalize_clause(value: str) -> str:

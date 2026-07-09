@@ -248,12 +248,16 @@ def _task_tier(prompt: str) -> tuple[str, str]:
         return "strong", "deductive_reasoning_requires_stronger_model"
     if _has_any(lowered, ["logical", "deductive", "constraint", "puzzle", "all conditions", "prove"]):
         return "strong", "deductive_reasoning_requires_stronger_model"
+    if _looks_like_field_extraction(lowered):
+        return "medium", "language_extraction_or_factual_task"
     if _looks_like_quantitative_word_problem(lowered):
         return "strong", "multi_step_reasoning_requires_stronger_model"
     if _has_any_keyword(lowered, ["multi-step", "word problem", "projection", "percentage", "percent", "rate", "average", "reasoning"]):
         return "strong", "multi_step_reasoning_requires_stronger_model"
     if _looks_like_direct_numeric_task(lowered):
         return "medium", "direct_numeric_task_requires_math_model"
+    if _looks_like_text_transform(lowered):
+        return "cheap", "format_constrained_task_can_start_on_cheapest_model"
     if _has_any_keyword(lowered, ["current", "latest", "today", "now", "price", "ceo", "version"]):
         return "strong", "time_sensitive_factuality_requires_stronger_model"
     if _looks_like_factual_question(lowered):
@@ -279,12 +283,16 @@ def _task_domain(prompt: str) -> str:
         return "logic"
     if _has_any(lowered, ["logical", "deductive", "constraint", "puzzle", "prove"]):
         return "logic"
+    if _looks_like_field_extraction(lowered):
+        return "extraction"
     if _looks_like_quantitative_word_problem(lowered):
         return "math_reasoning"
     if _has_any_keyword(lowered, ["multi-step", "word problem", "percentage", "percent", "rate", "average", "reasoning"]):
         return "math_reasoning"
     if _looks_like_direct_numeric_task(lowered):
         return "math_reasoning"
+    if _looks_like_text_transform(lowered):
+        return "formatting"
     if _has_any_keyword(lowered, ["current", "latest", "today", "now", "price", "ceo", "version"]):
         return "current_factual"
     if _looks_like_factual_question(lowered):
@@ -335,6 +343,27 @@ def _looks_like_direct_numeric_task(lowered_prompt: str) -> bool:
     if re.search(r"\b(min|max|minimum|maximum|mean|median|sum|total|product)\b", lowered_prompt):
         return True
     return bool(re.search(r"\d+\s*[-+*/]\s*\d+", lowered_prompt))
+
+
+def _looks_like_text_transform(lowered_prompt: str) -> bool:
+    return bool(
+        re.search(
+            r"\b(?:lowercase|uppercase|titlecase|lower case|upper case|title case)\b"
+            r".{0,40}\b(?:version of this text|this text|exactly)\b",
+            lowered_prompt,
+        )
+    )
+
+
+def _looks_like_field_extraction(lowered_prompt: str) -> bool:
+    extraction_patterns = [
+        r"\breturn only the title from this record\b",
+        r"\breturn only the invoice code\b",
+        r"\bextract\s+(?:customer|quantity|item|city)\b",
+        r"\bextract\s+customer,\s*quantity,\s*item,\s*city\b",
+        r"\bextract\s+(?:date|payer|amount|payee|person|organization|city|email|url|phone)\b",
+    ]
+    return any(re.search(pattern, lowered_prompt) for pattern in extraction_patterns)
 
 
 def _looks_like_code_debug(lowered_prompt: str) -> bool:

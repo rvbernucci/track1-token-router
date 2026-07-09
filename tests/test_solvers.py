@@ -39,6 +39,7 @@ class SolverPackTests(unittest.TestCase):
             "Compute 10 - 12": "-2",
             "Compute 17 * 6 + 4. Return only the number.": "106",
             "Evaluate (8 + 4) / 3. Return only the number.": "4",
+            "The scores are 12, 18, 21, and 25. Return only their arithmetic mean.": "19",
             "8 + 9": "17",
         }
         for prompt, answer in cases.items():
@@ -52,6 +53,7 @@ class SolverPackTests(unittest.TestCase):
         cases = {
             "A plan costs 80. It receives a 15 percent discount and then a 5 fee is added. Return only the final number.": "73",
             "If 3 identical machines produce 18 widgets per hour, how many widgets per hour do 2 machines produce? Return only the number.": "12",
+            "Start with 100, increase by 10 percent, then increase the result by another 10 percent. Return only the final number.": "121",
         }
         for prompt, answer in cases.items():
             with self.subTest(prompt=prompt):
@@ -76,6 +78,7 @@ class SolverPackTests(unittest.TestCase):
             "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The interface is quick, clean, and reliable.": "positive",
             "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The deployment failed twice and the logs were confusing.": "negative",
             "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The update is standard and okay.": "neutral",
+            "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The meeting starts at 10 and ends at 11.": "neutral",
         }
         for prompt, answer in cases.items():
             with self.subTest(prompt=prompt):
@@ -110,6 +113,16 @@ class SolverPackTests(unittest.TestCase):
                 "email": "ops@example.com",
                 "url": "https://example.com/help",
             },
+            "Return only minified JSON with exactly these key/value pairs: status=ready, retries=0.": {
+                "status": "ready",
+                "retries": 0,
+            },
+            "Return only minified JSON. Text: Customer Ana bought 3 blue notebooks in Recife. Extract customer, quantity, item, city.": {
+                "customer": "Ana",
+                "quantity": 3,
+                "item": "blue notebooks",
+                "city": "Recife",
+            },
             "Extract the names from this sentence as minified JSON with key names: Ana met Bruno in Recife.": {
                 "names": ["Ana", "Bruno"],
             },
@@ -136,6 +149,7 @@ class SolverPackTests(unittest.TestCase):
             "Ava is taller than Bea. Bea is taller than Cora. Who is the tallest? Return only the name.": "Ava",
             "If the alarm is armed, the door locks. The alarm is armed. Is the door locked? Return exactly yes or no.": "yes",
             "All merls are tivas. Some tivas are roons. Is it guaranteed that some merls are roons? Return exactly yes or no.": "no",
+            "All daxes are lims. No lims are vors. Can a dax be a vor? Return exactly yes or no.": "no",
             "All daxes are wugs. No wugs are plims. Can a daxes be a plims? Return exactly yes or no.": "no",
         }
         for prompt, answer in cases.items():
@@ -277,6 +291,7 @@ class SolverPackTests(unittest.TestCase):
             'Count words in "hello brave world". Return only the number.': "3",
             'Uppercase exactly "Hackathon Ai"': "HACKATHON AI",
             'Lowercase exactly "Hackathon Ai"': "hackathon ai",
+            "Return only the lowercase version of this text: FIREWORKS_ROUTE_ABC": "fireworks_route_abc",
             'Titlecase exactly "hello brave world"': "Hello Brave World",
             'Trim whitespace exactly "  hello  "': "hello",
             'Normalize whitespace exactly "a   b\nc"': "a b c",
@@ -305,6 +320,23 @@ class SolverPackTests(unittest.TestCase):
         self.assertEqual(first.answer, "apple")
         self.assertIsNotNone(last)
         self.assertEqual(last.answer, "blue")
+
+    def test_solves_safe_field_extraction_without_json(self) -> None:
+        title = solve_deterministic(
+            TaskEnvelope(
+                input_text="Return only the title from this record. Title: Quiet Routers Win. Author: R. Silva. Year: 2026."
+            )
+        )
+        invoice = solve_deterministic(
+            TaskEnvelope(
+                input_text="Return only the invoice code from this sentence: Please reconcile invoice INV-2026-884 before Friday."
+            )
+        )
+
+        self.assertIsNotNone(title)
+        self.assertEqual(title.answer, "Quiet Routers Win")
+        self.assertIsNotNone(invoice)
+        self.assertEqual(invoice.answer, "INV-2026-884")
 
     def test_blocks_ambiguous_dates_and_invalid_json(self) -> None:
         blocked = [

@@ -10,19 +10,19 @@ Ele existe para economizar latencia e reduzir risco quando a resposta pode ser c
 
 | solver | cobre | limite de seguranca |
 |---|---|---|
-| `arithmetic` | soma, subtracao, multiplicacao e divisao inteira exata | apenas expressoes inteiras de uma operacao |
-| `percent_fee_math` | desconto percentual unico seguido de fee fixa | exige formula textual `cost/price -> percent discount -> fee added` |
+| `arithmetic` | soma, subtracao, multiplicacao, divisao inteira exata e media aritmetica explicita | apenas expressoes inteiras curtas ou frase `scores -> arithmetic mean` |
+| `percent_fee_math` | desconto percentual unico seguido de fee fixa; aumento percentual repetido explicito | exige formula textual comprovavel e percentuais limitados |
 | `proportional_rate` | taxa linear de unidades identicas | exige frase com unidades identicas, producao total e novo numero de unidades |
 | `numeric_compare` | maior/menor entre dois numeros | exige exatamente dois numeros e palavra-chave de comparacao |
-| `sentiment_lexicon` | sentimento explicito `positive/neutral/negative` | exige prompt de sentimento, marcador `Text:` e margem lexical clara |
-| `entity_extract` | JSON minificado para padroes NER mecanicos | apenas pagamento datado, fundacao pessoa/org/cidade e contato email/url/phone |
-| `logic_ordering` | endpoint de ordenacao transitiva simples | exige relacoes comparativas nominais e endpoint unico |
+| `sentiment_lexicon` | sentimento explicito `positive/neutral/negative` | exige prompt de sentimento, marcador `Text:` e margem lexical clara ou frase factual neutra |
+| `entity_extract` | JSON minificado e campos simples para padroes NER mecanicos | apenas pagamento datado, fundacao pessoa/org/cidade, compra cliente/item/cidade, key/value pairs, nomes simples, title e invoice code |
+| `logic_ordering` | endpoint de ordenacao transitiva simples e silogismos quantificados estreitos | exige relacoes comparativas nominais, endpoint unico ou padrao `all/no` / `all/some` comprovavel |
 | `modus_ponens` | inferencia `if A then B; A; is B?` | responde apenas `yes` quando antecedente e consequente normalizados batem exatamente |
 | `python_code_debug` | correcoes Python de bugs triviais conhecidos | apenas assinaturas e sintomas exatos testados por `python_function_cases` |
 | `python_code_generation` | funcoes Python pequenas de utilidade comum | apenas templates sem `import`, executaveis pelo validador seguro |
 | `char_count` | contagem de caracteres | exige string entre aspas |
 | `word_count` | contagem de palavras | exige string entre aspas |
-| `case_transform` | uppercase, lowercase, titlecase | exige string entre aspas |
+| `case_transform` | uppercase, lowercase, titlecase | exige string entre aspas ou marcador mecanico `version of this text:` |
 | `whitespace` | trim e normalizacao de whitespace | exige string entre aspas |
 | `json_transform` | JSON compact e pretty | exige payload JSON valido |
 | `list_item` | primeiro/ultimo item | apenas lista JSON simples ou lista separada por virgulas |
@@ -31,10 +31,10 @@ Ele existe para economizar latencia e reduzir risco quando a resposta pode ser c
 
 - Algebra, equacoes, derivadas e integrais ficam fora.
 - Datas relativas ou ambiguas ficam fora.
-- Word problems ficam fora, mesmo quando parecem calculaveis.
+- Word problems amplos ficam fora, mesmo quando parecem calculaveis.
 - Divisao nao inteira e divisao por zero ficam fora.
 - Tarefas que pedem ordenacao ficam fora, mesmo se tambem pedirem primeiro/ultimo item.
-- Strings sem aspas ficam fora em solvers de contagem e transformacao.
+- Strings sem aspas ficam fora em solvers de contagem; transformacao sem aspas so entra com marcador `this text:`.
 - Sentimento misto ou sem margem lexical fica fora.
 - NER generico fica fora; o solver so entra em padroes estruturais comprovaveis.
 - Logica com contrapositiva, afirmacao do consequente ou grafos desconectados fica fora.
@@ -70,6 +70,8 @@ Esse gate roda os microbenches locais de Track 1 com `CompetitionRunner` em dry-
 - a cobertura deterministica cair abaixo do piso configurado.
 
 O mesmo gate tambem roda dentro de `scripts/offline_release_check.sh`.
+
+Resultado atual nos datasets locais de campeonato: `40/47` tarefas resolvidas por rota deterministica ou guardrail, com `100%` de validade nos outputs deterministicos.
 
 ## Regra operacional
 

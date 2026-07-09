@@ -138,6 +138,15 @@ class FireworksModelRouterTests(unittest.TestCase):
         self.assertEqual(selection.tier, "medium")
         self.assertEqual(selection.domain, "current_factual")
 
+    def test_lowercase_version_is_formatting_not_current_factual(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(input_text="Return only the lowercase version of this text: FIREWORKS_ROUTE_ABC"),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertEqual(selection.tier, "cheap")
+        self.assertEqual(selection.domain, "formatting")
+
     def test_accurate_does_not_trigger_rate_keyword(self) -> None:
         selection = select_fireworks_model(
             TaskEnvelope(
@@ -201,6 +210,18 @@ class FireworksModelRouterTests(unittest.TestCase):
 
         self.assertEqual(selection.tier, "medium")
         self.assertEqual(selection.domain, "math_reasoning")
+
+    def test_field_extraction_preempts_formatting_and_arithmetic_looking_codes(self) -> None:
+        cases = [
+            "Return only the title from this record. Title: Quiet Routers Win. Author: R. Silva. Year: 2026.",
+            "Return only the invoice code from this sentence: Please reconcile invoice INV-2026-884 before Friday.",
+        ]
+        for prompt in cases:
+            with self.subTest(prompt=prompt):
+                selection = select_fireworks_model(TaskEnvelope(input_text=prompt), TRACK1_ALLOWED_SHORT_NAMES)
+
+                self.assertEqual(selection.tier, "medium")
+                self.assertEqual(selection.domain, "extraction")
 
     def test_define_function_is_code_generation_domain(self) -> None:
         selection = select_fireworks_model(
