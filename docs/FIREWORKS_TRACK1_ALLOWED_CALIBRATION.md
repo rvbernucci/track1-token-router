@@ -10,6 +10,8 @@ Frontier dataset: `evals/fireworks-pareto/frontier-microbench.jsonl`
 
 Structure-heldout dataset: `evals/fireworks-pareto/structure-heldout-microbench.jsonl`
 
+Adversarial hidden dataset: `evals/fireworks-pareto/adversarial-hidden-microbench.jsonl`
+
 Escape dataset: `evals/fireworks-pareto/escape-microbench.jsonl`
 
 Command shape:
@@ -53,6 +55,10 @@ Latest expanded runtime-router result file: `reports/generated/fireworks-runtime
 
 Latest expanded runtime-router report: `reports/generated/fireworks-runtime-frontier-structure-hidden-20260709-literal-zero-report.md`
 
+Latest adversarial zero-token runtime result file: `reports/generated/fireworks-runtime-zero-token-111-results.jsonl`
+
+Latest adversarial zero-token runtime report: `reports/generated/fireworks-runtime-zero-token-111-report.md`
+
 Actual estimated spend for primary + hidden + championship + frontier + structure-heldout + escape: `$0.05761872`.
 
 Total aggregated historical result spend in the leaderboard is `$0.05761872`.
@@ -78,6 +84,7 @@ Additional runtime-router eval spend across three iterative escape runs: `$0.005
 - Domain policy changed again after escape calibration: `kimi-k2p7-code` is preferred where observed validity is comparable and domain/shape/model `usage.total` is materially lower, especially compact factual, summarization, logic and selected math probes; `minimax-m3` is now preferred for code generation/debug escapes, mixed sentiment, extraction robustness, and composed math where empirical risk outweighs token savings.
 - Runtime-router escape eval after solver and token-budget hardening passed `16/16` tasks with `2065` Fireworks tokens, `7/16` zero-remote-token answers, no invalid Fireworks attempts, and estimated spend `$0.00147425`.
 - Expanded runtime-router eval over `frontier + structure-heldout + hidden-variant` passed `46/46` tasks with `46/46` zero-remote-token answers after adding deterministic literal echo; this was verified against an unreachable fake Fireworks endpoint, proving no remote call was needed for that pack.
+- Expanded runtime-router eval over six local Track 1 packs, including `adversarial-hidden`, passed `108/108` deduplicated tasks with `108/108` zero-remote-token answers, `fireworks_tasks=0`, `remote_tokens.total=0`, and estimated spend `$0.00`; this was verified against an unreachable fake Fireworks endpoint.
 - Hidden-variant rerun: both accessible models passed `8/8`; `minimax-m3` cost `$0.00070650`, while `kimi-k2p7-code` cost `$0.00142610`.
 - The three Gemma serverless IDs returned `HTTP 404 Not Found` with the current local Fireworks key.
 - Gemma should remain in the architecture through AMD local inference and should still be attempted when the official harness exposes it, but repeated 404s should be cached and skipped within a batch.
@@ -101,6 +108,7 @@ After tightening the `ner_money_date` prompt to require date and amount exactly 
 - Deterministic literal echo now handles explicit `Return exactly this string...` and single-token `Return exactly X and nothing else` requests before Fireworks, while avoiding `yes or no` logic prompts.
 - In Fireworks-only mode, strict output validation now acts as an accuracy gate: if the selected model returns empty, invalid JSON, invalid number/yes-no, or irreparable Python/code output, the runner tries the next ranked candidate and records total tokens across attempts.
 - Keep Gemma IDs in `ALLOWED_MODELS` support, but cache unavailable-model errors per runner instance so one inaccessible Gemma endpoint does not cause repeated latency across the whole evaluator batch.
+- Keep LoRA/fine-tuned Fireworks deployments out of the default Track 1 runtime unless the official harness explicitly exposes them through `ALLOWED_MODELS`; see `docs/FIREWORKS_LORA_FINE_TUNING_STRATEGY.md`.
 
 ## Classifier Hardening
 

@@ -44,6 +44,7 @@ class SolverPackTests(unittest.TestCase):
             "Compute 17 * 6 + 4. Return only the number.": "106",
             "Evaluate (8 + 4) / 3. Return only the number.": "4",
             "The scores are 12, 18, 21, and 25. Return only their arithmetic mean.": "19",
+            "The values are 3, 4, 5, and 8. Return only the average.": "5",
             "A tank holds 80 liters. It is 3/5 full, then 12 liters are added. Return only the number of liters now in the tank.": "60",
             "8 + 9": "17",
         }
@@ -57,10 +58,12 @@ class SolverPackTests(unittest.TestCase):
     def test_solves_safe_percent_and_rate_math(self) -> None:
         cases = {
             "A plan costs 80. It receives a 15 percent discount and then a 5 fee is added. Return only the final number.": "73",
+            "A subscription costs $120. Apply a 25% discount, then add a $9 fee. Return only the final number.": "99",
             "If 3 identical machines produce 18 widgets per hour, how many widgets per hour do 2 machines produce? Return only the number.": "12",
             "If 5 machines make 40 parts per hour, how many parts per hour do 3 machines make? Return only the number.": "24",
             "If 4 machines make 56 parts in 2 hours, how many parts per hour do 3 machines make? Return only the number.": "21",
             "A recipe for 4 people uses 300 grams of flour. How many grams are needed for 10 people? Return only the number.": "750",
+            "A recipe for 6 servings uses 240 grams of flour. How many grams are needed for 9 servings? Return only the number.": "360",
             "Start with 100, increase by 10 percent, then increase the result by another 10 percent. Return only the final number.": "121",
         }
         for prompt, answer in cases.items():
@@ -100,8 +103,11 @@ class SolverPackTests(unittest.TestCase):
         cases = {
             "Who wrote Pride and Prejudice? Return only the author name.": "Jane Austen",
             "Which planet is known as the Red Planet? Return only the planet name.": "Mars",
+            "Which planet is called the Red Planet? Return only the planet name.": "Mars",
             "What is the capital of Canada? Return only the city.": "Ottawa",
+            "Return only the city: what is the capital of Canada?": "Ottawa",
             "What language is primarily spoken in Brazil? Return only the language name.": "Portuguese",
+            "What is the primary language of Brazil? Return only the language name.": "Portuguese",
             "Who wrote The Hobbit? Return only the author name.": "J. R. R. Tolkien",
             "What currency is used in Japan? Return only the full currency name.": "Japanese yen",
         }
@@ -300,6 +306,15 @@ class SolverPackTests(unittest.TestCase):
                     {"args": [21], "expected": True},
                 ],
             },
+            "Fix this Python code so it returns True for even numbers. Return only corrected Python code: def is_even(n):\n    return n % 2 == 1": {
+                "type": "python_function_cases",
+                "function_name": "is_even",
+                "cases": [
+                    {"args": [4], "expected": True},
+                    {"args": [7], "expected": False},
+                    {"args": [0], "expected": True},
+                ],
+            },
             "Fix this Python code so it returns the product. Return only corrected Python code: def multiply(a, b):\n    return a + b": {
                 "type": "python_function_cases",
                 "function_name": "multiply",
@@ -377,6 +392,22 @@ class SolverPackTests(unittest.TestCase):
                     {"args": ["xyz"], "expected": 0},
                 ],
             },
+            "Write a Python function square(n) that returns n squared. Return only Python code.": {
+                "type": "python_function_cases",
+                "function_name": "square",
+                "cases": [
+                    {"args": [5], "expected": 25},
+                    {"args": [-3], "expected": 9},
+                ],
+            },
+            "Return only Python code. Define a function reverse_text(text) that returns the reversed string.": {
+                "type": "python_function_cases",
+                "function_name": "reverse_text",
+                "cases": [
+                    {"args": ["abc"], "expected": "cba"},
+                    {"args": [""], "expected": ""},
+                ],
+            },
             "Return only Python code. Define a function is_palindrome(text) that ignores case and non-alphanumeric characters and returns a boolean.": {
                 "type": "python_function_cases",
                 "function_name": "is_palindrome",
@@ -417,6 +448,8 @@ class SolverPackTests(unittest.TestCase):
         cases = {
             "Choose the larger number and return only it: 10 or 12.": "12",
             "Which is smaller, -4 or 3? Return only the number.": "-4",
+            "Which is greater, 4.5 or 4.25? Return only the number.": "4.5",
+            "Which is larger: -8 or -13? Return only the number.": "-8",
         }
         for prompt, answer in cases.items():
             result = solve_deterministic(TaskEnvelope(input_text=prompt))
@@ -486,11 +519,17 @@ class SolverPackTests(unittest.TestCase):
     def test_solves_first_and_last_item(self) -> None:
         first = solve_deterministic(TaskEnvelope(input_text="Return the first item from this list: apple, banana, cherry"))
         last = solve_deterministic(TaskEnvelope(input_text='Return the last item from this list: ["red", "blue"]'))
+        third = solve_deterministic(TaskEnvelope(input_text="Return the third item from this list: alpha, beta, gamma, delta"))
+        second = solve_deterministic(TaskEnvelope(input_text='Return the 2nd item from this list: ["red", "blue", "green"]'))
 
         self.assertIsNotNone(first)
         self.assertEqual(first.answer, "apple")
         self.assertIsNotNone(last)
         self.assertEqual(last.answer, "blue")
+        self.assertIsNotNone(third)
+        self.assertEqual(third.answer, "gamma")
+        self.assertIsNotNone(second)
+        self.assertEqual(second.answer, "blue")
         code_debug = solve_deterministic(
             TaskEnvelope(
                 input_text="Fix this Python code so it returns the first item. Return only corrected Python code: def first_item(items):\n    return items[1]"

@@ -8,6 +8,8 @@ Perfil recomendado: `runtime-profiles/fireworks-serverless.env.example`.
 
 Nota Track 1 atual: local models sao uma estrategia valida de scoring. Respostas locais contam para accuracy e usam zero Fireworks tokens. Portanto Fireworks deve ser tratado como fallback/auditor no modo campeonato, nao necessariamente como caminho default.
 
+Nota LoRA/fine-tuning: nao usar no caminho principal sem confirmacao explicita do avaliador. A decisao operacional esta em [`docs/FIREWORKS_LORA_FINE_TUNING_STRATEGY.md`](./FIREWORKS_LORA_FINE_TUNING_STRATEGY.md).
+
 ## Variaveis obrigatorias
 
 - `FIREWORKS_API_KEY`: nunca commitar.
@@ -203,6 +205,8 @@ Politica atual para o caminho oficial:
 - se um modelo local confiavel estiver disponivel, `ROUTER_MODE=hybrid` deve ser comparado contra `ROUTER_MODE=fireworks`, porque respostas locais corretas custam zero Fireworks tokens.
 
 Calibracao complementar de 2026-07-09 com todos os modelos permitidos esta em [`docs/FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md`](./FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md).
+
+Fine-tuning/LoRA fica fora do caminho principal por risco regulatorio, a menos que o harness exponha explicitamente o deployment em `ALLOWED_MODELS`: [`docs/FIREWORKS_LORA_FINE_TUNING_STRATEGY.md`](./FIREWORKS_LORA_FINE_TUNING_STRATEGY.md).
 
 ## Serverless vs Batch vs Deployments
 

@@ -21,6 +21,7 @@ DEFAULT_DATASETS = (
     Path("evals/fireworks-pareto/track1-category-microbench.jsonl"),
     Path("evals/fireworks-pareto/championship-microbench.jsonl"),
     Path("evals/fireworks-pareto/hidden-variant-microbench.jsonl"),
+    Path("evals/fireworks-pareto/adversarial-hidden-microbench.jsonl"),
     Path("evals/fireworks-pareto/frontier-microbench.jsonl"),
     Path("evals/fireworks-pareto/structure-heldout-microbench.jsonl"),
 )

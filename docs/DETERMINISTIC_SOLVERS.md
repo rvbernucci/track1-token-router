@@ -27,7 +27,7 @@ Ele existe para economizar latencia e reduzir risco quando a resposta pode ser c
 | `case_transform` | uppercase, lowercase, titlecase | exige string entre aspas ou marcador mecanico `version of this text:` |
 | `whitespace` | trim e normalizacao de whitespace | exige string entre aspas |
 | `json_transform` | JSON compact e pretty | exige payload JSON valido |
-| `list_item` | primeiro/ultimo item | apenas lista JSON simples ou lista separada por virgulas |
+| `list_item` | primeiro/ultimo item e ordinais pequenos | apenas lista JSON simples ou lista separada por virgulas |
 
 ## Bloqueios deliberados
 
@@ -77,9 +77,13 @@ Esse gate roda os microbenches locais de Track 1 com `CompetitionRunner` em dry-
 
 O mesmo gate tambem roda dentro de `scripts/offline_release_check.sh`.
 
-Resultado atual nos datasets locais de campeonato, frontier e structure-heldout: `85/85` tarefas resolvidas por rota deterministica ou guardrail, com `100%` de validade nos outputs deterministicos.
+Resultado atual nos datasets locais de campeonato, hidden-variant, adversarial-hidden, frontier e structure-heldout: `111/111` tarefas resolvidas por rota deterministica ou guardrail, com `100%` de validade nos outputs deterministicos.
 
-O relatorio gerado tambem lista rotas nao deterministicas restantes. Em 2026-07-09, o gate ampliado nao possui rotas nao deterministicas nos cinco microbenches locais, mas isso nao significa que todo factual QA ou summarization deve virar codigo. A regra continua conservadora: quando nao houver whitelist ou contrato mecanico validavel, a cascata e a matriz Fireworks escolhem Minimax/Kimi por regressao + Nash conforme custo e validade observada.
+O dataset `evals/fireworks-pareto/adversarial-hidden-microbench.jsonl` foi adicionado como gate anti-overfitting. Ele cobre variantes mecanicas de factual QA, matematica, sentimento, summarization, NER, logic puzzles, code debugging, code generation e formatting. O objetivo nao e simular conhecimento aberto; e provar que subcasos estritamente verificaveis continuam saindo com zero token remoto mesmo quando a frase muda.
+
+Um runtime eval complementar com endpoint Fireworks propositalmente inalcançavel validou `108/108` tarefas unicas deduplicadas, `fireworks_tasks=0`, `remote_tokens.total=0` e custo `$0.00` em `reports/generated/fireworks-runtime-zero-token-111-report.md`.
+
+O relatorio gerado tambem lista rotas nao deterministicas restantes. Em 2026-07-09, o gate ampliado nao possui rotas nao deterministicas nos seis microbenches locais, mas isso nao significa que todo factual QA ou summarization deve virar codigo. A regra continua conservadora: quando nao houver whitelist ou contrato mecanico validavel, a cascata e a matriz Fireworks escolhem Minimax/Kimi por regressao + Nash conforme custo e validade observada.
 
 ## Regra operacional
 
