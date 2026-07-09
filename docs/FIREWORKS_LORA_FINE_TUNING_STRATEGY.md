@@ -11,8 +11,28 @@ Motivo: o Track 1 restringe a selecao a `ALLOWED_MODELS`, enquanto a documentaca
 Portanto:
 
 - caminho principal: solvers locais + matriz/Nash + modelos Fireworks permitidos;
-- caminho LoRA: pesquisa/calibracao opcional, atras de feature flag, nunca default;
+- fine-tuning do roteador: permitido e compativel com o scoring, desde que a saida final continue respeitando accuracy e Fireworks token count;
+- caminho LoRA como modelo de resposta: pesquisa/calibracao opcional, atras de feature flag, nunca default;
 - uso competitivo: somente se o guia oficial ou harness expuser um LoRA/fine-tuned model em `ALLOWED_MODELS`.
+
+## Distincao importante
+
+O texto oficial permite fine-tunar o roteador. Isso e diferente de trocar o modelo de resposta por um LoRA Fireworks fora do conjunto permitido.
+
+Seguro e alinhado:
+
+- treinar uma regressao/matriz local para escolher o menor modelo suficiente;
+- fine-tunar um classificador local que decide `local_solver`, `cheap_fireworks`, `strong_fireworks` ou `abstain`;
+- calibrar thresholds de risco com dados de microbench;
+- usar o fine-tuned router para reduzir chamadas Fireworks sem mudar os modelos finais permitidos.
+
+Condicionado ao harness:
+
+- chamar um fine-tuned Fireworks model como resposta final;
+- usar multi-LoRA com `model="<fine_tuned_model>#<deployment>"`;
+- substituir `minimax-m3`, `kimi-k2p7-code` ou Gemma permitido por um deployment proprio.
+
+Regra pratica: fine-tunar a decisao de roteamento e bom; fine-tunar o modelo respondedor so entra se o avaliador aceitar esse endpoint/model ID.
 
 ## O que a documentacao oficial diz
 
@@ -39,7 +59,7 @@ Pontos relevantes:
 
 ## Fit com Track 1
 
-Track 1 premia menor token count depois do accuracy gate. Fine-tuning pode melhorar accuracy de um modelo pequeno, mas nao reduz tokens automaticamente:
+Track 1 premia menor token count depois do accuracy gate. Fine-tuning do roteador pode reduzir tokens se ele evita chamadas ou escolhe modelos menores com seguranca. Fine-tuning do modelo respondedor pode melhorar accuracy de um modelo pequeno, mas nao reduz tokens automaticamente:
 
 - os tokens Fireworks continuam contando se a inferencia passa por `FIREWORKS_BASE_URL`;
 - se o LoRA exigir deployment proprio, ele pode sair do conjunto oficial de modelos permitidos;
