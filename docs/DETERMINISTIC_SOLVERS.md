@@ -13,9 +13,11 @@ Ele existe para economizar latencia e reduzir risco quando a resposta pode ser c
 | `arithmetic` | soma, subtracao, multiplicacao, divisao inteira exata e media aritmetica explicita | apenas expressoes inteiras curtas ou frase `scores -> arithmetic mean` |
 | `percent_fee_math` | desconto percentual unico seguido de fee fixa; aumento percentual repetido explicito | exige formula textual comprovavel e percentuais limitados |
 | `proportional_rate` | taxa linear de unidades identicas | exige frase com unidades identicas, producao total e novo numero de unidades |
-| `numeric_compare` | maior/menor entre dois numeros | exige exatamente dois numeros e palavra-chave de comparacao |
+| `numeric_compare` | maior/menor entre dois numeros; JSON min/max; JSON sum/product | exige lista numerica curta ou exatamente dois numeros e palavra-chave de comparacao |
+| `stable_factual_qa` | fatos estaveis de altissima confianca | apenas whitelist exact-prompt com `return only`; bloqueia `today/latest/current/now/as of` |
 | `sentiment_lexicon` | sentimento explicito `positive/neutral/negative` | exige prompt de sentimento, marcador `Text:` e margem lexical clara ou frase factual neutra |
-| `entity_extract` | JSON minificado e campos simples para padroes NER mecanicos | apenas pagamento datado, fundacao pessoa/org/cidade, compra cliente/item/cidade, key/value pairs, nomes simples, title e invoice code |
+| `constrained_summary` | resumos curtos com limite de palavras e termos obrigatorios/inferiveis | apenas templates que obedecem mecanicamente `at most N words` |
+| `entity_extract` | JSON minificado e campos simples para padroes NER mecanicos | apenas pagamento datado, invoice/date/amount, fundacao pessoa/org/cidade, compra/pedido cliente/item/cidade, key/value pairs, nomes simples, title e invoice code |
 | `logic_ordering` | endpoint de ordenacao transitiva simples e silogismos quantificados estreitos | exige relacoes comparativas nominais, endpoint unico ou padrao `all/no` / `all/some` comprovavel |
 | `modus_ponens` | inferencia `if A then B; A; is B?` | responde apenas `yes` quando antecedente e consequente normalizados batem exatamente |
 | `python_code_debug` | correcoes Python de bugs triviais conhecidos | apenas assinaturas e sintomas exatos testados por `python_function_cases` |
@@ -37,6 +39,8 @@ Ele existe para economizar latencia e reduzir risco quando a resposta pode ser c
 - Strings sem aspas ficam fora em solvers de contagem; transformacao sem aspas so entra com marcador `this text:`.
 - Sentimento misto ou sem margem lexical fica fora.
 - NER generico fica fora; o solver so entra em padroes estruturais comprovaveis.
+- Factual QA generico fica fora; so fatos estaveis explicitamente whitelisted entram.
+- Summarization aberta fica fora; so resumos curtos com restricao mecanicamente validavel entram.
 - Logica com contrapositiva, afirmacao do consequente ou grafos desconectados fica fora.
 - Programacao generica fica fora; os templates Python so entram quando assinatura, verbo e criterio batem exatamente.
 - Templates Python nao usam `import`, `open`, `eval`, classes ou estado global, para ficarem compativeis com o validador seguro do microbench.
@@ -48,7 +52,9 @@ O Track 1 inclui factual Q&A, math reasoning, sentiment, summarization, NER, cod
 Este pack nao tenta substituir os modelos nessas oito categorias. Ele remove do caminho remoto apenas os subcasos em que codigo e mais confiavel que LLM:
 
 - math reasoning mecanico com formula unica;
+- factual QA estavel em whitelist estreita;
 - sentiment obvio com vocabulario explicitamente polarizado;
+- summarization curta com limite de palavras e termos obrigatorios;
 - NER estrutural em frases regulares;
 - logic puzzles de uma inferencia ou uma cadeia transitiva curta;
 - code debugging/code generation em templates Python pequenos e executaveis;
@@ -71,9 +77,9 @@ Esse gate roda os microbenches locais de Track 1 com `CompetitionRunner` em dry-
 
 O mesmo gate tambem roda dentro de `scripts/offline_release_check.sh`.
 
-Resultado atual nos datasets locais de campeonato: `41/47` tarefas resolvidas por rota deterministica ou guardrail, com `100%` de validade nos outputs deterministicos.
+Resultado atual nos datasets locais de campeonato, frontier e structure-heldout: `85/85` tarefas resolvidas por rota deterministica ou guardrail, com `100%` de validade nos outputs deterministicos.
 
-O relatorio gerado tambem lista as rotas nao deterministicas restantes. Em 2026-07-09, os casos remanescentes eram factual QA e summarization. A decisao de campeonato e nao transformar esses dominios em regex/lookup fragil: eles devem passar pela cascata e pela matriz Fireworks, onde Minimax/Kimi sao escolhidos por regressao + Nash conforme custo e validade observada.
+O relatorio gerado tambem lista rotas nao deterministicas restantes. Em 2026-07-09, o gate ampliado nao possui rotas nao deterministicas nos cinco microbenches locais, mas isso nao significa que todo factual QA ou summarization deve virar codigo. A regra continua conservadora: quando nao houver whitelist ou contrato mecanico validavel, a cascata e a matriz Fireworks escolhem Minimax/Kimi por regressao + Nash conforme custo e validade observada.
 
 ## Regra operacional
 

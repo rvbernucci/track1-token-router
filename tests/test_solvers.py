@@ -17,7 +17,9 @@ class SolverPackTests(unittest.TestCase):
                 "percent_fee_math",
                 "proportional_rate",
                 "numeric_compare",
+                "stable_factual_qa",
                 "sentiment_lexicon",
+                "constrained_summary",
                 "entity_extract",
                 "logic_ordering",
                 "modus_ponens",
@@ -53,6 +55,8 @@ class SolverPackTests(unittest.TestCase):
         cases = {
             "A plan costs 80. It receives a 15 percent discount and then a 5 fee is added. Return only the final number.": "73",
             "If 3 identical machines produce 18 widgets per hour, how many widgets per hour do 2 machines produce? Return only the number.": "12",
+            "If 5 machines make 40 parts per hour, how many parts per hour do 3 machines make? Return only the number.": "24",
+            "If 4 machines make 56 parts in 2 hours, how many parts per hour do 3 machines make? Return only the number.": "21",
             "Start with 100, increase by 10 percent, then increase the result by another 10 percent. Return only the final number.": "121",
         }
         for prompt, answer in cases.items():
@@ -77,6 +81,8 @@ class SolverPackTests(unittest.TestCase):
         cases = {
             "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The interface is quick, clean, and reliable.": "positive",
             "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The deployment failed twice and the logs were confusing.": "negative",
+            "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The setup was easy, but the app crashed twice during export.": "negative",
+            "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The UI looks elegant, but the export failed twice and wasted my time.": "negative",
             "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The update is standard and okay.": "neutral",
             "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The meeting starts at 10 and ends at 11.": "neutral",
         }
@@ -85,6 +91,77 @@ class SolverPackTests(unittest.TestCase):
                 result = solve_deterministic(TaskEnvelope(input_text=prompt))
                 self.assertIsNotNone(result)
                 self.assertEqual(result.answer, answer)
+
+    def test_solves_whitelisted_stable_facts(self) -> None:
+        cases = {
+            "Who wrote Pride and Prejudice? Return only the author name.": "Jane Austen",
+            "Which planet is known as the Red Planet? Return only the planet name.": "Mars",
+            "What is the capital of Canada? Return only the city.": "Ottawa",
+            "What language is primarily spoken in Brazil? Return only the language name.": "Portuguese",
+            "Who wrote The Hobbit? Return only the author name.": "J. R. R. Tolkien",
+            "What currency is used in Japan? Return only the full currency name.": "Japanese yen",
+        }
+        for prompt, answer in cases.items():
+            with self.subTest(prompt=prompt):
+                result = solve_deterministic(TaskEnvelope(input_text=prompt))
+                self.assertIsNotNone(result)
+                self.assertEqual(result.solver_name, "stable_factual_qa")
+                self.assertEqual(result.answer, answer)
+
+    def test_blocks_unlisted_or_current_facts(self) -> None:
+        blocked = [
+            "Who wrote an obscure unpublished manuscript? Return only the author name.",
+            "Who is the current CEO of AMD? Return only the name.",
+            "What is the latest Fireworks model? Return only the model id.",
+        ]
+        for prompt in blocked:
+            with self.subTest(prompt=prompt):
+                self.assertIsNone(solve_deterministic(TaskEnvelope(input_text=prompt)))
+
+    def test_solves_constrained_summary_templates(self) -> None:
+        cases = {
+            "Summarize in at most 7 words: Local verification reduces remote token spend by catching easy tasks before Fireworks.": {
+                "type": "contains_all_lower",
+                "terms": ["local", "token"],
+                "max_words": 7,
+            },
+            "Summarize in at most 7 words: A routing agent should choose the cheapest accurate model for each task.": {
+                "type": "contains_all_lower",
+                "terms": ["cheapest", "model"],
+                "max_words": 7,
+            },
+            "Summarize in at most 8 words and include both words accuracy and calls: Token-efficient routing preserves accuracy while reducing paid model calls.": {
+                "type": "contains_all_lower",
+                "terms": ["accuracy", "calls"],
+                "max_words": 8,
+            },
+            "Summarize in at most 9 words and include router and tokens: The router preserves answer quality by sending only difficult tasks to larger models, reducing paid token usage.": {
+                "type": "contains_all_lower",
+                "terms": ["router", "tokens"],
+                "max_words": 9,
+            },
+            "Summarize in at most 7 words and include latency: A local validation pass can avoid unnecessary remote calls while keeping latency predictable.": {
+                "type": "contains_all_lower",
+                "terms": ["latency"],
+                "max_words": 7,
+            },
+        }
+        for prompt, validator in cases.items():
+            with self.subTest(prompt=prompt):
+                result = solve_deterministic(TaskEnvelope(input_text=prompt))
+                self.assertIsNotNone(result)
+                self.assertEqual(result.solver_name, "constrained_summary")
+                self.assertTrue(_validate(validator, result.answer)["valid"], result.answer)
+
+    def test_blocks_unbounded_or_unsupported_summaries(self) -> None:
+        blocked = [
+            "Summarize this paragraph: Token routing matters.",
+            "Summarize in at most 30 words: Token routing matters.",
+            "Summarize in at most 2 words: Token routing matters.",
+        ]
+        for prompt in blocked:
+            with self.subTest(prompt=prompt):
+                self.assertIsNone(solve_deterministic(TaskEnvelope(input_text=prompt)))
 
     def test_blocks_ambiguous_sentiment(self) -> None:
         blocked = [
@@ -123,6 +200,17 @@ class SolverPackTests(unittest.TestCase):
                 "item": "blue notebooks",
                 "city": "Recife",
             },
+            "Return only minified JSON. Extract invoice, amount, and date from: Invoice INV-884 was paid on 2026-07-03 for 149.50 USD.": {
+                "invoice": "INV-884",
+                "amount": "149.50 USD",
+                "date": "2026-07-03",
+            },
+            "Return only minified JSON. Extract customer, quantity, item, and city: Ana ordered 12 valves for delivery in Recife.": {
+                "customer": "Ana",
+                "quantity": 12,
+                "item": "valves",
+                "city": "Recife",
+            },
             "Extract the names from this sentence as minified JSON with key names: Ana met Bruno in Recife.": {
                 "names": ["Ana", "Bruno"],
             },
@@ -148,6 +236,7 @@ class SolverPackTests(unittest.TestCase):
             "Ava is taller than Bea. Bea is taller than Cora. Who is the shortest? Return only the name.": "Cora",
             "Ava is taller than Bea. Bea is taller than Cora. Who is the tallest? Return only the name.": "Ava",
             "If the alarm is armed, the door locks. The alarm is armed. Is the door locked? Return exactly yes or no.": "yes",
+            "If a task is cached, then it uses zero Fireworks tokens. This task is cached. Does it use zero Fireworks tokens? Return exactly yes or no.": "yes",
             "All merls are tivas. Some tivas are roons. Is it guaranteed that some merls are roons? Return exactly yes or no.": "no",
             "All daxes are lims. No lims are vors. Can a dax be a vor? Return exactly yes or no.": "no",
             "All daxes are wugs. No wugs are plims. Can a daxes be a plims? Return exactly yes or no.": "no",
@@ -196,6 +285,22 @@ class SolverPackTests(unittest.TestCase):
                     {"args": [21], "expected": True},
                 ],
             },
+            "Fix this Python code so it returns the product. Return only corrected Python code: def multiply(a, b):\n    return a + b": {
+                "type": "python_function_cases",
+                "function_name": "multiply",
+                "cases": [
+                    {"args": [3, 4], "expected": 12},
+                    {"args": [-2, 5], "expected": -10},
+                ],
+            },
+            "Fix this Python code so it returns the first item. Return only corrected Python code: def first_item(items):\n    return items[1]": {
+                "type": "python_function_cases",
+                "function_name": "first_item",
+                "cases": [
+                    {"args": [[9, 8, 7]], "expected": 9},
+                    {"args": [["a", "b"]], "expected": "a"},
+                ],
+            },
         }
         for prompt, validator in cases.items():
             with self.subTest(prompt=prompt):
@@ -229,6 +334,32 @@ class SolverPackTests(unittest.TestCase):
                 "cases": [
                     {"args": [["a", "b", "a", "c", "b"]], "expected": ["a", "b", "c"]},
                     {"args": [[3, 3, 2, 1, 2]], "expected": [3, 2, 1]},
+                ],
+            },
+            "Write a Python function unique_preserve_order(items) that removes duplicates while preserving first appearance. Return only Python code.": {
+                "type": "python_function_cases",
+                "function_name": "unique_preserve_order",
+                "cases": [
+                    {"args": [[1, 2, 1, 3, 2]], "expected": [1, 2, 3]},
+                    {"args": [["a", "a", "b"]], "expected": ["a", "b"]},
+                ],
+            },
+            "Write a Python function is_even(n) that returns True for even integers and False otherwise. Return only Python code.": {
+                "type": "python_function_cases",
+                "function_name": "is_even",
+                "cases": [
+                    {"args": [4], "expected": True},
+                    {"args": [7], "expected": False},
+                    {"args": [0], "expected": True},
+                ],
+            },
+            "Return only Python code. Define a function count_vowels(text) that counts vowels a, e, i, o, u case-insensitively.": {
+                "type": "python_function_cases",
+                "function_name": "count_vowels",
+                "cases": [
+                    {"args": ["Router"], "expected": 3},
+                    {"args": ["AMD AI"], "expected": 3},
+                    {"args": ["xyz"], "expected": 0},
                 ],
             },
             "Return only Python code. Define a function is_palindrome(text) that ignores case and non-alphanumeric characters and returns a boolean.": {
@@ -285,6 +416,14 @@ class SolverPackTests(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(json.loads(result.answer), {"min": 4, "max": 23})
 
+    def test_solves_json_sum_product(self) -> None:
+        result = solve_deterministic(
+            TaskEnvelope(input_text="Return only minified JSON. Given values [3, 5, 8], return sum and product.")
+        )
+
+        self.assertIsNotNone(result)
+        self.assertEqual(json.loads(result.answer), {"sum": 16, "product": 120})
+
     def test_solves_counts_and_text_transforms(self) -> None:
         cases = {
             'Count characters in "abc def". Return only the number.': "7",
@@ -320,6 +459,13 @@ class SolverPackTests(unittest.TestCase):
         self.assertEqual(first.answer, "apple")
         self.assertIsNotNone(last)
         self.assertEqual(last.answer, "blue")
+        code_debug = solve_deterministic(
+            TaskEnvelope(
+                input_text="Fix this Python code so it returns the first item. Return only corrected Python code: def first_item(items):\n    return items[1]"
+            )
+        )
+        self.assertIsNotNone(code_debug)
+        self.assertEqual(code_debug.solver_name, "python_code_debug")
 
     def test_solves_safe_field_extraction_without_json(self) -> None:
         title = solve_deterministic(
