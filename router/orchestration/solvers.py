@@ -43,6 +43,7 @@ SOLVERS: tuple[SolverRegistration, ...] = (
     SolverRegistration("entity_extract", lambda task: _solve_entity_extract(task)),
     SolverRegistration("logic_ordering", lambda task: _solve_logic_ordering(task)),
     SolverRegistration("modus_ponens", lambda task: _solve_modus_ponens(task)),
+    SolverRegistration("modus_tollens", lambda task: _solve_modus_tollens(task)),
     SolverRegistration("python_code_debug", lambda task: _solve_python_code_debug(task)),
     SolverRegistration("python_code_generation", lambda task: _solve_python_code_generation(task)),
     SolverRegistration("char_count", lambda task: _solve_char_count(task)),
@@ -69,6 +70,9 @@ def _solve_arithmetic(task: TaskEnvelope) -> SolverResult | None:
     aggregate = _solve_arithmetic_aggregate(text)
     if aggregate is not None:
         return aggregate
+    fraction_capacity = _solve_fraction_capacity(text)
+    if fraction_capacity is not None:
+        return fraction_capacity
     match = re.fullmatch(
         r"(?i)(?:what is|calculate|compute|solve)?\s*"
         r"(-?\d{1,9})\s*([+\-*/])\s*(-?\d{1,9})"
@@ -133,6 +137,9 @@ def _solve_percent_fee_math(task: TaskEnvelope) -> SolverResult | None:
 def _solve_proportional_rate(task: TaskEnvelope) -> SolverResult | None:
     text = _single_line(task.input_text)
     lowered = text.lower()
+    recipe = _solve_recipe_scale(text)
+    if recipe is not None:
+        return recipe
     if not (
         ("identical" in lowered and "produce" in lowered and "per" in lowered)
         or re.search(r"\bif\s+\d{1,6}\s+\w+\s+make\b", lowered)
@@ -187,6 +194,8 @@ def _solve_numeric_compare(task: TaskEnvelope) -> SolverResult | None:
     json_minmax = _solve_json_minmax(text, lowered)
     if json_minmax is not None:
         return json_minmax
+    if "json" in lowered:
+        return None
     numbers = re.findall(r"-?\d+(?:\.\d+)?", text)
     if len(numbers) != 2:
         return None
@@ -340,6 +349,9 @@ def _solve_entity_extract(task: TaskEnvelope) -> SolverResult | None:
     invoice_payment = _extract_invoice_payment_entities(text)
     if invoice_payment is not None and all(key in lowered for key in ("invoice", "amount", "date")):
         return _json_result(invoice_payment, "entity_extract", "invoice_payment_sentence_entities")
+    opening = _extract_opening_entities(text)
+    if opening is not None and all(key in lowered for key in ("organization", "city", "date")):
+        return _json_result(opening, "entity_extract", "opening_sentence_entities")
     founding = _extract_founding_entities(text)
     if founding is not None and all(key in lowered for key in ("person", "organization", "city")):
         return _json_result(founding, "entity_extract", "founding_sentence_entities")
@@ -404,6 +416,22 @@ def _solve_modus_ponens(task: TaskEnvelope) -> SolverResult | None:
     question = _normalize_clause(match.group(4))
     if antecedent and antecedent == fact and consequent and consequent == question:
         return _result("yes", "modus_ponens", "antecedent_observed_consequent_asked")
+    return None
+
+
+def _solve_modus_tollens(task: TaskEnvelope) -> SolverResult | None:
+    text = _single_line(task.input_text)
+    if "if " not in text.lower() or "not" not in text.lower() or "?" not in text:
+        return None
+    match = re.search(r"(?i)\bif\s+(.+?),\s+(.+?)\.\s+(.+?)\.\s+(?:is|does|do|will)\s+(.+?)\?", text)
+    if not match:
+        return None
+    antecedent = _normalize_clause(match.group(1))
+    consequent = _normalize_clause(match.group(2))
+    fact = match.group(3)
+    question = _normalize_clause(match.group(4))
+    if antecedent and antecedent == question and consequent and _is_negation_of(fact, consequent):
+        return _result("no", "modus_tollens", "consequent_negated_antecedent_asked")
     return None
 
 
@@ -838,6 +866,43 @@ def _solve_compound_percent_increase(text: str) -> SolverResult | None:
     return _result(_format_number(answer), "percent_fee_math", "explicit_repeated_percent_increase")
 
 
+def _solve_fraction_capacity(text: str) -> SolverResult | None:
+    match = re.fullmatch(
+        r"(?i)a\s+\w+\s+holds\s+(\d{1,6})\s+\w+\.\s+"
+        r"it\s+is\s+(\d{1,4})/(\d{1,4})\s+full,\s+then\s+(\d{1,6})\s+\w+\s+are\s+added\.\s+"
+        r"return\s+only\s+the\s+number\b.*\.?",
+        text,
+    )
+    if not match:
+        return None
+    capacity = int(match.group(1))
+    numerator = int(match.group(2))
+    denominator = int(match.group(3))
+    added = int(match.group(4))
+    if capacity < 0 or denominator <= 0 or numerator < 0 or numerator > denominator or added < 0:
+        return None
+    total = capacity * numerator / denominator + added
+    return _result(_format_number(total), "arithmetic", "fractional_capacity_plus_addition_formula")
+
+
+def _solve_recipe_scale(text: str) -> SolverResult | None:
+    match = re.fullmatch(
+        r"(?i)a\s+recipe\s+for\s+(\d{1,6})\s+people\s+uses\s+(\d+(?:\.\d+)?)\s+"
+        r"([a-z]+)\s+of\s+.+?\.\s+how\s+many\s+\3\s+are\s+needed\s+for\s+(\d{1,6})\s+people\?\s+"
+        r"return\s+only\s+the\s+number\.?",
+        text,
+    )
+    if not match:
+        return None
+    original_people = int(match.group(1))
+    original_amount = float(match.group(2))
+    target_people = int(match.group(4))
+    if original_people <= 0 or original_amount < 0 or target_people < 0:
+        return None
+    answer = original_amount / original_people * target_people
+    return _result(_format_number(answer), "proportional_rate", "recipe_linear_scaling_formula")
+
+
 def _quoted_value(text: str) -> str | None:
     match = re.search(r'"([^"]*)"', text, flags=re.DOTALL)
     if match:
@@ -1101,8 +1166,28 @@ def _extract_founding_entities(text: str) -> dict[str, str] | None:
     }
 
 
+def _extract_opening_entities(text: str) -> dict[str, str] | None:
+    match = re.search(
+        r"\bOn\s+(\d{1,2}\s+[A-Z][a-z]+\s+\d{4}),\s+"
+        r"([A-Z][A-Za-z0-9&.'-]*(?:\s+[A-Z][A-Za-z0-9&.'-]*){0,3})\s+"
+        r"opened\s+(?:a|an|the)\s+.+?\s+in\s+([A-Z][A-Za-zÀ-ÖØ-öø-ÿ.'-]+)\b",
+        text,
+    )
+    if not match:
+        return None
+    return {
+        "organization": match.group(2),
+        "city": match.group(3),
+        "date": match.group(1),
+    }
+
+
 def _extract_contact_entities(text: str, lowered_prompt: str) -> dict[str, str] | None:
     fields: dict[str, str] = {}
+    if "name" in lowered_prompt:
+        match = re.search(r"\bContact\s+([A-Z][a-zA-Z'-]+)\b", text)
+        if match:
+            fields["name"] = match.group(1)
     if "email" in lowered_prompt:
         match = re.search(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", text, flags=re.IGNORECASE)
         if match:
@@ -1246,6 +1331,14 @@ def _normalize_clause(value: str) -> str:
             token = token[:-1]
         stems.append(token)
     return " ".join(stems)
+
+
+def _is_negation_of(raw_clause: str, positive_clause: str) -> bool:
+    lowered = raw_clause.lower()
+    if not re.search(r"\b(?:not|no|never)\b", lowered):
+        return False
+    without_negation = re.sub(r"\b(?:not|no|never)\b", " ", lowered)
+    return _normalize_clause(without_negation) == positive_clause
 
 
 def _extract_json_payload(text: str) -> str | None:

@@ -45,9 +45,15 @@ Latest escape result file: `reports/generated/fireworks-escape-20260709-results.
 
 Latest escape report: `reports/generated/fireworks-escape-20260709-report.md`
 
+Latest runtime-router escape result file: `reports/generated/fireworks-runtime-escape-20260709-after-math-results.jsonl`
+
+Latest runtime-router escape report: `reports/generated/fireworks-runtime-escape-20260709-after-math-report.md`
+
 Actual estimated spend for primary + hidden + championship + frontier + structure-heldout + escape: `$0.05761872`.
 
 Total aggregated historical result spend in the leaderboard is `$0.05761872`.
+
+Additional runtime-router eval spend across three iterative escape runs: `$0.00517975`.
 
 ## Aggregate Results
 
@@ -66,6 +72,7 @@ Total aggregated historical result spend in the leaderboard is `$0.05761872`.
 - Frontier rerun with 28 focused calls passed `27/28`; `kimi-k2p7-code` passed `14/14` with `1397` tokens, while `minimax-m3` passed `13/14` with `2846` tokens.
 - Structure-heldout rerun with 120 calls cost `$0.00738105`; `kimi-k2p7-code` and `minimax-m3` both passed `21/24`, but Kimi used `2510` tokens versus Minimax `4398`.
 - Domain policy changed again after escape calibration: `kimi-k2p7-code` is preferred where observed validity is comparable and domain/shape/model `usage.total` is materially lower, especially compact factual, summarization, logic and selected math probes; `minimax-m3` is now preferred for code generation/debug escapes, mixed sentiment, extraction robustness, and composed math where empirical risk outweighs token savings.
+- Runtime-router escape eval after solver and token-budget hardening passed `16/16` tasks with `2065` Fireworks tokens, `7/16` zero-remote-token answers, no invalid Fireworks attempts, and estimated spend `$0.00147425`.
 - Hidden-variant rerun: both accessible models passed `8/8`; `minimax-m3` cost `$0.00070650`, while `kimi-k2p7-code` cost `$0.00142610`.
 - The three Gemma serverless IDs returned `HTTP 404 Not Found` with the current local Fireworks key.
 - Gemma should remain in the architecture through AMD local inference and should still be attempted when the official harness exposes it, but repeated 404s should be cached and skipped within a batch.
@@ -84,6 +91,8 @@ After tightening the `ner_money_date` prompt to require date and amount exactly 
 - Prefer `kimi-k2p7-code` when both observed models are valid and Kimi's predicted Fireworks token use is materially lower, especially compact factual QA, summarization, logic, selected math, and compact-formatting probes.
 - Keep `minimax-m3` as the preferred remote fallback where empirical validity, extraction behavior, code generation/debug, mixed sentiment, composed math, or future hidden-evaluator data shows higher robustness than Kimi.
 - Fireworks calls now use a dynamic completion budget under the global `FIREWORKS_MAX_TOKENS` ceiling: strict yes/no and numeric outputs get tiny caps, bounded JSON/summaries get medium caps, and code keeps a larger safety budget to avoid truncation-driven accuracy failures.
+- Numeric completion caps are risk-aware: simple numeric outputs stay compact, while strong `math_reasoning` gets more headroom to avoid empty-content/truncation failures before final numeric emission.
+- The `scripts/fireworks_runtime_eval.py` lab exercises the whole runtime path: deterministic solvers, matrix regression, Nash/Pareto selection, dynamic completion budgets, strict final validation and fallback attempts.
 - In Fireworks-only mode, strict output validation now acts as an accuracy gate: if the selected model returns empty, invalid JSON, invalid number/yes-no, or irreparable Python/code output, the runner tries the next ranked candidate and records total tokens across attempts.
 - Keep Gemma IDs in `ALLOWED_MODELS` support, but cache unavailable-model errors per runner instance so one inaccessible Gemma endpoint does not cause repeated latency across the whole evaluator batch.
 

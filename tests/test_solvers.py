@@ -23,6 +23,7 @@ class SolverPackTests(unittest.TestCase):
                 "entity_extract",
                 "logic_ordering",
                 "modus_ponens",
+                "modus_tollens",
                 "python_code_debug",
                 "python_code_generation",
                 "char_count",
@@ -42,6 +43,7 @@ class SolverPackTests(unittest.TestCase):
             "Compute 17 * 6 + 4. Return only the number.": "106",
             "Evaluate (8 + 4) / 3. Return only the number.": "4",
             "The scores are 12, 18, 21, and 25. Return only their arithmetic mean.": "19",
+            "A tank holds 80 liters. It is 3/5 full, then 12 liters are added. Return only the number of liters now in the tank.": "60",
             "8 + 9": "17",
         }
         for prompt, answer in cases.items():
@@ -57,6 +59,7 @@ class SolverPackTests(unittest.TestCase):
             "If 3 identical machines produce 18 widgets per hour, how many widgets per hour do 2 machines produce? Return only the number.": "12",
             "If 5 machines make 40 parts per hour, how many parts per hour do 3 machines make? Return only the number.": "24",
             "If 4 machines make 56 parts in 2 hours, how many parts per hour do 3 machines make? Return only the number.": "21",
+            "A recipe for 4 people uses 300 grams of flour. How many grams are needed for 10 people? Return only the number.": "750",
             "Start with 100, increase by 10 percent, then increase the result by another 10 percent. Return only the final number.": "121",
         }
         for prompt, answer in cases.items():
@@ -180,11 +183,21 @@ class SolverPackTests(unittest.TestCase):
                 "organization": "Nova Labs",
                 "city": "Recife",
             },
+            "Return only minified JSON. Extract organization, city, and date from: On 14 March 2025, NovaForge opened a lab in Porto.": {
+                "organization": "NovaForge",
+                "city": "Porto",
+                "date": "14 March 2025",
+            },
             "Return only minified JSON. Text: On July 8, 2026, Orion paid $450 to Atlas. Extract date, payer, amount, payee.": {
                 "date": "July 8, 2026",
                 "payer": "Orion",
                 "amount": "$450",
                 "payee": "Atlas",
+            },
+            "Return only minified JSON. Extract name, email, and phone from: Contact Lara at lara.silva@example.com or +55-11-99888-7766.": {
+                "name": "Lara",
+                "email": "lara.silva@example.com",
+                "phone": "+55-11-99888-7766",
             },
             "Return only minified JSON. Text: Contact support at ops@example.com and visit https://example.com/help. Extract email and url.": {
                 "email": "ops@example.com",
@@ -237,6 +250,7 @@ class SolverPackTests(unittest.TestCase):
             "Ava is taller than Bea. Bea is taller than Cora. Who is the tallest? Return only the name.": "Ava",
             "If the alarm is armed, the door locks. The alarm is armed. Is the door locked? Return exactly yes or no.": "yes",
             "If a task is cached, then it uses zero Fireworks tokens. This task is cached. Does it use zero Fireworks tokens? Return exactly yes or no.": "yes",
+            "If a badge is expired, access is denied. Access is not denied. Is the badge expired? Return exactly yes or no.": "no",
             "All merls are tivas. Some tivas are roons. Is it guaranteed that some merls are roons? Return exactly yes or no.": "no",
             "All daxes are lims. No lims are vors. Can a dax be a vor? Return exactly yes or no.": "no",
             "All daxes are wugs. No wugs are plims. Can a daxes be a plims? Return exactly yes or no.": "no",

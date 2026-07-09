@@ -273,6 +273,17 @@ python3 -m router ask "Summarise token-efficient routing in one sentence."
 
 Em clone limpo, o `fit` usa `evals/fireworks-pareto/seed-microbench-results.jsonl` como seed offline. Depois de rodar microbench real com creditos Fireworks, os resultados em `reports/generated/fireworks-microbench-*.jsonl` passam a alimentar pesos mais fortes.
 
+Para testar o roteador real, incluindo solvers, regressao matricial, Nash/Pareto, fallback e completion budget dinamico:
+
+```bash
+python3 scripts/fireworks_runtime_eval.py \
+  --dataset evals/fireworks-pareto/escape-microbench.jsonl \
+  --max-tasks 16 \
+  --budget-usd 0.25 \
+  --output-jsonl reports/generated/fireworks-runtime-escape-results.jsonl \
+  --report reports/generated/fireworks-runtime-escape-report.md
+```
+
 ## Modo competicao dry-run
 
 ```bash

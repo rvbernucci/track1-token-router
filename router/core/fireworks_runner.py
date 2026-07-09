@@ -324,6 +324,10 @@ def _completion_token_cap(task: TaskEnvelope, *, expected_format: str, tier: str
     if expected_format == "yes_no":
         return 8
     if expected_format == "number":
+        if domain == "math_reasoning" and tier == "strong":
+            return 48
+        if domain == "math_reasoning":
+            return 32
         return 16
     if expected_format == "literal_echo":
         literal = extract_literal_echo(task)

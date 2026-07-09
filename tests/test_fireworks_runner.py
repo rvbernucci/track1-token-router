@@ -163,6 +163,25 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertEqual(result.metadata["fireworks_completion_token_policy"]["expected_format"], "number")
         self.assertEqual(result.metadata["fireworks_completion_token_policy"]["max_tokens"], 16)
 
+    def test_strong_math_number_task_gets_reasoning_headroom(self) -> None:
+        with FakeOpenAIServer(response_text="144") as server:
+            client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
+            runner = FireworksDirectRunner(client, max_tokens=512)
+
+            result = runner.run(
+                TaskEnvelope(
+                    id="math",
+                    input_text=(
+                        "A multi-step word problem includes a percentage change and an average. "
+                        "Return only the number."
+                    ),
+                )
+            )
+
+        self.assertEqual(result.route, "fireworks_direct")
+        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 48)
+        self.assertEqual(result.metadata["fireworks_completion_token_policy"]["domain"], "math_reasoning")
+
     def test_code_task_keeps_larger_completion_budget(self) -> None:
         response = "def slugify_title(value):\n    return value.strip().lower().replace(' ', '-')"
         with FakeOpenAIServer(response_text=response) as server:
