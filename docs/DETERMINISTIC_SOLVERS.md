@@ -73,6 +73,8 @@ O mesmo gate tambem roda dentro de `scripts/offline_release_check.sh`.
 
 Resultado atual nos datasets locais de campeonato: `41/47` tarefas resolvidas por rota deterministica ou guardrail, com `100%` de validade nos outputs deterministicos.
 
+O relatorio gerado tambem lista as rotas nao deterministicas restantes. Em 2026-07-09, os casos remanescentes eram factual QA e summarization. A decisao de campeonato e nao transformar esses dominios em regex/lookup fragil: eles devem passar pela cascata e pela matriz Fireworks, onde Minimax/Kimi sao escolhidos por regressao + Nash conforme custo e validade observada.
+
 ## Regra operacional
 
 Se a regra precisa interpretar contexto amplo, ela nao e solver deterministico.

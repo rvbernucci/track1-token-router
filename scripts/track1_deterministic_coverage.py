@@ -131,6 +131,20 @@ def render_markdown(report: dict[str, Any]) -> str:
             )
     else:
         lines.append("- none")
+    lines.extend(["", "## Non-Deterministic Routes", ""])
+    non_deterministic = [
+        row
+        for dataset in report["datasets"]
+        for row in dataset["non_deterministic_outputs"]
+    ]
+    if non_deterministic:
+        for row in non_deterministic:
+            lines.append(
+                f"- `{row['dataset']}` `{row['id']}` domain `{row['domain']}` tier `{row['tier']}` "
+                f"route `{row['route']}`: {row['prompt_preview']}"
+            )
+    else:
+        lines.append("- none")
     lines.append("")
     return "\n".join(lines)
 
@@ -142,6 +156,7 @@ def _evaluate_dataset(path: Path) -> dict[str, Any]:
     deterministic = 0
     valid_deterministic = 0
     invalid: list[dict[str, str]] = []
+    non_deterministic: list[dict[str, str]] = []
     by_domain: dict[str, Counter[str]] = {}
 
     for task in tasks:
@@ -154,6 +169,16 @@ def _evaluate_dataset(path: Path) -> dict[str, Any]:
         routes[result.route] += 1
         by_domain.setdefault(task.domain, Counter())[result.route] += 1
         if not _is_deterministic_route(result.route):
+            non_deterministic.append(
+                {
+                    "dataset": str(path),
+                    "id": task.id,
+                    "domain": task.domain,
+                    "tier": task.tier,
+                    "route": result.route,
+                    "prompt_preview": _preview(task.prompt),
+                }
+            )
             continue
         deterministic += 1
         validation = _validate(task.validator, result.answer)
@@ -178,6 +203,7 @@ def _evaluate_dataset(path: Path) -> dict[str, Any]:
         "coverage_rate": _rate(deterministic, len(tasks)),
         "valid_deterministic_rate": _rate(valid_deterministic, deterministic),
         "invalid_deterministic_outputs": invalid,
+        "non_deterministic_outputs": non_deterministic,
         "routes": dict(sorted(routes.items())),
         "routes_by_domain": {domain: dict(sorted(counter.items())) for domain, counter in sorted(by_domain.items())},
     }

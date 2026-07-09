@@ -15,6 +15,7 @@ class Track1DeterministicCoverageTests(unittest.TestCase):
         self.assertEqual(report["invalid_deterministic_outputs"], [])
         self.assertGreaterEqual(report["totals"]["coverage_rate"], 0.40)
         self.assertEqual(report["totals"]["valid_deterministic_rate"], 1.0)
+        self.assertTrue(all("non_deterministic_outputs" in row for row in report["datasets"]))
 
     def test_markdown_report_includes_routes_and_invalid_section(self) -> None:
         report = build_report(DEFAULT_DATASETS, min_coverage=0.40)
@@ -24,6 +25,7 @@ class Track1DeterministicCoverageTests(unittest.TestCase):
         self.assertIn("# Track 1 Deterministic Coverage", markdown)
         self.assertIn("solver_python_code_generation", markdown)
         self.assertIn("Invalid Deterministic Outputs", markdown)
+        self.assertIn("Non-Deterministic Routes", markdown)
         self.assertIn("- none", markdown)
 
     def test_cli_check_writes_report(self) -> None:
