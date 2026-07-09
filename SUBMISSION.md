@@ -90,17 +90,19 @@ docker run --rm track1-token-router ask "What is 2+2?"
 Current public `linux/amd64` release candidate:
 
 ```text
-ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0229
+ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0245
 ```
 
 Verify without local Docker:
 
 ```bash
 python3 scripts/competition_submission_audit.py \
-  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0229
+  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0245 \
+  --expected-revision 2efdab9bd89cc06d2cbf4f8571059961b3e5dd70 \
+  --expected-version offline-rc-20260709-0245
 ```
 
-The audit confirms public pullability, official adapter smoke, deterministic zero-token coverage, `linux/amd64`, and the 10GB image limit.
+The audit confirms public pullability, official adapter smoke, deterministic zero-token coverage, `linux/amd64`, the 10GB image limit, and OCI source/revision/version labels.
 
 ## Hybrid Run
 
