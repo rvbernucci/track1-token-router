@@ -14,7 +14,7 @@ Official input/output formats should be translated here.
 - `plain_text`: one raw text task.
 - `json_task`: one JSON task object.
 - `jsonl_batch`: many JSON task objects, one per line.
-- `lablab_track1`: official ACT II Track 1 `/input/tasks.json` array to `/output/results.json` array.
+- `lablab_track1`: official ACT II Track 1 `/input/tasks.json` array to `/output/results.json` array. It also accepts conservative evaluator variants where the same task list is wrapped under `tasks`, `items`, `questions`, or `data`, and where prompt/id fields use common aliases.
 - `file_payload`: one JSON task object with file metadata.
 - `scoring_text_batch`: simulated evaluator text batch with explicit task headers.
 - `scoring_json_envelope`: simulated evaluator JSON envelope with scoring metadata.

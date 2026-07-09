@@ -28,6 +28,7 @@ This document maps what can still surprise us after the Participant Guide reveal
 |---|---|---|---|---|
 | input | The evaluator may send plain text through stdin. | The CLI could over-wrap the prompt or emit noisy stdout. | Keep `plain_text` and `scoring_text_batch` adapters. | `tests.test_official_adapters` |
 | input | The official guide requires `/input/tasks.json` as a task array. | Missing exact adapter would fail scoring. | Use `lablab_track1` adapter and `submit-track1`. | `tests.test_official_adapters` |
+| input | The evaluator may wrap the same tasks under `tasks`, `items`, `questions`, or `data`, or use `id/question/input_text` aliases. | A harmless wrapper change could crash the container before scoring. | `lablab_track1` accepts the official array plus conservative wrapper/field aliases while preserving output as `{task_id, answer}`. | `test_lablab_track1_accepts_enveloped_tasks_and_alias_fields` |
 | input | The evaluator may send one JSON object per task. | Parse failure or lost ids can break scoring. | Keep `json_task` and `scoring_json_envelope` adapters. | `scripts/adapter_drill.py --check` |
 | input | The evaluator may send JSONL batches. | Batch order, ids or partial failures may drift. | Keep `jsonl_batch` adapter and answer one line per result. | `tests.test_official_adapters` |
 | input | The evaluator may include file metadata or inline content. | The router may ignore attachments needed for accuracy. | Normalize files into `TaskEnvelope.files` and inline content into metadata. | `scoring_file_bundle` fixture |

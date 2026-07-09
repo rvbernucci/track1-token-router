@@ -82,6 +82,58 @@ class OfficialAdapterTests(unittest.TestCase):
         self.assertEqual(payload[0], {"task_id": "t1", "answer": "Local verification reduces token spend."})
         self.assertEqual(payload[1], {"task_id": "t2", "answer": "42"})
 
+    def test_lablab_track1_accepts_enveloped_tasks_and_alias_fields(self) -> None:
+        adapter = get_adapter("lablab_track1")
+        raw = json.dumps(
+            {
+                "run_id": "official-variant",
+                "scoring": {"primary": "accuracy"},
+                "tasks": [
+                    {
+                        "id": "alias-1",
+                        "question": "What is 2 + 2? Return only the number.",
+                        "category": "math",
+                        "metadata": {"difficulty": "easy"},
+                    },
+                    {
+                        "uid": "alias-2",
+                        "input_text": "Classify sentiment: Text: reliable and clean.",
+                        "domain": "sentiment",
+                    },
+                ],
+            }
+        )
+
+        tasks = adapter.parse(raw)
+
+        self.assertEqual([task.id for task in tasks], ["alias-1", "alias-2"])
+        self.assertEqual(tasks[0].input_text, "What is 2 + 2? Return only the number.")
+        self.assertEqual(tasks[0].metadata["input_shape"], "object.tasks")
+        self.assertEqual(tasks[0].metadata["source_id_field"], "id")
+        self.assertEqual(tasks[0].metadata["source_prompt_field"], "question")
+        self.assertEqual(tasks[0].metadata["run_id"], "official-variant")
+        self.assertEqual(tasks[0].metadata["category"], "math")
+        self.assertEqual(tasks[0].metadata["difficulty"], "easy")
+        self.assertEqual(tasks[1].metadata["source_id_field"], "uid")
+        self.assertEqual(tasks[1].metadata["source_prompt_field"], "input_text")
+
+    def test_lablab_track1_generates_stable_id_when_missing(self) -> None:
+        adapter = get_adapter("lablab_track1")
+
+        tasks = adapter.parse(json.dumps({"items": [{"text": "Hello"}]}))
+        output = adapter.format([AnswerResult(id=tasks[0].id, answer="Hi", route="test")])
+
+        self.assertEqual(tasks[0].id, "task-1")
+        self.assertEqual(tasks[0].metadata["input_shape"], "object.items")
+        self.assertEqual(tasks[0].metadata["source_id_field"], "generated_index")
+        self.assertEqual(json.loads(output), [{"task_id": "task-1", "answer": "Hi"}])
+
+    def test_lablab_track1_rejects_object_without_task_list(self) -> None:
+        adapter = get_adapter("lablab_track1")
+
+        with self.assertRaisesRegex(ValueError, "requires one list field"):
+            adapter.parse(json.dumps({"prompt": "Hello"}))
+
     def test_lablab_track1_cli_submission_contract(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
