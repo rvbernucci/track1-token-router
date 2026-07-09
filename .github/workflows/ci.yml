@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-and-docker:
-    runs-on: [self-hosted, Linux, X64, track1-builder-final]
+    runs-on: [self-hosted, Linux, X64, track1-builder-stable]
     strategy:
       fail-fast: false
       matrix:

@@ -16,7 +16,7 @@ env:
 
 jobs:
   ghcr-image:
-    runs-on: [self-hosted, Linux, X64, track1-builder-final]
+    runs-on: [self-hosted, Linux, X64, track1-builder-stable]
 
     steps:
       - name: Checkout

@@ -19,7 +19,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: [self-hosted, Linux, X64, track1-builder-final]
+    runs-on: [self-hosted, Linux, X64, track1-builder-stable]
 
     steps:
       - name: Checkout
