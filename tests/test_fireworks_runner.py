@@ -51,6 +51,37 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertTrue(result.metadata["final_answer_repaired"])
         self.assertEqual(result.metadata["final_validation"]["expected_format"], "code")
 
+    def test_repairs_leading_reasoning_before_python_code(self) -> None:
+        response = (
+            "The user wants a Python function, so I will provide one.\n\n"
+            "def unique_preserve_order(items):\n"
+            "    seen = set()\n"
+            "    result = []\n"
+            "    for item in items:\n"
+            "        if item not in seen:\n"
+            "            seen.add(item)\n"
+            "            result.append(item)\n"
+            "    return result"
+        )
+        with FakeOpenAIServer(response_text=response, prompt_tokens=11, completion_tokens=55) as server:
+            client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
+            runner = FireworksDirectRunner(client)
+
+            result = runner.run(
+                TaskEnvelope(
+                    id="code",
+                    input_text=(
+                        "Write a Python function unique_preserve_order(items) that removes duplicates "
+                        "while preserving first occurrence order."
+                    ),
+                )
+            )
+
+        self.assertTrue(result.answer.startswith("def unique_preserve_order(items):"))
+        self.assertNotIn("The user wants", result.answer)
+        self.assertTrue(result.metadata["final_answer_repaired"])
+        self.assertEqual(result.metadata["final_validation"]["reason"], "python_code_with_extra_text")
+
     def test_uses_selected_allowed_model_for_task(self) -> None:
         with FakeOpenAIServer(response_text="Fixed implementation.", prompt_tokens=20, completion_tokens=8) as server:
             client = FireworksClient(base_url=server.url, model="fallback-model", api_key="test", max_retries=0)

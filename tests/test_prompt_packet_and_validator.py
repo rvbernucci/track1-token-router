@@ -57,6 +57,45 @@ class FinalValidatorTests(unittest.TestCase):
         self.assertEqual(result.expected_format, "code")
         self.assertEqual(result.repaired_answer, "def add(a, b):\n    return a + b")
 
+    def test_repairs_python_code_with_leading_reasoning(self) -> None:
+        task = TaskEnvelope(
+            input_text=(
+                "Write a Python function unique_preserve_order(items) that removes duplicates "
+                "while preserving first occurrence order."
+            )
+        )
+        answer = (
+            "The user wants a Python function. I should return only code.\n\n"
+            "def unique_preserve_order(items):\n"
+            "    seen = set()\n"
+            "    result = []\n"
+            "    for item in items:\n"
+            "        if item not in seen:\n"
+            "            seen.add(item)\n"
+            "            result.append(item)\n"
+            "    return result"
+        )
+
+        result = validate_final_answer(task, answer)
+
+        self.assertFalse(result.valid)
+        self.assertEqual(result.reason, "python_code_with_extra_text")
+        self.assertTrue(result.repaired_answer.startswith("def unique_preserve_order(items):"))
+        self.assertNotIn("The user wants", result.repaired_answer)
+
+    def test_rejects_unparseable_python_code(self) -> None:
+        task = TaskEnvelope(input_text="Return only Python code. Define a function add(a, b).")
+
+        result = validate_final_answer(task, "def add(a, b):")
+
+        self.assertFalse(result.valid)
+        self.assertEqual(result.reason, "invalid_python_code")
+
+    def test_infers_natural_python_function_request_as_code(self) -> None:
+        task = TaskEnvelope(input_text="Write a Python function add(a, b) that returns the sum.")
+
+        self.assertEqual(infer_expected_format(task), "code")
+
     def test_validates_number_only_answer(self) -> None:
         task = TaskEnvelope(input_text="What is 12 - 5? Return only the number.")
 

@@ -77,6 +77,10 @@ def infer_expected_format(task: TaskEnvelope) -> str:
         "return only python code" in text
         or "return only corrected python code" in text
         or "return only code" in text
+        or re.search(r"\bwrite\s+a\s+python\s+function\b", text)
+        or re.search(r"\bdefine\s+a\s+python\s+function\b", text)
+        or re.search(r"\bimplement\s+a\s+python\s+function\b", text)
+        or ("corrected implementation" in text and re.search(r"\b(debug|bug|fix|broken)\b", text))
     ):
         return "code"
     if "return only the number" in text or re.search(r"\bwhat is\b.*[+\-*/]", text):

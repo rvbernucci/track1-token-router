@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import ast
 import json
 import re
+import textwrap
 from dataclasses import asdict, dataclass
 
 from router.core.contracts import TaskEnvelope
@@ -54,9 +56,17 @@ def validate_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationRes
             return FinalValidationResult(True, expected_format, "valid_uppercase")
         return FinalValidationResult(False, expected_format, "not_uppercase", stripped.upper())
     if expected_format == "code":
+        repaired = repair_final_answer(task, answer).repaired_answer
         if _has_markdown_fence(stripped):
-            repaired = repair_final_answer(task, answer).repaired_answer
             return FinalValidationResult(False, expected_format, "markdown_fence_in_code", repaired)
+        if _looks_like_python_code_task(task):
+            if _is_valid_python(stripped):
+                return FinalValidationResult(True, expected_format, "valid_python_code")
+            if repaired and repaired != stripped and _is_valid_python(repaired):
+                return FinalValidationResult(False, expected_format, "python_code_with_extra_text", repaired)
+            return FinalValidationResult(False, expected_format, "invalid_python_code", repaired)
+        if repaired and repaired != stripped:
+            return FinalValidationResult(False, expected_format, "code_with_extra_text", repaired)
         return FinalValidationResult(True, expected_format, "valid_code")
     return FinalValidationResult(True, expected_format, "valid_free_text")
 
@@ -83,7 +93,8 @@ def repair_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationResul
     if expected_format == "uppercase":
         return FinalValidationResult(bool(stripped), expected_format, "uppercase_repair", stripped.upper())
     if expected_format == "code":
-        return FinalValidationResult(bool(stripped), expected_format, "code_repair", stripped)
+        repaired = _repair_code_answer(task, stripped)
+        return FinalValidationResult(bool(repaired), expected_format, "code_repair", repaired)
     return FinalValidationResult(bool(stripped), expected_format, "free_text_repair", stripped)
 
 
@@ -108,3 +119,90 @@ def _extract_json_object(value: str) -> str:
     if start == -1 or end == -1 or end <= start:
         return ""
     return stripped[start : end + 1]
+
+
+def _repair_code_answer(task: TaskEnvelope, value: str) -> str:
+    stripped = _strip_markdown_fence(value.strip())
+    if not stripped:
+        return ""
+    fenced = _extract_fenced_code(stripped)
+    if fenced:
+        stripped = fenced
+    python_like = _looks_like_python_code_task(task) or _contains_python_code_anchor(stripped)
+    if python_like:
+        normalized = _normalize_code(stripped)
+        if _is_valid_python(normalized):
+            return normalized
+        extracted = _extract_python_code_block(normalized)
+        if extracted and _is_valid_python(extracted):
+            return extracted
+        return ""
+    generic = _extract_generic_code_block(stripped)
+    return generic or stripped
+
+
+def _looks_like_python_code_task(task: TaskEnvelope) -> bool:
+    text = task.input_text.lower()
+    if "python" in text:
+        return True
+    if re.search(r"\bdef\s+[a-zA-Z_]\w*\s*\(", task.input_text):
+        return True
+    if "corrected implementation" in text and re.search(r"\b(debug|bug|fix|broken)\b", text):
+        return True
+    if re.search(r"\b(write|define|implement|create)\b.*\bfunction\b", text) and "return only code" in text:
+        return True
+    return False
+
+
+def _contains_python_code_anchor(value: str) -> bool:
+    return bool(
+        re.search(r"```(?:python|py)\b", value, re.IGNORECASE)
+        or re.search(r"(?m)^\s*(?:async\s+def|def|class)\s+[a-zA-Z_]\w*\s*[\(:]", value)
+        or re.search(r"(?m)^\s*(?:from\s+\w[\w.]*\s+import|import\s+\w)", value)
+    )
+
+
+def _extract_fenced_code(value: str) -> str:
+    match = re.search(r"```(?:python|py|[a-zA-Z0-9_-]+)?\s*(.*?)```", value, re.DOTALL)
+    if not match:
+        return ""
+    return _normalize_code(match.group(1))
+
+
+def _extract_python_code_block(value: str) -> str:
+    lines = value.splitlines()
+    starts = [
+        index
+        for index, line in enumerate(lines)
+        if re.match(r"^\s*(?:@|async\s+def\b|def\b|class\b|from\s+\w|import\s+\w)", line)
+    ]
+    for start in starts:
+        for end in range(len(lines), start, -1):
+            candidate = _normalize_code("\n".join(lines[start:end]))
+            if candidate and _is_valid_python(candidate):
+                return candidate
+    return ""
+
+
+def _extract_generic_code_block(value: str) -> str:
+    lines = value.splitlines()
+    for index, line in enumerate(lines):
+        if re.match(
+            r"^\s*(?:function|const|let|var|export|class|public|private|#include|SELECT|WITH)\b",
+            line,
+            re.IGNORECASE,
+        ):
+            return "\n".join(lines[index:]).strip()
+    return ""
+
+
+def _normalize_code(value: str) -> str:
+    return textwrap.dedent(value).strip()
+
+
+def _is_valid_python(value: str) -> bool:
+    try:
+        ast.parse(value)
+    except SyntaxError:
+        return False
+    return bool(value.strip())
