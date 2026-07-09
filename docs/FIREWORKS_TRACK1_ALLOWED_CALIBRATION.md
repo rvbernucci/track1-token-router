@@ -51,6 +51,17 @@ After tightening the `ner_money_date` prompt to require date and amount exactly 
 - Keep `minimax-m3` as the preferred remote candidate for the other observed Track 1 domains because it matched Kimi accuracy at lower token cost.
 - Keep Gemma IDs in `ALLOWED_MODELS` support, but cache unavailable-model errors per runner instance so one inaccessible Gemma endpoint does not cause repeated latency across the whole evaluator batch.
 
+## Classifier Hardening
+
+The pre-routing classifier now treats common hidden-evaluator variants as their semantic domain before applying Pareto/Nash scoring:
+
+- direct arithmetic prompts such as `Compute 17 * 6 + 4` map to `math_reasoning` instead of `formatting`;
+- numeric JSON prompts such as `Given values [...], return min and max` map to `math_reasoning` even when they request minified JSON;
+- `Fix this Python code...` maps to `code_debug`, preserving the calibrated Kimi preference;
+- `Write a Python function...` maps to `code_generation`, preserving the calibrated Minimax preference.
+
+This does not answer tasks by regex. It only prevents format words like `Return only` or `JSON` from polluting the model-selection feature vector.
+
 ## Follow-Up Calibration
 
 - Re-run this benchmark if the official page, Participant Guide, or Discord announces a model-access change.

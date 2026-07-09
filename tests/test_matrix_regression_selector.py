@@ -129,6 +129,40 @@ class CheckedInTrack1WeightsTests(unittest.TestCase):
         )
         self.assertEqual(selection["selection_rule"], "matrix_regression_plus_nash")
 
+    def test_checked_in_track1_weights_route_common_hidden_variants(self) -> None:
+        weights = load_weights(Path("router/data/fireworks_track1_allowed_weights.json"))
+        allowed = ["minimax-m3", "kimi-k2p7-code", "gemma-4-31b-it", "gemma-4-26b-a4b-it", "gemma-4-31b-it-nvfp4"]
+
+        cases = [
+            (
+                "Compute 17 * 6 + 4. Return only the number.",
+                "math_reasoning",
+                "accounts/fireworks/models/minimax-m3",
+            ),
+            (
+                "Return only minified JSON. Given values [17, 4, 23, 9], return min and max.",
+                "math_reasoning",
+                "accounts/fireworks/models/minimax-m3",
+            ),
+            (
+                "Fix this Python code: def add(a, b): return a - b",
+                "code_debug",
+                "accounts/fireworks/models/kimi-k2p7-code",
+            ),
+            (
+                "Write a Python function add(a, b) that returns the sum.",
+                "code_generation",
+                "accounts/fireworks/models/minimax-m3",
+            ),
+        ]
+
+        for prompt, expected_domain, expected_model in cases:
+            with self.subTest(prompt=prompt):
+                selection = select_model_by_matrix_regression(TaskEnvelope(input_text=prompt), allowed, weights)
+
+                self.assertEqual(selection["domain"], expected_domain)
+                self.assertEqual(selection["model"], expected_model)
+
     def test_dockerfile_enables_checked_in_track1_weights(self) -> None:
         dockerfile = Path("Dockerfile").read_text(encoding="utf-8")
 

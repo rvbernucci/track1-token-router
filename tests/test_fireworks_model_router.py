@@ -184,6 +184,24 @@ class FireworksModelRouterTests(unittest.TestCase):
         self.assertEqual(selection.tier, "strong")
         self.assertEqual(selection.domain, "math_reasoning")
 
+    def test_direct_arithmetic_is_math_reasoning_not_formatting(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(input_text="Compute 17 * 6 + 4. Return only the number."),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertEqual(selection.tier, "medium")
+        self.assertEqual(selection.domain, "math_reasoning")
+
+    def test_json_numeric_minmax_is_math_reasoning_not_formatting(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(input_text="Return only minified JSON. Given values [17, 4, 23, 9], return min and max."),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertEqual(selection.tier, "medium")
+        self.assertEqual(selection.domain, "math_reasoning")
+
     def test_define_function_is_code_generation_domain(self) -> None:
         selection = select_fireworks_model(
             TaskEnvelope(input_text="Return only Python code. Define a function is_palindrome(text)."),
@@ -192,6 +210,24 @@ class FireworksModelRouterTests(unittest.TestCase):
 
         self.assertEqual(selection.tier, "strong")
         self.assertEqual(selection.domain, "code_generation")
+
+    def test_write_python_function_is_code_generation_domain(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(input_text="Write a Python function add(a, b) that returns the sum."),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertEqual(selection.tier, "strong")
+        self.assertEqual(selection.domain, "code_generation")
+
+    def test_fix_this_python_code_is_code_debug_domain(self) -> None:
+        selection = select_fireworks_model(
+            TaskEnvelope(input_text="Fix this Python code: def add(a, b): return a - b"),
+            TRACK1_ALLOWED_SHORT_NAMES,
+        )
+
+        self.assertEqual(selection.tier, "strong")
+        self.assertEqual(selection.domain, "code_debug")
 
     def test_syllogism_is_logic_domain(self) -> None:
         selection = select_fireworks_model(

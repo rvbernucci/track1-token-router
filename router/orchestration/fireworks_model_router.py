@@ -240,7 +240,7 @@ def _task_profile(prompt: str) -> _TaskProfile:
 
 def _task_tier(prompt: str) -> tuple[str, str]:
     lowered = prompt.lower()
-    if _has_any(lowered, ["debug", "bug", "traceback", "fix the code", "write a function", "define a function", "implement", "code generation"]):
+    if _looks_like_code_debug(lowered) or _looks_like_code_generation(lowered):
         return "strong", "code_task_requires_stronger_model"
     if _looks_like_syllogism(lowered):
         return "strong", "deductive_reasoning_requires_stronger_model"
@@ -252,6 +252,8 @@ def _task_tier(prompt: str) -> tuple[str, str]:
         return "strong", "multi_step_reasoning_requires_stronger_model"
     if _has_any_keyword(lowered, ["multi-step", "word problem", "projection", "percentage", "percent", "rate", "average", "reasoning"]):
         return "strong", "multi_step_reasoning_requires_stronger_model"
+    if _looks_like_direct_numeric_task(lowered):
+        return "medium", "direct_numeric_task_requires_math_model"
     if _has_any_keyword(lowered, ["current", "latest", "today", "now", "price", "ceo", "version"]):
         return "strong", "time_sensitive_factuality_requires_stronger_model"
     if _looks_like_factual_question(lowered):
@@ -267,9 +269,9 @@ def _task_tier(prompt: str) -> tuple[str, str]:
 
 def _task_domain(prompt: str) -> str:
     lowered = prompt.lower()
-    if _has_any(lowered, ["debug", "bug", "traceback", "fix the code"]):
+    if _looks_like_code_debug(lowered):
         return "code_debug"
-    if _has_any(lowered, ["write a function", "define a function", "implement", "code generation"]):
+    if _looks_like_code_generation(lowered):
         return "code_generation"
     if _looks_like_syllogism(lowered):
         return "logic"
@@ -280,6 +282,8 @@ def _task_domain(prompt: str) -> str:
     if _looks_like_quantitative_word_problem(lowered):
         return "math_reasoning"
     if _has_any_keyword(lowered, ["multi-step", "word problem", "percentage", "percent", "rate", "average", "reasoning"]):
+        return "math_reasoning"
+    if _looks_like_direct_numeric_task(lowered):
         return "math_reasoning"
     if _has_any_keyword(lowered, ["current", "latest", "today", "now", "price", "ceo", "version"]):
         return "current_factual"
@@ -314,6 +318,33 @@ def _looks_like_modus_ponens(lowered_prompt: str) -> bool:
 
 def _looks_like_quantitative_word_problem(lowered_prompt: str) -> bool:
     return bool(re.search(r"\d", lowered_prompt) and re.search(r"\bhow\s+(many|much)\b", lowered_prompt))
+
+
+def _looks_like_direct_numeric_task(lowered_prompt: str) -> bool:
+    if not re.search(r"\d", lowered_prompt):
+        return False
+    if re.search(r"\b(compute|calculate|evaluate)\b", lowered_prompt):
+        return True
+    if re.search(r"\b(min|max|minimum|maximum|mean|median|sum|total|product)\b", lowered_prompt):
+        return True
+    return bool(re.search(r"\d+\s*[-+*/]\s*\d+", lowered_prompt))
+
+
+def _looks_like_code_debug(lowered_prompt: str) -> bool:
+    if _has_any(lowered_prompt, ["debug", "bug", "traceback", "fix the code", "fix this code", "fix this python", "corrected python code"]):
+        return True
+    return bool(re.search(r"\bfix\b.{0,50}\b(code|function|python|javascript|typescript|program)\b", lowered_prompt))
+
+
+def _looks_like_code_generation(lowered_prompt: str) -> bool:
+    if _has_any(lowered_prompt, ["write a function", "define a function", "code generation"]):
+        return True
+    return bool(
+        re.search(
+            r"\b(write|create|define|implement)\b.{0,80}\b(function|class|method|script|program|python code|javascript code|typescript code)\b",
+            lowered_prompt,
+        )
+    )
 
 
 def _looks_like_factual_question(lowered_prompt: str) -> bool:
