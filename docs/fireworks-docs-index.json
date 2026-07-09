@@ -1,0 +1,2387 @@
+{
+  "generated_at": "2026-07-09",
+  "groups": {
+    "_root": {
+      "label": "Root / special pages",
+      "pages": 1,
+      "priority": "low"
+    },
+    "accounts": {
+      "label": "Accounts, billing, users and access",
+      "pages": 5,
+      "priority": "low"
+    },
+    "api-reference": {
+      "label": "API reference",
+      "pages": 22,
+      "priority": "high"
+    },
+    "deployments": {
+      "label": "Dedicated deployments",
+      "pages": 7,
+      "priority": "medium"
+    },
+    "ecosystem": {
+      "label": "Ecosystem integrations",
+      "pages": 16,
+      "priority": "low"
+    },
+    "examples": {
+      "label": "Examples",
+      "pages": 2,
+      "priority": "low"
+    },
+    "faq-new": {
+      "label": "FAQ",
+      "pages": 1,
+      "priority": "low"
+    },
+    "fine-tuning": {
+      "label": "Fine-tuning, LoRA and evaluators",
+      "pages": 54,
+      "priority": "medium"
+    },
+    "fireworks-for-work": {
+      "label": "Fireworks for Work",
+      "pages": 1,
+      "priority": "low"
+    },
+    "getting-started": {
+      "label": "Getting started",
+      "pages": 5,
+      "priority": "high"
+    },
+    "guides": {
+      "label": "Guides and optimization",
+      "pages": 19,
+      "priority": "high"
+    },
+    "models": {
+      "label": "Model library and model-specific docs",
+      "pages": 4,
+      "priority": "critical"
+    },
+    "serverless": {
+      "label": "Serverless inference",
+      "pages": 4,
+      "priority": "critical"
+    },
+    "structured-responses": {
+      "label": "Structured responses",
+      "pages": 1,
+      "priority": "low"
+    },
+    "tools-sdks": {
+      "label": "Tools, SDKs and protocol compatibility",
+      "pages": 114,
+      "priority": "medium"
+    }
+  },
+  "pages": [
+    {
+      "description": "Open weight models for personal agentic coding \u2014 Fire Pass",
+      "group": "_root",
+      "page_url": "https://docs.fireworks.ai/firepass",
+      "path": "firepass.md",
+      "priority": "low",
+      "title": "Fire Pass Setup",
+      "url": "https://docs.fireworks.ai/firepass.md"
+    },
+    {
+      "description": "Export billing and usage metrics for all Fireworks services",
+      "group": "accounts",
+      "page_url": "https://docs.fireworks.ai/accounts/exporting-billing-metrics",
+      "path": "accounts/exporting-billing-metrics.md",
+      "priority": "low",
+      "title": "Exporting Billing Metrics",
+      "url": "https://docs.fireworks.ai/accounts/exporting-billing-metrics.md"
+    },
+    {
+      "description": "Break down usage and rated costs by deployment, model, API key, or custom tags \u2014 via firectl or the billingUsage API",
+      "group": "accounts",
+      "page_url": "https://docs.fireworks.ai/accounts/exporting-usage-and-costs",
+      "path": "accounts/exporting-usage-and-costs.md",
+      "priority": "low",
+      "title": "Usage & Cost Breakdown",
+      "url": "https://docs.fireworks.ai/accounts/exporting-usage-and-costs.md"
+    },
+    {
+      "description": "How to manage and use service accounts in Fireworks",
+      "group": "accounts",
+      "page_url": "https://docs.fireworks.ai/accounts/service-accounts",
+      "path": "accounts/service-accounts.md",
+      "priority": "low",
+      "title": "Service Accounts",
+      "url": "https://docs.fireworks.ai/accounts/service-accounts.md"
+    },
+    {
+      "description": "Set up custom Single Sign-On (SSO) authentication for Fireworks AI",
+      "group": "accounts",
+      "page_url": "https://docs.fireworks.ai/accounts/sso",
+      "path": "accounts/sso.md",
+      "priority": "low",
+      "title": "Custom SSO",
+      "url": "https://docs.fireworks.ai/accounts/sso.md"
+    },
+    {
+      "description": "Add, delete, and manage roles for users in your Fireworks account",
+      "group": "accounts",
+      "page_url": "https://docs.fireworks.ai/accounts/users",
+      "path": "accounts/users.md",
+      "priority": "low",
+      "title": "Managing users",
+      "url": "https://docs.fireworks.ai/accounts/users.md"
+    },
+    {
+      "description": "**Anthropic-compatible endpoint.**",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/anthropic-messages",
+      "path": "api-reference/anthropic-messages.md",
+      "priority": "high",
+      "title": "Create a Message",
+      "url": "https://docs.fireworks.ai/api-reference/anthropic-messages.md"
+    },
+    {
+      "description": "Creates a custom evaluator for scoring model outputs. Evaluators use the [Eval Protocol](https://evalprotocol.io) to define test cases, run model inference, and score responses. They are used with evaluation jobs and Reinforcement Fine-Tuning (RFT).",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/create-evaluator",
+      "path": "api-reference/create-evaluator.md",
+      "priority": "high",
+      "title": "Create Evaluator",
+      "url": "https://docs.fireworks.ai/api-reference/create-evaluator.md"
+    },
+    {
+      "description": "Deletes an evaluator and its associated versions and build artifacts.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/delete-evaluator",
+      "path": "api-reference/delete-evaluator.md",
+      "priority": "high",
+      "title": "Delete Evaluator",
+      "url": "https://docs.fireworks.ai/api-reference/delete-evaluator.md"
+    },
+    {
+      "description": "Deletes a model response by its ID. Once deleted, the response data will be gone immediately and permanently.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/delete-response",
+      "path": "api-reference/delete-response.md",
+      "priority": "high",
+      "title": "Delete Response",
+      "url": "https://docs.fireworks.ai/api-reference/delete-response.md"
+    },
+    {
+      "description": "Returns a signed URL to download the evaluator's build logs. Useful for debugging `BUILD_FAILED` state.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/get-evaluator-build-log-endpoint",
+      "path": "api-reference/get-evaluator-build-log-endpoint.md",
+      "priority": "high",
+      "title": "Get Evaluator Build Log Endpoint",
+      "url": "https://docs.fireworks.ai/api-reference/get-evaluator-build-log-endpoint.md"
+    },
+    {
+      "description": "Returns a signed URL to download the evaluator's source code archive. Useful for debugging or reviewing the uploaded code.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/get-evaluator-source-code-endpoint",
+      "path": "api-reference/get-evaluator-source-code-endpoint.md",
+      "priority": "high",
+      "title": "Get Evaluator Source Code Endpoint",
+      "url": "https://docs.fireworks.ai/api-reference/get-evaluator-source-code-endpoint.md"
+    },
+    {
+      "description": "Returns signed URLs for uploading evaluator source code (**step 3** in the [Create Evaluator](/api-reference/create-evaluator) workflow). After receiving the signed URL, upload your `.tar.gz` archive using HTTP `PUT` with `Content-Type: application/octet-stream` header.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/get-evaluator-upload-endpoint",
+      "path": "api-reference/get-evaluator-upload-endpoint.md",
+      "priority": "high",
+      "title": "Get Evaluator Upload Endpoint",
+      "url": "https://docs.fireworks.ai/api-reference/get-evaluator-upload-endpoint.md"
+    },
+    {
+      "description": "Retrieves an evaluator by name. Use this to monitor build progress after creation (**step 6** in the [Create Evaluator](/api-reference/create-evaluator) workflow).",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/get-evaluator",
+      "path": "api-reference/get-evaluator.md",
+      "priority": "high",
+      "title": "Get Evaluator",
+      "url": "https://docs.fireworks.ai/api-reference/get-evaluator.md"
+    },
+    {
+      "description": "Gets a single quota by resource name.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/get-quota",
+      "path": "api-reference/get-quota.md",
+      "priority": "high",
+      "title": "Get Quota",
+      "url": "https://docs.fireworks.ai/api-reference/get-quota.md"
+    },
+    {
+      "description": "Retrieves a secret by name. Note that the `value` field is not returned in the response for security reasons. Only the `name` and `key_name` fields are included.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/get-secret",
+      "path": "api-reference/get-secret.md",
+      "priority": "high",
+      "title": "Get Secret",
+      "url": "https://docs.fireworks.ai/api-reference/get-secret.md"
+    },
+    {
+      "description": "Lists all evaluators for an account with pagination support.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/list-evaluators",
+      "path": "api-reference/list-evaluators.md",
+      "priority": "high",
+      "title": "List Evaluators",
+      "url": "https://docs.fireworks.ai/api-reference/list-evaluators.md"
+    },
+    {
+      "description": "Lists all quotas for an account.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/list-quotas",
+      "path": "api-reference/list-quotas.md",
+      "priority": "high",
+      "title": "List Quotas",
+      "url": "https://docs.fireworks.ai/api-reference/list-quotas.md"
+    },
+    {
+      "description": "Get a list of all responses for the authenticated account.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/list-responses",
+      "path": "api-reference/list-responses.md",
+      "priority": "high",
+      "title": "List Responses",
+      "url": "https://docs.fireworks.ai/api-reference/list-responses.md"
+    },
+    {
+      "description": "Lists all secrets for an account. Note that the `value` field is not returned in the response for security reasons. Only the `name` and `key_name` fields are included for each secret.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/list-secrets",
+      "path": "api-reference/list-secrets.md",
+      "priority": "high",
+      "title": "List Secrets",
+      "url": "https://docs.fireworks.ai/api-reference/list-secrets.md"
+    },
+    {
+      "description": "Create a completion for the provided prompt and parameters.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/post-chatcompletions",
+      "path": "api-reference/post-chatcompletions.md",
+      "priority": "high",
+      "title": "Create Chat Completion",
+      "url": "https://docs.fireworks.ai/api-reference/post-chatcompletions.md"
+    },
+    {
+      "description": "Create a completion for the provided prompt and parameters.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/post-completions",
+      "path": "api-reference/post-completions.md",
+      "priority": "high",
+      "title": "Create Completion",
+      "url": "https://docs.fireworks.ai/api-reference/post-completions.md"
+    },
+    {
+      "description": "Creates a model response, optionally interacting with custom tools via the Model Context Protocol (MCP). This endpoint supports conversational continuation and streaming.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/post-responses",
+      "path": "api-reference/post-responses.md",
+      "priority": "high",
+      "title": "Create Response",
+      "url": "https://docs.fireworks.ai/api-reference/post-responses.md"
+    },
+    {
+      "description": "Rerank documents for a query using relevance scoring",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/rerank-documents",
+      "path": "api-reference/rerank-documents.md",
+      "priority": "high",
+      "title": "Rerank documents",
+      "url": "https://docs.fireworks.ai/api-reference/rerank-documents.md"
+    },
+    {
+      "description": "Updates evaluator metadata (display_name, description, default_dataset). Changing `requirements` or `entry_point` triggers a rebuild. To upload new source code, set `prepare_code_upload: true` then follow the upload flow.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/update-evaluator",
+      "path": "api-reference/update-evaluator.md",
+      "priority": "high",
+      "title": "Update Evaluator",
+      "url": "https://docs.fireworks.ai/api-reference/update-evaluator.md"
+    },
+    {
+      "description": "Updates a quota.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/update-quota",
+      "path": "api-reference/update-quota.md",
+      "priority": "high",
+      "title": "Update Quota",
+      "url": "https://docs.fireworks.ai/api-reference/update-quota.md"
+    },
+    {
+      "description": "Provides a streamlined way to upload a dataset file in a single API request. This path can handle file sizes up to 150Mb. For larger file sizes use [Get Dataset Upload Endpoint](get-dataset-upload-endpoint).",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/upload-dataset-files",
+      "path": "api-reference/upload-dataset-files.md",
+      "priority": "high",
+      "title": "Upload Dataset Files",
+      "url": "https://docs.fireworks.ai/api-reference/upload-dataset-files.md"
+    },
+    {
+      "description": "Triggers server-side validation of the uploaded source code (**step 5** in the [Create Evaluator](/api-reference/create-evaluator) workflow). The server extracts and processes the archive, then builds the evaluator environment. Poll [Get Evaluator](/api-reference/get-evaluator) to monitor progress.",
+      "group": "api-reference",
+      "page_url": "https://docs.fireworks.ai/api-reference/validate-evaluator-upload",
+      "path": "api-reference/validate-evaluator-upload.md",
+      "priority": "high",
+      "title": "Validate Evaluator Upload",
+      "url": "https://docs.fireworks.ai/api-reference/validate-evaluator-upload.md"
+    },
+    {
+      "description": "Configure how your deployment scales based on traffic",
+      "group": "deployments",
+      "page_url": "https://docs.fireworks.ai/deployments/autoscaling",
+      "path": "deployments/autoscaling.md",
+      "priority": "medium",
+      "title": "Autoscaling",
+      "url": "https://docs.fireworks.ai/deployments/autoscaling.md"
+    },
+    {
+      "description": "Measure and optimize your deployment's performance with load testing",
+      "group": "deployments",
+      "page_url": "https://docs.fireworks.ai/deployments/benchmarking",
+      "path": "deployments/benchmarking.md",
+      "priority": "medium",
+      "title": "Performance benchmarking",
+      "url": "https://docs.fireworks.ai/deployments/benchmarking.md"
+    },
+    {
+      "description": "Optimize your client code for maximum performance with dedicated deployments",
+      "group": "deployments",
+      "page_url": "https://docs.fireworks.ai/deployments/client-side-performance-optimization",
+      "path": "deployments/client-side-performance-optimization.md",
+      "priority": "medium",
+      "title": "Client-side performance optimization",
+      "url": "https://docs.fireworks.ai/deployments/client-side-performance-optimization.md"
+    },
+    {
+      "description": "Export metrics from your dedicated deployments to your observability stack",
+      "group": "deployments",
+      "page_url": "https://docs.fireworks.ai/deployments/exporting-metrics",
+      "path": "deployments/exporting-metrics.md",
+      "priority": "medium",
+      "title": "Exporting Metrics",
+      "url": "https://docs.fireworks.ai/deployments/exporting-metrics.md"
+    },
+    {
+      "description": "Fireworks runs a global fleet of hardware on which you can deploy your models.",
+      "group": "deployments",
+      "page_url": "https://docs.fireworks.ai/deployments/regions",
+      "path": "deployments/regions.md",
+      "priority": "medium",
+      "title": "Regions",
+      "url": "https://docs.fireworks.ai/deployments/regions.md"
+    },
+    {
+      "description": "Distribute traffic across multiple deployments for A/B testing, traffic migration, and load distribution.",
+      "group": "deployments",
+      "page_url": "https://docs.fireworks.ai/deployments/routers",
+      "path": "deployments/routers.md",
+      "priority": "medium",
+      "title": "Routers",
+      "url": "https://docs.fireworks.ai/deployments/routers.md"
+    },
+    {
+      "description": "Speed up generation with draft models and n-gram speculation",
+      "group": "deployments",
+      "page_url": "https://docs.fireworks.ai/deployments/speculative-decoding",
+      "path": "deployments/speculative-decoding.md",
+      "priority": "medium",
+      "title": "Speculative Decoding",
+      "url": "https://docs.fireworks.ai/deployments/speculative-decoding.md"
+    },
+    {
+      "description": "Use Fireworks AI models in Claude Code with the FireConnect CLI",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/fireconnect/claude-code",
+      "path": "ecosystem/fireconnect/claude-code.md",
+      "priority": "low",
+      "title": "Claude Code",
+      "url": "https://docs.fireworks.ai/ecosystem/fireconnect/claude-code.md"
+    },
+    {
+      "description": "Use Fireworks AI models in OpenAI Codex CLI with the FireConnect CLI",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/fireconnect/codex",
+      "path": "ecosystem/fireconnect/codex.md",
+      "priority": "low",
+      "title": "Codex",
+      "url": "https://docs.fireworks.ai/ecosystem/fireconnect/codex.md"
+    },
+    {
+      "description": "Use Fireworks AI models in Cursor IDE with the FireConnect CLI",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/fireconnect/cursor",
+      "path": "ecosystem/fireconnect/cursor.md",
+      "priority": "low",
+      "title": "Cursor",
+      "url": "https://docs.fireworks.ai/ecosystem/fireconnect/cursor.md"
+    },
+    {
+      "description": "Use Fireworks AI models in LangChain Deep Agents Code with the FireConnect CLI",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/fireconnect/deepagents",
+      "path": "ecosystem/fireconnect/deepagents.md",
+      "priority": "low",
+      "title": "Deep Agents",
+      "url": "https://docs.fireworks.ai/ecosystem/fireconnect/deepagents.md"
+    },
+    {
+      "description": "Route OpenCode, Codex, and Pi through Fireworks models deployed in your Azure subscription with FireConnect",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/fireconnect/microsoft-foundry",
+      "path": "ecosystem/fireconnect/microsoft-foundry.md",
+      "priority": "low",
+      "title": "Microsoft Foundry",
+      "url": "https://docs.fireworks.ai/ecosystem/fireconnect/microsoft-foundry.md"
+    },
+    {
+      "description": "Use Fireworks AI models in OpenCode with the FireConnect CLI",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/fireconnect/opencode",
+      "path": "ecosystem/fireconnect/opencode.md",
+      "priority": "low",
+      "title": "OpenCode",
+      "url": "https://docs.fireworks.ai/ecosystem/fireconnect/opencode.md"
+    },
+    {
+      "description": "Route Claude Code, OpenCode, Codex, Pi, Cursor, VS Code, and Deep Agents through Fireworks AI or Microsoft Foundry models",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/fireconnect/overview",
+      "path": "ecosystem/fireconnect/overview.md",
+      "priority": "low",
+      "title": "Overview",
+      "url": "https://docs.fireworks.ai/ecosystem/fireconnect/overview.md"
+    },
+    {
+      "description": "Use Fireworks AI models in Pi with the FireConnect CLI",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/fireconnect/pi",
+      "path": "ecosystem/fireconnect/pi.md",
+      "priority": "low",
+      "title": "Pi",
+      "url": "https://docs.fireworks.ai/ecosystem/fireconnect/pi.md"
+    },
+    {
+      "description": "Use Fireworks AI models in GitHub Copilot Chat with the FireConnect CLI",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/fireconnect/vscode",
+      "path": "ecosystem/fireconnect/vscode.md",
+      "priority": "low",
+      "title": "VS Code",
+      "url": "https://docs.fireworks.ai/ecosystem/fireconnect/vscode.md"
+    },
+    {
+      "description": "Build production-ready AI agents with Fireworks and leading open-source frameworks",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/integrations/agent-frameworks",
+      "path": "ecosystem/integrations/agent-frameworks.md",
+      "priority": "low",
+      "title": "Agent Frameworks",
+      "url": "https://docs.fireworks.ai/ecosystem/integrations/agent-frameworks.md"
+    },
+    {
+      "description": "Deploy frontier open models inside your Azure subscription, billed through Azure.",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/integrations/azure-foundry",
+      "path": "ecosystem/integrations/azure-foundry.md",
+      "priority": "low",
+      "title": "Microsoft Foundry",
+      "url": "https://docs.fireworks.ai/ecosystem/integrations/azure-foundry.md"
+    },
+    {
+      "description": "Understand the high-level onboarding flow for Bring Your Own Cluster.",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/integrations/byoc/how-setup-works",
+      "path": "ecosystem/integrations/byoc/how-setup-works.md",
+      "priority": "low",
+      "title": "How Setup Works",
+      "url": "https://docs.fireworks.ai/ecosystem/integrations/byoc/how-setup-works.md"
+    },
+    {
+      "description": "Learn how Fireworks operates Bring Your Own Cluster environments day to day.",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/integrations/byoc/operational-model",
+      "path": "ecosystem/integrations/byoc/operational-model.md",
+      "priority": "low",
+      "title": "Operational Model",
+      "url": "https://docs.fireworks.ai/ecosystem/integrations/byoc/operational-model.md"
+    },
+    {
+      "description": "Run Fireworks inference in your own Kubernetes cluster, cloud account or data center, and network boundary.",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/integrations/byoc/overview",
+      "path": "ecosystem/integrations/byoc/overview.md",
+      "priority": "low",
+      "title": "Bring Your Own Cluster",
+      "url": "https://docs.fireworks.ai/ecosystem/integrations/byoc/overview.md"
+    },
+    {
+      "description": "Configure the Fireworks AI Docs MCP server for Claude Code and Cursor",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/integrations/development-setup",
+      "path": "ecosystem/integrations/development-setup.md",
+      "priority": "low",
+      "title": "Development Setup with Fireworks Docs MCP",
+      "url": "https://docs.fireworks.ai/ecosystem/integrations/development-setup.md"
+    },
+    {
+      "description": "Track and monitor your Fireworks AI deployments with leading MLOps and observability platforms",
+      "group": "ecosystem",
+      "page_url": "https://docs.fireworks.ai/ecosystem/integrations/mlops-observability",
+      "path": "ecosystem/integrations/mlops-observability.md",
+      "priority": "low",
+      "title": "MLOps & Observability",
+      "url": "https://docs.fireworks.ai/ecosystem/integrations/mlops-observability.md"
+    },
+    {
+      "description": "Interactive Jupyter notebooks demonstrating advanced use cases and best practices with Fireworks AI",
+      "group": "examples",
+      "page_url": "https://docs.fireworks.ai/examples/cookbooks",
+      "path": "examples/cookbooks.md",
+      "priority": "low",
+      "title": "Cookbooks",
+      "url": "https://docs.fireworks.ai/examples/cookbooks.md"
+    },
+    {
+      "description": "Standalone end-to-end examples showing how to use Fireworks to solve real-world use cases",
+      "group": "examples",
+      "page_url": "https://docs.fireworks.ai/examples/introduction",
+      "path": "examples/introduction.md",
+      "priority": "low",
+      "title": "Courses",
+      "url": "https://docs.fireworks.ai/examples/introduction.md"
+    },
+    {
+      "description": "Learn how to calculate token usage for images in vision models and understand pricing implications",
+      "group": "faq-new",
+      "page_url": "https://docs.fireworks.ai/faq-new/billing-pricing/how-many-tokens-per-image",
+      "path": "faq-new/billing-pricing/how-many-tokens-per-image.md",
+      "priority": "low",
+      "title": "How many tokens per image?",
+      "url": "https://docs.fireworks.ai/faq-new/billing-pricing/how-many-tokens-per-image.md"
+    },
+    {
+      "description": "Benchmark base models, fine-tune on labeled data, and pick the best classifier \u2014 automatically.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/agent/classification",
+      "path": "fine-tuning/agent/classification.md",
+      "priority": "medium",
+      "title": "Fireworks Agent: Classification",
+      "url": "https://docs.fireworks.ai/fine-tuning/agent/classification.md"
+    },
+    {
+      "description": "Run preference fine-tuning end-to-end with optional base-model sweep, automatic pair generation, and pairwise evaluation.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/agent/dpo",
+      "path": "fine-tuning/agent/dpo.md",
+      "priority": "medium",
+      "title": "Fireworks Agent: Preference Learning (DPO/ORPO)",
+      "url": "https://docs.fireworks.ai/fine-tuning/agent/dpo.md"
+    },
+    {
+      "description": "Have Fireworks Agent generate a reusable evaluator from your dataset \u2014 for scoring candidates in an SFT sweep, or for use with Managed RFT.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/agent/evaluators",
+      "path": "fine-tuning/agent/evaluators.md",
+      "priority": "medium",
+      "title": "Fireworks Agent: Evaluator Authoring",
+      "url": "https://docs.fireworks.ai/fine-tuning/agent/evaluators.md"
+    },
+    {
+      "description": "Describe what you want, approve the plan and cost, get a deployed fine-tuned model.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/agent/introduction",
+      "path": "fine-tuning/agent/introduction.md",
+      "priority": "medium",
+      "title": "Fireworks Agent Overview",
+      "url": "https://docs.fireworks.ai/fine-tuning/agent/introduction.md"
+    },
+    {
+      "description": "Run end-to-end SFT with Fireworks Agent \u2014 dataset inspection, hyperparameter sweep, evaluator-guided selection, and a deployed winner.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/agent/sft",
+      "path": "fine-tuning/agent/sft.md",
+      "priority": "medium",
+      "title": "Fireworks Agent: Supervised Fine-Tuning",
+      "url": "https://docs.fireworks.ai/fine-tuning/agent/sft.md"
+    },
+    {
+      "description": "Install the Fireworks Agent skill file once and drive end-to-end fine-tuning from your coding agent.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/agent/use-with-coding-agents",
+      "path": "fine-tuning/agent/use-with-coding-agents.md",
+      "priority": "medium",
+      "title": "Use Fireworks Agent with Claude Code, Cursor, Codex, and other coding agents",
+      "url": "https://docs.fireworks.ai/fine-tuning/agent/use-with-coding-agents.md"
+    },
+    {
+      "description": "Launch RFT jobs using the eval-protocol CLI",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/cli-reference",
+      "path": "fine-tuning/cli-reference.md",
+      "priority": "medium",
+      "title": "Training Overview",
+      "url": "https://docs.fireworks.ai/fine-tuning/cli-reference.md"
+    },
+    {
+      "description": "Implement the /init endpoint to run evaluations in your infrastructure",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/connect-environments",
+      "path": "fine-tuning/connect-environments.md",
+      "priority": "medium",
+      "title": "Remote Environment Setup",
+      "url": "https://docs.fireworks.ai/fine-tuning/connect-environments.md"
+    },
+    {
+      "description": "Download rendered token IDs and loss masks for supervised fine-tuning jobs.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/debug-sft-tokenization",
+      "path": "fine-tuning/debug-sft-tokenization.md",
+      "priority": "medium",
+      "title": "Debug SFT tokenization",
+      "url": "https://docs.fireworks.ai/fine-tuning/debug-sft-tokenization.md"
+    },
+    {
+      "description": "Deploy one or multiple LoRA models fine tuned on Fireworks using live merge or multi-LoRA",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/deploying-loras",
+      "path": "fine-tuning/deploying-loras.md",
+      "priority": "medium",
+      "title": "Deploying Fine Tuned Models",
+      "url": "https://docs.fireworks.ai/fine-tuning/deploying-loras.md"
+    },
+    {
+      "description": "Understand where your agent runs and how tracing enables reinforcement fine-tuning",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/environments",
+      "path": "fine-tuning/environments.md",
+      "priority": "medium",
+      "title": "Agent Tracing",
+      "url": "https://docs.fireworks.ai/fine-tuning/environments.md"
+    },
+    {
+      "description": "Understand the fundamentals of evaluators and reward functions in reinforcement fine-tuning",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/evaluators",
+      "path": "fine-tuning/evaluators.md",
+      "priority": "medium",
+      "title": "Evaluators",
+      "url": "https://docs.fireworks.ai/fine-tuning/evaluators.md"
+    },
+    {
+      "description": "Learn how to fine-tune vision-language models on Fireworks AI with image and text datasets",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/fine-tuning-vlm",
+      "path": "fine-tuning/fine-tuning-vlm.md",
+      "priority": "medium",
+      "title": "Supervised Fine Tuning - Vision",
+      "url": "https://docs.fireworks.ai/fine-tuning/fine-tuning-vlm.md"
+    },
+    {
+      "description": "Understand the reinforcement learning fundamentals behind RFT",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/how-rft-works",
+      "path": "fine-tuning/how-rft-works.md",
+      "priority": "medium",
+      "title": "Basics",
+      "url": "https://docs.fireworks.ai/fine-tuning/how-rft-works.md"
+    },
+    {
+      "description": "Fine-tune models with Fireworks-managed infrastructure \u2014 no custom code required.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/managed-finetuning-intro",
+      "path": "fine-tuning/managed-finetuning-intro.md",
+      "priority": "medium",
+      "title": "Managed Fine-Tuning Overview",
+      "url": "https://docs.fireworks.ai/fine-tuning/managed-finetuning-intro.md"
+    },
+    {
+      "description": "Track RFT job progress and diagnose issues in real-time",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/monitor-training",
+      "path": "fine-tuning/monitor-training.md",
+      "priority": "medium",
+      "title": "Monitor Training",
+      "url": "https://docs.fireworks.ai/fine-tuning/monitor-training.md"
+    },
+    {
+      "description": "Estimate the cost of multi-turn agentic RL rollouts on Fireworks compared to Tinker's per-token pricing",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/multi-turn-cost-comparison",
+      "path": "fine-tuning/multi-turn-cost-comparison.md",
+      "priority": "medium",
+      "title": "Price comparison vs Tinker",
+      "url": "https://docs.fireworks.ai/fine-tuning/multi-turn-cost-comparison.md"
+    },
+    {
+      "description": "Learn how training parameters affect model behavior and outcomes",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/parameter-tuning",
+      "path": "fine-tuning/parameter-tuning.md",
+      "priority": "medium",
+      "title": "Parameter Tuning",
+      "url": "https://docs.fireworks.ai/fine-tuning/parameter-tuning.md"
+    },
+    {
+      "description": "Train a model to be an expert at answering GSM8K math questions",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/quickstart-math",
+      "path": "fine-tuning/quickstart-math.md",
+      "priority": "medium",
+      "title": "Single-Turn Training Quickstart",
+      "url": "https://docs.fireworks.ai/fine-tuning/quickstart-math.md"
+    },
+    {
+      "description": "Train an SVG drawing agent running in a remote environment",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/quickstart-svg-agent",
+      "path": "fine-tuning/quickstart-svg-agent.md",
+      "priority": "medium",
+      "title": "Remote Agent Quickstart",
+      "url": "https://docs.fireworks.ai/fine-tuning/quickstart-svg-agent.md"
+    },
+    {
+      "description": "Train models using reinforcement learning in minutes",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/reinforcement-fine-tuning-models",
+      "path": "fine-tuning/reinforcement-fine-tuning-models.md",
+      "priority": "medium",
+      "title": "Overview",
+      "url": "https://docs.fireworks.ai/fine-tuning/reinforcement-fine-tuning-models.md"
+    },
+    {
+      "description": "Estimate and optimize the cost of your RFT training jobs",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/rft-cost-estimator",
+      "path": "fine-tuning/rft-cost-estimator.md",
+      "priority": "medium",
+      "title": "Cost Estimator",
+      "url": "https://docs.fireworks.ai/fine-tuning/rft-cost-estimator.md"
+    },
+    {
+      "description": "Checkpoint, resume, and GRPO metrics fields for reinforcement fine-tuning recipes.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/rft-parameters-reference",
+      "path": "fine-tuning/rft-parameters-reference.md",
+      "priority": "medium",
+      "title": "RFT parameters reference",
+      "url": "https://docs.fireworks.ai/fine-tuning/rft-parameters-reference.md"
+    },
+    {
+      "description": "Inspect snapshot history, reset the ledger, and understand how in-flight requests behave during a weight swap.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/rl-rollout-debugging",
+      "path": "fine-tuning/rl-rollout-debugging.md",
+      "priority": "medium",
+      "title": "Ledger & Debugging for RL Rollouts",
+      "url": "https://docs.fireworks.ai/fine-tuning/rl-rollout-debugging.md"
+    },
+    {
+      "description": "Build ARC2 incremental checkpoints and signal delta hot-loads for BYOT RL rollout integrations.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/rl-rollout-delta-checkpoints",
+      "path": "fine-tuning/rl-rollout-delta-checkpoints.md",
+      "priority": "medium",
+      "title": "Incremental Snapshots (ARC2)",
+      "url": "https://docs.fireworks.ai/fine-tuning/rl-rollout-delta-checkpoints.md"
+    },
+    {
+      "description": "Integrate an external RL trainer with Fireworks inference: hot-load new checkpoints from your bucket and run rollouts via the OpenAI-compatible API.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/rl-rollout-integration",
+      "path": "fine-tuning/rl-rollout-integration.md",
+      "priority": "medium",
+      "title": "RL Rollouts with Your Own Trainer",
+      "url": "https://docs.fireworks.ai/fine-tuning/rl-rollout-integration.md"
+    },
+    {
+      "description": "Fine-tune models while keeping sensitive data and components under your control",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/secure-fine-tuning",
+      "path": "fine-tuning/secure-fine-tuning.md",
+      "priority": "medium",
+      "title": "Secure Training (BYOB)",
+      "url": "https://docs.fireworks.ai/fine-tuning/secure-fine-tuning.md"
+    },
+    {
+      "description": "Save training progress, resume from failures, and promote checkpoints to deployable models \u2014 driven by the recipe.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/checkpoints",
+      "path": "fine-tuning/training-api/cookbook/checkpoints.md",
+      "priority": "medium",
+      "title": "Checkpoints and Resume",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/checkpoints.md"
+    },
+    {
+      "description": "On-policy distillation recipes with one or more frozen teachers.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/distillation",
+      "path": "fine-tuning/training-api/cookbook/distillation.md",
+      "priority": "medium",
+      "title": "Cookbook: Distillation",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/distillation.md"
+    },
+    {
+      "description": "Direct Preference Optimization with pairwise data using the cookbook recipe.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/dpo",
+      "path": "fine-tuning/training-api/cookbook/dpo.md",
+      "priority": "medium",
+      "title": "Cookbook: DPO",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/dpo.md"
+    },
+    {
+      "description": "Ready-to-run training recipes for GRPO, DPO, SFT, and distillation built on top of the Training API.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/overview",
+      "path": "fine-tuning/training-api/cookbook/overview.md",
+      "priority": "medium",
+      "title": "The Cookbook",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/overview.md"
+    },
+    {
+      "description": "Configuration classes, checkpoint utilities, and advanced recipe knobs.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/reference",
+      "path": "fine-tuning/training-api/cookbook/reference.md",
+      "priority": "medium",
+      "title": "Cookbook Reference",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/reference.md"
+    },
+    {
+      "description": "Async RL on Fireworks \u2014 write a rollout function, the recipe owns the loop (gate, advantage, weight sync, KL/TIS, PPO, checkpoints). Runs async or fully synchronous.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/rl",
+      "path": "fine-tuning/training-api/cookbook/rl.md",
+      "priority": "medium",
+      "title": "Cookbook: Reinforcement Learning",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/rl.md"
+    },
+    {
+      "description": "Supervised fine-tuning via the cookbook's sft_loop recipe.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/sft",
+      "path": "fine-tuning/training-api/cookbook/sft.md",
+      "priority": "medium",
+      "title": "Cookbook: SFT",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/sft.md"
+    },
+    {
+      "description": "How a trainer's updated weights reach the serving deployment during RL training.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/weight-sync",
+      "path": "fine-tuning/training-api/cookbook/weight-sync.md",
+      "priority": "medium",
+      "title": "Weight sync",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/cookbook/weight-sync.md"
+    },
+    {
+      "description": "Fireworks Training API \u2014 custom training loops with full Python control over objectives, while Fireworks handles distributed GPU infrastructure.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/introduction",
+      "path": "fine-tuning/training-api/introduction.md",
+      "priority": "medium",
+      "title": "Introduction",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/introduction.md"
+    },
+    {
+      "description": "Built-in loss functions and custom objectives via forward_backward_custom.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/loss-functions",
+      "path": "fine-tuning/training-api/loss-functions.md",
+      "priority": "medium",
+      "title": "Loss Functions",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/loss-functions.md"
+    },
+    {
+      "description": "Get a custom training loop running in minutes with the Fireworks Training API.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/quickstart",
+      "path": "fine-tuning/training-api/quickstart.md",
+      "priority": "medium",
+      "title": "Quickstart",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/quickstart.md"
+    },
+    {
+      "description": "Delete trainer jobs and deployments after experiments to avoid leaked resources.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/cleanup",
+      "path": "fine-tuning/training-api/reference/cleanup.md",
+      "priority": "medium",
+      "title": "Cleanup and Teardown",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/cleanup.md"
+    },
+    {
+      "description": "Legacy SDK reference for direct deployment lifecycle and weight-sync management.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/deployment-manager",
+      "path": "fine-tuning/training-api/reference/deployment-manager.md",
+      "priority": "medium",
+      "title": "DeploymentManager (Compatibility)",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/deployment-manager.md"
+    },
+    {
+      "description": "Client-side tokenized sampling from inference deployments for training and evaluation.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/deployment-sampler",
+      "path": "fine-tuning/training-api/reference/deployment-sampler.md",
+      "priority": "medium",
+      "title": "DeploymentSampler",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/deployment-sampler.md"
+    },
+    {
+      "description": "Account-level operations that don't require a running trainer job.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/fireworks-client",
+      "path": "fine-tuning/training-api/reference/fireworks-client.md",
+      "priority": "medium",
+      "title": "FireworksClient",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/fireworks-client.md"
+    },
+    {
+      "description": "Connect to a trainer endpoint and use the training client for forward/backward passes, optimizer steps, and checkpointing.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/service-client",
+      "path": "fine-tuning/training-api/reference/service-client.md",
+      "priority": "medium",
+      "title": "FiretitanServiceClient & TrainingClient",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/service-client.md"
+    },
+    {
+      "description": "Legacy SDK reference for service-mode trainer job lifecycle management.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/trainer-job-manager",
+      "path": "fine-tuning/training-api/reference/trainer-job-manager.md",
+      "priority": "medium",
+      "title": "TrainerJobManager (Compatibility)",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/trainer-job-manager.md"
+    },
+    {
+      "description": "Backward-compatibility reference for the old standalone checkpoint-then-sync helper.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/weight-syncer",
+      "path": "fine-tuning/training-api/reference/weight-syncer.md",
+      "priority": "medium",
+      "title": "WeightSyncer (Legacy)",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/reference/weight-syncer.md"
+    },
+    {
+      "description": "SDK-level reference for checkpoint save, load, weight sync, and promotion.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/saving-and-loading",
+      "path": "fine-tuning/training-api/saving-and-loading.md",
+      "priority": "medium",
+      "title": "Saving and Loading",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/saving-and-loading.md"
+    },
+    {
+      "description": "End-to-end SDK walkthrough: bootstrap resources, train, checkpoint, and sample through a serving deployment.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/training-and-sampling",
+      "path": "fine-tuning/training-api/training-and-sampling.md",
+      "priority": "medium",
+      "title": "Training and Sampling",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/training-and-sampling.md"
+    },
+    {
+      "description": "Pre-configured GPU and model training profiles that simplify distributed training setup.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/training-shapes",
+      "path": "fine-tuning/training-api/training-shapes.md",
+      "priority": "medium",
+      "title": "Training Shapes",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/training-shapes.md"
+    },
+    {
+      "description": "Fine-tune vision-language models (VLMs) with the Training API using multimodal chat data containing images and text.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-api/vision-inputs",
+      "path": "fine-tuning/training-api/vision-inputs.md",
+      "priority": "medium",
+      "title": "Vision Inputs",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-api/vision-inputs.md"
+    },
+    {
+      "description": "Requirements, validation checks, and common issues when launching RFT jobs",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/training-prerequisites",
+      "path": "fine-tuning/training-prerequisites.md",
+      "priority": "medium",
+      "title": "Training Prerequisites & Validation",
+      "url": "https://docs.fireworks.ai/fine-tuning/training-prerequisites.md"
+    },
+    {
+      "description": "Learn how to create secrets that can be utilized within your reward function.",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/using-secret-in-evaluator",
+      "path": "fine-tuning/using-secret-in-evaluator.md",
+      "priority": "medium",
+      "title": "Using Secrets",
+      "url": "https://docs.fireworks.ai/fine-tuning/using-secret-in-evaluator.md"
+    },
+    {
+      "description": "Continue training from a previously fine-tuned model with RFT",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/warm-start",
+      "path": "fine-tuning/warm-start.md",
+      "priority": "medium",
+      "title": "Warm Start from Fine-Tuned Models",
+      "url": "https://docs.fireworks.ai/fine-tuning/warm-start.md"
+    },
+    {
+      "description": "Launch RFT jobs using the Fireworks dashboard",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/web-ui-guide",
+      "path": "fine-tuning/web-ui-guide.md",
+      "priority": "medium",
+      "title": "Training Guide: UI",
+      "url": "https://docs.fireworks.ai/fine-tuning/web-ui-guide.md"
+    },
+    {
+      "description": "Control which samples have greater influence during RFT training",
+      "group": "fine-tuning",
+      "page_url": "https://docs.fireworks.ai/fine-tuning/weighted-training",
+      "path": "fine-tuning/weighted-training.md",
+      "priority": "medium",
+      "title": "Weighted Training",
+      "url": "https://docs.fireworks.ai/fine-tuning/weighted-training.md"
+    },
+    {
+      "description": "Set per-user spending limits on serverless inference \u2014 account defaults and per-user overrides",
+      "group": "fireworks-for-work",
+      "page_url": "https://docs.fireworks.ai/fireworks-for-work/usage-limits",
+      "path": "fireworks-for-work/usage-limits.md",
+      "priority": "low",
+      "title": "Per-User Usage Limits",
+      "url": "https://docs.fireworks.ai/fireworks-for-work/usage-limits.md"
+    },
+    {
+      "description": "This document outlines basic Fireworks AI concepts.",
+      "group": "getting-started",
+      "page_url": "https://docs.fireworks.ai/getting-started/concepts",
+      "path": "getting-started/concepts.md",
+      "priority": "high",
+      "title": "Concepts",
+      "url": "https://docs.fireworks.ai/getting-started/concepts.md"
+    },
+    {
+      "description": "Definitions for key terms used across Fireworks AI documentation.",
+      "group": "getting-started",
+      "page_url": "https://docs.fireworks.ai/getting-started/glossary",
+      "path": "getting-started/glossary.md",
+      "priority": "high",
+      "title": "Glossary",
+      "url": "https://docs.fireworks.ai/getting-started/glossary.md"
+    },
+    {
+      "description": "Fast inference and fine-tuning for open source models",
+      "group": "getting-started",
+      "page_url": "https://docs.fireworks.ai/getting-started/introduction",
+      "path": "getting-started/introduction.md",
+      "priority": "high",
+      "title": "Build with Fireworks AI",
+      "url": "https://docs.fireworks.ai/getting-started/introduction.md"
+    },
+    {
+      "description": "Deploy models on dedicated GPUs in minutes",
+      "group": "getting-started",
+      "page_url": "https://docs.fireworks.ai/getting-started/ondemand-quickstart",
+      "path": "getting-started/ondemand-quickstart.md",
+      "priority": "high",
+      "title": "Deployments Quickstart",
+      "url": "https://docs.fireworks.ai/getting-started/ondemand-quickstart.md"
+    },
+    {
+      "description": "Make your first Serverless API call in minutes",
+      "group": "getting-started",
+      "page_url": "https://docs.fireworks.ai/getting-started/quickstart",
+      "path": "getting-started/quickstart.md",
+      "priority": "high",
+      "title": "Serverless Quickstart",
+      "url": "https://docs.fireworks.ai/getting-started/quickstart.md"
+    },
+    {
+      "description": "Process large-scale async workloads at a discount",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/batch-inference",
+      "path": "guides/batch-inference.md",
+      "priority": "high",
+      "title": "Batch API",
+      "url": "https://docs.fireworks.ai/guides/batch-inference.md"
+    },
+    {
+      "description": "Use the completions API for raw text generation with custom prompt templates",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/completions-api",
+      "path": "guides/completions-api.md",
+      "priority": "high",
+      "title": "Completions API",
+      "url": "https://docs.fireworks.ai/guides/completions-api.md"
+    },
+    {
+      "description": "Connect models to external tools and APIs",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/function-calling",
+      "path": "guides/function-calling.md",
+      "priority": "high",
+      "title": "Tool Calling",
+      "url": "https://docs.fireworks.ai/guides/function-calling.md"
+    },
+    {
+      "description": "Common error codes, their meanings, and resolutions for inference requests",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/inference-error-codes",
+      "path": "guides/inference-error-codes.md",
+      "priority": "high",
+      "title": "Inference Error Codes",
+      "url": "https://docs.fireworks.ai/guides/inference-error-codes.md"
+    },
+    {
+      "description": "Configure and manage on-demand deployments on dedicated GPUs",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/ondemand-deployments",
+      "path": "guides/ondemand-deployments.md",
+      "priority": "high",
+      "title": "Deployments",
+      "url": "https://docs.fireworks.ai/guides/ondemand-deployments.md"
+    },
+    {
+      "description": "Use Predicted Outputs to boost output generation speeds for editing / rewriting use cases",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/predicted-outputs",
+      "path": "guides/predicted-outputs.md",
+      "priority": "high",
+      "title": "Using predicted outputs",
+      "url": "https://docs.fireworks.ai/guides/predicted-outputs.md"
+    },
+    {
+      "description": "Generate embeddings and rerank results for semantic search",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/querying-embeddings-models",
+      "path": "guides/querying-embeddings-models.md",
+      "priority": "high",
+      "title": "Embeddings & Reranking",
+      "url": "https://docs.fireworks.ai/guides/querying-embeddings-models.md"
+    },
+    {
+      "description": "Query, track and manage inference for text models",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/querying-text-models",
+      "path": "guides/querying-text-models.md",
+      "priority": "high",
+      "title": "Text Models",
+      "url": "https://docs.fireworks.ai/guides/querying-text-models.md"
+    },
+    {
+      "description": "Query vision-language models to analyze images and visual content",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/querying-vision-language-models",
+      "path": "guides/querying-vision-language-models.md",
+      "priority": "high",
+      "title": "Vision Models",
+      "url": "https://docs.fireworks.ai/guides/querying-vision-language-models.md"
+    },
+    {
+      "description": "Account-wide request limits, spending tiers, budget controls, and on-demand GPU quotas",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/quotas_usage/account-quotas",
+      "path": "guides/quotas_usage/account-quotas.md",
+      "priority": "high",
+      "title": "Account quotas",
+      "url": "https://docs.fireworks.ai/guides/quotas_usage/account-quotas.md"
+    },
+    {
+      "description": "How to use reasoning with Fireworks models",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/reasoning",
+      "path": "guides/reasoning.md",
+      "priority": "high",
+      "title": "Reasoning",
+      "url": "https://docs.fireworks.ai/guides/reasoning.md"
+    },
+    {
+      "description": "Find the best open models for your use case or migrate from closed source models like Claude, GPT, and Gemini",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/recommended-models",
+      "path": "guides/recommended-models.md",
+      "priority": "high",
+      "title": "Which model should I use?",
+      "url": "https://docs.fireworks.ai/guides/recommended-models.md"
+    },
+    {
+      "description": "Recommended patterns for timeouts, retries, and error handling when building production applications on the Fireworks API.",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/reliability",
+      "path": "guides/reliability.md",
+      "priority": "high",
+      "title": "Reliability and Error Handling",
+      "url": "https://docs.fireworks.ai/guides/reliability.md"
+    },
+    {
+      "description": "Session affinity, KV-cache behavior, weight-swap behavior, and MoE Router Replay for rollout traffic on Fireworks inference deployments.",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/rollout-inference",
+      "path": "guides/rollout-inference.md",
+      "priority": "high",
+      "title": "Inference for RL Rollouts",
+      "url": "https://docs.fireworks.ai/guides/rollout-inference.md"
+    },
+    {
+      "description": "Monitor and track account activities with audit logging for Enterprise accounts",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/security_compliance/audit_logs",
+      "path": "guides/security_compliance/audit_logs.md",
+      "priority": "high",
+      "title": "Audit & Access Logs",
+      "url": "https://docs.fireworks.ai/guides/security_compliance/audit_logs.md"
+    },
+    {
+      "description": "Data retention policies at Fireworks",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/security_compliance/data_handling",
+      "path": "guides/security_compliance/data_handling.md",
+      "priority": "high",
+      "title": "Zero Data Retention",
+      "url": "https://docs.fireworks.ai/guides/security_compliance/data_handling.md"
+    },
+    {
+      "description": "How we secure and handle your data for inference and training",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/security_compliance/data_security",
+      "path": "guides/security_compliance/data_security.md",
+      "priority": "high",
+      "title": "Data Security",
+      "url": "https://docs.fireworks.ai/guides/security_compliance/data_security.md"
+    },
+    {
+      "description": "Understand the performance impact of LoRA fine-tuning, optimization strategies, and deployment considerations.",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/understanding_lora_performance",
+      "path": "guides/understanding_lora_performance.md",
+      "priority": "high",
+      "title": "Understanding LoRA performance",
+      "url": "https://docs.fireworks.ai/guides/understanding_lora_performance.md"
+    },
+    {
+      "description": "Query multimodal models to process video and audio content directly",
+      "group": "guides",
+      "page_url": "https://docs.fireworks.ai/guides/video-audio-inputs",
+      "path": "guides/video-audio-inputs.md",
+      "priority": "high",
+      "title": "Video & Audio Inputs",
+      "url": "https://docs.fireworks.ai/guides/video-audio-inputs.md"
+    },
+    {
+      "description": "Using Kimi K2 family models in agentic and tool-calling workflows on Fireworks.",
+      "group": "models",
+      "page_url": "https://docs.fireworks.ai/models/kimi-k2",
+      "path": "models/kimi-k2.md",
+      "priority": "critical",
+      "title": "Kimi K2 family",
+      "url": "https://docs.fireworks.ai/models/kimi-k2.md"
+    },
+    {
+      "description": "Reduce model precision to improve performance and lower costs",
+      "group": "models",
+      "page_url": "https://docs.fireworks.ai/models/quantization",
+      "path": "models/quantization.md",
+      "priority": "critical",
+      "title": "Quantization",
+      "url": "https://docs.fireworks.ai/models/quantization.md"
+    },
+    {
+      "description": "Programmatically upload custom models using the Fireworks REST API",
+      "group": "models",
+      "page_url": "https://docs.fireworks.ai/models/uploading-custom-models-api",
+      "path": "models/uploading-custom-models-api.md",
+      "priority": "critical",
+      "title": "Upload via REST API",
+      "url": "https://docs.fireworks.ai/models/uploading-custom-models-api.md"
+    },
+    {
+      "description": "Upload, verify, and deploy your own models from Hugging Face or elsewhere",
+      "group": "models",
+      "page_url": "https://docs.fireworks.ai/models/uploading-custom-models",
+      "path": "models/uploading-custom-models.md",
+      "priority": "critical",
+      "title": "Custom Models",
+      "url": "https://docs.fireworks.ai/models/uploading-custom-models.md"
+    },
+    {
+      "description": "How Serverless inference works on Fireworks: serving paths, billing, request/response headers, prompt caching, model lifecycle, and when to choose Serverless over On-demand",
+      "group": "serverless",
+      "page_url": "https://docs.fireworks.ai/serverless/overview",
+      "path": "serverless/overview.md",
+      "priority": "critical",
+      "title": "Serverless Overview",
+      "url": "https://docs.fireworks.ai/serverless/overview.md"
+    },
+    {
+      "description": "Per-token serverless pricing for text, vision, and embedding models, including Priority and Fast serving paths",
+      "group": "serverless",
+      "page_url": "https://docs.fireworks.ai/serverless/pricing",
+      "path": "serverless/pricing.md",
+      "priority": "critical",
+      "title": "Serverless Pricing",
+      "url": "https://docs.fireworks.ai/serverless/pricing.md"
+    },
+    {
+      "description": "Adaptive rate limits grow and shrink with your usage",
+      "group": "serverless",
+      "page_url": "https://docs.fireworks.ai/serverless/rate-limits",
+      "path": "serverless/rate-limits.md",
+      "priority": "critical",
+      "title": "Serverless Rate Limits",
+      "url": "https://docs.fireworks.ai/serverless/rate-limits.md"
+    },
+    {
+      "description": "Standard, Priority, and Fast serving paths on Fireworks Serverless",
+      "group": "serverless",
+      "page_url": "https://docs.fireworks.ai/serverless/serving-paths",
+      "path": "serverless/serving-paths.md",
+      "priority": "critical",
+      "title": "Serverless Serving Paths",
+      "url": "https://docs.fireworks.ai/serverless/serving-paths.md"
+    },
+    {
+      "description": "Enforce output formats using JSON schemas or custom grammars",
+      "group": "structured-responses",
+      "page_url": "https://docs.fireworks.ai/structured-responses/structured-response-formatting",
+      "path": "structured-responses/structured-response-formatting.md",
+      "priority": "low",
+      "title": "Structured Outputs",
+      "url": "https://docs.fireworks.ai/structured-responses/structured-response-formatting.md"
+    },
+    {
+      "description": "Use Anthropic SDKs with Fireworks, and understand the supported surface for the Anthropic-compatible Messages API.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/anthropic-compatibility",
+      "path": "tools-sdks/anthropic-compatibility.md",
+      "priority": "medium",
+      "title": "Anthropic compatibility",
+      "url": "https://docs.fireworks.ai/tools-sdks/anthropic-compatibility.md"
+    },
+    {
+      "description": "Prints information about an account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/account-get",
+      "path": "tools-sdks/firectl/commands/account-get.md",
+      "priority": "medium",
+      "title": "firectl account get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/account-get.md"
+    },
+    {
+      "description": "Prints all accounts the current signed-in user has access to.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/account-list",
+      "path": "tools-sdks/firectl/commands/account-list.md",
+      "priority": "medium",
+      "title": "firectl account list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/account-list.md"
+    },
+    {
+      "description": "Creates an API key for the signed in user or a specified service account user.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/api-key-create",
+      "path": "tools-sdks/firectl/commands/api-key-create.md",
+      "priority": "medium",
+      "title": "firectl api-key create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/api-key-create.md"
+    },
+    {
+      "description": "Deletes an API key.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/api-key-delete",
+      "path": "tools-sdks/firectl/commands/api-key-delete.md",
+      "priority": "medium",
+      "title": "firectl api-key delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/api-key-delete.md"
+    },
+    {
+      "description": "Prints information about an API key.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/api-key-get",
+      "path": "tools-sdks/firectl/commands/api-key-get.md",
+      "priority": "medium",
+      "title": "firectl api-key get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/api-key-get.md"
+    },
+    {
+      "description": "Prints all API keys for the signed in user.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/api-key-list",
+      "path": "tools-sdks/firectl/commands/api-key-list.md",
+      "priority": "medium",
+      "title": "firectl api-key list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/api-key-list.md"
+    },
+    {
+      "description": "Lists audit logs for the signed in user.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/audit-logs-list",
+      "path": "tools-sdks/firectl/commands/audit-logs-list.md",
+      "priority": "medium",
+      "title": "firectl audit-logs list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/audit-logs-list.md"
+    },
+    {
+      "description": "Authentication for access to your account",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/authentication",
+      "path": "tools-sdks/firectl/commands/authentication.md",
+      "priority": "medium",
+      "title": "Authentication",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/authentication.md"
+    },
+    {
+      "description": "Creates a batch inference job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/batch-inference-job-create",
+      "path": "tools-sdks/firectl/commands/batch-inference-job-create.md",
+      "priority": "medium",
+      "title": "firectl batch-inference-job create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/batch-inference-job-create.md"
+    },
+    {
+      "description": "Deletes a batch inference job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/batch-inference-job-delete",
+      "path": "tools-sdks/firectl/commands/batch-inference-job-delete.md",
+      "priority": "medium",
+      "title": "firectl batch-inference-job delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/batch-inference-job-delete.md"
+    },
+    {
+      "description": "Retrieves information about a batch inference job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/batch-inference-job-get",
+      "path": "tools-sdks/firectl/commands/batch-inference-job-get.md",
+      "priority": "medium",
+      "title": "firectl batch-inference-job get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/batch-inference-job-get.md"
+    },
+    {
+      "description": "Lists all batch inference jobs in an account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/batch-inference-job-list",
+      "path": "tools-sdks/firectl/commands/batch-inference-job-list.md",
+      "priority": "medium",
+      "title": "firectl batch-inference-job list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/batch-inference-job-list.md"
+    },
+    {
+      "description": "Exports billing metrics",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/billing-export-metrics",
+      "path": "tools-sdks/firectl/commands/billing-export-metrics.md",
+      "priority": "medium",
+      "title": "firectl billing export-metrics",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/billing-export-metrics.md"
+    },
+    {
+      "description": "Prints account usage and rated costs for a time range.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/billing-get-usage",
+      "path": "tools-sdks/firectl/commands/billing-get-usage.md",
+      "priority": "medium",
+      "title": "firectl billing get-usage",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/billing-get-usage.md"
+    },
+    {
+      "description": "Prints information about invoices.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/billing-list-invoices",
+      "path": "tools-sdks/firectl/commands/billing-list-invoices.md",
+      "priority": "medium",
+      "title": "firectl billing list-invoices",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/billing-list-invoices.md"
+    },
+    {
+      "description": "Get notification settings for an account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/billing-notification-settings-get",
+      "path": "tools-sdks/firectl/commands/billing-notification-settings-get.md",
+      "priority": "medium",
+      "title": "firectl billing notification-settings get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/billing-notification-settings-get.md"
+    },
+    {
+      "description": "Update notification settings for an account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/billing-notification-settings-update",
+      "path": "tools-sdks/firectl/commands/billing-notification-settings-update.md",
+      "priority": "medium",
+      "title": "firectl billing notification-settings update",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/billing-notification-settings-update.md"
+    },
+    {
+      "description": "Manage notification settings.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/billing-notification-settings",
+      "path": "tools-sdks/firectl/commands/billing-notification-settings.md",
+      "priority": "medium",
+      "title": "firectl billing notification-settings",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/billing-notification-settings.md"
+    },
+    {
+      "description": "Lists credit code redemptions for the current account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/credit-redemption-list",
+      "path": "tools-sdks/firectl/commands/credit-redemption-list.md",
+      "priority": "medium",
+      "title": "firectl credit-redemption list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/credit-redemption-list.md"
+    },
+    {
+      "description": "Redeems a credit code.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/credit-redemption-redeem",
+      "path": "tools-sdks/firectl/commands/credit-redemption-redeem.md",
+      "priority": "medium",
+      "title": "firectl credit-redemption redeem",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/credit-redemption-redeem.md"
+    },
+    {
+      "description": "Creates and uploads a dataset.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dataset-create",
+      "path": "tools-sdks/firectl/commands/dataset-create.md",
+      "priority": "medium",
+      "title": "firectl dataset create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dataset-create.md"
+    },
+    {
+      "description": "Deletes a dataset.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dataset-delete",
+      "path": "tools-sdks/firectl/commands/dataset-delete.md",
+      "priority": "medium",
+      "title": "firectl dataset delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dataset-delete.md"
+    },
+    {
+      "description": "Downloads a dataset to a local directory.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dataset-download",
+      "path": "tools-sdks/firectl/commands/dataset-download.md",
+      "priority": "medium",
+      "title": "firectl dataset download",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dataset-download.md"
+    },
+    {
+      "description": "Prints information about a dataset.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dataset-get",
+      "path": "tools-sdks/firectl/commands/dataset-get.md",
+      "priority": "medium",
+      "title": "firectl dataset get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dataset-get.md"
+    },
+    {
+      "description": "Prints all datasets in an account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dataset-list",
+      "path": "tools-sdks/firectl/commands/dataset-list.md",
+      "priority": "medium",
+      "title": "firectl dataset list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dataset-list.md"
+    },
+    {
+      "description": "Updates a dataset.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dataset-update",
+      "path": "tools-sdks/firectl/commands/dataset-update.md",
+      "priority": "medium",
+      "title": "firectl dataset update",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dataset-update.md"
+    },
+    {
+      "description": "Prints information about a deployed model.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployed-model-get",
+      "path": "tools-sdks/firectl/commands/deployed-model-get.md",
+      "priority": "medium",
+      "title": "firectl deployed-model get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployed-model-get.md"
+    },
+    {
+      "description": "Prints all deployed models in the account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployed-model-list",
+      "path": "tools-sdks/firectl/commands/deployed-model-list.md",
+      "priority": "medium",
+      "title": "firectl deployed-model list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployed-model-list.md"
+    },
+    {
+      "description": "Update a deployed model.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployed-model-update",
+      "path": "tools-sdks/firectl/commands/deployed-model-update.md",
+      "priority": "medium",
+      "title": "firectl deployed-model update",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployed-model-update.md"
+    },
+    {
+      "description": "Creates a new deployment.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-create",
+      "path": "tools-sdks/firectl/commands/deployment-create.md",
+      "priority": "medium",
+      "title": "firectl deployment create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-create.md"
+    },
+    {
+      "description": "Deletes a deployment.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-delete",
+      "path": "tools-sdks/firectl/commands/deployment-delete.md",
+      "priority": "medium",
+      "title": "firectl deployment delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-delete.md"
+    },
+    {
+      "description": "Prints information about a deployment.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-get",
+      "path": "tools-sdks/firectl/commands/deployment-get.md",
+      "priority": "medium",
+      "title": "firectl deployment get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-get.md"
+    },
+    {
+      "description": "Prints all deployments in the account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-list",
+      "path": "tools-sdks/firectl/commands/deployment-list.md",
+      "priority": "medium",
+      "title": "firectl deployment list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-list.md"
+    },
+    {
+      "description": "Scales a deployment to a specified number of replicas.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-scale",
+      "path": "tools-sdks/firectl/commands/deployment-scale.md",
+      "priority": "medium",
+      "title": "firectl deployment scale",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-scale.md"
+    },
+    {
+      "description": "Prints information about a deployment shape version.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-shape-version-get",
+      "path": "tools-sdks/firectl/commands/deployment-shape-version-get.md",
+      "priority": "medium",
+      "title": "firectl deployment-shape-version get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-shape-version-get.md"
+    },
+    {
+      "description": "Prints all deployment shape versions of this deployment shape.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-shape-version-list",
+      "path": "tools-sdks/firectl/commands/deployment-shape-version-list.md",
+      "priority": "medium",
+      "title": "firectl deployment-shape-version list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-shape-version-list.md"
+    },
+    {
+      "description": "Undeletes a deployment.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-undelete",
+      "path": "tools-sdks/firectl/commands/deployment-undelete.md",
+      "priority": "medium",
+      "title": "firectl deployment undelete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-undelete.md"
+    },
+    {
+      "description": "Update a deployment.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-update",
+      "path": "tools-sdks/firectl/commands/deployment-update.md",
+      "priority": "medium",
+      "title": "firectl deployment update",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/deployment-update.md"
+    },
+    {
+      "description": "Cancels a running dpo job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-cancel",
+      "path": "tools-sdks/firectl/commands/dpo-job-cancel.md",
+      "priority": "medium",
+      "title": "firectl dpo-job cancel",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-cancel.md"
+    },
+    {
+      "description": "Creates a dpo job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-create",
+      "path": "tools-sdks/firectl/commands/dpo-job-create.md",
+      "priority": "medium",
+      "title": "firectl dpo-job create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-create.md"
+    },
+    {
+      "description": "Deletes a dpo job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-delete",
+      "path": "tools-sdks/firectl/commands/dpo-job-delete.md",
+      "priority": "medium",
+      "title": "firectl dpo-job delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-delete.md"
+    },
+    {
+      "description": "Exports metrics for a dpo job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-export-metrics",
+      "path": "tools-sdks/firectl/commands/dpo-job-export-metrics.md",
+      "priority": "medium",
+      "title": "firectl dpo-job export-metrics",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-export-metrics.md"
+    },
+    {
+      "description": "Retrieves information about a dpo job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-get",
+      "path": "tools-sdks/firectl/commands/dpo-job-get.md",
+      "priority": "medium",
+      "title": "firectl dpo-job get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-get.md"
+    },
+    {
+      "description": "Lists all dpo jobs in an account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-list",
+      "path": "tools-sdks/firectl/commands/dpo-job-list.md",
+      "priority": "medium",
+      "title": "firectl dpo-job list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-list.md"
+    },
+    {
+      "description": "Resumes a dpo job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-resume",
+      "path": "tools-sdks/firectl/commands/dpo-job-resume.md",
+      "priority": "medium",
+      "title": "firectl dpo-job resume",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/dpo-job-resume.md"
+    },
+    {
+      "description": "Alias an evaluator revision",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/evaluator-revision-alias",
+      "path": "tools-sdks/firectl/commands/evaluator-revision-alias.md",
+      "priority": "medium",
+      "title": "firectl evaluator-revision alias",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/evaluator-revision-alias.md"
+    },
+    {
+      "description": "Delete an evaluator revision",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/evaluator-revision-delete",
+      "path": "tools-sdks/firectl/commands/evaluator-revision-delete.md",
+      "priority": "medium",
+      "title": "firectl evaluator-revision delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/evaluator-revision-delete.md"
+    },
+    {
+      "description": "Get an evaluator revision",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/evaluator-revision-get",
+      "path": "tools-sdks/firectl/commands/evaluator-revision-get.md",
+      "priority": "medium",
+      "title": "firectl evaluator-revision get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/evaluator-revision-get.md"
+    },
+    {
+      "description": "List evaluator revisions",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/evaluator-revision-list",
+      "path": "tools-sdks/firectl/commands/evaluator-revision-list.md",
+      "priority": "medium",
+      "title": "firectl evaluator-revision list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/evaluator-revision-list.md"
+    },
+    {
+      "description": "Creates a new identity provider.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/identity-provider-create",
+      "path": "tools-sdks/firectl/commands/identity-provider-create.md",
+      "priority": "medium",
+      "title": "firectl identity-provider create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/identity-provider-create.md"
+    },
+    {
+      "description": "Prints information about an identity provider.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/identity-provider-get",
+      "path": "tools-sdks/firectl/commands/identity-provider-get.md",
+      "priority": "medium",
+      "title": "firectl identity-provider get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/identity-provider-get.md"
+    },
+    {
+      "description": "List identity providers for an account",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/identity-provider-list",
+      "path": "tools-sdks/firectl/commands/identity-provider-list.md",
+      "priority": "medium",
+      "title": "firectl identity-provider list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/identity-provider-list.md"
+    },
+    {
+      "description": "Creates and uploads a model.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-create",
+      "path": "tools-sdks/firectl/commands/model-create.md",
+      "priority": "medium",
+      "title": "firectl model create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-create.md"
+    },
+    {
+      "description": "Deletes a model.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-delete",
+      "path": "tools-sdks/firectl/commands/model-delete.md",
+      "priority": "medium",
+      "title": "firectl model delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-delete.md"
+    },
+    {
+      "description": "Download a model.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-download",
+      "path": "tools-sdks/firectl/commands/model-download.md",
+      "priority": "medium",
+      "title": "firectl model download",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-download.md"
+    },
+    {
+      "description": "Prints information about a model.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-get",
+      "path": "tools-sdks/firectl/commands/model-get.md",
+      "priority": "medium",
+      "title": "firectl model get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-get.md"
+    },
+    {
+      "description": "Prints all models in an account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-list",
+      "path": "tools-sdks/firectl/commands/model-list.md",
+      "priority": "medium",
+      "title": "firectl model list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-list.md"
+    },
+    {
+      "description": "Loads a LoRA model.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-load-lora",
+      "path": "tools-sdks/firectl/commands/model-load-lora.md",
+      "priority": "medium",
+      "title": "firectl model load-lora",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-load-lora.md"
+    },
+    {
+      "description": "Prepare models for different precisions",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-prepare",
+      "path": "tools-sdks/firectl/commands/model-prepare.md",
+      "priority": "medium",
+      "title": "firectl model prepare",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-prepare.md"
+    },
+    {
+      "description": "Unloads a LoRA model.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-unload-lora",
+      "path": "tools-sdks/firectl/commands/model-unload-lora.md",
+      "priority": "medium",
+      "title": "firectl model unload-lora",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-unload-lora.md"
+    },
+    {
+      "description": "Updates a model.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-update",
+      "path": "tools-sdks/firectl/commands/model-update.md",
+      "priority": "medium",
+      "title": "firectl model update",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-update.md"
+    },
+    {
+      "description": "Resumes or completes a model upload.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-upload",
+      "path": "tools-sdks/firectl/commands/model-upload.md",
+      "priority": "medium",
+      "title": "firectl model upload",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/model-upload.md"
+    },
+    {
+      "description": "Prints information about a quota.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/quota-get",
+      "path": "tools-sdks/firectl/commands/quota-get.md",
+      "priority": "medium",
+      "title": "firectl quota get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/quota-get.md"
+    },
+    {
+      "description": "Prints all quotas.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/quota-list",
+      "path": "tools-sdks/firectl/commands/quota-list.md",
+      "priority": "medium",
+      "title": "firectl quota list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/quota-list.md"
+    },
+    {
+      "description": "Updates a quota.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/quota-update",
+      "path": "tools-sdks/firectl/commands/quota-update.md",
+      "priority": "medium",
+      "title": "firectl quota update",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/quota-update.md"
+    },
+    {
+      "description": "Cancels a running reinforcement fine-tuning job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-cancel",
+      "path": "tools-sdks/firectl/commands/reinforcement-fine-tuning-job-cancel.md",
+      "priority": "medium",
+      "title": "firectl reinforcement-fine-tuning-job cancel",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-cancel.md"
+    },
+    {
+      "description": "Creates a reinforcement fine-tuning job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-create",
+      "path": "tools-sdks/firectl/commands/reinforcement-fine-tuning-job-create.md",
+      "priority": "medium",
+      "title": "firectl reinforcement-fine-tuning-job create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-create.md"
+    },
+    {
+      "description": "Deletes a reinforcement fine-tuning job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-delete",
+      "path": "tools-sdks/firectl/commands/reinforcement-fine-tuning-job-delete.md",
+      "priority": "medium",
+      "title": "firectl reinforcement-fine-tuning-job delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-delete.md"
+    },
+    {
+      "description": "Retrieves information about a reinforcement fine-tuning job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-get",
+      "path": "tools-sdks/firectl/commands/reinforcement-fine-tuning-job-get.md",
+      "priority": "medium",
+      "title": "firectl reinforcement-fine-tuning-job get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-get.md"
+    },
+    {
+      "description": "Lists all reinforcement fine-tuning jobs in an account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-list",
+      "path": "tools-sdks/firectl/commands/reinforcement-fine-tuning-job-list.md",
+      "priority": "medium",
+      "title": "firectl reinforcement-fine-tuning-job list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-list.md"
+    },
+    {
+      "description": "Resumes a failed reinforcement fine-tuning job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-resume",
+      "path": "tools-sdks/firectl/commands/reinforcement-fine-tuning-job-resume.md",
+      "priority": "medium",
+      "title": "firectl reinforcement-fine-tuning-job resume",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-resume.md"
+    },
+    {
+      "description": "Update fields on a reinforcement fine-tuning job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-update",
+      "path": "tools-sdks/firectl/commands/reinforcement-fine-tuning-job-update.md",
+      "priority": "medium",
+      "title": "firectl reinforcement-fine-tuning-job update",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reinforcement-fine-tuning-job-update.md"
+    },
+    {
+      "description": "Prints information about a reservation.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reservation-get",
+      "path": "tools-sdks/firectl/commands/reservation-get.md",
+      "priority": "medium",
+      "title": "firectl reservation get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reservation-get.md"
+    },
+    {
+      "description": "Prints active reservations.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reservation-list",
+      "path": "tools-sdks/firectl/commands/reservation-list.md",
+      "priority": "medium",
+      "title": "firectl reservation list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/reservation-list.md"
+    },
+    {
+      "description": "Cancels a running rlor trainer job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/rlor-trainer-job-cancel",
+      "path": "tools-sdks/firectl/commands/rlor-trainer-job-cancel.md",
+      "priority": "medium",
+      "title": "firectl rlor-trainer-job cancel",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/rlor-trainer-job-cancel.md"
+    },
+    {
+      "description": "Creates a rlor trainer job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/rlor-trainer-job-create",
+      "path": "tools-sdks/firectl/commands/rlor-trainer-job-create.md",
+      "priority": "medium",
+      "title": "firectl rlor-trainer-job create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/rlor-trainer-job-create.md"
+    },
+    {
+      "description": "Deletes a rlor trainer job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/rlor-trainer-job-delete",
+      "path": "tools-sdks/firectl/commands/rlor-trainer-job-delete.md",
+      "priority": "medium",
+      "title": "firectl rlor-trainer-job delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/rlor-trainer-job-delete.md"
+    },
+    {
+      "description": "Retrieves information about a rlor trainer job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/rlor-trainer-job-get",
+      "path": "tools-sdks/firectl/commands/rlor-trainer-job-get.md",
+      "priority": "medium",
+      "title": "firectl rlor-trainer-job get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/rlor-trainer-job-get.md"
+    },
+    {
+      "description": "Lists all rlor trainer jobs in an account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/rlor-trainer-job-list",
+      "path": "tools-sdks/firectl/commands/rlor-trainer-job-list.md",
+      "priority": "medium",
+      "title": "firectl rlor-trainer-job list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/rlor-trainer-job-list.md"
+    },
+    {
+      "description": "Creates a router.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/router-create",
+      "path": "tools-sdks/firectl/commands/router-create.md",
+      "priority": "medium",
+      "title": "firectl router create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/router-create.md"
+    },
+    {
+      "description": "Deletes a router.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/router-delete",
+      "path": "tools-sdks/firectl/commands/router-delete.md",
+      "priority": "medium",
+      "title": "firectl router delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/router-delete.md"
+    },
+    {
+      "description": "Prints information about a router.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/router-get",
+      "path": "tools-sdks/firectl/commands/router-get.md",
+      "priority": "medium",
+      "title": "firectl router get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/router-get.md"
+    },
+    {
+      "description": "Prints all routers in the account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/router-list",
+      "path": "tools-sdks/firectl/commands/router-list.md",
+      "priority": "medium",
+      "title": "firectl router list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/router-list.md"
+    },
+    {
+      "description": "Update a router.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/router-update",
+      "path": "tools-sdks/firectl/commands/router-update.md",
+      "priority": "medium",
+      "title": "firectl router update",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/router-update.md"
+    },
+    {
+      "description": "Creates a secret for the signed in user.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/secret-create",
+      "path": "tools-sdks/firectl/commands/secret-create.md",
+      "priority": "medium",
+      "title": "firectl secret create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/secret-create.md"
+    },
+    {
+      "description": "Deletes a secret.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/secret-delete",
+      "path": "tools-sdks/firectl/commands/secret-delete.md",
+      "priority": "medium",
+      "title": "firectl secret delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/secret-delete.md"
+    },
+    {
+      "description": "Retrieves a secret by name.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/secret-get",
+      "path": "tools-sdks/firectl/commands/secret-get.md",
+      "priority": "medium",
+      "title": "firectl secret get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/secret-get.md"
+    },
+    {
+      "description": "Lists all secrets for the signed in user.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/secret-list",
+      "path": "tools-sdks/firectl/commands/secret-list.md",
+      "priority": "medium",
+      "title": "firectl secret list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/secret-list.md"
+    },
+    {
+      "description": "Updates an existing secret.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/secret-update",
+      "path": "tools-sdks/firectl/commands/secret-update.md",
+      "priority": "medium",
+      "title": "firectl secret update",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/secret-update.md"
+    },
+    {
+      "description": "Sets the default API key in ~/.fireworks/auth.ini.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/set-api-key",
+      "path": "tools-sdks/firectl/commands/set-api-key.md",
+      "priority": "medium",
+      "title": "firectl set-api-key",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/set-api-key.md"
+    },
+    {
+      "description": "Cancels a running supervised fine-tuning job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/supervised-fine-tuning-job-cancel",
+      "path": "tools-sdks/firectl/commands/supervised-fine-tuning-job-cancel.md",
+      "priority": "medium",
+      "title": "firectl supervised-fine-tuning-job cancel",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/supervised-fine-tuning-job-cancel.md"
+    },
+    {
+      "description": "Creates a supervised fine-tuning job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/supervised-fine-tuning-job-create",
+      "path": "tools-sdks/firectl/commands/supervised-fine-tuning-job-create.md",
+      "priority": "medium",
+      "title": "firectl supervised-fine-tuning-job create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/supervised-fine-tuning-job-create.md"
+    },
+    {
+      "description": "Deletes a supervised fine-tuning job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/supervised-fine-tuning-job-delete",
+      "path": "tools-sdks/firectl/commands/supervised-fine-tuning-job-delete.md",
+      "priority": "medium",
+      "title": "firectl supervised-fine-tuning-job delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/supervised-fine-tuning-job-delete.md"
+    },
+    {
+      "description": "Retrieves information about a supervised fine-tuning job.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/supervised-fine-tuning-job-get",
+      "path": "tools-sdks/firectl/commands/supervised-fine-tuning-job-get.md",
+      "priority": "medium",
+      "title": "firectl supervised-fine-tuning-job get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/supervised-fine-tuning-job-get.md"
+    },
+    {
+      "description": "Lists all supervised fine-tuning jobs in an account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/supervised-fine-tuning-job-list",
+      "path": "tools-sdks/firectl/commands/supervised-fine-tuning-job-list.md",
+      "priority": "medium",
+      "title": "firectl supervised-fine-tuning-job list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/supervised-fine-tuning-job-list.md"
+    },
+    {
+      "description": "Clones an existing training shape to a new shape.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-clone",
+      "path": "tools-sdks/firectl/commands/training-shape-clone.md",
+      "priority": "medium",
+      "title": "firectl training-shape clone",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-clone.md"
+    },
+    {
+      "description": "Creates a new training shape.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-create",
+      "path": "tools-sdks/firectl/commands/training-shape-create.md",
+      "priority": "medium",
+      "title": "firectl training-shape create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-create.md"
+    },
+    {
+      "description": "Deletes a training shape and all its versions.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-delete",
+      "path": "tools-sdks/firectl/commands/training-shape-delete.md",
+      "priority": "medium",
+      "title": "firectl training-shape delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-delete.md"
+    },
+    {
+      "description": "Prints information about a training shape.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-get",
+      "path": "tools-sdks/firectl/commands/training-shape-get.md",
+      "priority": "medium",
+      "title": "firectl training-shape get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-get.md"
+    },
+    {
+      "description": "Lists training shapes in the account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-list",
+      "path": "tools-sdks/firectl/commands/training-shape-list.md",
+      "priority": "medium",
+      "title": "firectl training-shape list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-list.md"
+    },
+    {
+      "description": "Updates a training shape (mutable fields only). Creates a new version automatically.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-update",
+      "path": "tools-sdks/firectl/commands/training-shape-update.md",
+      "priority": "medium",
+      "title": "firectl training-shape update",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-update.md"
+    },
+    {
+      "description": "Prints information about a training shape version.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-version-get",
+      "path": "tools-sdks/firectl/commands/training-shape-version-get.md",
+      "priority": "medium",
+      "title": "firectl training-shape-version get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-version-get.md"
+    },
+    {
+      "description": "Lists training shape versions.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-version-list",
+      "path": "tools-sdks/firectl/commands/training-shape-version-list.md",
+      "priority": "medium",
+      "title": "firectl training-shape-version list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-version-list.md"
+    },
+    {
+      "description": "Update a training shape version.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-version-update",
+      "path": "tools-sdks/firectl/commands/training-shape-version-update.md",
+      "priority": "medium",
+      "title": "firectl training-shape-version update",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/training-shape-version-update.md"
+    },
+    {
+      "description": "Upgrades the firectl binary to the latest version.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/upgrade",
+      "path": "tools-sdks/firectl/commands/upgrade.md",
+      "priority": "medium",
+      "title": "firectl upgrade",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/upgrade.md"
+    },
+    {
+      "description": "Creates a new user.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/user-create",
+      "path": "tools-sdks/firectl/commands/user-create.md",
+      "priority": "medium",
+      "title": "firectl user create",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/user-create.md"
+    },
+    {
+      "description": "Deletes a user.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/user-delete",
+      "path": "tools-sdks/firectl/commands/user-delete.md",
+      "priority": "medium",
+      "title": "firectl user delete",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/user-delete.md"
+    },
+    {
+      "description": "Prints information about a user.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/user-get",
+      "path": "tools-sdks/firectl/commands/user-get.md",
+      "priority": "medium",
+      "title": "firectl user get",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/user-get.md"
+    },
+    {
+      "description": "Prints all users in the account.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/user-list",
+      "path": "tools-sdks/firectl/commands/user-list.md",
+      "priority": "medium",
+      "title": "firectl user list",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/user-list.md"
+    },
+    {
+      "description": "Updates a user.",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/user-update",
+      "path": "tools-sdks/firectl/commands/user-update.md",
+      "priority": "medium",
+      "title": "firectl user update",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/user-update.md"
+    },
+    {
+      "description": "Prints the version of firectl",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/version",
+      "path": "tools-sdks/firectl/commands/version.md",
+      "priority": "medium",
+      "title": "firectl version",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/version.md"
+    },
+    {
+      "description": "Shows the currently authenticated user",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/whoami",
+      "path": "tools-sdks/firectl/commands/whoami.md",
+      "priority": "medium",
+      "title": "firectl whoami",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/commands/whoami.md"
+    },
+    {
+      "description": "Learn to create, deploy, and manage resources using Firectl",
+      "group": "tools-sdks",
+      "page_url": "https://docs.fireworks.ai/tools-sdks/firectl/firectl",
+      "path": "tools-sdks/firectl/firectl.md",
+      "priority": "medium",
+      "title": "Getting started",
+      "url": "https://docs.fireworks.ai/tools-sdks/firectl/firectl.md"
+    }
+  ],
+  "source": "https://docs.fireworks.ai/llms.txt"
+}
