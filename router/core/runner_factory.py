@@ -171,4 +171,5 @@ def _build_fireworks_direct_runner(config: RouterConfig, logger: JsonlRunLogger)
         max_tokens=config.fireworks_max_tokens,
         allowed_models=config.allowed_models,
         service_tier=config.fireworks_service_tier,
+        matrix_weights_path=config.fireworks_matrix_weights,
     )

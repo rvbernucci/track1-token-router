@@ -1,5 +1,6 @@
 import os
 import unittest
+from pathlib import Path
 
 from router.core.config import RouterConfig
 
@@ -61,6 +62,15 @@ class RouterConfigTests(unittest.TestCase):
             config = RouterConfig.from_env()
 
         self.assertEqual(config.fireworks_model, "accounts/fireworks/models/gemma-4-31b-it-nvfp4")
+
+    def test_fireworks_matrix_weights_is_optional_path(self) -> None:
+        with patched_env(FIREWORKS_MATRIX_WEIGHTS=None):
+            default_config = RouterConfig.from_env()
+        with patched_env(FIREWORKS_MATRIX_WEIGHTS="reports/generated/weights.json"):
+            calibrated_config = RouterConfig.from_env()
+
+        self.assertIsNone(default_config.fireworks_matrix_weights)
+        self.assertEqual(calibrated_config.fireworks_matrix_weights, Path("reports/generated/weights.json"))
 
 
 class patched_env:

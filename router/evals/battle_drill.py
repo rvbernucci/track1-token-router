@@ -214,7 +214,7 @@ def write_battle_report_markdown(path: Path, report: dict[str, Any]) -> None:
             "## Batch Stress",
             "",
             f"- batch_stress_ready: `{report.get('batch_stress_probe', {}).get('ok')}`",
-            f"- tasks_per_second: `{(report.get('batch_stress_probe', {}).get('large_batch') or {}).get('tasks_per_second')}`",
+            f"- throughput_threshold: `>= {(report.get('batch_stress_probe', {}).get('thresholds') or {}).get('min_tasks_per_second')} tasks/s`",
             f"- output_contract_pass_rate: `{(report.get('batch_stress_probe', {}).get('cli_contract') or {}).get('output_contract_pass_rate')}`",
         ]
     )

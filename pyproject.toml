@@ -7,7 +7,7 @@ name = "track1-token-router"
 version = "0.1.0"
 description = "Hybrid token-efficient routing agent for AMD Developer Hackathon Track 1."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 authors = [
   { name = "rvbernucci" }
 ]
@@ -22,4 +22,3 @@ include = ["router*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
-

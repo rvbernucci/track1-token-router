@@ -8,6 +8,10 @@ on:
 jobs:
   test-and-docker:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
 
     steps:
       - name: Checkout
@@ -16,7 +20,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install package
         run: python -m pip install -e .
@@ -25,18 +29,23 @@ jobs:
         run: scripts/offline_release_check.sh
 
       - name: Build Docker image
+        if: matrix.python-version == '3.12'
         run: docker build -t track1-token-router .
 
       - name: Docker help smoke test
+        if: matrix.python-version == '3.12'
         run: docker run --rm track1-token-router --help
 
       - name: Docker ask smoke test
-        run: docker run --rm track1-token-router ask "What is 2+2?"
+        if: matrix.python-version == '3.12'
+        run: docker run --rm -e ROUTER_MODE=mock track1-token-router ask "What is 2+2?"
 
       - name: Docker JSONL run smoke test
-        run: docker run --rm track1-token-router run --jsonl evals/golden/tasks.jsonl --out /tmp/router-output.jsonl
+        if: matrix.python-version == '3.12'
+        run: docker run --rm -e ROUTER_MODE=mock track1-token-router run --jsonl evals/golden/tasks.jsonl --out /tmp/router-output.jsonl
 
       - name: Docker official Track 1 smoke test
+        if: matrix.python-version == '3.12'
         run: |
           mkdir -p /tmp/track1-input /tmp/track1-output
           cp fixtures/official/lablab_track1_tasks.json /tmp/track1-input/tasks.json

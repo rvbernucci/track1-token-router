@@ -2,7 +2,7 @@ PYTHON ?= python3
 VENV ?= .venv
 VENV_PYTHON := $(VENV)/bin/python
 
-.PHONY: setup smoke test official-smoke release-check secret-scan diff-check doctor
+.PHONY: setup smoke test official-smoke release-check secret-scan diff-check doctor amd-doctor amd-bootstrap matrix-fit
 
 setup:
 	$(PYTHON) -m venv $(VENV)
@@ -27,3 +27,12 @@ diff-check:
 	git diff --check
 
 doctor: test secret-scan diff-check official-smoke
+
+amd-doctor:
+	$(PYTHON) scripts/amd_pod_doctor.py
+
+amd-bootstrap:
+	scripts/bootstrap_amd_pod.sh
+
+matrix-fit:
+	$(PYTHON) scripts/fit_fireworks_matrix_regression.py

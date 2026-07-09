@@ -22,9 +22,12 @@ from router.orchestration.matrix_regression_selector import (
 
 
 DEFAULT_DATASET = Path("evals/fireworks-pareto/minimal-microbench.jsonl")
-DEFAULT_RESULTS = [
+DEFAULT_REAL_RESULTS = [
     Path("reports/generated/fireworks-microbench-results.jsonl"),
     Path("reports/generated/fireworks-microbench-gpt-low-results.jsonl"),
+]
+DEFAULT_SEED_RESULTS = [
+    Path("evals/fireworks-pareto/seed-microbench-results.jsonl"),
 ]
 DEFAULT_WEIGHTS = Path("reports/generated/fireworks-matrix-regression-weights.json")
 DEFAULT_REPORT = Path("reports/generated/fireworks-matrix-regression-report.md")
@@ -40,7 +43,9 @@ def main() -> int:
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
-    result_paths = args.results or DEFAULT_RESULTS
+    result_paths = args.results or _default_result_paths()
+    if not result_paths:
+        raise FileNotFoundError("No microbench result files found. Run scripts/fireworks_microbench.py or keep the seed results fixture.")
     rows = load_microbench_rows(result_paths)
     tasks = load_regression_tasks(args.dataset)
     models = sorted({str(row["model"]) for row in rows})
@@ -61,6 +66,13 @@ def main() -> int:
     else:
         print(json.dumps(payload, ensure_ascii=True, indent=2, sort_keys=True))
     return 0
+
+
+def _default_result_paths() -> list[Path]:
+    real_results = [path for path in DEFAULT_REAL_RESULTS if path.exists()]
+    if real_results:
+        return real_results
+    return [path for path in DEFAULT_SEED_RESULTS if path.exists()]
 
 
 def _render_report(

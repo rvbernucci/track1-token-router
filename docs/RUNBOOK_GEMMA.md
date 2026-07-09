@@ -19,9 +19,26 @@ Antes de rodar Gemma local:
 
 Se aparecer `team not registered`, o problema nao e codigo: falta criar/entrar no time.
 
+Perfil observado em 2026-07-08 no ACT II:
+
+- Ubuntu 22.04;
+- Python 3.10.12;
+- ROCm 7.2.1;
+- 1 GPU AMD `gfx1100`;
+- VRAM aproximada: 48 GiB;
+- RAM aproximada: 503 GiB;
+- workspace persistente com cerca de 93 GB livres.
+
+Valide sempre o pod real antes de baixar pesos:
+
+```bash
+scripts/amd_pod_doctor.py
+```
+
 ## Escolha inicial
 
 - Comecar com um modelo Gemma grande apenas se a GPU e a latencia permitirem.
+- Em pod `gfx1100` com ~48 GiB, preferir quantizacao ou contexto menor antes de tentar Gemma 31B cheio.
 - Reduzir contexto antes de trocar arquitetura.
 - Trocar para modelo menor se houver OOM ou latencia alta.
 - Nao usar embedding/RAG se a task oficial for pergunta livre sem base vetorial.

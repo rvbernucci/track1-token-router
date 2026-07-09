@@ -137,6 +137,8 @@ def _format_http_error(exc: urllib.error.HTTPError) -> str:
         body = exc.read().decode("utf-8", errors="replace").strip()
     except Exception:
         body = ""
+    finally:
+        exc.close()
     if body:
         body = _sanitize_error_body(body)
         if len(body) > 500:

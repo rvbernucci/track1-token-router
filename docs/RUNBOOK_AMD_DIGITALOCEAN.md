@@ -59,11 +59,20 @@ ssh -L 8000:127.0.0.1:8000 root@<droplet-ip>
 ## Health checks da VM
 
 ```bash
+scripts/amd_pod_doctor.py
 rocm-smi
 python3 --version
 df -h
 free -h
 ```
+
+Bootstrap padrao do repositorio:
+
+```bash
+scripts/bootstrap_amd_pod.sh
+```
+
+Se o pod vier com Python 3.10, isso e esperado e suportado pelo projeto.
 
 ## Health check do endpoint
 

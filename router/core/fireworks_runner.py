@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from pathlib import Path
 from time import perf_counter
+from typing import Any
 
 from router.core.contracts import AnswerResult, TaskEnvelope, TokenUsage
 from router.core.fireworks import FireworksClient
@@ -8,6 +10,11 @@ from router.core.logging import JsonlRunLogger
 from router.core.model_client import ModelClientError, ModelResponse
 from router.core.prompts import build_m1_messages
 from router.orchestration.fireworks_model_router import select_fireworks_model, select_reasoning_effort
+from router.orchestration.matrix_regression_selector import (
+    MatrixRegressionWeights,
+    load_weights,
+    select_model_by_matrix_regression,
+)
 from router.orchestration.solvers import solve_deterministic
 
 
@@ -23,6 +30,7 @@ class FireworksDirectRunner:
         max_tokens: int = 512,
         allowed_models: list[str] | None = None,
         service_tier: str | None = None,
+        matrix_weights_path: Path | None = None,
     ) -> None:
         self.client = client
         self.logger = logger
@@ -30,6 +38,9 @@ class FireworksDirectRunner:
         self.max_tokens = max_tokens
         self.allowed_models = allowed_models or []
         self.service_tier = service_tier
+        self.matrix_weights_path = matrix_weights_path
+        self._matrix_weights: MatrixRegressionWeights | None = None
+        self._matrix_error: str | None = None
 
     def run(self, task: TaskEnvelope) -> AnswerResult:
         solver = solve_deterministic(task)
@@ -50,14 +61,15 @@ class FireworksDirectRunner:
 
         started_at = perf_counter()
         selection = select_fireworks_model(task, self.allowed_models, default_model=self.client.model)
-        selected_model = selection.model
+        matrix_selection = self._matrix_selection(task)
+        selected_model = str(matrix_selection.get("model") or selection.model) if matrix_selection else selection.model
         request_options = _request_options_for_selection(selected_model, selection.tier, service_tier=self.service_tier)
         request_options_fallback: str | None = None
         original_model = self.client.model
         attempt_errors: list[dict[str, str]] = []
         response: ModelResponse | None = None
         try:
-            for attempt_model in _models_to_try(selection):
+            for attempt_model in _models_to_try(selection, first_model=selected_model):
                 selected_model = attempt_model
                 request_options = _request_options_for_selection(
                     selected_model,
@@ -95,6 +107,7 @@ class FireworksDirectRunner:
                     "runner": "fireworks_direct",
                     "fireworks_model": selected_model,
                     "fireworks_model_selection": selection.to_dict(),
+                    "fireworks_matrix_selection": matrix_selection,
                     "fireworks_request_options": request_options,
                     "fireworks_attempt_errors": attempt_errors,
                     "latency_fireworks_ms": latency_ms,
@@ -109,6 +122,7 @@ class FireworksDirectRunner:
                 latency_fireworks_ms=latency_ms,
                 fireworks_request_options=request_options,
                 fireworks_attempt_errors=attempt_errors,
+                fireworks_matrix_selection=matrix_selection,
             )
             return result
 
@@ -122,6 +136,7 @@ class FireworksDirectRunner:
                 "runner": "fireworks_direct",
                 "fireworks_model": selected_model,
                 "fireworks_model_selection": selection.to_dict(),
+                "fireworks_matrix_selection": matrix_selection,
                 "fireworks_request_options": request_options,
                 "fireworks_request_options_fallback": request_options_fallback,
                 "fireworks_attempt_errors": attempt_errors,
@@ -138,12 +153,27 @@ class FireworksDirectRunner:
             fireworks_request_options=request_options,
             fireworks_request_options_fallback=request_options_fallback,
             fireworks_attempt_errors=attempt_errors,
+            fireworks_matrix_selection=matrix_selection,
         )
         return result
 
     def _log(self, task: TaskEnvelope, result: AnswerResult, **extra: object) -> None:
         if self.logger:
             self.logger.log_result(task, result, extra=extra)
+
+    def _matrix_selection(self, task: TaskEnvelope) -> dict[str, Any] | None:
+        if self.matrix_weights_path is None:
+            return None
+        if self._matrix_error:
+            return {"error": self._matrix_error}
+        try:
+            if self._matrix_weights is None:
+                self._matrix_weights = load_weights(self.matrix_weights_path)
+            models = self.allowed_models or [self.client.model]
+            return select_model_by_matrix_regression(task, models, self._matrix_weights)
+        except Exception as exc:
+            self._matrix_error = str(exc)
+            return {"error": self._matrix_error}
 
 
 def _elapsed_ms(started_at: float) -> int:
@@ -160,13 +190,14 @@ def _request_options_for_selection(model: str, tier: str, *, service_tier: str |
     return options
 
 
-def _models_to_try(selection: object) -> list[str]:
+def _models_to_try(selection: object, *, first_model: str | None = None) -> list[str]:
     models: list[str] = []
 
     def add(model: object) -> None:
         if isinstance(model, str) and model and model not in models:
             models.append(model)
 
+    add(first_model)
     add(getattr(selection, "model", ""))
     candidates = getattr(selection, "candidates", [])
     if isinstance(candidates, list):

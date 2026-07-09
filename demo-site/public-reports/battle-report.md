@@ -65,7 +65,7 @@
 ## Batch Stress
 
 - batch_stress_ready: `True`
-- tasks_per_second: `12750.657`
+- throughput_threshold: `>= 100.0 tasks/s`
 - output_contract_pass_rate: `1.0`
 
 ## Readiness

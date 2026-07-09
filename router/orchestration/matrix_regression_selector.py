@@ -9,6 +9,7 @@ from router.core.contracts import TaskEnvelope
 from router.orchestration.fireworks_model_router import (
     _build_candidates,
     _task_profile,
+    rank_fireworks_models,
     select_reasoning_effort,
 )
 
@@ -118,7 +119,8 @@ def select_model_by_matrix_regression(
     weights: MatrixRegressionWeights,
 ) -> dict[str, Any]:
     task_profile = _task_profile(task.input_text)
-    candidates = _build_candidates(allowed_models, task_profile)
+    normalized_models = rank_fireworks_models(allowed_models)
+    candidates = _build_candidates(normalized_models, task_profile)
     chat_candidates = [candidate for candidate in candidates if candidate.supports_chat]
     if not chat_candidates:
         raise ValueError("No chat-capable Fireworks model available in ALLOWED_MODELS.")

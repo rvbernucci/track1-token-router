@@ -32,6 +32,7 @@ class RouterConfig:
     fireworks_temperature: float
     fireworks_max_tokens: int
     fireworks_service_tier: str | None
+    fireworks_matrix_weights: Path | None
     enable_guardrails: bool
     enable_orchestrator: bool
     competition_dry_run: bool
@@ -65,6 +66,7 @@ class RouterConfig:
             fireworks_temperature=float(os.getenv("FIREWORKS_TEMPERATURE", "0.0")),
             fireworks_max_tokens=int(os.getenv("FIREWORKS_MAX_TOKENS", "256")),
             fireworks_service_tier=os.getenv("FIREWORKS_SERVICE_TIER") or None,
+            fireworks_matrix_weights=_optional_path(os.getenv("FIREWORKS_MATRIX_WEIGHTS")),
             enable_guardrails=_env_flag("ENABLE_GUARDRAILS"),
             enable_orchestrator=_env_flag("ENABLE_ORCHESTRATOR"),
             competition_dry_run=_env_flag("COMPETITION_DRY_RUN", default=True),
@@ -96,3 +98,9 @@ def _allowed_models(raw: str | None) -> list[str]:
 def _optional_model(raw: str | None) -> str | None:
     model = normalize_fireworks_model_id(raw)
     return model or None
+
+
+def _optional_path(raw: str | None) -> Path | None:
+    if raw is None or not raw.strip():
+        return None
+    return Path(raw.strip())

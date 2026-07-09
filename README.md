@@ -19,7 +19,7 @@ Prioridades:
 
 ## Quickstart limpo
 
-Do zero, use virtualenv. Em macOS/Homebrew, `python3 -m pip install -e .` fora de uma venv pode falhar por PEP 668.
+Do zero, use virtualenv. O projeto suporta Python `3.10+`, que cobre o pod AMD observado no hackathon. Em macOS/Homebrew, `python3 -m pip install -e .` fora de uma venv pode falhar por PEP 668.
 
 ```bash
 python3 -m venv .venv
@@ -51,6 +51,15 @@ make smoke
 make test
 make release-check
 make doctor
+```
+
+No AMD Developer Cloud/Jupyter pod:
+
+```bash
+git clone https://github.com/rvbernucci/track1-token-router.git
+cd track1-token-router
+scripts/amd_pod_doctor.py
+SKIP_TESTS=1 scripts/bootstrap_amd_pod.sh
 ```
 
 Contrato oficial Track 1 em modo offline:
@@ -194,6 +203,7 @@ python3 -m router ask "What is 2+2?"
 | `FIREWORKS_TEMPERATURE` | `0.0` | Temperatura do auditor remoto. |
 | `FIREWORKS_MAX_TOKENS` | `256` | Limite de output do auditor remoto. |
 | `FIREWORKS_SERVICE_TIER` | vazio | Vazio usa Standard; `priority` deve ser usado apenas como fallback manual de confiabilidade. |
+| `FIREWORKS_MATRIX_WEIGHTS` | vazio | Caminho opcional para pesos calibrados por `scripts/fit_fireworks_matrix_regression.py`; quando presente, o Fireworks runner usa regressao matricial + Nash para escolher o modelo. |
 
 ## Modo local M1
 
@@ -239,6 +249,19 @@ python3 -m router submit-track1 --input /input/tasks.json --output /output/resul
 ```
 
 Esse modo implementa o contrato oficial ACT II: le `/input/tasks.json`, escreve `/output/results.json`, usa solvers deterministicos antes de Fireworks e escolhe entre modelos de `ALLOWED_MODELS` por tier de tarefa.
+
+Para usar calibracao por microbench:
+
+```bash
+python3 scripts/fit_fireworks_matrix_regression.py
+ROUTER_MODE=fireworks \
+FIREWORKS_MATRIX_WEIGHTS=reports/generated/fireworks-matrix-regression-weights.json \
+FIREWORKS_API_KEY=<harness-key> \
+ALLOWED_MODELS=minimax-m3,kimi-k2p7-code,gemma-4-31b-it,gemma-4-26b-a4b-it,gemma-4-31b-it-nvfp4 \
+python3 -m router ask "Summarise token-efficient routing in one sentence."
+```
+
+Em clone limpo, o `fit` usa `evals/fireworks-pareto/seed-microbench-results.jsonl` como seed offline. Depois de rodar microbench real com creditos Fireworks, os resultados em `reports/generated/fireworks-microbench-*.jsonl` passam a alimentar pesos mais fortes.
 
 ## Modo competicao dry-run
 
@@ -439,6 +462,8 @@ Publicacao GHCR fica em `.github/workflows/release.yml` e acontece apenas em tag
 ## Submissao
 
 Leia [`SUBMISSION.md`](./SUBMISSION.md) para a narrativa tecnica, estrategia e pitch curto.
+
+O sync mais recente com a pagina oficial da competicao esta em [`docs/OFFICIAL_COMPETITION_SYNC.md`](./docs/OFFICIAL_COMPETITION_SYNC.md).
 
 ## Chaos lab sem credito
 

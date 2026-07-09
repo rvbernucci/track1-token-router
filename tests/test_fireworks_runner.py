@@ -10,6 +10,7 @@ from router.core.contracts import TaskEnvelope, TokenUsage
 from router.core.fireworks import FireworksClient
 from router.core.fireworks_runner import FireworksDirectRunner
 from router.core.model_client import ModelClientError, ModelResponse
+from router.orchestration.matrix_regression_selector import MatrixRegressionWeights, save_weights
 from tests.fake_openai_server import FakeOpenAIServer
 
 
@@ -138,6 +139,84 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertNotEqual(server.requests[0]["payload"]["model"], server.requests[1]["payload"]["model"])
         self.assertTrue(result.metadata["fireworks_attempt_errors"])
         self.assertEqual(client.model, "fallback-model")
+
+    def test_matrix_weights_can_override_nash_selection(self) -> None:
+        weights = MatrixRegressionWeights(
+            feature_names=[
+                "bias",
+                "tier_cheap",
+                "tier_strong",
+                "domain_formatting",
+                "domain_classification",
+                "domain_math_reasoning",
+                "domain_logic",
+                "domain_code_generation",
+                "capability",
+                "correlation",
+                "reliability",
+                "cost_utility",
+                "latency_utility",
+                "nash_product",
+                "prisoner_payoff",
+                "family_gpt_oss",
+                "family_deepseek",
+                "family_minimax",
+                "family_kimi",
+                "family_qwen",
+                "reasoning_none",
+                "reasoning_low",
+                "reasoning_medium",
+                "reasoning_omitted",
+            ],
+            coefficients=[
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                10.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+            ],
+            ridge_lambda=0.35,
+            training_rows=1,
+            target_mean=1.0,
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            weights_path = Path(tmp) / "weights.json"
+            save_weights(weights, weights_path)
+            with FakeOpenAIServer(response_text="Kimi-selected answer.") as server:
+                client = FireworksClient(base_url=server.url, model="fallback-model", api_key="test", max_retries=0)
+                runner = FireworksDirectRunner(
+                    client,
+                    allowed_models=["minimax-m3", "kimi-k2p7-code"],
+                    matrix_weights_path=weights_path,
+                )
+
+                result = runner.run(TaskEnvelope(id="summary", input_text="Summarise this: token routing matters."))
+
+        self.assertEqual(result.route, "fireworks_direct")
+        self.assertEqual(server.requests[0]["payload"]["model"], "accounts/fireworks/models/kimi-k2p7-code")
+        self.assertEqual(
+            result.metadata["fireworks_matrix_selection"]["selection_rule"],
+            "matrix_regression_plus_nash",
+        )
 
     def test_submit_track1_with_fireworks_mode_and_allowed_models(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
