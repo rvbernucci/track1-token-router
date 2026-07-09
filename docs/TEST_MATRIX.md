@@ -13,6 +13,7 @@ This matrix maps critical project areas to automated tests and playground probes
 | cascade | M1, M2A, M2B, hybrid audit routing | `tests/test_local_cascade.py`, `tests/test_hybrid_cascade.py` | none | `SUBMISSION.md` |
 | fake_provider | fake OpenAI-compatible server, chaos profiles | `tests/test_fake_provider.py`, `tests/test_bad_local_model_chaos.py` | none | `docs/CHAOS_LAB.md`, `fixtures/chaos/bad-local-model/` |
 | evals | offline dataset, eval summary, policy comparison, semantic validation | `tests/test_eval_summary.py`, `tests/test_offline_dataset.py`, `tests/test_policy_lab.py`, `tests/test_semantic_validation.py` | none | `evals/offline/README.md`, `evals/semantic/` |
+| deterministic_coverage | Track 1 solver/guardrail coverage, local validator pass rate, zero-token regression guard | `tests/test_track1_deterministic_coverage.py` | none | `evals/fireworks-pareto/*microbench.jsonl`, `reports/generated/track1-deterministic-coverage.md` |
 | operational_envelope | latency percentiles, timeout probes, token exposure thresholds, batch stress | `tests/test_operational_envelope.py`, `tests/test_battle_drill.py`, `tests/test_batch_stress.py` | none | `reports/generated/latency-report.md`, `reports/generated/token-envelope.md`, `fixtures/stress/` |
 | cli | ask, solve, run, eval, official submit-track1, controlled errors, submission rehearsal | `tests/test_io_and_cli.py`, `tests/test_official_adapters.py`, `tests/test_redaction_rehearsal.py` | none | `README.md`, `docs/SUBMISSION_REHEARSAL.md`, `docs/PARTICIPANT_GUIDE_TRACK1_MAP.md` |
 
@@ -24,4 +25,4 @@ Every domain must have at least one automated test. Playground files are optiona
 
 - No real AMD runtime tests because credits are not available.
 - No real Fireworks audit tests because credits are not available.
-- No official evaluator adapter because the kickoff format is not public yet; simulated adapter drills exist under `fixtures/adapter-drill/`.
+- Real official scoring remains external to the repo; local adapter drills and deterministic coverage protect the known file contract before submission.

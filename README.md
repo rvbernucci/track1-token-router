@@ -38,6 +38,7 @@ Checks principais:
 
 ```bash
 python3 -m unittest discover -s tests
+python3 scripts/track1_deterministic_coverage.py --check
 scripts/offline_release_check.sh
 python3 scripts/secret_scan.py
 git diff --check
@@ -49,6 +50,7 @@ Atalhos equivalentes:
 make setup
 make smoke
 make test
+make deterministic-coverage
 make release-check
 make doctor
 ```

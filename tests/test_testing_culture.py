@@ -22,6 +22,7 @@ class TestingCultureTests(unittest.TestCase):
                 "cascade",
                 "fake_provider",
                 "evals",
+                "deterministic_coverage",
                 "operational_envelope",
                 "cli",
             },

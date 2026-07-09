@@ -56,6 +56,21 @@ Este pack nao tenta substituir os modelos nessas oito categorias. Ele remove do 
 
 O ganho esperado e reduzir chamadas Fireworks sem derrubar o accuracy gate. Quando o padrao nao e claro, `solve_deterministic` retorna `None` e a cascata/model router continua normalmente.
 
+## Gate de regressao
+
+Antes de mexer em qualquer solver, rode:
+
+```bash
+python3 scripts/track1_deterministic_coverage.py --check
+```
+
+Esse gate roda os microbenches locais de Track 1 com `CompetitionRunner` em dry-run, valida somente rotas `solver_*` e `guardrail_*` contra os validadores do dataset e falha se:
+
+- qualquer output deterministico validavel estiver incorreto;
+- a cobertura deterministica cair abaixo do piso configurado.
+
+O mesmo gate tambem roda dentro de `scripts/offline_release_check.sh`.
+
 ## Regra operacional
 
 Se a regra precisa interpretar contexto amplo, ela nao e solver deterministico.
