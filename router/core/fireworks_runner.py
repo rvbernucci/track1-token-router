@@ -69,7 +69,12 @@ class FireworksDirectRunner:
         request_options_fallback: str | None = None
         original_model = self.client.model
         attempt_errors: list[dict[str, str]] = []
+        invalid_attempts: list[dict[str, object]] = []
         response: ModelResponse | None = None
+        final_validation = None
+        last_invalid_response: ModelResponse | None = None
+        last_invalid_validation = None
+        total_usage = TokenUsage.empty()
         try:
             for attempt_model in _models_to_try(
                 selection,
@@ -92,10 +97,48 @@ class FireworksDirectRunner:
                         max_tokens=self.max_tokens,
                         request_options=request_options,
                     )
+                    total_usage = _add_usage(total_usage, response.usage)
+                    final_validation = validate_final_answer(task, response.text)
+                    if (
+                        not final_validation.valid
+                        and not final_validation.repaired_answer
+                        and _should_retry_invalid_final_answer(final_validation.reason)
+                    ):
+                        invalid_attempts.append(
+                            {
+                                "model": selected_model,
+                                "reason": final_validation.reason,
+                                "expected_format": final_validation.expected_format,
+                                "usage": response.usage.to_dict(),
+                            }
+                        )
+                        last_invalid_response = response
+                        last_invalid_validation = final_validation
+                        response = None
+                        continue
                     break
                 except _RequestOptionsFallback as fallback:
                     response = fallback.response
+                    total_usage = _add_usage(total_usage, response.usage)
+                    final_validation = validate_final_answer(task, response.text)
                     request_options_fallback = fallback.reason
+                    if (
+                        not final_validation.valid
+                        and not final_validation.repaired_answer
+                        and _should_retry_invalid_final_answer(final_validation.reason)
+                    ):
+                        invalid_attempts.append(
+                            {
+                                "model": selected_model,
+                                "reason": final_validation.reason,
+                                "expected_format": final_validation.expected_format,
+                                "usage": response.usage.to_dict(),
+                            }
+                        )
+                        last_invalid_response = response
+                        last_invalid_validation = final_validation
+                        response = None
+                        continue
                     break
                 except ModelClientError as exc:
                     error = str(exc)
@@ -107,6 +150,10 @@ class FireworksDirectRunner:
                     continue
         finally:
             self.client.model = original_model
+
+        if response is None and last_invalid_response is not None:
+            response = last_invalid_response
+            final_validation = last_invalid_validation
 
         if response is None:
             latency_ms = _elapsed_ms(started_at)
@@ -122,6 +169,7 @@ class FireworksDirectRunner:
                     "fireworks_matrix_selection": matrix_selection,
                     "fireworks_request_options": request_options,
                     "fireworks_attempt_errors": attempt_errors,
+                    "fireworks_invalid_attempts": invalid_attempts,
                     "fireworks_unavailable_models": sorted(self._unavailable_models),
                     "latency_fireworks_ms": latency_ms,
                     "error": attempt_errors[-1]["error"] if attempt_errors else "no_model_attempted",
@@ -135,19 +183,21 @@ class FireworksDirectRunner:
                 latency_fireworks_ms=latency_ms,
                 fireworks_request_options=request_options,
                 fireworks_attempt_errors=attempt_errors,
+                fireworks_invalid_attempts=invalid_attempts,
                 fireworks_matrix_selection=matrix_selection,
                 fireworks_unavailable_models=sorted(self._unavailable_models),
             )
             return result
 
         latency_ms = _elapsed_ms(started_at)
-        final_validation = validate_final_answer(task, response.text)
+        if final_validation is None:
+            final_validation = validate_final_answer(task, response.text)
         final_answer = final_validation.repaired_answer if not final_validation.valid and final_validation.repaired_answer else response.text
         result = AnswerResult(
             id=task.id,
             answer=final_answer,
             route="fireworks_direct",
-            remote_tokens=response.usage,
+            remote_tokens=total_usage,
             metadata={
                 "runner": "fireworks_direct",
                 "fireworks_model": selected_model,
@@ -156,6 +206,7 @@ class FireworksDirectRunner:
                 "fireworks_request_options": request_options,
                 "fireworks_request_options_fallback": request_options_fallback,
                 "fireworks_attempt_errors": attempt_errors,
+                "fireworks_invalid_attempts": invalid_attempts,
                 "fireworks_unavailable_models": sorted(self._unavailable_models),
                 "latency_fireworks_ms": latency_ms,
                 "final_validation": final_validation.to_dict(),
@@ -167,11 +218,12 @@ class FireworksDirectRunner:
             result,
             stage="fireworks_direct",
             latency_fireworks_ms=latency_ms,
-            fireworks_tokens=response.usage.to_dict(),
+            fireworks_tokens=total_usage.to_dict(),
             fireworks_model=selected_model,
             fireworks_request_options=request_options,
             fireworks_request_options_fallback=request_options_fallback,
             fireworks_attempt_errors=attempt_errors,
+            fireworks_invalid_attempts=invalid_attempts,
             fireworks_matrix_selection=matrix_selection,
             fireworks_unavailable_models=sorted(self._unavailable_models),
         )
@@ -198,6 +250,25 @@ class FireworksDirectRunner:
 
 def _elapsed_ms(started_at: float) -> int:
     return round((perf_counter() - started_at) * 1000)
+
+
+def _add_usage(left: TokenUsage, right: TokenUsage) -> TokenUsage:
+    return TokenUsage(
+        prompt=left.prompt + right.prompt,
+        completion=left.completion + right.completion,
+        total=left.total + right.total,
+    )
+
+
+def _should_retry_invalid_final_answer(reason: str) -> bool:
+    return reason in {
+        "empty_answer",
+        "invalid_json",
+        "not_number_only",
+        "not_yes_no",
+        "invalid_python_code",
+        "code_with_extra_text",
+    }
 
 
 def _request_options_for_selection(model: str, tier: str, *, service_tier: str | None = None) -> dict[str, object]:

@@ -83,6 +83,7 @@ After tightening the `ner_money_date` prompt to require date and amount exactly 
 - The runtime token utility now blends static profile estimates with observed `avg_total_tokens` by domain/shape/model, weighted by sample confidence.
 - Prefer `kimi-k2p7-code` when both observed models are valid and Kimi's predicted Fireworks token use is materially lower, especially compact factual QA, summarization, logic, selected math, and compact-formatting probes.
 - Keep `minimax-m3` as the preferred remote fallback where empirical validity, extraction behavior, code generation/debug, mixed sentiment, composed math, or future hidden-evaluator data shows higher robustness than Kimi.
+- In Fireworks-only mode, strict output validation now acts as an accuracy gate: if the selected model returns empty, invalid JSON, invalid number/yes-no, or irreparable Python/code output, the runner tries the next ranked candidate and records total tokens across attempts.
 - Keep Gemma IDs in `ALLOWED_MODELS` support, but cache unavailable-model errors per runner instance so one inaccessible Gemma endpoint does not cause repeated latency across the whole evaluator batch.
 
 ## Classifier Hardening

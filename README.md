@@ -256,7 +256,7 @@ python3 -m router submit-track1 --input /input/tasks.json --output /output/resul
 
 Esse modo implementa o contrato oficial ACT II: le `/input/tasks.json`, escreve `/output/results.json`, usa solvers deterministicos antes de Fireworks e escolhe entre modelos de `ALLOWED_MODELS` por tier de tarefa.
 
-No Docker de submissao, `FIREWORKS_MATRIX_WEIGHTS` ja aponta para `router/data/fireworks_track1_allowed_weights.json`, treinado com microbench real dos modelos permitidos Track 1 em 2026-07-09. A politica atual combina regressao ridge, Nash welfare, eficiencia de tokens, tokens observados por dominio/estrutura/modelo e risco empirico: `kimi-k2p7-code` vence quando sua validade observada e comparavel e ele economiza tokens; `minimax-m3` vence quando robustez empirica supera a economia, especialmente em escapes de codigo, extracao e sentimento misto.
+No Docker de submissao, `FIREWORKS_MATRIX_WEIGHTS` ja aponta para `router/data/fireworks_track1_allowed_weights.json`, treinado com microbench real dos modelos permitidos Track 1 em 2026-07-09. A politica atual combina regressao ridge, Nash welfare, eficiencia de tokens, tokens observados por dominio/estrutura/modelo e risco empirico: `kimi-k2p7-code` vence quando sua validade observada e comparavel e ele economiza tokens; `minimax-m3` vence quando robustez empirica supera a economia, especialmente em escapes de codigo, extracao e sentimento misto. Se a primeira resposta Fireworks falhar validacao mecanica e nao puder ser reparada, o runner tenta o proximo candidato ranqueado e soma os tokens das tentativas, protegendo o accuracy gate sem esconder custo.
 
 Para usar calibracao por microbench:
 

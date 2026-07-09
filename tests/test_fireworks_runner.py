@@ -264,6 +264,51 @@ class FireworksDirectRunnerTests(unittest.TestCase):
             "matrix_regression_plus_nash",
         )
 
+    def test_invalid_strict_output_falls_back_to_next_ranked_model(self) -> None:
+        weights = MatrixRegressionWeights(
+            feature_names=FEATURE_NAMES,
+            coefficients=_coefficients({"family_kimi": 10.0}),
+            ridge_lambda=0.35,
+            training_rows=1,
+            target_mean=1.0,
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            weights_path = Path(tmp) / "weights.json"
+            save_weights(weights, weights_path)
+            with FakeOpenAIServer(
+                responses=[
+                    "I will explain the approach first, but I will not provide code yet.",
+                    "def normalize_slug(text):\n    return text.strip().lower().replace(' ', '-')",
+                ],
+                prompt_tokens=10,
+                completion_tokens=5,
+            ) as server:
+                client = FireworksClient(base_url=server.url, model="fallback-model", api_key="test", max_retries=0)
+                runner = FireworksDirectRunner(
+                    client,
+                    allowed_models=["minimax-m3", "kimi-k2p7-code"],
+                    matrix_weights_path=weights_path,
+                )
+
+                result = runner.run(
+                    TaskEnvelope(
+                        id="code",
+                        input_text=(
+                            "Write a Python function normalize_slug(text) that lowercases text, "
+                            "trims spaces, and replaces spaces with hyphens. Return only Python code."
+                        ),
+                    )
+                )
+
+        self.assertEqual(result.answer, "def normalize_slug(text):\n    return text.strip().lower().replace(' ', '-')")
+        self.assertEqual(result.remote_tokens.total, 30)
+        self.assertEqual(len(server.requests), 2)
+        self.assertEqual(server.requests[0]["payload"]["model"], "accounts/fireworks/models/kimi-k2p7-code")
+        self.assertEqual(server.requests[1]["payload"]["model"], "accounts/fireworks/models/minimax-m3")
+        self.assertEqual(result.metadata["fireworks_model"], "accounts/fireworks/models/minimax-m3")
+        self.assertEqual(result.metadata["fireworks_invalid_attempts"][0]["reason"], "invalid_python_code")
+        self.assertTrue(result.metadata["final_validation"]["valid"])
+
     def test_submit_track1_with_fireworks_mode_and_allowed_models(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
