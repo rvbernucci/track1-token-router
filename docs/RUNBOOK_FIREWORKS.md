@@ -201,6 +201,8 @@ Politica atual para o caminho oficial:
 - `kimi-k2p7-code` permanece como fallback/candidato, especialmente para codigo/logica, mas nao como default atual.
 - se um modelo local confiavel estiver disponivel, `ROUTER_MODE=hybrid` deve ser comparado contra `ROUTER_MODE=fireworks`, porque respostas locais corretas custam zero Fireworks tokens.
 
+Calibracao complementar de 2026-07-09 com todos os modelos permitidos esta em [`docs/FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md`](./FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md).
+
 ## Serverless vs Batch vs Deployments
 
 Fireworks tem tres caminhos diferentes, e eles nao significam a mesma coisa para o Track 1.

@@ -41,6 +41,7 @@ class FireworksDirectRunner:
         self.matrix_weights_path = matrix_weights_path
         self._matrix_weights: MatrixRegressionWeights | None = None
         self._matrix_error: str | None = None
+        self._unavailable_models: set[str] = set()
 
     def run(self, task: TaskEnvelope) -> AnswerResult:
         solver = solve_deterministic(task)
@@ -69,7 +70,11 @@ class FireworksDirectRunner:
         attempt_errors: list[dict[str, str]] = []
         response: ModelResponse | None = None
         try:
-            for attempt_model in _models_to_try(selection, first_model=selected_model):
+            for attempt_model in _models_to_try(
+                selection,
+                first_model=selected_model,
+                unavailable_models=self._unavailable_models,
+            ):
                 selected_model = attempt_model
                 request_options = _request_options_for_selection(
                     selected_model,
@@ -91,7 +96,10 @@ class FireworksDirectRunner:
                     request_options_fallback = fallback.reason
                     break
                 except ModelClientError as exc:
-                    attempt_errors.append({"model": selected_model, "error": str(exc)})
+                    error = str(exc)
+                    attempt_errors.append({"model": selected_model, "error": error})
+                    if _is_unavailable_model_error(error):
+                        self._unavailable_models.add(selected_model)
                     continue
         finally:
             self.client.model = original_model
@@ -110,6 +118,7 @@ class FireworksDirectRunner:
                     "fireworks_matrix_selection": matrix_selection,
                     "fireworks_request_options": request_options,
                     "fireworks_attempt_errors": attempt_errors,
+                    "fireworks_unavailable_models": sorted(self._unavailable_models),
                     "latency_fireworks_ms": latency_ms,
                     "error": attempt_errors[-1]["error"] if attempt_errors else "no_model_attempted",
                 },
@@ -123,6 +132,7 @@ class FireworksDirectRunner:
                 fireworks_request_options=request_options,
                 fireworks_attempt_errors=attempt_errors,
                 fireworks_matrix_selection=matrix_selection,
+                fireworks_unavailable_models=sorted(self._unavailable_models),
             )
             return result
 
@@ -140,6 +150,7 @@ class FireworksDirectRunner:
                 "fireworks_request_options": request_options,
                 "fireworks_request_options_fallback": request_options_fallback,
                 "fireworks_attempt_errors": attempt_errors,
+                "fireworks_unavailable_models": sorted(self._unavailable_models),
                 "latency_fireworks_ms": latency_ms,
             },
         )
@@ -154,6 +165,7 @@ class FireworksDirectRunner:
             fireworks_request_options_fallback=request_options_fallback,
             fireworks_attempt_errors=attempt_errors,
             fireworks_matrix_selection=matrix_selection,
+            fireworks_unavailable_models=sorted(self._unavailable_models),
         )
         return result
 
@@ -190,11 +202,17 @@ def _request_options_for_selection(model: str, tier: str, *, service_tier: str |
     return options
 
 
-def _models_to_try(selection: object, *, first_model: str | None = None) -> list[str]:
+def _models_to_try(
+    selection: object,
+    *,
+    first_model: str | None = None,
+    unavailable_models: set[str] | None = None,
+) -> list[str]:
     models: list[str] = []
+    unavailable = unavailable_models or set()
 
     def add(model: object) -> None:
-        if isinstance(model, str) and model and model not in models:
+        if isinstance(model, str) and model and model not in unavailable and model not in models:
             models.append(model)
 
     add(first_model)
@@ -244,6 +262,16 @@ def _complete_with_optional_request_options(
 def _is_request_option_error(message: str) -> bool:
     lowered = message.lower()
     return "reasoning_effort" in lowered or "service_tier" in lowered or "extra inputs are not permitted" in lowered
+
+
+def _is_unavailable_model_error(message: str) -> bool:
+    lowered = message.lower()
+    return (
+        "http 404" in lowered
+        or "model not found" in lowered
+        or "inaccessible" in lowered
+        or "not deployed" in lowered
+    )
 
 
 class _RequestOptionsFallback(Exception):

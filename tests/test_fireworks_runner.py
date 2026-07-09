@@ -140,6 +140,38 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertTrue(result.metadata["fireworks_attempt_errors"])
         self.assertEqual(client.model, "fallback-model")
 
+    def test_unavailable_model_is_skipped_after_first_404(self) -> None:
+        with FakeOpenAIServer(
+            responses=["First fallback.", "Second fallback."],
+            statuses=[404, 200, 200],
+            prompt_tokens=9,
+            completion_tokens=3,
+        ) as server:
+            client = FireworksClient(base_url=server.url, model="fallback-model", api_key="test", max_retries=0)
+            runner = FireworksDirectRunner(
+                client,
+                allowed_models=["gemma-4-31b-it", "minimax-m3"],
+            )
+
+            first = runner.run(TaskEnvelope(id="summary-1", input_text="Summarise this: token routing matters."))
+            second = runner.run(TaskEnvelope(id="summary-2", input_text="Summarise this: local routing matters."))
+
+        requested_models = [request["payload"]["model"] for request in server.requests]
+        self.assertEqual(first.answer, "First fallback.")
+        self.assertEqual(second.answer, "Second fallback.")
+        self.assertEqual(
+            requested_models,
+            [
+                "accounts/fireworks/models/gemma-4-31b-it",
+                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/minimax-m3",
+            ],
+        )
+        self.assertEqual(
+            second.metadata["fireworks_unavailable_models"],
+            ["accounts/fireworks/models/gemma-4-31b-it"],
+        )
+
     def test_matrix_weights_can_override_nash_selection(self) -> None:
         weights = MatrixRegressionWeights(
             feature_names=[
