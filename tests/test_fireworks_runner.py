@@ -146,6 +146,61 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertEqual(server.requests[0]["payload"]["service_tier"], "priority")
         self.assertEqual(result.metadata["fireworks_request_options"]["service_tier"], "priority")
 
+    def test_number_task_uses_compact_completion_budget(self) -> None:
+        with FakeOpenAIServer(response_text="0") as server:
+            client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
+            runner = FireworksDirectRunner(client, max_tokens=512)
+
+            result = runner.run(
+                TaskEnvelope(
+                    id="number",
+                    input_text="Return only the number of vowels in this invented label: rzxby.",
+                )
+            )
+
+        self.assertEqual(result.route, "fireworks_direct")
+        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 16)
+        self.assertEqual(result.metadata["fireworks_completion_token_policy"]["expected_format"], "number")
+        self.assertEqual(result.metadata["fireworks_completion_token_policy"]["max_tokens"], 16)
+
+    def test_code_task_keeps_larger_completion_budget(self) -> None:
+        response = "def slugify_title(value):\n    return value.strip().lower().replace(' ', '-')"
+        with FakeOpenAIServer(response_text=response) as server:
+            client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
+            runner = FireworksDirectRunner(client, max_tokens=512)
+
+            result = runner.run(
+                TaskEnvelope(
+                    id="code",
+                    input_text=(
+                        "Implement a Python function slugify_title(value) that returns a URL slug. "
+                        "Return only Python code."
+                    ),
+                )
+            )
+
+        self.assertEqual(result.answer, response)
+        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 384)
+        self.assertEqual(result.metadata["fireworks_completion_token_policy"]["expected_format"], "code")
+
+    def test_configured_lower_max_tokens_overrides_completion_policy(self) -> None:
+        response = "def slugify_title(value):\n    return value.strip().lower().replace(' ', '-')"
+        with FakeOpenAIServer(response_text=response) as server:
+            client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
+            runner = FireworksDirectRunner(client, max_tokens=40)
+
+            runner.run(
+                TaskEnvelope(
+                    id="code",
+                    input_text=(
+                        "Implement a Python function slugify_title(value) that returns a URL slug. "
+                        "Return only Python code."
+                    ),
+                )
+            )
+
+        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 40)
+
     def test_reasoning_option_error_falls_back_without_extra_body(self) -> None:
         client = _RejectReasoningOnceClient()
         runner = FireworksDirectRunner(

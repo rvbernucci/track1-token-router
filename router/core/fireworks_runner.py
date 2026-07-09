@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+import re
 from pathlib import Path
 from time import perf_counter
 from typing import Any
@@ -16,6 +18,7 @@ from router.orchestration.matrix_regression_selector import (
     load_weights,
     select_model_by_matrix_regression,
 )
+from router.orchestration.prompt_packet import extract_literal_echo, infer_expected_format
 from router.orchestration.solvers import solve_deterministic
 
 
@@ -75,6 +78,13 @@ class FireworksDirectRunner:
         last_invalid_response: ModelResponse | None = None
         last_invalid_validation = None
         total_usage = TokenUsage.empty()
+        token_policy = _completion_token_policy(
+            task,
+            tier=selection.tier,
+            domain=selection.domain,
+            configured_max_tokens=self.max_tokens,
+        )
+        request_max_tokens = int(token_policy["max_tokens"])
         try:
             for attempt_model in _models_to_try(
                 selection,
@@ -94,7 +104,7 @@ class FireworksDirectRunner:
                         self.client,
                         build_m1_messages(task),
                         temperature=self.temperature,
-                        max_tokens=self.max_tokens,
+                        max_tokens=request_max_tokens,
                         request_options=request_options,
                     )
                     total_usage = _add_usage(total_usage, response.usage)
@@ -109,6 +119,7 @@ class FireworksDirectRunner:
                                 "model": selected_model,
                                 "reason": final_validation.reason,
                                 "expected_format": final_validation.expected_format,
+                                "max_tokens": request_max_tokens,
                                 "usage": response.usage.to_dict(),
                             }
                         )
@@ -132,6 +143,7 @@ class FireworksDirectRunner:
                                 "model": selected_model,
                                 "reason": final_validation.reason,
                                 "expected_format": final_validation.expected_format,
+                                "max_tokens": request_max_tokens,
                                 "usage": response.usage.to_dict(),
                             }
                         )
@@ -168,6 +180,7 @@ class FireworksDirectRunner:
                     "fireworks_model_selection": selection.to_dict(),
                     "fireworks_matrix_selection": matrix_selection,
                     "fireworks_request_options": request_options,
+                    "fireworks_completion_token_policy": token_policy,
                     "fireworks_attempt_errors": attempt_errors,
                     "fireworks_invalid_attempts": invalid_attempts,
                     "fireworks_unavailable_models": sorted(self._unavailable_models),
@@ -182,6 +195,7 @@ class FireworksDirectRunner:
                 error=result.metadata["error"],
                 latency_fireworks_ms=latency_ms,
                 fireworks_request_options=request_options,
+                fireworks_completion_token_policy=token_policy,
                 fireworks_attempt_errors=attempt_errors,
                 fireworks_invalid_attempts=invalid_attempts,
                 fireworks_matrix_selection=matrix_selection,
@@ -205,6 +219,7 @@ class FireworksDirectRunner:
                 "fireworks_matrix_selection": matrix_selection,
                 "fireworks_request_options": request_options,
                 "fireworks_request_options_fallback": request_options_fallback,
+                "fireworks_completion_token_policy": token_policy,
                 "fireworks_attempt_errors": attempt_errors,
                 "fireworks_invalid_attempts": invalid_attempts,
                 "fireworks_unavailable_models": sorted(self._unavailable_models),
@@ -222,6 +237,7 @@ class FireworksDirectRunner:
             fireworks_model=selected_model,
             fireworks_request_options=request_options,
             fireworks_request_options_fallback=request_options_fallback,
+            fireworks_completion_token_policy=token_policy,
             fireworks_attempt_errors=attempt_errors,
             fireworks_invalid_attempts=invalid_attempts,
             fireworks_matrix_selection=matrix_selection,
@@ -279,6 +295,79 @@ def _request_options_for_selection(model: str, tier: str, *, service_tier: str |
     if reasoning_effort:
         options["reasoning_effort"] = reasoning_effort
     return options
+
+
+def _completion_token_policy(
+    task: TaskEnvelope,
+    *,
+    tier: str,
+    domain: str,
+    configured_max_tokens: int,
+) -> dict[str, object]:
+    expected_format = infer_expected_format(task)
+    policy_cap = _completion_token_cap(task, expected_format=expected_format, tier=tier, domain=domain)
+    configured_cap = max(1, configured_max_tokens)
+    max_tokens = min(configured_cap, policy_cap)
+    return {
+        "max_tokens": max_tokens,
+        "configured_max_tokens": configured_cap,
+        "policy_cap": policy_cap,
+        "expected_format": expected_format,
+        "tier": tier,
+        "domain": domain,
+    }
+
+
+def _completion_token_cap(task: TaskEnvelope, *, expected_format: str, tier: str, domain: str) -> int:
+    text = task.input_text
+    lowered = text.lower()
+    if expected_format == "yes_no":
+        return 8
+    if expected_format == "number":
+        return 16
+    if expected_format == "literal_echo":
+        literal = extract_literal_echo(task)
+        return _bounded_token_cap(_approx_tokens_for_chars(len(literal)) + 8, lower=16, upper=96)
+    if expected_format == "uppercase":
+        return _bounded_token_cap(_approx_tokens_for_chars(len(text)) + 16, lower=32, upper=160)
+    if expected_format == "json":
+        return _bounded_token_cap(_approx_tokens_for_chars(len(text)) + 48, lower=96, upper=224)
+    if expected_format == "code":
+        return 384
+
+    explicit_word_cap = _explicit_word_cap(lowered)
+    if explicit_word_cap is not None:
+        return _bounded_token_cap(math.ceil(explicit_word_cap * 1.5) + 16, lower=32, upper=224)
+    if re.search(r"\b(one|single)\s+(word|label|sentence)\b", lowered):
+        return 48
+    if domain in {"classification", "formatting"} or tier == "cheap":
+        return 64
+    if domain in {"extraction", "summarization"}:
+        return 160
+    if tier == "strong" or domain in {"logic", "math_reasoning", "current_factual"}:
+        return 224
+    return 128
+
+
+def _explicit_word_cap(lowered_text: str) -> int | None:
+    patterns = [
+        r"\b(?:at most|no more than|max(?:imum)?|under)\s+(\d{1,3})\s+words?\b",
+        r"\bin\s+(\d{1,3})\s+words?\s+or\s+(?:fewer|less)\b",
+        r"\b(\d{1,3})\s+words?\s+or\s+(?:fewer|less)\b",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, lowered_text)
+        if match:
+            return int(match.group(1))
+    return None
+
+
+def _approx_tokens_for_chars(chars: int) -> int:
+    return max(1, math.ceil(chars / 4))
+
+
+def _bounded_token_cap(value: int, *, lower: int, upper: int) -> int:
+    return min(upper, max(lower, value))
 
 
 def _models_to_try(

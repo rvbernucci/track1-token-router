@@ -205,7 +205,7 @@ python3 -m router ask "What is 2+2?"
 | `FIREWORKS_TIMEOUT_S` | `24` | Timeout por chamada Fireworks, mantido abaixo do limite oficial de 30s por request. |
 | `FIREWORKS_MAX_RETRIES` | `0` | Tentativas extras em falha Fireworks; no Track 1 evitamos cascata lenta por retry. |
 | `FIREWORKS_TEMPERATURE` | `0.0` | Temperatura do auditor remoto. |
-| `FIREWORKS_MAX_TOKENS` | `256` | Limite de output do auditor remoto. |
+| `FIREWORKS_MAX_TOKENS` | `256` | Teto global de output Fireworks; o runner aplica um cap menor por formato esperado quando seguro. |
 | `FIREWORKS_SERVICE_TIER` | vazio | Vazio usa Standard; `priority` deve ser usado apenas como fallback manual de confiabilidade. |
 | `FIREWORKS_MATRIX_WEIGHTS` | vazio localmente; `/app/router/data/fireworks_track1_allowed_weights.json` no Docker | Caminho para pesos calibrados por microbench; quando presente, os runners Fireworks e hibrido usam regressao matricial + Nash para escolher o modelo. |
 | `TRACK1_MAX_RUNTIME_S` | `570` | Orçamento total do comando `submit-track1`, deixando margem abaixo dos 10 minutos oficiais. |
@@ -256,7 +256,7 @@ python3 -m router submit-track1 --input /input/tasks.json --output /output/resul
 
 Esse modo implementa o contrato oficial ACT II: le `/input/tasks.json`, escreve `/output/results.json`, usa solvers deterministicos antes de Fireworks e escolhe entre modelos de `ALLOWED_MODELS` por tier de tarefa.
 
-No Docker de submissao, `FIREWORKS_MATRIX_WEIGHTS` ja aponta para `router/data/fireworks_track1_allowed_weights.json`, treinado com microbench real dos modelos permitidos Track 1 em 2026-07-09. A politica atual combina regressao ridge, Nash welfare, eficiencia de tokens, tokens observados por dominio/estrutura/modelo e risco empirico: `kimi-k2p7-code` vence quando sua validade observada e comparavel e ele economiza tokens; `minimax-m3` vence quando robustez empirica supera a economia, especialmente em escapes de codigo, extracao e sentimento misto. Se a primeira resposta Fireworks falhar validacao mecanica e nao puder ser reparada, o runner tenta o proximo candidato ranqueado e soma os tokens das tentativas, protegendo o accuracy gate sem esconder custo.
+No Docker de submissao, `FIREWORKS_MATRIX_WEIGHTS` ja aponta para `router/data/fireworks_track1_allowed_weights.json`, treinado com microbench real dos modelos permitidos Track 1 em 2026-07-09. A politica atual combina regressao ridge, Nash welfare, eficiencia de tokens, tokens observados por dominio/estrutura/modelo e risco empirico: `kimi-k2p7-code` vence quando sua validade observada e comparavel e ele economiza tokens; `minimax-m3` vence quando robustez empirica supera a economia, especialmente em escapes de codigo, extracao e sentimento misto. O runtime tambem aplica um completion budget por formato esperado: yes/no, numero e literal recebem caps curtos; JSON, resumo e codigo mantem folga maior. Se a primeira resposta Fireworks falhar validacao mecanica e nao puder ser reparada, o runner tenta o proximo candidato ranqueado e soma os tokens das tentativas, protegendo o accuracy gate sem esconder custo.
 
 Para usar calibracao por microbench:
 
