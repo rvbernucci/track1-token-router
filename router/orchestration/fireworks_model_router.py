@@ -363,6 +363,8 @@ def _looks_like_field_extraction(lowered_prompt: str) -> bool:
         r"\breturn only the invoice code\b",
         r"\bextract\s+(?:customer|quantity|item|city)\b",
         r"\bextract\s+customer,\s*quantity,\s*item,\s*city\b",
+        r"\bextract\s+(?:name|contact|email|phone)\b",
+        r"\bextract\b.{0,80}\b(?:email|phone|contact)\b",
         r"\bextract\s+(?:date|payer|amount|payee|person|organization|city|email|url|phone)\b",
     ]
     return any(re.search(pattern, lowered_prompt) for pattern in extraction_patterns)

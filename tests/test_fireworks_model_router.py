@@ -215,6 +215,7 @@ class FireworksModelRouterTests(unittest.TestCase):
         cases = [
             "Return only the title from this record. Title: Quiet Routers Win. Author: R. Silva. Year: 2026.",
             "Return only the invoice code from this sentence: Please reconcile invoice INV-2026-884 before Friday.",
+            "Return only minified JSON. Extract name, email, and phone from: Contact Lara at lara.silva@example.com or +55-11-99888-7766.",
         ]
         for prompt in cases:
             with self.subTest(prompt=prompt):

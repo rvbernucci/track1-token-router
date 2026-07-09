@@ -409,7 +409,7 @@ class CheckedInTrack1WeightsTests(unittest.TestCase):
             (
                 "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The UI looks elegant, but the export failed twice and wasted my time.",
                 "classification",
-                "accounts/fireworks/models/kimi-k2p7-code",
+                "accounts/fireworks/models/minimax-m3",
             ),
             (
                 "Compute 17 * 6 + 4. Return only the number.",
@@ -424,11 +424,16 @@ class CheckedInTrack1WeightsTests(unittest.TestCase):
             (
                 "Fix this Python code: def add(a, b): return a - b",
                 "code_debug",
-                "accounts/fireworks/models/kimi-k2p7-code",
+                "accounts/fireworks/models/minimax-m3",
             ),
             (
                 "Write a Python function add(a, b) that returns the sum.",
                 "code_generation",
+                "accounts/fireworks/models/minimax-m3",
+            ),
+            (
+                "Return only minified JSON. Extract name, email, and phone from: Contact Lara at lara.silva@example.com or +55-11-99888-7766.",
+                "extraction",
                 "accounts/fireworks/models/minimax-m3",
             ),
             (
