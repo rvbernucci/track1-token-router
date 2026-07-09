@@ -17,6 +17,8 @@ SPEAKER_NOTES = FINAL_ROOT / "speaker-notes.md"
 MANIFEST = FINAL_ROOT / "artifact-manifest.json"
 VIDEO_PLACEHOLDER = FINAL_ROOT / "video-placeholder-approved.md"
 FINAL_README = FINAL_ROOT / "README.md"
+LABLAB_FIELDS = FINAL_ROOT / "lablab-submit-fields.md"
+SUBMISSION_STATUS = FINAL_ROOT / "submission-status.json"
 
 
 def build_submission_artifacts(root: Path = Path(".")) -> dict[str, object]:
@@ -28,6 +30,7 @@ def build_submission_artifacts(root: Path = Path(".")) -> dict[str, object]:
     _write_speaker_notes(root / SPEAKER_NOTES, slides)
     _write_video_placeholder(root / VIDEO_PLACEHOLDER)
     _write_final_readme(root / FINAL_README)
+    _write_lablab_fields(root / LABLAB_FIELDS, root)
     manifest = _manifest(root, slides)
     (root / MANIFEST).write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return manifest
@@ -35,7 +38,7 @@ def build_submission_artifacts(root: Path = Path(".")) -> dict[str, object]:
 
 def validate_submission_artifacts(root: Path = Path(".")) -> list[str]:
     errors: list[str] = []
-    for relative in (SLIDES_PDF, COVER_PNG, SPEAKER_NOTES, MANIFEST, VIDEO_PLACEHOLDER, FINAL_README):
+    for relative in (SLIDES_PDF, COVER_PNG, SPEAKER_NOTES, MANIFEST, VIDEO_PLACEHOLDER, FINAL_README, LABLAB_FIELDS):
         path = root / relative
         if not path.exists():
             errors.append(f"missing {relative}")
@@ -216,10 +219,96 @@ def _write_final_readme(path: Path) -> None:
         "- `cover.png`: generated placeholder cover image.\n"
         "- `speaker-notes.md`: short notes generated from the slide outline.\n"
         "- `video-placeholder-approved.md`: temporary placeholder until final recording is uploaded.\n"
-        "- `submission-status.json`: strict readiness status for repo, demo, video, CI and public GHCR image.\n\n"
+        "- `submission-status.json`: strict readiness status for repo, demo, video, CI and public GHCR image.\n"
+        "- `lablab-submit-fields.md`: copy-paste fields for the lablab.ai submission form.\n\n"
         "Replace visual placeholders before final submission if a designed deck or cover is available.\n",
         encoding="utf-8",
     )
+
+
+def _write_lablab_fields(path: Path, root: Path) -> None:
+    status = _load_status(root / SUBMISSION_STATUS)
+    title = _read_text(root / "submission" / "title.md").strip()
+    short = _read_text(root / "submission" / "short-description.md").strip()
+    long = _strip_markdown_title(_read_text(root / "submission" / "long-description.md")).strip()
+    tags = _strip_markdown_title(_read_text(root / "submission" / "tags.md")).strip()
+    docker_image = str(status.get("docker_image") or "PENDING_GHCR_IMAGE")
+    release_tag = str(status.get("release_tag") or "PENDING_RELEASE_TAG")
+    commit_sha = str(status.get("commit_sha") or "PENDING_COMMIT_SHA")
+    demo_url = str(status.get("demo_url") or "PENDING_DEMO_URL")
+    repo_url = str(status.get("repo_url") or "PENDING_REPO_URL")
+    raw_video_url = str(status.get("video_url") or "")
+    video_url = raw_video_url
+    if not raw_video_url:
+        video_url = "PENDING_VIDEO_URL - placeholder approved until final recording upload"
+    lines = [
+        "# lablab.ai Submission Fields",
+        "",
+        "Use this as the copy-paste source of truth for the final hackathon form.",
+        "",
+        "## Project Title",
+        "",
+        title,
+        "",
+        "## Short Description",
+        "",
+        short,
+        "",
+        "## Long Description",
+        "",
+        long,
+        "",
+        "## Tags",
+        "",
+        tags,
+        "",
+        "## Track",
+        "",
+        "Track 1 - Hybrid Token-Efficient Routing Agent",
+        "",
+        "## Public Repository",
+        "",
+        repo_url,
+        "",
+        "## Demo URL",
+        "",
+        demo_url,
+        "",
+        "## Video URL",
+        "",
+        video_url,
+        "",
+        "## Public Docker Image",
+        "",
+        docker_image,
+        "",
+        "## Release Evidence",
+        "",
+        f"- release_tag: `{release_tag}`",
+        f"- commit_sha: `{commit_sha}`",
+        f"- ci_status: `{status.get('ci_status', 'unknown')}`",
+        f"- release_status: `{status.get('release_status', 'unknown')}`",
+        f"- image_audit_status: `{status.get('image_audit_status', 'unknown')}`",
+        f"- image_platform: `{status.get('image_platform', 'unknown')}`",
+        f"- image_compressed_size_bytes: `{status.get('image_compressed_size_bytes', 'unknown')}`",
+        "",
+        "## Image Audit Command",
+        "",
+        "```bash",
+        "python3 scripts/competition_submission_audit.py \\",
+        f"  --image {docker_image} \\",
+        f"  --expected-revision {commit_sha} \\",
+        f"  --expected-version {release_tag}",
+        "```",
+        "",
+        "## Notes",
+        "",
+        "- Submit the Docker image above for Track 1.",
+        "- Replace the video URL before final submission if lablab requires a hosted video.",
+        "- Keep this file aligned with `submission/final/submission-status.json`.",
+        "",
+    ]
+    path.write_text("\n".join(lines), encoding="utf-8")
 
 
 def _manifest(root: Path, slides: list[dict[str, str]]) -> dict[str, object]:
@@ -227,7 +316,7 @@ def _manifest(root: Path, slides: list[dict[str, str]]) -> dict[str, object]:
         "slides": len(slides),
         "artifacts": {
             str(relative): (root / relative).stat().st_size
-            for relative in (SLIDES_PDF, COVER_PNG, SPEAKER_NOTES, VIDEO_PLACEHOLDER, FINAL_README)
+            for relative in (SLIDES_PDF, COVER_PNG, SPEAKER_NOTES, VIDEO_PLACEHOLDER, FINAL_README, LABLAB_FIELDS)
         },
         "notes": "Generated placeholder artifacts. Replace visuals before final submission if a designed deck/cover is available.",
     }
@@ -236,6 +325,21 @@ def _manifest(root: Path, slides: list[dict[str, str]]) -> dict[str, object]:
 def _short_note(body: str) -> str:
     compact = " ".join(line.strip() for line in body.splitlines() if line.strip())
     return compact[:220] + ("..." if len(compact) > 220 else "")
+
+
+def _load_status(path: Path) -> dict[str, object]:
+    if not path.exists():
+        return {}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    return payload if isinstance(payload, dict) else {}
+
+
+def _read_text(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
+
+
+def _strip_markdown_title(value: str) -> str:
+    return re.sub(r"^# .+?\n+", "", value.strip(), count=1)
 
 
 if __name__ == "__main__":

@@ -45,6 +45,7 @@ class SubmissionReadinessTests(unittest.TestCase):
         self.assertIn('"ok": true', payload)
         self.assertTrue(Path("submission/final/slides.pdf").exists())
         self.assertTrue(Path("submission/final/cover.png").exists())
+        self.assertTrue(Path("submission/final/lablab-submit-fields.md").exists())
 
     def test_checked_in_strict_mode_is_ok_with_approved_video_placeholder(self) -> None:
         readiness = check_submission_readiness(Path("."), strict=True)
@@ -104,7 +105,6 @@ class SubmissionReadinessTests(unittest.TestCase):
                 "Dockerfile",
             ):
                 shutil.copy2(relative, tmp_root / relative)
-            build_submission_artifacts(tmp_root)
             status_path = tmp_root / "submission" / "final" / "submission-status.json"
             status_path.write_text(
                 "{\n"
@@ -112,12 +112,15 @@ class SubmissionReadinessTests(unittest.TestCase):
                 '  "demo_url": "https://example.com/demo",\n'
                 '  "docker_image": "ghcr.io/rvbernucci/track1-token-router:offline-rc-test",\n'
                 '  "image_audit_status": "green",\n'
+                '  "release_tag": "offline-rc-test",\n'
+                '  "commit_sha": "abc123",\n'
                 '  "repo_url": "https://github.com/rvbernucci/track1-token-router",\n'
                 '  "video_placeholder_approved": true,\n'
                 '  "video_url": ""\n'
                 "}\n",
                 encoding="utf-8",
             )
+            build_submission_artifacts(tmp_root)
 
             readiness = check_submission_readiness(tmp_root, strict=True)
 

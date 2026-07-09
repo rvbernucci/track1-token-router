@@ -186,6 +186,7 @@ def _check_strict_artifacts(root: Path, errors: list[str], warnings: list[str], 
     slides_pdf = final_root / "slides.pdf"
     if not slides_pdf.exists() or slides_pdf.stat().st_size < 100 or not slides_pdf.read_bytes().startswith(b"%PDF-"):
         errors.append("strict: submission/final/slides.pdf must exist and be a valid PDF")
+    _check_lablab_submit_fields(final_root / "lablab-submit-fields.md", status, errors)
     cover_candidates = [final_root / "cover.png", final_root / "cover.jpg", final_root / "cover.jpeg"]
     if not any(path.exists() and path.stat().st_size >= 100 for path in cover_candidates):
         errors.append("strict: submission/final/cover.png or cover.jpg must exist")
@@ -196,6 +197,28 @@ def _check_strict_artifacts(root: Path, errors: list[str], warnings: list[str], 
         errors.append("strict: provide video_url, video MP4, or approved video placeholder")
     if placeholder_ok and not video_url:
         warnings.append("strict: video placeholder is approved but must be replaced before final submission")
+
+
+def _check_lablab_submit_fields(path: Path, status: dict[str, object], errors: list[str]) -> None:
+    if not path.exists():
+        errors.append("strict: missing submission/final/lablab-submit-fields.md")
+        return
+    content = _read(path)
+    required_literals = [
+        "lablab.ai Submission Fields",
+        "Track 1 - Hybrid Token-Efficient Routing Agent",
+        "Public Docker Image",
+        "Image Audit Command",
+        "scripts/competition_submission_audit.py",
+        str(status.get("repo_url") or ""),
+        str(status.get("demo_url") or ""),
+        str(status.get("docker_image") or ""),
+        str(status.get("release_tag") or ""),
+        str(status.get("commit_sha") or ""),
+    ]
+    for literal in required_literals:
+        if literal and literal not in content:
+            errors.append(f"strict: lablab-submit-fields.md missing literal: {literal}")
 
 
 def _is_explicit_ghcr_image(value: str) -> bool:
