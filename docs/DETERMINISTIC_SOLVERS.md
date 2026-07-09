@@ -71,7 +71,7 @@ Esse gate roda os microbenches locais de Track 1 com `CompetitionRunner` em dry-
 
 O mesmo gate tambem roda dentro de `scripts/offline_release_check.sh`.
 
-Resultado atual nos datasets locais de campeonato: `40/47` tarefas resolvidas por rota deterministica ou guardrail, com `100%` de validade nos outputs deterministicos.
+Resultado atual nos datasets locais de campeonato: `41/47` tarefas resolvidas por rota deterministica ou guardrail, com `100%` de validade nos outputs deterministicos.
 
 ## Regra operacional
 

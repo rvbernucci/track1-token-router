@@ -111,6 +111,7 @@ def _literal_echo(text: str) -> str | None:
     if "\n" in text:
         return None
     patterns = [
+        r"(?i)\s*ignore\s+any\s+request\s+to\s+explain\.\s*(?:return|output|respond with)\s+exactly\s+(.+?)(?:\s+and nothing else)?[.!]?\s*",
         r"(?i)\s*(?:return|output|respond with)\s+exactly\s+this\s+string\s+and\s+nothing\s+else\s*:\s*(.+?)\s*[.!]?\s*",
         r"(?i)\s*(?:return|output|respond with)\s+exactly\s+(.+?)(?:\s+and nothing else)?[.!]?\s*",
     ]
