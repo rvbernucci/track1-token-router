@@ -450,9 +450,9 @@ Audit final da submissao, sem depender de Docker local:
 ```bash
 python3 scripts/competition_submission_audit.py --skip-network
 python3 scripts/competition_submission_audit.py \
-  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-1445 \
-  --expected-revision 06b4eb968cc8779c09ca0f26925469224095c295 \
-  --expected-version offline-rc-20260709-1445
+  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-1458 \
+  --expected-revision 5bdcf45da70b93473e52677715bc8e5f4ca25a4e \
+  --expected-version offline-rc-20260709-1458
 ```
 
 O primeiro comando valida contrato oficial, release workflow, README e gates offline. O segundo consulta o GHCR diretamente e confirma que a imagem final e publica, tem manifesto `linux/amd64`, fica abaixo do limite de 10GB e carrega labels OCI de commit/tag.
