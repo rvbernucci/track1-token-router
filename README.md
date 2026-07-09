@@ -199,7 +199,7 @@ python3 -m router ask "What is 2+2?"
 | `M2B_TEMPERATURE` | `0.2` | Temperatura do gerador local M2B. |
 | `M2B_MAX_TOKENS` | `768` | Limite de output do M2B. |
 | `FIREWORKS_BASE_URL` | `https://api.fireworks.ai/inference/v1` | Endpoint Fireworks OpenAI-compatible. |
-| `ALLOWED_MODELS` | vazio | Lista oficial de modelos permitidos injetada pelo harness ACT II. |
+| `ALLOWED_MODELS` | vazio | Lista oficial de modelos permitidos injetada pelo harness ACT II; aceita CSV, espacos/quebras de linha ou JSON array. |
 | `FIREWORKS_MODEL` | vazio | Override local; se vazio, usa o primeiro item de `ALLOWED_MODELS`. |
 | `FIREWORKS_API_KEY` | vazio | API key Fireworks, usada apenas nas sprints remotas. |
 | `FIREWORKS_TIMEOUT_S` | `60` | Timeout por chamada Fireworks. |

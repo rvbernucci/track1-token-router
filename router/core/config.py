@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -92,7 +94,21 @@ def _first_allowed_model(raw: str | None) -> str | None:
 def _allowed_models(raw: str | None) -> list[str]:
     if not raw:
         return []
-    return [normalize_fireworks_model_id(item) for item in raw.split(",") if item.strip()]
+    return [normalize_fireworks_model_id(item) for item in _split_allowed_models(raw)]
+
+
+def _split_allowed_models(raw: str) -> list[str]:
+    stripped = raw.strip()
+    if not stripped:
+        return []
+    if stripped.startswith("["):
+        try:
+            payload = json.loads(stripped)
+        except json.JSONDecodeError:
+            payload = None
+        if isinstance(payload, list):
+            return [str(item).strip() for item in payload if str(item).strip()]
+    return [item for item in re.split(r"[,\s]+", stripped) if item]
 
 
 def _optional_model(raw: str | None) -> str | None:

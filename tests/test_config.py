@@ -54,6 +54,39 @@ class RouterConfigTests(unittest.TestCase):
             ],
         )
 
+    def test_allowed_models_accept_whitespace_and_newlines(self) -> None:
+        with patched_env(
+            FIREWORKS_MODEL=None,
+            ALLOWED_MODELS="minimax-m3\nkimi-k2p7-code gemma-4-31b-it",
+        ):
+            config = RouterConfig.from_env()
+
+        self.assertEqual(
+            config.allowed_models,
+            [
+                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
+                "accounts/fireworks/models/gemma-4-31b-it",
+            ],
+        )
+
+    def test_allowed_models_accept_json_array(self) -> None:
+        with patched_env(
+            FIREWORKS_MODEL=None,
+            ALLOWED_MODELS='["minimax-m3", "kimi-k2p7-code", "gemma-4-31b-it"]',
+        ):
+            config = RouterConfig.from_env()
+
+        self.assertEqual(config.fireworks_model, "accounts/fireworks/models/minimax-m3")
+        self.assertEqual(
+            config.allowed_models,
+            [
+                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
+                "accounts/fireworks/models/gemma-4-31b-it",
+            ],
+        )
+
     def test_short_fireworks_model_name_is_normalized(self) -> None:
         with patched_env(
             FIREWORKS_MODEL="gemma-4-31b-it-nvfp4",
