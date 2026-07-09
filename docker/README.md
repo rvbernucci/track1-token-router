@@ -30,6 +30,15 @@ git push origin offline-rc-YYYYMMDD-HHMM
 docker pull ghcr.io/rvbernucci/track1-token-router:offline-rc-YYYYMMDD-HHMM
 ```
 
+If Docker is not available locally, verify the registry artifact directly:
+
+```bash
+python3 scripts/competition_submission_audit.py \
+  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-YYYYMMDD-HHMM
+```
+
+The audit checks public pullability, `linux/amd64`, and the 10GB image limit.
+
 ## Smoke tests
 
 ```bash

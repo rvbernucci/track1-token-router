@@ -39,6 +39,7 @@ Checks principais:
 ```bash
 python3 -m unittest discover -s tests
 python3 scripts/track1_deterministic_coverage.py --check
+python3 scripts/competition_submission_audit.py --skip-network
 scripts/offline_release_check.sh
 python3 scripts/secret_scan.py
 git diff --check
@@ -51,6 +52,7 @@ make setup
 make smoke
 make test
 make deterministic-coverage
+make submission-audit
 make release-check
 make doctor
 ```
@@ -436,6 +438,16 @@ python3 scripts/generate_release_notes.py \
 ```
 
 Publicacao GHCR fica em `.github/workflows/release.yml` e acontece apenas em tags `v*` ou `offline-*`.
+
+Audit final da submissao, sem depender de Docker local:
+
+```bash
+python3 scripts/competition_submission_audit.py --skip-network
+python3 scripts/competition_submission_audit.py \
+  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-0215
+```
+
+O primeiro comando valida contrato oficial, release workflow, README e gates offline. O segundo consulta o GHCR diretamente e confirma que a imagem final e publica, tem manifesto `linux/amd64` e fica abaixo do limite de 10GB.
 
 ## Estrategia de token efficiency
 

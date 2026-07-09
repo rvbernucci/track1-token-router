@@ -2,7 +2,7 @@ PYTHON ?= python3
 VENV ?= .venv
 VENV_PYTHON := $(VENV)/bin/python
 
-.PHONY: setup smoke test official-smoke deterministic-coverage release-check secret-scan diff-check doctor amd-doctor amd-bootstrap matrix-fit
+.PHONY: setup smoke test official-smoke deterministic-coverage submission-audit release-check secret-scan diff-check doctor amd-doctor amd-bootstrap matrix-fit
 
 setup:
 	$(PYTHON) -m venv $(VENV)
@@ -19,6 +19,9 @@ official-smoke:
 
 deterministic-coverage:
 	$(PYTHON) scripts/track1_deterministic_coverage.py --check
+
+submission-audit:
+	$(PYTHON) scripts/competition_submission_audit.py $(if $(IMAGE),--image $(IMAGE),)
 
 release-check:
 	scripts/offline_release_check.sh

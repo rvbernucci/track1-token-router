@@ -48,6 +48,15 @@ docker pull ghcr.io/rvbernucci/track1-token-router:offline-rc-YYYYMMDD-HHMM
 
 If GHCR shows the package as private, make the package public in GitHub Packages before submitting the image URL.
 
+When Docker is unavailable locally, use the submission audit instead:
+
+```bash
+python3 scripts/competition_submission_audit.py \
+  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-YYYYMMDD-HHMM
+```
+
+This validates the public registry manifest, `linux/amd64`, and the 10GB compressed image limit.
+
 ## Safety rules
 
 - Normal pushes to `main` do not publish an image.

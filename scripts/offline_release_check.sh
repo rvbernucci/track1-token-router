@@ -24,6 +24,7 @@ python3 scripts/generate_release_notes.py --tag offline-dry-run --output reports
 python3 scripts/adapter_drill.py --check >/dev/null
 python3 scripts/battle_drill.py >/dev/null
 python3 scripts/track1_deterministic_coverage.py --check >/dev/null
+python3 scripts/competition_submission_audit.py --skip-network >/dev/null
 python3 scripts/bad_local_model_drill.py --check >/dev/null
 python3 scripts/run_semantic_eval.py --check >/dev/null
 python3 scripts/batch_stress.py --check >/dev/null
