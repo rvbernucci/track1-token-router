@@ -4,6 +4,8 @@ from pathlib import Path
 
 from router.core.contracts import TaskEnvelope
 from router.orchestration.matrix_regression_selector import (
+    FEATURE_NAMES,
+    MatrixRegressionWeights,
     RegressionTask,
     fit_matrix_regression,
     load_weights,
@@ -94,7 +96,38 @@ class MatrixRegressionSelectorTests(unittest.TestCase):
         self.assertEqual(loaded.feature_names, weights.feature_names)
         self.assertEqual(loaded.training_rows, weights.training_rows)
         self.assertEqual(loaded.observed_models, weights.observed_models)
+        self.assertEqual(loaded.domain_model_stats, weights.domain_model_stats)
         self.assertEqual(len(loaded.coefficients), len(weights.coefficients))
+
+    def test_fit_records_domain_model_empirical_stats(self) -> None:
+        tasks = {
+            "logic": RegressionTask(
+                id="logic",
+                prompt="All daxes are lims. No lims are vors. Can a dax be a vor?",
+                domain="logic",
+                tier="strong",
+            )
+        }
+        rows = [
+            _row("logic", "accounts/fireworks/models/minimax-m3", True, 0.00004, 900, tokens=80),
+            _row("logic", "accounts/fireworks/models/kimi-k2p7-code", False, 0.00004, 900, tokens=80),
+        ]
+
+        weights = fit_matrix_regression(
+            rows,
+            tasks,
+            allowed_models=[
+                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
+            ],
+        )
+
+        self.assertIsNotNone(weights.domain_model_stats)
+        assert weights.domain_model_stats is not None
+        self.assertEqual(weights.domain_model_stats["logic"]["accounts/fireworks/models/minimax-m3"]["calls"], 1.0)
+        self.assertEqual(weights.domain_model_stats["logic"]["accounts/fireworks/models/minimax-m3"]["valid"], 1.0)
+        self.assertEqual(weights.domain_model_stats["logic"]["accounts/fireworks/models/kimi-k2p7-code"]["valid"], 0.0)
+        self.assertIn("__overall__", weights.domain_model_stats)
 
     def test_selection_filters_unobserved_allowed_models_when_possible(self) -> None:
         tasks = {
@@ -162,6 +195,54 @@ class MatrixRegressionSelectorTests(unittest.TestCase):
             selection["ranked_candidates"][1]["regression_utility"],
         )
 
+    def test_empirical_domain_risk_can_override_cheaper_base_score(self) -> None:
+        weights = MatrixRegressionWeights(
+            feature_names=FEATURE_NAMES,
+            coefficients=[0.0 for _ in FEATURE_NAMES],
+            ridge_lambda=0.35,
+            training_rows=24,
+            target_mean=0.90,
+            observed_models=[
+                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
+            ],
+            domain_model_stats={
+                "current_factual": {
+                    "accounts/fireworks/models/minimax-m3": {
+                        "calls": 12.0,
+                        "valid": 12.0,
+                        "valid_rate": 1.0,
+                        "valid_rate_smoothed": 0.98,
+                        "confidence": 0.75,
+                    },
+                    "accounts/fireworks/models/kimi-k2p7-code": {
+                        "calls": 12.0,
+                        "valid": 3.0,
+                        "valid_rate": 0.25,
+                        "valid_rate_smoothed": 0.35,
+                        "confidence": 0.75,
+                    },
+                }
+            },
+        )
+
+        selection = select_model_by_matrix_regression(
+            TaskEnvelope(input_text="Who wrote Pride and Prejudice? Return only the author name."),
+            ["minimax-m3", "kimi-k2p7-code"],
+            weights,
+        )
+
+        self.assertEqual(selection["model"], "accounts/fireworks/models/minimax-m3")
+        self.assertGreater(
+            selection["ranked_candidates"][0]["hybrid_score"],
+            selection["ranked_candidates"][1]["hybrid_score"],
+        )
+        self.assertGreater(
+            selection["ranked_candidates"][1]["base_hybrid_score"],
+            selection["ranked_candidates"][1]["hybrid_score"],
+        )
+        self.assertEqual(selection["ranked_candidates"][0]["empirical_calls"], 12.0)
+
 
 def _row(task_id: str, model: str, valid: bool, cost: float, latency_ms: int, *, tokens: int = 100) -> dict[str, object]:
     return {
@@ -197,6 +278,11 @@ class CheckedInTrack1WeightsTests(unittest.TestCase):
             },
         )
         self.assertEqual(selection["selection_rule"], "matrix_regression_plus_nash")
+        self.assertGreaterEqual(weights.training_rows, 100)
+        self.assertIsNotNone(weights.domain_model_stats)
+        assert weights.domain_model_stats is not None
+        self.assertIn("summarization", weights.domain_model_stats)
+        self.assertIn("accounts/fireworks/models/kimi-k2p7-code", weights.domain_model_stats["summarization"])
 
     def test_checked_in_track1_weights_route_common_hidden_variants(self) -> None:
         weights = load_weights(Path("router/data/fireworks_track1_allowed_weights.json"))
@@ -211,6 +297,11 @@ class CheckedInTrack1WeightsTests(unittest.TestCase):
             (
                 "Summarize in at most 8 words: Token-efficient routing preserves accuracy while reducing paid model calls.",
                 "summarization",
+                "accounts/fireworks/models/kimi-k2p7-code",
+            ),
+            (
+                "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The UI looks elegant, but the export failed twice and wasted my time.",
+                "classification",
                 "accounts/fireworks/models/kimi-k2p7-code",
             ),
             (

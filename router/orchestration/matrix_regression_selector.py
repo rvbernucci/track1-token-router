@@ -71,6 +71,7 @@ class MatrixRegressionWeights:
     training_rows: int
     target_mean: float
     observed_models: list[str] | None = None
+    domain_model_stats: dict[str, dict[str, dict[str, float]]] | None = None
 
     def predict(self, features: list[float]) -> float:
         return sum(coefficient * value for coefficient, value in zip(self.coefficients, features))
@@ -87,6 +88,7 @@ class MatrixRegressionWeights:
             training_rows=int(payload["training_rows"]),
             target_mean=float(payload["target_mean"]),
             observed_models=[str(value) for value in payload.get("observed_models") or []] or None,
+            domain_model_stats=_coerce_domain_model_stats(payload.get("domain_model_stats")),
         )
 
 
@@ -106,6 +108,7 @@ def fit_matrix_regression(
     matrix: list[list[float]] = []
     targets: list[float] = []
     observed_models: set[str] = set()
+    stats_accumulator: dict[str, dict[str, dict[str, float]]] = {}
     for row in rows:
         task = tasks.get(str(row["id"]))
         if task is None:
@@ -117,6 +120,8 @@ def fit_matrix_regression(
         tier = task.tier or _task_profile(task.prompt).tier
         domain = _normalize_domain(task.domain or _task_profile(task.prompt).domain)
         reasoning_effort = _row_reasoning_effort(row)
+        _add_domain_model_stat(stats_accumulator, domain, candidate.model, row)
+        _add_domain_model_stat(stats_accumulator, "__overall__", candidate.model, row)
         matrix.append(_feature_vector(candidate, tier, domain, reasoning_effort))
         targets.append(_target(row, cost_bounds, token_bounds, latency_bounds))
     if not matrix:
@@ -129,6 +134,7 @@ def fit_matrix_regression(
         training_rows=len(matrix),
         target_mean=sum(targets) / len(targets),
         observed_models=sorted(observed_models),
+        domain_model_stats=_finalize_domain_model_stats(stats_accumulator),
     )
 
 
@@ -159,23 +165,32 @@ def select_model_by_matrix_regression(
         regression_score = weights.predict(features)
         regression_utility = _clamp(regression_score, 0.0, 1.0)
         score_weights = _hybrid_score_weights(task_profile.tier)
-        hybrid_score = (
+        empirical = _empirical_stats_for(weights, task_profile.domain, candidate.model)
+        empirical_utility = empirical["valid_rate_smoothed"]
+        empirical_confidence = empirical["confidence"]
+        base_hybrid_score = (
             (score_weights["regression"] * regression_utility)
             + (score_weights["nash"] * candidate.nash_product)
             + (score_weights["token"] * candidate.token_utility)
             + (score_weights["cost"] * candidate.cost_utility)
         )
+        hybrid_score = _risk_adjusted_score(base_hybrid_score, empirical_utility, empirical_confidence)
         scored.append(
             {
                 "model": candidate.model,
                 "regression_score": regression_score,
                 "regression_utility": regression_utility,
+                "base_hybrid_score": base_hybrid_score,
                 "hybrid_score": hybrid_score,
                 "hybrid_score_weights": score_weights,
                 "nash_product": candidate.nash_product,
                 "estimated_total_tokens": candidate.estimated_total_tokens,
                 "token_utility": candidate.token_utility,
                 "estimated_cost_usd": candidate.estimated_cost_usd,
+                "empirical_valid_rate": empirical["valid_rate"],
+                "empirical_valid_rate_smoothed": empirical_utility,
+                "empirical_confidence": empirical_confidence,
+                "empirical_calls": empirical["calls"],
                 "features": dict(zip(FEATURE_NAMES, features)),
             }
         )
@@ -368,6 +383,116 @@ def _model_family(model: str) -> str:
     if "qwen" in lowered:
         return "qwen"
     return "other"
+
+
+def _add_domain_model_stat(
+    accumulator: dict[str, dict[str, dict[str, float]]],
+    domain: str,
+    model: str,
+    row: dict[str, Any],
+) -> None:
+    stats = accumulator.setdefault(domain, {}).setdefault(
+        model,
+        {
+            "calls": 0.0,
+            "valid": 0.0,
+            "tokens": 0.0,
+            "cost": 0.0,
+            "latency_ms": 0.0,
+        },
+    )
+    stats["calls"] += 1.0
+    stats["valid"] += 1.0 if row.get("valid") else 0.0
+    stats["tokens"] += _row_token_total(row)
+    stats["cost"] += float(row.get("estimated_cost_usd") or 0.0)
+    stats["latency_ms"] += float(row.get("latency_ms") or 0.0)
+
+
+def _finalize_domain_model_stats(
+    accumulator: dict[str, dict[str, dict[str, float]]],
+    *,
+    prior_strength: float = 4.0,
+) -> dict[str, dict[str, dict[str, float]]]:
+    global_valid = sum(stats["valid"] for models in accumulator.values() for stats in models.values() if models)
+    global_calls = sum(stats["calls"] for models in accumulator.values() for stats in models.values() if models)
+    global_rate = (global_valid / global_calls) if global_calls else 0.75
+    finalized: dict[str, dict[str, dict[str, float]]] = {}
+    for domain, models in accumulator.items():
+        finalized[domain] = {}
+        for model, stats in models.items():
+            calls = stats["calls"]
+            valid = stats["valid"]
+            valid_rate = valid / calls if calls else global_rate
+            finalized[domain][model] = {
+                "calls": calls,
+                "valid": valid,
+                "valid_rate": valid_rate,
+                "valid_rate_smoothed": ((valid + (prior_strength * global_rate)) / (calls + prior_strength))
+                if calls
+                else global_rate,
+                "confidence": calls / (calls + prior_strength) if calls else 0.0,
+                "avg_total_tokens": stats["tokens"] / calls if calls else 0.0,
+                "avg_cost_usd": stats["cost"] / calls if calls else 0.0,
+                "avg_latency_ms": stats["latency_ms"] / calls if calls else 0.0,
+            }
+    return finalized
+
+
+def _empirical_stats_for(weights: MatrixRegressionWeights, domain: str, model: str) -> dict[str, float]:
+    stats = weights.domain_model_stats or {}
+    normalized_domain = _normalize_domain(domain)
+    fallback = {
+        "calls": 0.0,
+        "valid": 0.0,
+        "valid_rate": weights.target_mean,
+        "valid_rate_smoothed": weights.target_mean,
+        "confidence": 0.0,
+        "avg_total_tokens": 0.0,
+        "avg_cost_usd": 0.0,
+        "avg_latency_ms": 0.0,
+    }
+    row = stats.get(normalized_domain, {}).get(model)
+    if row is None:
+        row = stats.get("__overall__", {}).get(model)
+    if row is None:
+        return fallback
+    return {
+        "calls": float(row.get("calls") or 0.0),
+        "valid": float(row.get("valid") or 0.0),
+        "valid_rate": float(row.get("valid_rate") or 0.0),
+        "valid_rate_smoothed": float(row.get("valid_rate_smoothed") or weights.target_mean),
+        "confidence": float(row.get("confidence") or 0.0),
+        "avg_total_tokens": float(row.get("avg_total_tokens") or 0.0),
+        "avg_cost_usd": float(row.get("avg_cost_usd") or 0.0),
+        "avg_latency_ms": float(row.get("avg_latency_ms") or 0.0),
+    }
+
+
+def _risk_adjusted_score(base_score: float, empirical_utility: float, empirical_confidence: float) -> float:
+    confidence = _clamp(empirical_confidence, 0.0, 1.0)
+    utility = _clamp(empirical_utility, 0.0, 1.0)
+    reward = 0.08 * confidence * max(0.0, utility - 0.90)
+    penalty = 0.18 * confidence * max(0.0, 0.92 - utility)
+    return base_score + reward - penalty
+
+
+def _coerce_domain_model_stats(value: object) -> dict[str, dict[str, dict[str, float]]] | None:
+    if not isinstance(value, dict):
+        return None
+    coerced: dict[str, dict[str, dict[str, float]]] = {}
+    for domain, models in value.items():
+        if not isinstance(models, dict):
+            continue
+        coerced[str(domain)] = {}
+        for model, stats in models.items():
+            if not isinstance(stats, dict):
+                continue
+            coerced[str(domain)][str(model)] = {
+                str(key): float(number)
+                for key, number in stats.items()
+                if isinstance(number, int | float)
+            }
+    return coerced or None
 
 
 def _ridge_regression(matrix: list[list[float]], targets: list[float], ridge_lambda: float) -> list[float]:

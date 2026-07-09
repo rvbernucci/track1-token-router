@@ -1,43 +1,265 @@
 {
   "coefficients": [
-    0.8408925056546235,
-    0.028128522620482377,
-    -0.008277784277334074,
-    0.030407667759150676,
-    -0.0022791451386551874,
-    0.012230688756730354,
-    -0.00016444951829107282,
-    0.026021035916262966,
-    -0.0505610129787542,
-    -0.016149353834434232,
-    0.004182736585947385,
-    -0.003688167547919531,
-    -0.06506549722491736,
-    0.17108582867272248,
-    0.00031801886515468627,
-    -0.014310848935089332,
-    -0.0187250147269899,
-    0.014310848934981904,
-    -0.004118777598046185,
-    0.016381806408126715,
+    0.8991061983809396,
+    0.009466243188091882,
+    -0.008610447777493976,
+    0.013113242463003327,
+    -0.0036469992749091247,
+    0.017103782090129974,
+    0.04762327052021246,
+    -0.03731170612368914,
+    -0.04011339053583992,
+    -0.011655931436904606,
+    0.029491070062715688,
+    -0.01460333776467427,
+    -0.18091836682307022,
+    0.09161320249018193,
+    0.000497787288999764,
+    0.004126089744429638,
+    0.050583740017804725,
+    0.022400428006024264,
+    0.038608101892509405,
+    -0.004383206343230704,
     0.0,
     0.0,
-    -0.015900943261162172,
-    0.01590094326122166,
+    -0.024889364451216884,
+    0.024889364451323837,
     0.0,
-    0.0156860880553049,
-    0.017818831685305955,
-    0.012813927266762167,
-    0.047996799477828506,
-    -0.003455399298568343,
-    -0.03396818551973841,
-    -0.008631190680814799,
-    -0.09855781245658601,
-    0.008277784277372009,
+    0.055219135613083836,
+    0.014975961715042724,
+    0.02862275388217921,
+    0.0492266063617719,
+    -0.03811535352295279,
+    -0.02663189315194753,
+    0.0008683161805389094,
+    -0.0893399968976209,
+    0.008610447777572238,
     0.0,
     0.0,
-    -0.008277784277334155
+    -0.008610447777494215
   ],
+  "domain_model_stats": {
+    "__overall__": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "avg_cost_usd": 0.00018327830188679244,
+        "avg_latency_ms": 2303.1509433962265,
+        "avg_total_tokens": 93.94339622641509,
+        "calls": 53.0,
+        "confidence": 0.9298245614035088,
+        "valid": 52.0,
+        "valid_rate": 0.9811320754716981,
+        "valid_rate_smoothed": 0.98110661268556
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "avg_cost_usd": 8.355882352941174e-05,
+        "avg_latency_ms": 1825.3921568627452,
+        "avg_total_tokens": 191.94117647058823,
+        "calls": 51.0,
+        "confidence": 0.9272727272727272,
+        "valid": 50.0,
+        "valid_rate": 0.9803921568627451,
+        "valid_rate_smoothed": 0.9804195804195803
+      }
+    },
+    "classification": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "avg_cost_usd": 7.180833333333334e-05,
+        "avg_latency_ms": 3529.0,
+        "avg_total_tokens": 69.16666666666667,
+        "calls": 6.0,
+        "confidence": 0.6,
+        "valid": 6.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9923076923076923
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "avg_cost_usd": 5.105e-05,
+        "avg_latency_ms": 1376.3333333333333,
+        "avg_total_tokens": 164.16666666666666,
+        "calls": 6.0,
+        "confidence": 0.6,
+        "valid": 6.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9923076923076923
+      }
+    },
+    "code_debug": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "avg_cost_usd": 0.00043105999999999993,
+        "avg_latency_ms": 3145.6,
+        "avg_total_tokens": 164.8,
+        "calls": 5.0,
+        "confidence": 0.5555555555555556,
+        "valid": 5.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9914529914529915
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "avg_cost_usd": 0.000137925,
+        "avg_latency_ms": 1913.25,
+        "avg_total_tokens": 250.5,
+        "calls": 4.0,
+        "confidence": 0.5,
+        "valid": 4.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9903846153846154
+      }
+    },
+    "code_generation": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "avg_cost_usd": 0.00034111000000000005,
+        "avg_latency_ms": 2187.2,
+        "avg_total_tokens": 132.4,
+        "calls": 5.0,
+        "confidence": 0.5555555555555556,
+        "valid": 5.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9914529914529915
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "avg_cost_usd": 0.00012431999999999998,
+        "avg_latency_ms": 1851.0,
+        "avg_total_tokens": 231.4,
+        "calls": 5.0,
+        "confidence": 0.5555555555555556,
+        "valid": 5.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9914529914529915
+      }
+    },
+    "current_factual": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "avg_cost_usd": 6.31625e-05,
+        "avg_latency_ms": 1475.25,
+        "avg_total_tokens": 55.25,
+        "calls": 4.0,
+        "confidence": 0.5,
+        "valid": 4.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9903846153846154
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "avg_cost_usd": 4.7175e-05,
+        "avg_latency_ms": 1839.25,
+        "avg_total_tokens": 149.0,
+        "calls": 4.0,
+        "confidence": 0.5,
+        "valid": 4.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9903846153846154
+      }
+    },
+    "extraction": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "avg_cost_usd": 0.00012131428571428571,
+        "avg_latency_ms": 1946.7142857142858,
+        "avg_total_tokens": 80.0,
+        "calls": 7.0,
+        "confidence": 0.6363636363636364,
+        "valid": 6.0,
+        "valid_rate": 0.8571428571428571,
+        "valid_rate_smoothed": 0.9020979020979021
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "avg_cost_usd": 6.39e-05,
+        "avg_latency_ms": 1578.857142857143,
+        "avg_total_tokens": 172.71428571428572,
+        "calls": 7.0,
+        "confidence": 0.6363636363636364,
+        "valid": 7.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.993006993006993
+      }
+    },
+    "formatting": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "avg_cost_usd": 8.09e-05,
+        "avg_latency_ms": 2275.4,
+        "avg_total_tokens": 61.4,
+        "calls": 5.0,
+        "confidence": 0.5555555555555556,
+        "valid": 5.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9914529914529915
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "avg_cost_usd": 5.364e-05,
+        "avg_latency_ms": 2259.2,
+        "avg_total_tokens": 156.6,
+        "calls": 5.0,
+        "confidence": 0.5555555555555556,
+        "valid": 5.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9914529914529915
+      }
+    },
+    "logic": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "avg_cost_usd": 0.00024719285714285715,
+        "avg_latency_ms": 2088.714285714286,
+        "avg_total_tokens": 111.14285714285714,
+        "calls": 7.0,
+        "confidence": 0.6363636363636364,
+        "valid": 7.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.993006993006993
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "avg_cost_usd": 0.00014079999999999998,
+        "avg_latency_ms": 2964.8333333333335,
+        "avg_total_tokens": 246.83333333333334,
+        "calls": 6.0,
+        "confidence": 0.6,
+        "valid": 6.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9923076923076923
+      }
+    },
+    "math_reasoning": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "avg_cost_usd": 0.00018128000000000003,
+        "avg_latency_ms": 1671.1,
+        "avg_total_tokens": 92.9,
+        "calls": 10.0,
+        "confidence": 0.7142857142857143,
+        "valid": 10.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9945054945054945
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "avg_cost_usd": 7.986000000000001e-05,
+        "avg_latency_ms": 1499.8,
+        "avg_total_tokens": 190.9,
+        "calls": 10.0,
+        "confidence": 0.7142857142857143,
+        "valid": 10.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9945054945054945
+      }
+    },
+    "summarization": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "avg_cost_usd": 9.313750000000001e-05,
+        "avg_latency_ms": 2998.0,
+        "avg_total_tokens": 70.75,
+        "calls": 4.0,
+        "confidence": 0.5,
+        "valid": 4.0,
+        "valid_rate": 1.0,
+        "valid_rate_smoothed": 0.9903846153846154
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "avg_cost_usd": 5.8575e-05,
+        "avg_latency_ms": 1359.25,
+        "avg_total_tokens": 166.75,
+        "calls": 4.0,
+        "confidence": 0.5,
+        "valid": 3.0,
+        "valid_rate": 0.75,
+        "valid_rate_smoothed": 0.8653846153846154
+      }
+    }
+  },
   "feature_names": [
     "bias",
     "tier_cheap",
@@ -82,6 +304,6 @@
     "accounts/fireworks/models/minimax-m3"
   ],
   "ridge_lambda": 0.35,
-  "target_mean": 0.940024983210423,
-  "training_rows": 76
+  "target_mean": 0.9334757142113416,
+  "training_rows": 104
 }

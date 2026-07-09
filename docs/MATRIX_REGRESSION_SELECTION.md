@@ -78,28 +78,31 @@ A ideia competitiva e simples: em tarefa forte, primeiro passar pelo accuracy ga
 - Fit offline: `scripts/fit_fireworks_matrix_regression.py`
 - Pesos Track 1 usados no Docker: `router/data/fireworks_track1_allowed_weights.json`
 - Relatorio Track 1: `reports/generated/fireworks-track1-allowed-20260709-regression.md`
-- Resultados Fireworks reais: `reports/generated/fireworks-track1-category-20260709-results.jsonl`, `reports/generated/fireworks-hidden-variant-results.jsonl`, `reports/generated/fireworks-championship-results.jsonl`
+- Resultados Fireworks reais: `reports/generated/fireworks-track1-category-20260709-results.jsonl`, `reports/generated/fireworks-hidden-variant-results.jsonl`, `reports/generated/fireworks-championship-results.jsonl`, `reports/generated/fireworks-frontier-20260709-results.jsonl`
 
 ## Resultado Atual
 
-Treino Track 1 permitido com `76` linhas uteis, filtradas de `339` linhas brutas:
+Treino Track 1 permitido com `104` linhas uteis, filtradas de `367` linhas brutas:
 
 - `minimax-m3`
 - `kimi-k2p7-code`
 
 As linhas `ok=false` sao excluidas por padrao para nao confundir erro de acesso/transporte com qualidade do modelo. Os pesos tambem registram `observed_models`; no runtime matricial, modelos permitidos mas sem nenhuma chamada concluida no treino sao filtrados quando ha alternativa observada. Isso evita escolher Gemma cegamente enquanto os IDs serverless seguem retornando `404` na chave local.
 
+Os pesos agora tambem registram uma matriz empirica `domain_model_stats`. No runtime, cada candidato recebe ajuste por taxa de validade suavizada e confianca por dominio/modelo. Isso evita que uma opcao barata com historico ruim no dominio vire estrategia dominante so por custo/tokens.
+
 Top coeficientes aprendidos no fit atual:
 
 | Feature | Sinal |
 | --- | ---: |
 | `bias` | positivo |
-| `correlation` | positivo |
-| `interaction_minimax_extraction` | positivo |
-| `interaction_kimi_extraction` | negativo |
 | `capability` | negativo no fit pequeno |
-| `domain_extraction` | negativo no fit pequeno |
-| `domain_formatting` | positivo |
+| `correlation` | positivo |
+| `interaction_kimi_extraction` | negativo |
+| `interaction_minimax_math` | positivo |
+| `token_utility` | positivo |
+| `interaction_minimax_extraction` | positivo |
+| `domain_logic` | positivo |
 | `interaction_kimi_code_debug` | negativo |
 
 Replay atual:
@@ -113,14 +116,14 @@ Replay atual:
 | `code_gen_clamp` | `minimax-m3` |
 | `math_discount_fee` | `minimax-m3` |
 | `ner_money_date` | `minimax-m3` |
-| `sentiment_positive` | `minimax-m3` |
+| `sentiment_positive` | `kimi-k2p7-code` |
 
 ## Leitura Competitiva
 
 A regressao confirmou alguns sinais fortes:
 
-- `minimax-m3` e o melhor default empirico para a maioria dos dominios Track 1 observados;
-- `kimi-k2p7-code` deve vencer em factual QA e summarization quando ambos passam, porque os resultados pagos observaram menor `usage.total` nesses dominios;
+- `minimax-m3` continua forte em math, logic, code generation, code debugging e extraction quando o score calibrado favorece robustez/custo;
+- `kimi-k2p7-code` deve vencer em factual QA, summarization e classificacoes curtas quando ambos passam, porque os resultados pagos observaram menor `usage.total` e respostas mais concisas nesses dominios;
 - Gemma serverless segue indisponivel na chave local, entao o runner precisa tentar, cachear 404 e seguir sem travar;
 - interacoes familia x dominio sao necessarias, porque uma media global por modelo esconde especializacoes.
 
@@ -130,8 +133,8 @@ O dataset ainda e pequeno, mas a regressao agora esta ativa como camada de calib
 
 Principal lacuna:
 
-- a estimativa runtime de tokens ainda e aproximada por perfil;
-- o microbench mostrou que tokenizacao e verbosidade real variam por familia;
+- a estimativa runtime de tokens ainda e aproximada por perfil, apesar de agora haver stats reais por dominio/modelo;
+- o microbench frontier mostrou que verbosidade real varia por familia e por formato de pergunta;
 - proximo passo e regressao dedicada de `observed_completion_tokens` por modelo/dominio/modo de reasoning.
 
 ## Proximo Passo

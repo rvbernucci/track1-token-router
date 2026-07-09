@@ -6,6 +6,8 @@ Primary dataset: `evals/fireworks-pareto/track1-category-microbench.jsonl`
 
 Hidden-variant dataset: `evals/fireworks-pareto/hidden-variant-microbench.jsonl`
 
+Frontier dataset: `evals/fireworks-pareto/frontier-microbench.jsonl`
+
 Command shape:
 
 ```bash
@@ -23,11 +25,17 @@ Latest hidden-variant result file: `reports/generated/fireworks-hidden-variant-r
 
 Latest championship result file: `reports/generated/fireworks-championship-results.jsonl`
 
+Latest frontier result file: `reports/generated/fireworks-frontier-20260709-results.jsonl`
+
 Latest primary report: `reports/generated/fireworks-track1-category-20260709-report.md`
 
 Latest hidden-variant report: `reports/generated/fireworks-hidden-variant-report.md`
 
-Actual estimated spend: `$0.00448690` primary + `$0.00213260` hidden variants = `$0.00661950`.
+Latest frontier report: `reports/generated/fireworks-frontier-20260709-report.md`
+
+Actual estimated spend for primary + hidden + frontier: `$0.00448690 + $0.00213260 + $0.00418060 = $0.01080010`.
+
+Total aggregated historical result spend in the leaderboard is `$0.04465962`.
 
 ## Aggregate Results
 
@@ -43,7 +51,8 @@ Actual estimated spend: `$0.00448690` primary + `$0.00213260` hidden variants = 
 
 - `minimax-m3` is the current cheapest high-accuracy Fireworks fallback among accessible Track 1 allowed models.
 - `kimi-k2p7-code` is more expensive and slower, but it was the only accessible model with `16/16` valid answers in this run.
-- Domain winner policy changed: `kimi-k2p7-code` is preferred for `code_debug`; `minimax-m3` is preferred for code generation, math, logic, factual, sentiment, summarization and NER unless future calibration says otherwise.
+- Frontier rerun with 28 focused calls passed `27/28`; `kimi-k2p7-code` passed `14/14` with `1397` tokens, while `minimax-m3` passed `13/14` with `2846` tokens.
+- Domain policy changed again after frontier: `kimi-k2p7-code` is preferred for factual QA, summarization, classification and compact formatting; `minimax-m3` remains preferred for math, logic, code generation, code debugging and extraction unless future calibration says otherwise.
 - Hidden-variant rerun: both accessible models passed `8/8`; `minimax-m3` cost `$0.00070650`, while `kimi-k2p7-code` cost `$0.00142610`.
 - The three Gemma serverless IDs returned `HTTP 404 Not Found` with the current local Fireworks key.
 - Gemma should remain in the architecture through AMD local inference and should still be attempted when the official harness exposes it, but repeated 404s should be cached and skipped within a batch.
@@ -55,11 +64,11 @@ After tightening the `ner_money_date` prompt to require date and amount exactly 
 
 - Use local Gemma first when an AMD pod endpoint is available and validated.
 - In Fireworks-only mode, the Docker image now enables `FIREWORKS_MATRIX_WEIGHTS=/app/router/data/fireworks_track1_allowed_weights.json` by default.
-- The checked-in matrix weights now use `76` completed, deduplicated, observed Track 1 rows from category, hidden-variant, and championship result files.
+- The checked-in matrix weights now use `104` completed, deduplicated, observed Track 1 rows from category, hidden-variant, championship, and frontier result files.
 - Transport/access failures such as Gemma `404` are excluded from quality fitting by default. The weights record `observed_models`, and the matrix selector filters unobserved allowed models when observed alternatives exist.
-- The matrix selector uses ridge-regression utility plus Nash welfare, with an explicit token-efficiency utility because Track 1 ranks by Fireworks token count after the accuracy gate.
+- The matrix selector uses ridge-regression utility plus Nash welfare, explicit token-efficiency utility, and smoothed empirical validity by domain/model because Track 1 ranks by Fireworks token count after the accuracy gate.
 - Keep `minimax-m3` as the preferred remote candidate for math, code, and logic domains where the calibrated score still favors robustness/cost balance.
-- Prefer `kimi-k2p7-code` for factual QA and summarization when both observed models are valid, because the paid microbenches showed lower `usage.total` in those domains.
+- Prefer `kimi-k2p7-code` for factual QA, summarization, classification and compact formatting when both observed models are valid, because the paid microbenches showed lower `usage.total` and concise outputs in those domains.
 - Keep Gemma IDs in `ALLOWED_MODELS` support, but cache unavailable-model errors per runner instance so one inaccessible Gemma endpoint does not cause repeated latency across the whole evaluator batch.
 
 ## Classifier Hardening
@@ -68,7 +77,7 @@ The pre-routing classifier now treats common hidden-evaluator variants as their 
 
 - direct arithmetic prompts such as `Compute 17 * 6 + 4` map to `math_reasoning` instead of `formatting`;
 - numeric JSON prompts such as `Given values [...], return min and max` map to `math_reasoning` even when they request minified JSON;
-- `Fix this Python code...` maps to `code_debug`, preserving the calibrated Kimi preference;
+- `Fix this Python code...` maps to `code_debug`, preserving the calibrated Minimax preference;
 - `Write a Python function...` maps to `code_generation`, preserving the calibrated Minimax preference.
 - quantified logic prompts such as `All merls are... Is it guaranteed... Return exactly yes or no` map to `logic` instead of `formatting`.
 

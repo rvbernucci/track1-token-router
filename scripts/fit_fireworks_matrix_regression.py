@@ -146,14 +146,40 @@ def _render_report(
     ]
     for name, coefficient in sorted(zip(FEATURE_NAMES, weights.coefficients), key=lambda pair: abs(pair[1]), reverse=True):
         lines.append(f"| `{name}` | {coefficient:.5f} |")
+    lines.extend(["", "## Empirical Domain Matrix", ""])
+    lines.extend(_domain_matrix_lines(weights))
     lines.extend(["", "## Selection Replay", ""])
     lines.extend(_selection_replay_lines(rows, tasks, models, weights))
     lines.extend(["", "## Interpretation", ""])
     lines.append("- Positive coefficients increase the learned utility for a model/task pair.")
     lines.append("- Negative coefficients reduce utility and usually indicate observed failures, overthinking, cost drag, or mode mismatch.")
-    lines.append("- This is an experimental calibration layer; it should not replace the Nash router until the dataset is larger.")
+    lines.append("- Domain/model empirical validity is smoothed before scoring, so one lucky or unlucky call cannot dominate Nash welfare.")
+    lines.append("- The runtime combines ridge utility, Nash welfare, token utility and empirical risk; it does not hardcode domain winners.")
     lines.append("")
     return "\n".join(lines)
+
+
+def _domain_matrix_lines(weights: Any) -> list[str]:
+    stats = getattr(weights, "domain_model_stats", None) or {}
+    if not stats:
+        return ["- no empirical stats recorded"]
+    lines = [
+        "| Domain | Model | Calls | Valid | Smoothed Valid Rate | Avg Tokens | Avg Cost USD |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for domain, models in sorted(stats.items()):
+        if domain == "__overall__":
+            continue
+        for model, row in sorted(models.items()):
+            calls = float(row.get("calls") or 0.0)
+            valid = float(row.get("valid") or 0.0)
+            lines.append(
+                f"| `{domain}` | `{model}` | {calls:.0f} | {valid:.0f} "
+                f"| {float(row.get('valid_rate_smoothed') or 0.0):.3f} "
+                f"| {float(row.get('avg_total_tokens') or 0.0):.0f} "
+                f"| {float(row.get('avg_cost_usd') or 0.0):.8f} |"
+            )
+    return lines
 
 
 def _selection_replay_lines(
