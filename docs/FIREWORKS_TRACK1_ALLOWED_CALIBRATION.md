@@ -57,9 +57,9 @@ After tightening the `ner_money_date` prompt to require date and amount exactly 
 - In Fireworks-only mode, the Docker image now enables `FIREWORKS_MATRIX_WEIGHTS=/app/router/data/fireworks_track1_allowed_weights.json` by default.
 - The checked-in matrix weights now use `76` completed, deduplicated, observed Track 1 rows from category, hidden-variant, and championship result files.
 - Transport/access failures such as Gemma `404` are excluded from quality fitting by default. The weights record `observed_models`, and the matrix selector filters unobserved allowed models when observed alternatives exist.
-- The matrix selector uses ridge-regression utility plus Nash welfare. For strong tasks, regression/accuracy is weighted above token cost; for cheap tasks, token cost remains a larger part of the score.
-- Keep `minimax-m3` as the preferred remote candidate for observed Track 1 domains because it matched or exceeded the accessible alternatives at lower estimated token cost after the championship recalibration.
-- Keep `kimi-k2p7-code` as an observed fallback for code/debug cases if Minimax errors at runtime.
+- The matrix selector uses ridge-regression utility plus Nash welfare, with an explicit token-efficiency utility because Track 1 ranks by Fireworks token count after the accuracy gate.
+- Keep `minimax-m3` as the preferred remote candidate for math, code, and logic domains where the calibrated score still favors robustness/cost balance.
+- Prefer `kimi-k2p7-code` for factual QA and summarization when both observed models are valid, because the paid microbenches showed lower `usage.total` in those domains.
 - Keep Gemma IDs in `ALLOWED_MODELS` support, but cache unavailable-model errors per runner instance so one inaccessible Gemma endpoint does not cause repeated latency across the whole evaluator batch.
 
 ## Classifier Hardening

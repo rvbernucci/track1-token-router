@@ -31,6 +31,7 @@ FEATURE_NAMES = [
     "correlation",
     "reliability",
     "cost_utility",
+    "token_utility",
     "latency_utility",
     "nash_product",
     "prisoner_payoff",
@@ -100,6 +101,7 @@ def fit_matrix_regression(
         raise ValueError("Cannot fit matrix regression without rows.")
     models = allowed_models or sorted({str(row["model"]) for row in rows})
     cost_bounds = _bounds(float(row.get("estimated_cost_usd") or 0.0) for row in rows)
+    token_bounds = _bounds(_row_token_total(row) for row in rows)
     latency_bounds = _bounds(float(row.get("latency_ms") or 0.0) for row in rows)
     matrix: list[list[float]] = []
     targets: list[float] = []
@@ -116,7 +118,7 @@ def fit_matrix_regression(
         domain = _normalize_domain(task.domain or _task_profile(task.prompt).domain)
         reasoning_effort = _row_reasoning_effort(row)
         matrix.append(_feature_vector(candidate, tier, domain, reasoning_effort))
-        targets.append(_target(row, cost_bounds, latency_bounds))
+        targets.append(_target(row, cost_bounds, token_bounds, latency_bounds))
     if not matrix:
         raise ValueError("No trainable rows matched the provided tasks.")
     coefficients = _ridge_regression(matrix, targets, ridge_lambda)
@@ -160,6 +162,7 @@ def select_model_by_matrix_regression(
         hybrid_score = (
             (score_weights["regression"] * regression_utility)
             + (score_weights["nash"] * candidate.nash_product)
+            + (score_weights["token"] * candidate.token_utility)
             + (score_weights["cost"] * candidate.cost_utility)
         )
         scored.append(
@@ -170,6 +173,8 @@ def select_model_by_matrix_regression(
                 "hybrid_score": hybrid_score,
                 "hybrid_score_weights": score_weights,
                 "nash_product": candidate.nash_product,
+                "estimated_total_tokens": candidate.estimated_total_tokens,
+                "token_utility": candidate.token_utility,
                 "estimated_cost_usd": candidate.estimated_cost_usd,
                 "features": dict(zip(FEATURE_NAMES, features)),
             }
@@ -273,6 +278,7 @@ def _feature_vector(candidate: Any, tier: str, domain: str, reasoning_effort: st
         candidate.correlation,
         candidate.reliability,
         candidate.cost_utility,
+        candidate.token_utility,
         candidate.latency_utility,
         candidate.nash_product,
         candidate.prisoner_payoff,
@@ -298,17 +304,30 @@ def _feature_vector(candidate: Any, tier: str, domain: str, reasoning_effort: st
 
 def _hybrid_score_weights(tier: str) -> dict[str, float]:
     if tier == "strong":
-        return {"regression": 0.85, "nash": 0.10, "cost": 0.05}
+        return {"regression": 0.80, "nash": 0.10, "token": 0.08, "cost": 0.02}
     if tier == "medium":
-        return {"regression": 0.70, "nash": 0.20, "cost": 0.10}
-    return {"regression": 0.55, "nash": 0.25, "cost": 0.20}
+        return {"regression": 0.65, "nash": 0.15, "token": 0.15, "cost": 0.05}
+    return {"regression": 0.50, "nash": 0.20, "token": 0.20, "cost": 0.10}
 
 
-def _target(row: dict[str, Any], cost_bounds: tuple[float, float], latency_bounds: tuple[float, float]) -> float:
+def _target(
+    row: dict[str, Any],
+    cost_bounds: tuple[float, float],
+    token_bounds: tuple[float, float],
+    latency_bounds: tuple[float, float],
+) -> float:
     valid = bool(row.get("valid"))
     cost_utility = _inverse_range(float(row.get("estimated_cost_usd") or 0.0), *cost_bounds)
+    token_utility = _inverse_range(_row_token_total(row), *token_bounds)
     latency_utility = _inverse_range(float(row.get("latency_ms") or 0.0), *latency_bounds)
-    return (0.80 if valid else 0.0) + (0.15 * cost_utility) + (0.05 * latency_utility)
+    return (0.80 if valid else 0.0) + (0.14 * token_utility) + (0.04 * cost_utility) + (0.02 * latency_utility)
+
+
+def _row_token_total(row: dict[str, Any]) -> float:
+    usage = row.get("usage")
+    if isinstance(usage, dict):
+        return float(usage.get("total") or 0.0)
+    return float(row.get("total_tokens") or row.get("tokens") or 0.0)
 
 
 def _row_reasoning_effort(row: dict[str, Any]) -> str | None:

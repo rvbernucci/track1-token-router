@@ -128,12 +128,48 @@ class MatrixRegressionSelectorTests(unittest.TestCase):
         self.assertNotIn("accounts/fireworks/models/gemma-4-31b-it-nvfp4", ranked_models)
         self.assertIn(selection["model"], weights.observed_models)
 
+    def test_fit_learns_token_efficiency_over_usd_cost_when_both_are_valid(self) -> None:
+        tasks = {
+            "factual": RegressionTask(
+                id="factual",
+                prompt="Who wrote Pride and Prejudice? Return only the author name.",
+                domain="factual_qa",
+                tier="medium",
+            )
+        }
+        rows = [
+            _row("factual", "accounts/fireworks/models/minimax-m3", True, 0.00004, 1500, tokens=180),
+            _row("factual", "accounts/fireworks/models/kimi-k2p7-code", True, 0.00008, 900, tokens=55),
+        ]
 
-def _row(task_id: str, model: str, valid: bool, cost: float, latency_ms: int) -> dict[str, object]:
+        weights = fit_matrix_regression(
+            rows,
+            tasks,
+            allowed_models=[
+                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
+            ],
+        )
+        selection = select_model_by_matrix_regression(
+            TaskEnvelope(input_text="What is the capital of Canada? Return only the city."),
+            ["minimax-m3", "kimi-k2p7-code"],
+            weights,
+        )
+
+        self.assertEqual(selection["model"], "accounts/fireworks/models/kimi-k2p7-code")
+        self.assertGreater(
+            selection["ranked_candidates"][0]["regression_utility"],
+            selection["ranked_candidates"][1]["regression_utility"],
+        )
+
+
+def _row(task_id: str, model: str, valid: bool, cost: float, latency_ms: int, *, tokens: int = 100) -> dict[str, object]:
     return {
         "id": task_id,
         "model": model,
         "valid": valid,
+        "ok": True,
+        "usage": {"total": tokens},
         "estimated_cost_usd": cost,
         "latency_ms": latency_ms,
         "request_options": {"user": "test"},
@@ -167,6 +203,16 @@ class CheckedInTrack1WeightsTests(unittest.TestCase):
         allowed = ["minimax-m3", "kimi-k2p7-code", "gemma-4-31b-it", "gemma-4-26b-a4b-it", "gemma-4-31b-it-nvfp4"]
 
         cases = [
+            (
+                "Who wrote Pride and Prejudice? Return only the author name.",
+                "current_factual",
+                "accounts/fireworks/models/kimi-k2p7-code",
+            ),
+            (
+                "Summarize in at most 8 words: Token-efficient routing preserves accuracy while reducing paid model calls.",
+                "summarization",
+                "accounts/fireworks/models/kimi-k2p7-code",
+            ),
             (
                 "Compute 17 * 6 + 4. Return only the number.",
                 "math_reasoning",

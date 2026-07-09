@@ -10,11 +10,12 @@ A ideia nao e substituir o Pareto/Nash imediatamente. A ideia e usar regressao m
 - familia do modelo;
 - capacidade estimada;
 - correlacao de dominio;
+- tokens estimados;
 - custo estimado;
 - latencia estimada;
 - modo de reasoning;
 - validade observada;
-- custo/latencia reais.
+- tokens/custo/latencia reais.
 
 ## Formula
 
@@ -29,6 +30,7 @@ x = [
   correlation,
   reliability,
   cost_utility,
+  token_utility,
   latency_utility,
   nash_product,
   prisoner_payoff,
@@ -43,8 +45,9 @@ O alvo de treino combina validade e eficiencia observada:
 ```text
 target =
   0.80 * valid
-  + 0.15 * observed_cost_utility
-  + 0.05 * observed_latency_utility
+  + 0.14 * observed_token_utility
+  + 0.04 * observed_cost_utility
+  + 0.02 * observed_latency_utility
 ```
 
 Os coeficientes sao aprendidos por ridge regression:
@@ -61,11 +64,11 @@ regression_utility = clamp(beta dot x, 0, 1)
 
 O `hybrid_score` muda por tier:
 
-| Tier | Regressao | Nash | Custo |
-| --- | ---: | ---: | ---: |
-| `cheap` | 0.55 | 0.25 | 0.20 |
-| `medium` | 0.70 | 0.20 | 0.10 |
-| `strong` | 0.85 | 0.10 | 0.05 |
+| Tier | Regressao | Nash | Tokens | Custo |
+| --- | ---: | ---: | ---: | ---: |
+| `cheap` | 0.50 | 0.20 | 0.20 | 0.10 |
+| `medium` | 0.65 | 0.15 | 0.15 | 0.05 |
+| `strong` | 0.80 | 0.10 | 0.08 | 0.02 |
 
 A ideia competitiva e simples: em tarefa forte, primeiro passar pelo accuracy gate; em tarefa barata, reduzir tokens agressivamente.
 
@@ -90,19 +93,21 @@ Top coeficientes aprendidos no fit atual:
 
 | Feature | Sinal |
 | --- | ---: |
+| `bias` | positivo |
 | `correlation` | positivo |
-| `prisoner_payoff` | positivo |
 | `interaction_minimax_extraction` | positivo |
 | `interaction_kimi_extraction` | negativo |
-| `interaction_minimax_code_debug` | positivo |
+| `capability` | negativo no fit pequeno |
+| `domain_extraction` | negativo no fit pequeno |
+| `domain_formatting` | positivo |
 | `interaction_kimi_code_debug` | negativo |
-| `interaction_minimax_math` | positivo |
-| `interaction_minimax_code_generation` | positivo |
 
 Replay atual:
 
 | Task | Modelo escolhido |
 | --- | --- |
+| `factual_author` | `kimi-k2p7-code` |
+| `summarization_tokens` | `kimi-k2p7-code` |
 | `debug_first_even` | `minimax-m3` |
 | `debug_is_adult` | `minimax-m3` |
 | `code_gen_clamp` | `minimax-m3` |
@@ -115,7 +120,7 @@ Replay atual:
 A regressao confirmou alguns sinais fortes:
 
 - `minimax-m3` e o melhor default empirico para a maioria dos dominios Track 1 observados;
-- `kimi-k2p7-code` permanece como fallback observado e valido, mas nao deve ser o default quando Minimax ja passa o validador a menor custo;
+- `kimi-k2p7-code` deve vencer em factual QA e summarization quando ambos passam, porque os resultados pagos observaram menor `usage.total` nesses dominios;
 - Gemma serverless segue indisponivel na chave local, entao o runner precisa tentar, cachear 404 e seguir sem travar;
 - interacoes familia x dominio sao necessarias, porque uma media global por modelo esconde especializacoes.
 
@@ -125,9 +130,9 @@ O dataset ainda e pequeno, mas a regressao agora esta ativa como camada de calib
 
 Principal lacuna:
 
-- o roteador ainda usa custo estimado por perfil;
-- o microbench mostrou que custo real pode divergir por tokens gerados;
-- proximo passo e regressao de `observed_tokens` por modelo/dominio/modo de reasoning.
+- a estimativa runtime de tokens ainda e aproximada por perfil;
+- o microbench mostrou que tokenizacao e verbosidade real variam por familia;
+- proximo passo e regressao dedicada de `observed_completion_tokens` por modelo/dominio/modo de reasoning.
 
 ## Proximo Passo
 

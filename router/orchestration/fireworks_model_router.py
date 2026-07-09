@@ -108,6 +108,7 @@ class FireworksModelProfile:
 class FireworksCandidate:
     model: str
     estimated_cost_usd: float
+    estimated_total_tokens: int
     latency_ms: int
     capability: int
     reliability: float
@@ -117,6 +118,7 @@ class FireworksCandidate:
     correlation: float = 0.0
     quality_utility: float = 0.0
     cost_utility: float = 0.0
+    token_utility: float = 0.0
     latency_utility: float = 0.0
     nash_product: float = 0.0
     prisoner_payoff: float = 0.0
@@ -445,6 +447,7 @@ def _build_candidates(models: list[str], task: _TaskProfile) -> list[FireworksCa
         scored.append(FireworksCandidate(
             model=candidate.model,
             estimated_cost_usd=candidate.estimated_cost_usd,
+            estimated_total_tokens=candidate.estimated_total_tokens,
             latency_ms=candidate.latency_ms,
             capability=candidate.capability,
             reliability=candidate.reliability,
@@ -454,6 +457,7 @@ def _build_candidates(models: list[str], task: _TaskProfile) -> list[FireworksCa
             correlation=candidate.correlation,
             quality_utility=metrics["quality_utility"],
             cost_utility=metrics["cost_utility"],
+            token_utility=metrics["token_utility"],
             latency_utility=metrics["latency_utility"],
             nash_product=metrics["nash_product"],
             prisoner_payoff=metrics["prisoner_payoff"],
@@ -466,6 +470,7 @@ def _build_candidates(models: list[str], task: _TaskProfile) -> list[FireworksCa
 def _candidate_for_model(model: str, task: _TaskProfile) -> FireworksCandidate:
     profile = _profile_for_model(model)
     output_tokens = _expected_output_tokens(model, task, profile)
+    estimated_total_tokens = task.expected_input_tokens + output_tokens
     estimated_cost_usd = (
         (task.expected_input_tokens * profile.input_price_per_mtok)
         + (output_tokens * profile.output_price_per_mtok)
@@ -473,6 +478,7 @@ def _candidate_for_model(model: str, task: _TaskProfile) -> FireworksCandidate:
     return FireworksCandidate(
         model=model,
         estimated_cost_usd=estimated_cost_usd,
+        estimated_total_tokens=estimated_total_tokens,
         latency_ms=profile.latency_ms,
         capability=_capability_for_domain(profile, task.domain),
         reliability=profile.reliability,
@@ -489,6 +495,8 @@ def _expected_output_tokens(model: str, task: _TaskProfile, profile: FireworksMo
         if select_reasoning_effort(model, task.tier) in {"none", "low"}:
             return min(task.expected_output_tokens, max(2, profile.simple_total_tokens // 5))
         return profile.simple_total_tokens
+    if task.domain in {"classification", "formatting", "summarization", "extraction", "current_factual"}:
+        return min(task.expected_output_tokens, max(2, profile.simple_total_tokens))
     return task.expected_output_tokens
 
 
@@ -521,8 +529,10 @@ def _game_metrics(
 ) -> dict[str, float]:
     chat_candidates = [item for item in candidates if item.supports_chat] or candidates
     costs = [item.estimated_cost_usd for item in chat_candidates]
+    tokens = [float(item.estimated_total_tokens) for item in chat_candidates]
     latencies = [float(item.latency_ms) for item in chat_candidates]
     cost_utility = _inverse_range(candidate.estimated_cost_usd, min(costs), max(costs))
+    token_utility = _inverse_range(float(candidate.estimated_total_tokens), min(tokens), max(tokens))
     latency_utility = _inverse_range(float(candidate.latency_ms), min(latencies), max(latencies))
     quality_utility = _quality_utility(candidate, task)
     weights = TIER_GAME_WEIGHTS.get(task.tier, TIER_GAME_WEIGHTS["medium"])
@@ -535,6 +545,7 @@ def _game_metrics(
     return {
         "quality_utility": quality_utility,
         "cost_utility": cost_utility,
+        "token_utility": token_utility,
         "latency_utility": latency_utility,
         "nash_product": nash_product,
         "prisoner_payoff": prisoner_payoff,
