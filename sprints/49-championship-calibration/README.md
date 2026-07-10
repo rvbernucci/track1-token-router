@@ -69,9 +69,10 @@ Public reproducibility:
 - Linux `amd64` manifest digest: `sha256:b88778e89291dc7a21f638a4347e0c4ba0ef8d156a43a45ae248215d40f4bb5e`;
 - registry-compressed size: `45,522,326` bytes, below the `10,000,000,000` byte gate;
 - isolated resource gate: `4,294,967,296` memory bytes, `2` CPUs, network `none` and `600 s` timeout;
-- observed official-contract smoke: `1 s` outer runtime, `8 ms` process time and `28.469 MiB` process peak RSS;
+- exact public-image smoke: anonymous pull, `1 s` outer runtime, `10 ms` process time and `28.348 MiB` process peak RSS;
 - release workflow: GitHub Actions run `29107760615`, all steps passed;
-- public audit: pullability, manifest, labels, revision, version and size all passed;
-- repository release gate: `463/463` tests, deterministic coverage, frozen evidence hashes, submission checks and secret scan passed.
+- exact public-image audit: GitHub Actions run `29108270058`, pullability, runtime limits, manifest, labels, revision, version and size all passed;
+- final repository CI: GitHub Actions run `29108264888`, Python 3.10/3.12 and Docker jobs passed;
+- repository release gate: `464/464` tests, deterministic coverage, frozen evidence hashes, submission checks and secret scan passed.
 
 The final image intentionally excludes FunctionGemma and E2B weights. Their frozen experiments remain reproducible evidence, while the submitted runtime contains only the promoted deterministic-then-Kimi policy.

@@ -1,3 +1,4 @@
+import json
 import shutil
 import subprocess
 import sys
@@ -61,13 +62,9 @@ class SubmissionReadinessTests(unittest.TestCase):
             tmp_root = Path(tmp)
             shutil.copytree("submission", tmp_root / "submission")
             status_path = tmp_root / "submission" / "final" / "submission-status.json"
-            status_path.write_text(
-                status_path.read_text(encoding="utf-8").replace(
-                    '"process_max_rss_mib": 28.469',
-                    '"process_max_rss_mib": null',
-                ),
-                encoding="utf-8",
-            )
+            status = json.loads(status_path.read_text(encoding="utf-8"))
+            status["resource_gate"]["process_max_rss_mib"] = None
+            status_path.write_text(json.dumps(status) + "\n", encoding="utf-8")
             for relative in (".github",):
                 shutil.copytree(relative, tmp_root / relative)
             for relative in ("README.md", "SUBMISSION.md", "CREDIT_ACTIVATION.md", "Dockerfile"):

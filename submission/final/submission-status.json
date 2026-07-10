@@ -1,8 +1,10 @@
 {
   "ci_status": "green",
+  "ci_run_id": 29108264888,
   "demo_url": "https://rvbernucci.github.io/track1-token-router/",
   "docker_image": "ghcr.io/rvbernucci/track1-token-router:v1.0.0-championship",
   "image_audit_status": "green",
+  "image_audit_run_id": 29108270058,
   "image_compressed_size_bytes": 45522326,
   "image_manifest_digest": "sha256:b88778e89291dc7a21f638a4347e0c4ba0ef8d156a43a45ae248215d40f4bb5e",
   "image_platform": "linux/amd64",
@@ -14,8 +16,8 @@
     "memory_limit_bytes": 4294967296,
     "network": "none",
     "observed_runtime_seconds": 1,
-    "process_elapsed_ms": 8,
-    "process_max_rss_mib": 28.469
+    "process_elapsed_ms": 10,
+    "process_max_rss_mib": 28.348
   },
   "release_status": "green",
   "release_tag": "v1.0.0-championship",

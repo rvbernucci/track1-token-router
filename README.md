@@ -76,6 +76,7 @@ python3 -m router submit-track1 \
 | [AMD training tutorial](./docs/FUNCTIONGEMMA_270M_AMD_TRAINING_TUTORIAL.md) | Full SFT and LoRA workflow on ROCm |
 | [Gemma E2B token ladder](./docs/E2B_TOKEN_LADDER.md) | Adaptive 96/192/384 experiment, quantization and CPU runtime audit |
 | [Public E2B evidence](./reports/public/e2b-token-ladder.md) | Aggregate recovery, feature and latency results |
+| [Sprints 45-49 completion audit](./reports/public/sprints-45-49-completion-audit.md) | Requirement-to-evidence map and final release proof |
 | [E2B runtime](./docs/GEMMA_E2B_TEXT_ONLY_RUNTIME.md) | Text-only LiteRT-LM packaging and 4 GB gates |
 | [Deterministic solvers](./docs/DETERMINISTIC_SOLVERS.md) | Mechanical registry and proof rules |
 | [Fireworks calibration](./docs/FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md) | Allowed-model microbench workflow |
