@@ -43,7 +43,12 @@ resources = json.loads(resource_path.read_text(encoding="utf-8"))
 if not isinstance(payload, list) or not payload:
     raise SystemExit("results.json must be a non-empty JSON array")
 for row in payload:
-    if not isinstance(row, dict) or not isinstance(row.get("id"), str) or not isinstance(row.get("answer"), str):
+    if (
+        not isinstance(row, dict)
+        or set(row) != {"task_id", "answer"}
+        or not isinstance(row.get("task_id"), str)
+        or not isinstance(row.get("answer"), str)
+    ):
         raise SystemExit("results.json row violates the official output contract")
 report = {
     "schema_version": "docker-resource-gate-v1",
