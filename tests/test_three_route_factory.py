@@ -15,7 +15,7 @@ ENV = {
     "ROUTER_MODE": "three_route",
     "FIREWORKS_API_KEY": "test-key",
     "ALLOWED_MODELS": "minimax-m3,kimi-k2p7-code",
-    "FUNCTIONGEMMA_CALIBRATION": "reports/generated/amd-pod-scale789/runs/lora_r16_scale789/gguf/q8-cap64-calibration.json",
+    "FUNCTIONGEMMA_CALIBRATION": "configs/functiongemma-scale789-q8-calibration.json",
     "FUNCTIONGEMMA_CALIBRATION_SHA256": "0078565ab90a6c93981e954d13daabdaa11a4535da9257eae03f3a034afcc1e1",
     "OUTCOME_MODELS_PATH": "configs/engine-outcome-models-v1.json",
     "OUTCOME_MODELS_SHA256": "927a64303501d43f3b509a8f48d397d372c4211f8347890827206e82bda60712",

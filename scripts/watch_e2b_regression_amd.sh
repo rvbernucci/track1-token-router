@@ -148,7 +148,7 @@ printf 'BUILDING_MATRIX kimi=%s gemini=%s\n' "$kimi_rows" "$gemini_rows" >"$STAT
 "$PYTHON_BIN" "$ROOT/scripts/build_engine_outcome_matrix.py" \
   --tasks "$LOCAL_DIR/functiongemma-valid-tasks.jsonl" \
   --assessments "$LOCAL_DIR/functiongemma-valid-predictions.jsonl" \
-  --calibration "$ROOT/reports/generated/amd-pod-scale789/runs/lora_r16_scale789/gguf/q8-cap64-calibration.json" \
+  --calibration "$ROOT/configs/functiongemma-scale789-q8-calibration.json" \
   --judge-policy "$ROOT/configs/e2b-regression-judge-policy.json" \
   --competition-snapshot "$ROOT/configs/track1-competition-snapshot-20260710.json" \
   --candidate "$LOCAL_DIR/e2b-candidates-96.jsonl" \
