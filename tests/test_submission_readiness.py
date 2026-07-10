@@ -54,6 +54,29 @@ class SubmissionReadinessTests(unittest.TestCase):
         self.assertTrue(readiness.ok, readiness.errors)
         self.assertIn("submission/final/demo.mp4", readiness.metrics["strict_video_files"])
         self.assertFalse(any("video placeholder" in warning for warning in readiness.warnings))
+        self.assertFalse(any("dry-run evidence" in warning for warning in readiness.warnings))
+
+    def test_pending_benchmark_warning_requires_complete_resource_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            shutil.copytree("submission", tmp_root / "submission")
+            status_path = tmp_root / "submission" / "final" / "submission-status.json"
+            status_path.write_text(
+                status_path.read_text(encoding="utf-8").replace(
+                    '"process_max_rss_mib": 28.469',
+                    '"process_max_rss_mib": null',
+                ),
+                encoding="utf-8",
+            )
+            for relative in (".github",):
+                shutil.copytree(relative, tmp_root / relative)
+            for relative in ("README.md", "SUBMISSION.md", "CREDIT_ACTIVATION.md", "Dockerfile"):
+                shutil.copy2(relative, tmp_root / relative)
+
+            readiness = check_submission_readiness(tmp_root)
+
+        self.assertTrue(readiness.ok, readiness.errors)
+        self.assertTrue(any("dry-run evidence" in warning for warning in readiness.warnings))
 
     def test_strict_mode_warns_when_only_video_placeholder_is_available(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

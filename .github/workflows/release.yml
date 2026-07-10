@@ -61,3 +61,19 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.version=${{ github.ref_name }}
             org.opencontainers.image.description=AMD Developer Hackathon ACT II Track 1 token-efficient router
+
+      - name: Pull the published image without local build state
+        run: |
+          docker image rm "${IMAGE_NAME}:${GITHUB_REF_NAME}" 2>/dev/null || true
+          docker pull --platform linux/amd64 "${IMAGE_NAME}:${GITHUB_REF_NAME}"
+
+      - name: Gate the exact published image under evaluator limits
+        run: bash scripts/docker_resource_gate.sh "${IMAGE_NAME}:${GITHUB_REF_NAME}"
+
+      - name: Audit public manifest and immutable labels
+        run: |
+          python scripts/competition_submission_audit.py \
+            --image "${IMAGE_NAME}:${GITHUB_REF_NAME}" \
+            --expected-revision "${GITHUB_SHA}" \
+            --expected-version "${GITHUB_REF_NAME}" \
+            --json

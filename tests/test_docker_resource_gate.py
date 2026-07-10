@@ -29,9 +29,15 @@ class DockerResourceGateTests(unittest.TestCase):
     def test_ci_and_release_execute_the_resource_gate(self) -> None:
         ci = Path(".github/workflows/ci.yml").read_text(encoding="utf-8")
         release = Path(".github/workflows/release.yml").read_text(encoding="utf-8")
+        public_audit = Path(".github/workflows/public-image-audit.yml").read_text(encoding="utf-8")
 
         self.assertIn("scripts/docker_resource_gate.sh", ci)
         self.assertIn("scripts/docker_resource_gate.sh", release)
+        self.assertGreaterEqual(release.count("scripts/docker_resource_gate.sh"), 2)
+        self.assertIn("docker pull --platform linux/amd64", release)
+        self.assertIn("scripts/docker_resource_gate.sh", public_audit)
+        self.assertIn("docker pull --platform linux/amd64", public_audit)
+        self.assertNotIn("docker/login-action", public_audit)
 
 
 if __name__ == "__main__":

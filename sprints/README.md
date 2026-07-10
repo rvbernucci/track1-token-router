@@ -8,7 +8,7 @@ The architecture reset starts at Sprint 45. These sprints are sequential and all
 - [x] [Sprint 46 - FunctionGemma Assessment Training](./46-functiongemma-router-training/README.md)
 - [x] [Sprint 47 - Engine Outcome Matrix](./47-gemma-e2b-text-only-runtime/README.md)
 - [x] [Sprint 48 - Regression And Game-Theory Decision Engine](./48-three-route-orchestration/README.md)
-- [Sprint 49 - Championship Calibration](./49-championship-calibration/README.md)
+- [x] [Sprint 49 - Championship Calibration](./49-championship-calibration/README.md)
 
 ## Completed Foundation
 

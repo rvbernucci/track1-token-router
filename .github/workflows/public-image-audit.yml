@@ -1,0 +1,56 @@
+name: Public Image Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Public GHCR image tag to audit
+        required: true
+        default: ghcr.io/rvbernucci/track1-token-router:v1.0.0-championship
+      expected_revision:
+        description: Expected immutable OCI revision
+        required: true
+        default: 8cbe0c58333486278f467d27ea9f27093eb68e99
+      expected_version:
+        description: Expected immutable OCI version
+        required: true
+        default: v1.0.0-championship
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  exact-public-image:
+    runs-on: [self-hosted, Linux, X64, track1-builder-stable]
+
+    steps:
+      - name: Checkout audit code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Pull public image anonymously
+        env:
+          IMAGE: ${{ inputs.image }}
+        run: docker pull --platform linux/amd64 "$IMAGE"
+
+      - name: Run exact public image under evaluator limits
+        env:
+          IMAGE: ${{ inputs.image }}
+        run: bash scripts/docker_resource_gate.sh "$IMAGE"
+
+      - name: Audit public manifest, size and immutable labels
+        env:
+          IMAGE: ${{ inputs.image }}
+          EXPECTED_REVISION: ${{ inputs.expected_revision }}
+          EXPECTED_VERSION: ${{ inputs.expected_version }}
+        run: |
+          python scripts/competition_submission_audit.py \
+            --image "$IMAGE" \
+            --expected-revision "$EXPECTED_REVISION" \
+            --expected-version "$EXPECTED_VERSION" \
+            --json

@@ -32,6 +32,7 @@ REQUIRED_FILES = (
     "Dockerfile",
     ".github/workflows/ci.yml",
     ".github/workflows/release.yml",
+    ".github/workflows/public-image-audit.yml",
     "router/adapters/official/lablab_track1.py",
     "scripts/offline_release_check.sh",
     "scripts/docker_resource_gate.sh",
@@ -317,6 +318,8 @@ def _check_release_workflow(path: Path) -> Check:
         "org.opencontainers.image.source",
         "org.opencontainers.image.revision",
         "org.opencontainers.image.version",
+        "Gate the exact published image under evaluator limits",
+        "competition_submission_audit.py",
     ]
     missing = [token for token in required_tokens if token not in content]
     return Check(

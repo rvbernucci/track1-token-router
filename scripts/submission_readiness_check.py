@@ -267,7 +267,16 @@ def _check_pending_items(root: Path, warnings: list[str]) -> None:
         warnings.append("Add final public repository URL in lablab form.")
     if not video_url.startswith("https://") and not video_files:
         warnings.append("Add final demo/video URL after recording.")
-    warnings.append("Replace dry-run evidence with real AMD/Fireworks benchmark after final official evaluator access is available.")
+    resource_gate = status.get("resource_gate")
+    has_real_benchmark = (
+        status.get("image_audit_status") == "green"
+        and isinstance(resource_gate, dict)
+        and resource_gate.get("cpus") == 2
+        and resource_gate.get("memory_limit_bytes") == 4 * 1024**3
+        and isinstance(resource_gate.get("process_max_rss_mib"), (int, float))
+    )
+    if not has_real_benchmark:
+        warnings.append("Replace dry-run evidence with real AMD/Fireworks benchmark after final official evaluator access is available.")
 
 
 def _load_optional_status(path: Path) -> dict[str, object]:

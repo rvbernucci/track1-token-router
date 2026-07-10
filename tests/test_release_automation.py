@@ -24,6 +24,20 @@ class ReleaseAutomationTests(unittest.TestCase):
         self.assertIn("org.opencontainers.image.source", content)
         self.assertIn("org.opencontainers.image.revision", content)
         self.assertIn("org.opencontainers.image.version", content)
+        self.assertIn("Gate the exact published image under evaluator limits", content)
+        self.assertIn("competition_submission_audit.py", content)
+        self.assertNotIn("FIREWORKS_API_KEY", content)
+
+    def test_public_image_audit_uses_anonymous_pull_and_exact_limits(self) -> None:
+        content = Path(".github/workflows/public-image-audit.yml").read_text(encoding="utf-8")
+
+        self.assertIn("workflow_dispatch:", content)
+        self.assertIn("docker pull --platform linux/amd64", content)
+        self.assertIn("scripts/docker_resource_gate.sh", content)
+        self.assertIn("competition_submission_audit.py", content)
+        self.assertIn("expected_revision", content)
+        self.assertIn("expected_version", content)
+        self.assertNotIn("docker/login-action", content)
         self.assertNotIn("FIREWORKS_API_KEY", content)
 
     def test_release_notes_dry_run_writes_markdown(self) -> None:

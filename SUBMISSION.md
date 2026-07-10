@@ -40,4 +40,4 @@ scripts/offline_release_check.sh
 
 ## Current Status
 
-The frozen championship ablation is complete. The exact Linux `amd64` image is built and resource-gated by CI before release.
+The frozen championship ablation is complete. The public image `ghcr.io/rvbernucci/track1-token-router:v1.0.0-championship` passed CI, public pullability and manifest audits, and the exact 4 GB/2 vCPU/no-network resource gate.

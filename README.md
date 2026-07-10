@@ -35,7 +35,7 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-Sprints 45-48 are complete. The frozen 571-task ablation selected deterministic-then-Kimi over matrix, per-intent, Minimax and local-E2B challengers. Sprint 49 is validating the exact public Linux `amd64` image and final submission assets.
+Sprints 45-49 are complete. The frozen 571-task ablation selected deterministic-then-Kimi over matrix, per-intent, Minimax and local-E2B challengers. The public championship image passed the exact `linux/amd64`, 4 GB, 2 vCPU, no-network and official-contract gates.
 
 ## Quickstart
 
@@ -108,11 +108,13 @@ ROUTER_MODE=three_route
 
 ## Public Image
 
-Release tags publish the Linux `amd64` image at:
+The audited championship image is:
 
 ```text
-ghcr.io/rvbernucci/track1-token-router:TAG
+ghcr.io/rvbernucci/track1-token-router:v1.0.0-championship
 ```
+
+Its immutable platform-manifest digest is `sha256:b88778e89291dc7a21f638a4347e0c4ba0ef8d156a43a45ae248215d40f4bb5e`.
 
 ## Fireworks
 
