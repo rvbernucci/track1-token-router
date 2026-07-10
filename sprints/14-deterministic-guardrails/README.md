@@ -53,4 +53,4 @@ scripts/offline_release_check.sh
 
 - Nao resolve multiplicacao, divisao, porcentagem, algebra, datas ou problemas de palavras.
 - Nao tenta julgar dificuldade ampla.
-- Nao substitui M1/M2A/M2B; apenas evita chamadas quando a resposta e deterministicamente segura.
+- Na arquitetura atual, `sub_intent`, `deterministic_fit` e a regressao tornam o solver candidato; ele ainda precisa aceitar o input original.

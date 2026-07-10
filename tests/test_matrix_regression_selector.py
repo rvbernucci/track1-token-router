@@ -1,5 +1,6 @@
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 from router.core.contracts import TaskEnvelope
@@ -11,10 +12,31 @@ from router.orchestration.matrix_regression_selector import (
     load_weights,
     save_weights,
     select_model_by_matrix_regression,
+    _feature_vector,
 )
+from router.orchestration.fireworks_model_router import _build_candidates, _task_profile
 
 
 class MatrixRegressionSelectorTests(unittest.TestCase):
+    def test_dollar_price_feature_is_neutralized_for_competition_scoring(self) -> None:
+        profile = _task_profile("Classify sentiment as positive, neutral, or negative.")
+        candidate = _build_candidates(
+            ["accounts/fireworks/models/minimax-m3"],
+            profile,
+        )[0]
+        expensive = replace(candidate, estimated_cost_usd=99.0, cost_utility=0.0)
+        cheap = replace(candidate, estimated_cost_usd=0.0, cost_utility=1.0)
+
+        expensive_features = _feature_vector(
+            expensive, profile.tier, profile.domain, "none", "Classify sentiment."
+        )
+        cheap_features = _feature_vector(
+            cheap, profile.tier, profile.domain, "none", "Classify sentiment."
+        )
+
+        self.assertEqual(expensive_features, cheap_features)
+        self.assertEqual(expensive_features[FEATURE_NAMES.index("cost_utility")], 0.0)
+
     def test_fit_prefers_model_with_valid_observations(self) -> None:
         tasks = {
             "sentiment": RegressionTask(
@@ -233,13 +255,11 @@ class MatrixRegressionSelectorTests(unittest.TestCase):
         )
 
         self.assertEqual(selection["model"], "accounts/fireworks/models/minimax-m3")
-        self.assertGreater(
-            selection["ranked_candidates"][0]["hybrid_score"],
-            selection["ranked_candidates"][1]["hybrid_score"],
-        )
-        self.assertGreater(
-            selection["ranked_candidates"][1]["base_hybrid_score"],
-            selection["ranked_candidates"][1]["hybrid_score"],
+        self.assertTrue(selection["ranked_candidates"][0]["accuracy_feasible"])
+        self.assertFalse(selection["ranked_candidates"][1]["accuracy_feasible"])
+        self.assertGreaterEqual(
+            selection["ranked_candidates"][0]["empirical_wilson_lower_95"],
+            selection["accuracy_gate"],
         )
         self.assertEqual(selection["ranked_candidates"][0]["empirical_calls"], 12.0)
 
@@ -409,7 +429,7 @@ class CheckedInTrack1WeightsTests(unittest.TestCase):
             (
                 "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The UI looks elegant, but the export failed twice and wasted my time.",
                 "classification",
-                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
             ),
             (
                 "Compute 17 * 6 + 4. Return only the number.",
@@ -434,7 +454,7 @@ class CheckedInTrack1WeightsTests(unittest.TestCase):
             (
                 "Return only minified JSON. Extract name, email, and phone from: Contact Lara at lara.silva@example.com or +55-11-99888-7766.",
                 "extraction",
-                "accounts/fireworks/models/minimax-m3",
+                "accounts/fireworks/models/kimi-k2p7-code",
             ),
             (
                 "All merls are tivas. Some tivas are roons. Is it guaranteed that some merls are roons? Return exactly yes or no.",

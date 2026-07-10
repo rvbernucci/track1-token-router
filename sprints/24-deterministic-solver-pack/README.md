@@ -19,7 +19,7 @@ Se codigo resolve com certeza, usar LLM e desperdicio de latencia e risco. O sol
 - Solvers seguros para matematica e transformacao simples.
 - Testes de falso positivo.
 - Metricas de economia no battle drill.
-- Integracao opcional antes de M1 no modo competicao.
+- Registro reutilizado como engine candidato quando `sub_intent` e a regressao indicarem alto `deterministic_fit`.
 
 ## Checklist
 

@@ -1,0 +1,216 @@
+import unittest
+from time import monotonic
+
+from router.core.contracts import (
+    AnswerResult,
+    AssessmentScores,
+    Engine,
+    EnginePrediction,
+    Intent,
+    TaskAssessment,
+    TaskEnvelope,
+    TokenUsage,
+)
+from router.core.three_route_runner import ThreeRouteRunner
+from router.functiongemma.provider import AssessmentInvocation, FunctionGemmaProviderError
+from router.orchestration.game_theory_selector import MinimaxRegretSelector
+
+
+ASSESSMENT = TaskAssessment(
+    intent=Intent.FACTUAL_QA,
+    scores=AssessmentScores(
+        deterministic_fit=2,
+        reasoning_demand=2,
+        knowledge_uncertainty=1,
+        generation_demand=2,
+        format_complexity=2,
+    ),
+)
+
+
+class Provider:
+    def assess_with_trace(self, _task):
+        return AssessmentInvocation(
+            assessment=ASSESSMENT,
+            raw_assessment=ASSESSMENT,
+            latency_ms=1.0,
+            usage=TokenUsage.empty(),
+            model="functiongemma",
+        )
+
+
+class BrokenProvider:
+    def assess_with_trace(self, _task):
+        raise FunctionGemmaProviderError("bad output")
+
+
+class Predictor:
+    def __init__(self, e2b=0.2, fireworks=0.9):
+        self.probabilities = {Engine.GEMMA_E2B: e2b, Engine.FIREWORKS: fireworks}
+
+    def predict(self, _features, engine):
+        return EnginePrediction(
+            engine=engine,
+            probability_correct=self.probabilities[engine],
+            expected_latency_ms=10,
+            expected_fireworks_tokens=100 if engine is Engine.FIREWORKS else 0,
+            probability_runtime_failure=0.01,
+            expected_peak_memory_mb=100,
+            model_version="test",
+        )
+
+    def uncertainty(self, _prediction):
+        return 0.0
+
+
+class Runner:
+    def __init__(self, answer, route):
+        self.answer = answer
+        self.route = route
+        self.calls = 0
+
+    def run(self, task):
+        self.calls += 1
+        return AnswerResult(id=task.id, answer=self.answer, route=self.route)
+
+
+class BrokenRunner:
+    def run(self, _task):
+        raise MemoryError("simulated local allocation failure")
+
+
+class ThreeRouteRunnerTests(unittest.TestCase):
+    def test_disabled_e2b_routes_to_fireworks(self):
+        e2b = Runner("local", "e2b_local")
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(),
+            predictor=Predictor(e2b=0.99, fireworks=0.8),
+            selector=MinimaxRegretSelector(e2b_enabled=False),
+            e2b_runner=e2b,
+            fireworks_runner=remote,
+        )
+        result = runner.run(TaskEnvelope(id="task", input_text="Explain why the sky is blue."))
+        self.assertEqual(result.answer, "remote")
+        self.assertEqual(e2b.calls, 0)
+
+    def test_enabled_high_confidence_e2b_can_answer_locally(self):
+        e2b = Runner("Rayleigh scattering.", "e2b_local")
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(),
+            predictor=Predictor(e2b=0.99, fireworks=0.61),
+            selector=MinimaxRegretSelector(e2b_enabled=True),
+            e2b_runner=e2b,
+            fireworks_runner=remote,
+        )
+        result = runner.run(TaskEnvelope(id="task", input_text="Explain why the sky is blue."))
+        self.assertEqual(result.route, "e2b_local")
+        self.assertEqual(remote.calls, 0)
+
+    def test_invalid_e2b_answer_falls_back_to_fireworks(self):
+        e2b = Runner("", "e2b_error")
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(),
+            predictor=Predictor(e2b=0.99, fireworks=0.61),
+            selector=MinimaxRegretSelector(e2b_enabled=True),
+            e2b_runner=e2b,
+            fireworks_runner=remote,
+        )
+        result = runner.run(TaskEnvelope(id="task", input_text="Explain why the sky is blue."))
+        self.assertEqual(result.answer, "remote")
+        self.assertIn("e2b_rejected", result.metadata["routing_trace"]["fallback"])
+
+    def test_degenerate_e2b_answer_falls_back_to_fireworks(self):
+        e2b = Runner(
+            "The president of Brazil is elected. president of Brazil and "
+            "president of Brazil and president of Brazil and president of Brazil and "
+            "president of Brazil",
+            "e2b_local",
+        )
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(),
+            predictor=Predictor(e2b=0.99, fireworks=0.61),
+            selector=MinimaxRegretSelector(e2b_enabled=True),
+            e2b_runner=e2b,
+            fireworks_runner=remote,
+        )
+
+        result = runner.run(TaskEnvelope(id="task", input_text="Who is the president of Brazil?"))
+
+        self.assertEqual(result.answer, "remote")
+        self.assertEqual(
+            result.metadata["routing_trace"]["fallback"],
+            "e2b_rejected:degenerate_repetition",
+        )
+
+    def test_safely_repaired_e2b_answer_avoids_fireworks(self):
+        e2b = Runner('```json\n{"answer": 4}\n```', "e2b_local")
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(),
+            predictor=Predictor(e2b=0.99, fireworks=0.61),
+            selector=MinimaxRegretSelector(e2b_enabled=True),
+            e2b_runner=e2b,
+            fireworks_runner=remote,
+        )
+
+        result = runner.run(TaskEnvelope(id="task", input_text="Return only JSON with key answer."))
+
+        self.assertEqual(result.answer, '{"answer": 4}')
+        self.assertEqual(result.route, "e2b_local_repaired")
+        self.assertEqual(remote.calls, 0)
+        self.assertEqual(
+            result.metadata["mechanical_repair"]["reason"],
+            "safe_repair:markdown_fence_in_strict_format",
+        )
+
+    def test_assessment_failure_falls_closed_to_fireworks(self):
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=BrokenProvider(),
+            predictor=Predictor(),
+            selector=MinimaxRegretSelector(),
+            e2b_runner=Runner("local", "e2b_local"),
+            fireworks_runner=remote,
+        )
+        result = runner.run(TaskEnvelope(id="task", input_text="Anything"))
+        self.assertEqual(result.answer, "remote")
+        self.assertTrue(result.metadata["routing_trace"]["decision"]["safe_fallback"])
+
+    def test_recoverable_e2b_memory_failure_falls_back_to_fireworks(self):
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(),
+            predictor=Predictor(e2b=0.99, fireworks=0.61),
+            selector=MinimaxRegretSelector(e2b_enabled=True),
+            e2b_runner=BrokenRunner(),
+            fireworks_runner=remote,
+        )
+        result = runner.run(TaskEnvelope(id="task", input_text="Explain why the sky is blue."))
+        self.assertEqual(result.answer, "remote")
+        self.assertEqual(
+            result.metadata["routing_trace"]["fallback"],
+            "e2b_runtime_failure:MemoryError",
+        )
+
+    def test_absolute_run_deadline_reaches_feature_vector(self):
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(),
+            predictor=Predictor(e2b=0.2, fireworks=0.9),
+            selector=MinimaxRegretSelector(),
+            e2b_runner=Runner("local", "e2b_local"),
+            fireworks_runner=remote,
+        )
+        runner.set_run_deadline(monotonic() + 60)
+        result = runner.run(TaskEnvelope(id="task", input_text="Explain why the sky is blue."))
+        trace = result.metadata["routing_trace"]
+        features = dict(zip(trace["features"]["names"], trace["features"]["values"], strict=True))
+        self.assertLess(features["struct.deadline_remaining_ratio"], 0.11)
+
+
+if __name__ == "__main__":
+    unittest.main()

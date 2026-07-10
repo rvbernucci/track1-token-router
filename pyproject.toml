@@ -15,6 +15,7 @@ dependencies = []
 
 [project.scripts]
 router = "router.cli.main:main"
+dataset-forge = "router.dataset_forge.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["router*"]

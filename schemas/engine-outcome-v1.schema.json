@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rvbernucci/track1-token-router/schemas/engine-outcome-v1.schema.json",
+  "title": "EngineOutcomeObservation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "engine",
+    "correct",
+    "latency_ms",
+    "fireworks_prompt_tokens",
+    "fireworks_completion_tokens",
+    "runtime_failure",
+    "peak_memory_mb",
+    "feature_schema_version",
+    "engine_version",
+    "model_id"
+  ],
+  "properties": {
+    "schema_version": {"const": "engine-outcome-v1"},
+    "task_id": {"type": "string", "minLength": 1},
+    "engine": {"enum": ["deterministic", "gemma_e2b", "fireworks"]},
+    "correct": {"type": "boolean"},
+    "latency_ms": {"type": "integer", "minimum": 0},
+    "fireworks_prompt_tokens": {"type": "integer", "minimum": 0},
+    "fireworks_completion_tokens": {"type": "integer", "minimum": 0},
+    "runtime_failure": {"type": "boolean"},
+    "peak_memory_mb": {"type": "number", "minimum": 0},
+    "feature_schema_version": {"const": "feature-vector-v1"},
+    "engine_version": {"type": "string", "minLength": 1},
+    "model_id": {"type": ["string", "null"]}
+  },
+  "allOf": [
+    {
+      "not": {
+        "properties": {
+          "correct": {"const": true},
+          "runtime_failure": {"const": true}
+        },
+        "required": ["correct", "runtime_failure"]
+      }
+    },
+    {
+      "if": {
+        "properties": {"engine": {"enum": ["deterministic", "gemma_e2b"]}},
+        "required": ["engine"]
+      },
+      "then": {
+        "properties": {
+          "fireworks_prompt_tokens": {"const": 0},
+          "fireworks_completion_tokens": {"const": 0}
+        }
+      }
+    }
+  ]
+}

@@ -17,9 +17,8 @@ Quando os creditos chegarem, nao podemos gastar as primeiras horas decidindo com
 - `runtime-profiles/`.
 - Perfis `.env.example` por plataforma/modelo.
 - Runbook AMD/DigitalOcean MI300X.
-- Runbook vLLM OpenAI-compatible.
-- Runbook SGLang OpenAI-compatible.
-- Runbook Gemma local.
+- Runbook FunctionGemma training.
+- Runbook Gemma E2B text-only.
 - Runbook Fireworks serverless.
 - Runbook Native.Builder como demo auxiliar.
 - Health check offline para perfis.
@@ -27,9 +26,8 @@ Quando os creditos chegarem, nao podemos gastar as primeiras horas decidindo com
 
 ## Checklist
 
-- [x] Criar `runtime-profiles/amd-mi300x-vllm.env.example`.
-- [x] Criar `runtime-profiles/amd-mi300x-sglang.env.example`.
-- [x] Criar `runtime-profiles/gemma-local.env.example`.
+- [x] Os perfis de serving grande foram aposentados do caminho ativo.
+- [x] O perfil Gemma generico foi aposentado; os perfis ativos agora separam FunctionGemma, E2B e `three_route`.
 - [x] Criar `runtime-profiles/fireworks-serverless.env.example`.
 - [x] Criar `docs/RUNBOOK_AMD_DIGITALOCEAN.md`.
 - [x] Criar `docs/RUNBOOK_GEMMA.md`.

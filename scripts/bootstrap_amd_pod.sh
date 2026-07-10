@@ -37,4 +37,4 @@ if [ "${SKIP_TESTS:-0}" != "1" ]; then
 fi
 
 echo "== Ready =="
-echo "Next local-model step: start an OpenAI-compatible Gemma endpoint, load runtime-profiles/gemma-local.env.example, then run ROUTER_MODE=hybrid."
+echo "Next step: follow docs/FUNCTIONGEMMA_270M_AMD_TRAINING_TUTORIAL.md and persist the trained router artifact."

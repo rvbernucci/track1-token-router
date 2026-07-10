@@ -35,7 +35,7 @@ Responsavel por converter entradas e saidas entre o mundo externo e o `core`.
 {
   "id": "same-task-id",
   "answer": "resposta final livre",
-  "route": "m1_approved|m2b_fireworks_approved|fireworks_replaced",
+  "route": "deterministic|e2b|fireworks",
   "remote_tokens": {
     "prompt": 0,
     "completion": 0,
@@ -47,4 +47,3 @@ Responsavel por converter entradas e saidas entre o mundo externo e o `core`.
 ## Regra
 
 Adapters podem mudar quando o kickoff revelar o formato real. O `core` deve mudar o minimo possivel.
-

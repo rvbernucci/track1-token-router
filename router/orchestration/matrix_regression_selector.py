@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
@@ -68,6 +69,9 @@ FEATURE_NAMES = [
     "reasoning_omitted",
 ]
 
+MIN_EMPIRICAL_GATE_CALLS = 8
+EMPIRICAL_ACCURACY_GATE = 0.60
+
 
 @dataclass(frozen=True)
 class RegressionTask:
@@ -116,7 +120,6 @@ def fit_matrix_regression(
     if not rows:
         raise ValueError("Cannot fit matrix regression without rows.")
     models = allowed_models or sorted({str(row["model"]) for row in rows})
-    cost_bounds = _bounds(float(row.get("estimated_cost_usd") or 0.0) for row in rows)
     token_bounds = _bounds(_row_token_total(row) for row in rows)
     latency_bounds = _bounds(float(row.get("latency_ms") or 0.0) for row in rows)
     matrix: list[list[float]] = []
@@ -138,7 +141,7 @@ def fit_matrix_regression(
         _add_domain_model_stat(stats_accumulator, domain, candidate.model, row)
         _add_domain_model_stat(stats_accumulator, "__overall__", candidate.model, row)
         matrix.append(_feature_vector(candidate, tier, domain, reasoning_effort, task.prompt))
-        targets.append(_target(row, cost_bounds, token_bounds, latency_bounds))
+        targets.append(_target(row, token_bounds, latency_bounds))
     if not matrix:
         raise ValueError("No trainable rows matched the provided tasks.")
     coefficients = _ridge_regression(matrix, targets, ridge_lambda)
@@ -188,6 +191,14 @@ def select_model_by_matrix_regression(
         score_weights = _hybrid_score_weights(task_profile.tier)
         empirical_utility = empirical["valid_rate_smoothed"]
         empirical_confidence = empirical["confidence"]
+        empirical_wilson_lower = _wilson_lower(
+            int(empirical["valid"]),
+            int(empirical["calls"]),
+        )
+        accuracy_feasible = (
+            empirical["calls"] < MIN_EMPIRICAL_GATE_CALLS
+            or empirical_wilson_lower >= EMPIRICAL_ACCURACY_GATE
+        )
         predicted_token_utility = _inverse_range(predicted_total_tokens, *token_bounds)
         base_hybrid_score = (
             (score_weights["regression"] * regression_utility)
@@ -214,20 +225,40 @@ def select_model_by_matrix_regression(
                 "empirical_valid_rate_smoothed": empirical_utility,
                 "empirical_confidence": empirical_confidence,
                 "empirical_calls": empirical["calls"],
+                "empirical_wilson_lower_95": empirical_wilson_lower,
+                "accuracy_feasible": accuracy_feasible,
                 "empirical_avg_total_tokens": empirical["avg_total_tokens"],
                 "features": dict(zip(FEATURE_NAMES, features)),
             }
         )
-    selected = max(scored, key=lambda row: (row["hybrid_score"], -row["estimated_cost_usd"], row["model"]))
+    feasible = [row for row in scored if row["accuracy_feasible"]] or scored
+    selected = max(
+        feasible,
+        key=lambda row: (
+            row["hybrid_score"],
+            -row["predicted_total_tokens"],
+            -row["estimated_cost_usd"],
+            row["model"],
+        ),
+    )
     return {
         "model": selected["model"],
         "selection_rule": "matrix_regression_plus_nash",
         "tier": task_profile.tier,
         "domain": task_profile.domain,
+        "accuracy_gate": EMPIRICAL_ACCURACY_GATE,
+        "accuracy_gate_minimum_calls": MIN_EMPIRICAL_GATE_CALLS,
+        "accuracy_gate_fallback_used": not any(row["accuracy_feasible"] for row in scored),
         "observed_model_filter": weights.observed_models,
         "ranked_candidates": sorted(
             scored,
-            key=lambda row: (row["hybrid_score"], -row["estimated_cost_usd"], row["model"]),
+            key=lambda row: (
+                row["accuracy_feasible"],
+                row["hybrid_score"],
+                -row["predicted_total_tokens"],
+                -row["estimated_cost_usd"],
+                row["model"],
+            ),
             reverse=True,
         ),
     }
@@ -330,7 +361,7 @@ def _feature_vector(candidate: Any, tier: str, domain: str, reasoning_effort: st
         min(candidate.capability / 4.0, 1.0),
         candidate.correlation,
         candidate.reliability,
-        candidate.cost_utility,
+        0.0,  # Dollar price is intentionally excluded from the competition score.
         candidate.token_utility,
         candidate.latency_utility,
         candidate.nash_product,
@@ -430,23 +461,21 @@ def _shape_signature(prompt: str) -> str:
 
 def _hybrid_score_weights(tier: str) -> dict[str, float]:
     if tier == "strong":
-        return {"regression": 0.80, "nash": 0.10, "token": 0.08, "cost": 0.02}
+        return {"regression": 0.80, "nash": 0.10, "token": 0.10, "cost": 0.00}
     if tier == "medium":
-        return {"regression": 0.65, "nash": 0.15, "token": 0.15, "cost": 0.05}
-    return {"regression": 0.50, "nash": 0.20, "token": 0.20, "cost": 0.10}
+        return {"regression": 0.65, "nash": 0.15, "token": 0.20, "cost": 0.00}
+    return {"regression": 0.50, "nash": 0.20, "token": 0.30, "cost": 0.00}
 
 
 def _target(
     row: dict[str, Any],
-    cost_bounds: tuple[float, float],
     token_bounds: tuple[float, float],
     latency_bounds: tuple[float, float],
 ) -> float:
     valid = bool(row.get("valid"))
-    cost_utility = _inverse_range(float(row.get("estimated_cost_usd") or 0.0), *cost_bounds)
     token_utility = _inverse_range(_row_token_total(row), *token_bounds)
     latency_utility = _inverse_range(float(row.get("latency_ms") or 0.0), *latency_bounds)
-    return (0.80 if valid else 0.0) + (0.14 * token_utility) + (0.04 * cost_utility) + (0.02 * latency_utility)
+    return (0.80 if valid else 0.0) + (0.18 * token_utility) + (0.02 * latency_utility)
 
 
 def _row_token_total(row: dict[str, Any]) -> float:
@@ -587,6 +616,20 @@ def _risk_adjusted_score(base_score: float, empirical_utility: float, empirical_
     reward = 0.08 * confidence * max(0.0, utility - 0.90)
     penalty = 0.18 * confidence * max(0.0, 0.92 - utility)
     return base_score + reward - penalty
+
+
+def _wilson_lower(successes: int, observations: int) -> float:
+    if observations <= 0 or not 0 <= successes <= observations:
+        return 0.0
+    rate = successes / observations
+    z = 1.959963984540054
+    denominator = 1.0 + z * z / observations
+    center = rate + z * z / (2.0 * observations)
+    margin = z * math.sqrt(
+        rate * (1.0 - rate) / observations
+        + z * z / (4.0 * observations * observations)
+    )
+    return max(0.0, (center - margin) / denominator)
 
 
 def _predicted_total_tokens(estimated_total_tokens: int, empirical: dict[str, float]) -> float:

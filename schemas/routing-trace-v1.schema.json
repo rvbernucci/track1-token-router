@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rvbernucci/track1-token-router/schemas/routing-trace-v1.schema.json",
+  "title": "RoutingTrace v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "assessment", "features", "predictions", "decision", "fallback"],
+  "properties": {
+    "schema_version": {"const": "routing-trace-v1"},
+    "task_id": {"type": ["string", "null"]},
+    "assessment": {
+      "anyOf": [
+        {"$ref": "task-assessment-v1.schema.json"},
+        {"type": "null"}
+      ]
+    },
+    "features": {
+      "anyOf": [
+        {"$ref": "feature-vector-v1.schema.json"},
+        {"type": "null"}
+      ]
+    },
+    "predictions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["engine", "probability_correct", "expected_latency_ms", "expected_fireworks_tokens", "probability_runtime_failure", "expected_peak_memory_mb", "model_version"],
+        "properties": {
+          "engine": {"enum": ["deterministic", "gemma_e2b", "fireworks"]},
+          "probability_correct": {"type": "number", "minimum": 0, "maximum": 1},
+          "expected_latency_ms": {"type": "number", "minimum": 0},
+          "expected_fireworks_tokens": {"type": "number", "minimum": 0},
+          "probability_runtime_failure": {"type": "number", "minimum": 0, "maximum": 1},
+          "expected_peak_memory_mb": {"type": "number", "minimum": 0},
+          "model_version": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["engine", "reason", "feasible_engines", "probability_correct", "worst_case_regret", "solver_hint", "safe_fallback"],
+      "properties": {
+        "engine": {"enum": ["deterministic", "gemma_e2b", "fireworks"]},
+        "reason": {"type": "string", "minLength": 1},
+        "feasible_engines": {"type": "array", "items": {"enum": ["deterministic", "gemma_e2b", "fireworks"]}},
+        "probability_correct": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "worst_case_regret": {"type": ["number", "null"], "minimum": 0},
+        "solver_hint": {"type": ["string", "null"]},
+        "safe_fallback": {"type": "boolean"}
+      }
+    },
+    "fallback": {"type": ["string", "null"]}
+  }
+}

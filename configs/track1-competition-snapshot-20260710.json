@@ -1,0 +1,41 @@
+{
+  "schema_version": "track1-competition-snapshot-v1",
+  "captured_at": "2026-07-10",
+  "track": "General-Purpose AI Agent / Hybrid Token-Efficient Routing Agent",
+  "allowed_models_revision": "participant-guide-current-2026-07-10",
+  "allowed_models": [
+    "accounts/fireworks/models/minimax-m3",
+    "accounts/fireworks/models/kimi-k2p7-code",
+    "accounts/fireworks/models/gemma-4-31b-it",
+    "accounts/fireworks/models/gemma-4-26b-a4b-it",
+    "accounts/fireworks/models/gemma-4-31b-it-nvfp4"
+  ],
+  "pricing_note": "Planning snapshot only. Track 1 scoring uses Fireworks token count and accuracy, not USD cost.",
+  "models": {
+    "accounts/fireworks/models/minimax-m3": {
+      "access": "serverless_observed",
+      "input_usd_per_million_tokens": 0.3,
+      "output_usd_per_million_tokens": 1.2
+    },
+    "accounts/fireworks/models/kimi-k2p7-code": {
+      "access": "serverless_observed",
+      "input_usd_per_million_tokens": 0.95,
+      "output_usd_per_million_tokens": 4.0
+    },
+    "accounts/fireworks/models/gemma-4-31b-it": {
+      "access": "unavailable_without_dedicated_deployment",
+      "input_usd_per_million_tokens": 0.24,
+      "output_usd_per_million_tokens": 0.6
+    },
+    "accounts/fireworks/models/gemma-4-26b-a4b-it": {
+      "access": "unavailable_without_dedicated_deployment",
+      "input_usd_per_million_tokens": 0.2,
+      "output_usd_per_million_tokens": 0.5
+    },
+    "accounts/fireworks/models/gemma-4-31b-it-nvfp4": {
+      "access": "unavailable_without_dedicated_deployment",
+      "input_usd_per_million_tokens": 0.2,
+      "output_usd_per_million_tokens": 0.5
+    }
+  }
+}

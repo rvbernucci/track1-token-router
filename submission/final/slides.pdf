@@ -65,7 +65,7 @@ BT
 (Slide 4 - Architecture) Tj
 /F1 20 Tf
 0 -34 Td
-(Mechanical validators protect schema and high-confidence cases, then the router selects the cheapest sufficient Firework) Tj
+(Fail-closed solvers answer only provable templates. All other tasks use validation-selected Kimi when authorized, then s) Tj
 ET
 endstream
 endobj
@@ -113,7 +113,7 @@ BT
 (Slide 7 - AMD/Fireworks Activation) Tj
 /F1 20 Tf
 0 -34 Td
-(Runtime profiles are ready for AMD/Gemma development and Fireworks calibration, while the submitted Docker image stays c) Tj
+(The AMD pod trained FunctionGemma and benchmarked E2B. Memory passed, accuracy did not, so the final image intentionally) Tj
 ET
 endstream
 endobj
@@ -153,15 +153,15 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 1280 720] /Resources << /Font << /F1 3 0 R >> >> /Contents 20 0 R >>
 endobj
 22 0 obj
-<< /Length 195 >>
+<< /Length 208 >>
 stream
 BT
 /F1 34 Tf
 72 642 Td
-(Slide 10 - Remaining Kickoff Work) Tj
+(Slide 10 - Championship Decision) Tj
 /F1 20 Tf
 0 -34 Td
-(Plug in real AMD endpoint, calibrate Fireworks model, adapt official input format and run final benchmark.) Tj
+(The frozen ablation selected deterministic-then-Kimi: 75% binary locked-test accuracy, 73,870 tokens, and no post-test t) Tj
 ET
 endstream
 endobj
@@ -193,9 +193,9 @@ xref
 0000003149 00000 n
 0000003401 00000 n
 0000003530 00000 n
-0000003777 00000 n
+0000003790 00000 n
 trailer
 << /Size 24 /Root 1 0 R >>
 startxref
-3906
+3919
 %%EOF

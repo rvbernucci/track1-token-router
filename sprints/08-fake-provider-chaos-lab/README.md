@@ -31,7 +31,7 @@ Criar simuladores configuraveis de provedor local e Fireworks para testar falhas
 
 ## Criterios de aceite
 
-- [x] E possivel rodar `ROUTER_MODE=hybrid` sem credenciais reais usando fake providers.
+- [x] O fake provider legado permanece como infraestrutura reutilizavel para o fault injection de `three_route`.
 - [x] O sistema se comporta bem com timeout, erro 500 e JSON invalido.
 - [x] Logs mostram falhas sem vazar segredo.
 - [x] CI roda ao menos um cenario fake hybrid.

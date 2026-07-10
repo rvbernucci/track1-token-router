@@ -95,6 +95,7 @@ class LocalCascadeTests(unittest.TestCase):
             env = {
                 **os.environ,
                 "ROUTER_MODE": "cascade",
+                "ENABLE_LEGACY_CASCADE_MODES": "1",
                 "LOCAL_MODEL": "fake-local",
                 "LOCAL_MAX_RETRIES": "0",
                 "ROUTER_LOG_PATH": str(log_path),

@@ -77,9 +77,9 @@ DOMAIN_CORRELATION_MATRIX: dict[str, dict[str, float]] = {
 }
 
 TIER_GAME_WEIGHTS: dict[str, dict[str, float]] = {
-    "cheap": {"cost": 0.65, "quality": 0.25, "latency": 0.10},
-    "medium": {"cost": 0.50, "quality": 0.35, "latency": 0.15},
-    "strong": {"cost": 0.40, "quality": 0.50, "latency": 0.10},
+    "cheap": {"token": 0.65, "quality": 0.25, "latency": 0.10},
+    "medium": {"token": 0.50, "quality": 0.35, "latency": 0.15},
+    "strong": {"token": 0.40, "quality": 0.50, "latency": 0.10},
 }
 
 FIREWORKS_MODEL_ALIASES: dict[str, str] = {
@@ -213,6 +213,8 @@ def select_reasoning_effort(model: str, tier: str) -> str | None:
         return "low"
     if "gemma" in lowered:
         return None
+    if "minimax" in lowered or "kimi" in lowered:
+        return "none"
     if tier in {"cheap", "medium"}:
         return "none"
     return None
@@ -509,12 +511,12 @@ def _is_dominated(candidate: FireworksCandidate, candidates: list[FireworksCandi
         if not other.supports_chat:
             continue
         if (
-            other.estimated_cost_usd <= candidate.estimated_cost_usd
+            other.estimated_total_tokens <= candidate.estimated_total_tokens
             and other.latency_ms <= candidate.latency_ms
             and other.capability >= candidate.capability
             and other.reliability >= candidate.reliability
             and (
-                other.estimated_cost_usd < candidate.estimated_cost_usd
+                other.estimated_total_tokens < candidate.estimated_total_tokens
                 or other.latency_ms < candidate.latency_ms
                 or other.capability > candidate.capability
                 or other.reliability > candidate.reliability
@@ -539,11 +541,11 @@ def _game_metrics(
     quality_utility = _quality_utility(candidate, task)
     weights = TIER_GAME_WEIGHTS.get(task.tier, TIER_GAME_WEIGHTS["medium"])
     nash_product = (
-        (cost_utility ** weights["cost"])
+        (token_utility ** weights["token"])
         * (quality_utility ** weights["quality"])
         * (latency_utility ** weights["latency"])
     )
-    prisoner_payoff = _prisoner_payoff(candidate, candidates, task, cost_utility, latency_utility, quality_utility)
+    prisoner_payoff = _prisoner_payoff(candidate, candidates, task, token_utility, latency_utility, quality_utility)
     return {
         "quality_utility": quality_utility,
         "cost_utility": cost_utility,
@@ -571,7 +573,7 @@ def _prisoner_payoff(
     candidate: FireworksCandidate,
     candidates: list[FireworksCandidate],
     task: _TaskProfile,
-    cost_utility: float,
+    token_utility: float,
     latency_utility: float,
     quality_utility: float,
 ) -> float:
@@ -580,14 +582,14 @@ def _prisoner_payoff(
         for item in candidates
         if item.supports_chat and item.capability >= task.required_capability
     ]
-    min_eligible_cost = min((item.estimated_cost_usd for item in eligible), default=candidate.estimated_cost_usd)
-    cost_ratio = candidate.estimated_cost_usd / max(min_eligible_cost, 0.000000001)
-    over_escalation_penalty = max(0.0, cost_ratio - 1.0) * 0.05
+    min_eligible_tokens = min((item.estimated_total_tokens for item in eligible), default=candidate.estimated_total_tokens)
+    token_ratio = candidate.estimated_total_tokens / max(min_eligible_tokens, 1)
+    over_escalation_penalty = max(0.0, token_ratio - 1.0) * 0.05
     unsafe_penalty = 0.40 if candidate.capability < task.required_capability else 0.0
     non_chat_penalty = 0.90 if not candidate.supports_chat else 0.0
     payoff = (
         (0.50 * quality_utility)
-        + (0.40 * cost_utility)
+        + (0.40 * token_utility)
         + (0.10 * latency_utility)
         - over_escalation_penalty
         - unsafe_penalty
@@ -614,12 +616,12 @@ def _game_label(
         for item in candidates
         if item.supports_chat and item.capability >= task.required_capability
     ]
-    min_eligible_cost = min((item.estimated_cost_usd for item in eligible), default=candidate.estimated_cost_usd)
-    cost_ratio = candidate.estimated_cost_usd / max(min_eligible_cost, 0.000000001)
+    min_eligible_tokens = min((item.estimated_total_tokens for item in eligible), default=candidate.estimated_total_tokens)
+    token_ratio = candidate.estimated_total_tokens / max(min_eligible_tokens, 1)
     best_quality = max((_quality_utility(item, task) for item in eligible), default=metrics["quality_utility"])
-    if cost_ratio > 2.5 and metrics["quality_utility"] <= best_quality + 0.02:
-        return "defect_expensive_overescalation"
-    if cost_ratio <= 1.20 and metrics["quality_utility"] >= 0.75:
+    if token_ratio > 2.5 and metrics["quality_utility"] <= best_quality + 0.02:
+        return "defect_token_overescalation"
+    if token_ratio <= 1.20 and metrics["quality_utility"] >= 0.75:
         return "cooperate_token_efficient"
     return "cooperate_quality_safe"
 
@@ -640,7 +642,7 @@ def _game_theory_summary(
         "selected_correlation": selected.correlation,
         "eligible_pool_size": len(pool),
         "dilemma": (
-            "avoid_expensive_overescalation_and_unsafe_underqualification"
+            "avoid_token_overescalation_and_unsafe_underqualification"
         ),
     }
 
@@ -663,12 +665,13 @@ def _clamp(value: float, minimum: float, maximum: float) -> float:
     return max(minimum, min(maximum, value))
 
 
-def _nash_selection_score(candidate: FireworksCandidate) -> tuple[float, float, float, int, str]:
+def _nash_selection_score(candidate: FireworksCandidate) -> tuple[float, float, float, int, float, str]:
     return (
         candidate.nash_product,
         candidate.prisoner_payoff,
-        -candidate.estimated_cost_usd,
+        -float(candidate.estimated_total_tokens),
         -candidate.latency_ms,
+        -candidate.estimated_cost_usd,
         candidate.model,
     )
 

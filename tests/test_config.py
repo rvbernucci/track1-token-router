@@ -37,6 +37,15 @@ class RouterConfigTests(unittest.TestCase):
         self.assertIsNone(default_config.fireworks_service_tier)
         self.assertEqual(priority_config.fireworks_service_tier, "priority")
 
+    def test_fireworks_champion_model_is_normalized_and_optional(self) -> None:
+        with patched_env(FIREWORKS_CHAMPION_MODEL=None):
+            default_config = RouterConfig.from_env()
+        with patched_env(FIREWORKS_CHAMPION_MODEL="kimi-k2p7-code"):
+            champion_config = RouterConfig.from_env()
+
+        self.assertIsNone(default_config.fireworks_champion_model)
+        self.assertEqual(champion_config.fireworks_champion_model, "accounts/fireworks/models/kimi-k2p7-code")
+
     def test_short_allowed_model_names_are_normalized(self) -> None:
         with patched_env(
             FIREWORKS_MODEL=None,
@@ -104,6 +113,20 @@ class RouterConfigTests(unittest.TestCase):
 
         self.assertIsNone(default_config.fireworks_matrix_weights)
         self.assertEqual(calibrated_config.fireworks_matrix_weights, Path("reports/generated/weights.json"))
+
+    def test_fireworks_intent_policy_is_optional_and_pinnable(self) -> None:
+        with patched_env(FIREWORKS_INTENT_POLICY=None, FIREWORKS_INTENT_POLICY_SHA256=None):
+            default_config = RouterConfig.from_env()
+        with patched_env(
+            FIREWORKS_INTENT_POLICY="configs/fireworks-intent-policy-v1.json",
+            FIREWORKS_INTENT_POLICY_SHA256="a" * 64,
+        ):
+            calibrated_config = RouterConfig.from_env()
+
+        self.assertIsNone(default_config.fireworks_intent_policy)
+        self.assertIsNone(default_config.fireworks_intent_policy_sha256)
+        self.assertEqual(calibrated_config.fireworks_intent_policy, Path("configs/fireworks-intent-policy-v1.json"))
+        self.assertEqual(calibrated_config.fireworks_intent_policy_sha256, "a" * 64)
 
     def test_fireworks_defaults_fit_track1_latency_envelope(self) -> None:
         with patched_env(FIREWORKS_TIMEOUT_S=None, FIREWORKS_MAX_RETRIES=None):

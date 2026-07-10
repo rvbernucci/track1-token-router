@@ -129,6 +129,7 @@ class HybridCascadeTests(unittest.TestCase):
             env = {
                 **os.environ,
                 "ROUTER_MODE": "hybrid",
+                "ENABLE_LEGACY_CASCADE_MODES": "1",
                 "LOCAL_MODEL": "fake-local",
                 "LOCAL_MAX_RETRIES": "0",
                 "FIREWORKS_MODEL": "fake-fireworks",

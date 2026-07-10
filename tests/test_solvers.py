@@ -84,6 +84,18 @@ class SolverPackTests(unittest.TestCase):
             with self.subTest(prompt=prompt):
                 self.assertIsNone(solve_deterministic(TaskEnvelope(input_text=prompt)))
 
+    def test_blocks_championship_keyword_leakage_regressions(self) -> None:
+        blocked = [
+            "Print exactly this SQL query: SELECT * FROM users WHERE age > 18;",
+            'Classify sentiment as one lowercase word. Review: "Battery life is fantastic."',
+            "Write a function and return JSON with code_base64, character count, and sha256.",
+            'Summarize in at most 15 words as JSON schema: {"type":"object"}. Text: Quantum computing helps.',
+            "Write normalize_scores that rescales values to [0, 1] using min-max normalization.",
+        ]
+        for prompt in blocked:
+            with self.subTest(prompt=prompt):
+                self.assertIsNone(solve_deterministic(TaskEnvelope(input_text=prompt)))
+
     def test_solves_explicit_sentiment(self) -> None:
         cases = {
             "Classify the sentiment as exactly one word: positive, neutral, or negative. Text: The interface is quick, clean, and reliable.": "positive",
@@ -172,6 +184,29 @@ class SolverPackTests(unittest.TestCase):
         for prompt in blocked:
             with self.subTest(prompt=prompt):
                 self.assertIsNone(solve_deterministic(TaskEnvelope(input_text=prompt)))
+
+    def test_count_solvers_require_an_explicit_count_request(self) -> None:
+        cases = {
+            "How many words are in 'one two three'? Return only the number.": ("word_count", "3"),
+            "Count the characters in 'route'. Return only the number.": ("char_count", "5"),
+        }
+        for prompt, (solver, answer) in cases.items():
+            with self.subTest(prompt=prompt):
+                result = solve_deterministic(TaskEnvelope(input_text=prompt))
+                self.assertIsNotNone(result)
+                self.assertEqual(result.solver_name, solver)
+                self.assertEqual(result.answer, answer)
+
+        false_positives = [
+            "Classify this sentence as positive or negative. Respond with a single word: 'Excellent service.'",
+            "Summarize this article in your own words: 'Routing saves tokens.'",
+            "Return JSON with a confidence_note string of at most 20 words. Passage: 'The answer is Ottawa.'",
+            "Return JSON with a quote that is at least 8 characters. Passage: 'The answer is 34.1 C.'",
+        ]
+        for prompt in false_positives:
+            with self.subTest(prompt=prompt):
+                result = solve_deterministic(TaskEnvelope(input_text=prompt))
+                self.assertTrue(result is None or result.solver_name not in {"word_count", "char_count"})
 
     def test_blocks_ambiguous_sentiment(self) -> None:
         blocked = [

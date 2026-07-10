@@ -57,10 +57,11 @@ Official objective:
 - `Dockerfile` provides the container entrypoint for Track 1.
 - `router submit-track1` implements the file contract used by the container default command.
 - `ROUTER_MODE=fireworks` is the safest official default for the current final grading envelope.
-- `ROUTER_MODE=hybrid` remains an experimental/championship profile only if a compact local model is proven under the final envelope or an official local endpoint is provided.
+- `ROUTER_MODE=three_route` reproduces the rejected FunctionGemma/E2B challenger; it is not the submitted default.
 - `scripts/amd_pod_doctor.py` verifies the AMD pod before model downloads.
 - `scripts/bootstrap_amd_pod.sh` validates clone-to-smoke bootstrap on the AMD notebook.
-- `FIREWORKS_MATRIX_WEIGHTS` can enable microbench-calibrated model selection for Fireworks fallback.
+- `FIREWORKS_CHAMPION_MODEL` prefers validation-selected Kimi only when authorized by `ALLOWED_MODELS`.
+- `FIREWORKS_MATRIX_WEIGHTS` remains a fallback experiment and cannot override the promoted champion.
 
 ## Watch Items
 

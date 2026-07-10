@@ -24,9 +24,11 @@ logs/*.jsonl
 logs/*.log
 runs/
 reports/generated/
+data/dataset-forge/
+data/e2b-regression-2000/
+artifacts/
 
 # OS/editor noise
 .DS_Store
 .idea/
 .vscode/
-

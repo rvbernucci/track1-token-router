@@ -226,12 +226,13 @@
         <p class="eyebrow">AMD Developer Hackathon ACT II / Track 1</p>
         <h1>Accuracy first. Remote tokens only when needed.</h1>
         <p class="lead">
-          Track 1 Token Router is a CLI-first routing agent that uses deterministic solvers,
-          local generation, local verification and compact Fireworks audit to preserve answer
-          quality while minimizing remote token spend.
+          Track 1 Token Router is a CLI-first agent that uses fail-closed deterministic solvers,
+          then validation-selected Kimi when authorized by the evaluator, with strict output
+          validation and allowed-model fallback.
         </p>
         <div class="actions">
           <a class="button" href="public-reports/battle-report.md">Battle report</a>
+          <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/reports/public/championship-ablation.md">Championship ablation</a>
           <a class="button secondary" href="public-reports/fuzz-report.md">Fuzz report</a>
           <a class="button secondary" href="public-reports/submission-readiness.md">Submission readiness</a>
           <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/README.md">README</a>
@@ -240,13 +241,11 @@
       </div>
 
       <aside class="panel router-card" aria-label="Router flow">
-        <div class="node"><strong>0. Deterministic</strong> Guardrails and solvers answer mechanical tasks before any model.</div>
+        <div class="node"><strong>1. Local proof</strong> A registered solver accepts only an exact mechanical contract.</div>
         <div class="arrow">↓</div>
-        <div class="node"><strong>1. Local Candidate</strong> M1 proposes a free-form answer through an OpenAI-compatible endpoint.</div>
+        <div class="node"><strong>2. Accuracy route</strong> Kimi is preferred only when it appears in <code>ALLOWED_MODELS</code>.</div>
         <div class="arrow">↓</div>
-        <div class="node"><strong>2. Local Verification</strong> M2A checks risk, format and confidence before spending remote tokens.</div>
-        <div class="arrow">↓</div>
-        <div class="node"><strong>3. Remote Audit</strong> Fireworks receives a compact approve-or-replace packet only on risky tasks.</div>
+        <div class="node"><strong>3. Contract guard</strong> Strict validation, safe repair and ranked fallback produce the answer.</div>
       </aside>
     </section>
 
@@ -254,24 +253,24 @@
       <article class="card">
         <h2>Why this wins</h2>
         <p>The hard part is not calling the strongest model. The hard part is knowing when not to call it.</p>
-        <span class="metric">local-first</span>
+        <span class="metric">75% binary</span>
       </article>
 
       <article class="card">
         <h2>Evidence</h2>
-        <p>Offline battle drill checks policy score, competition readiness, solver savings and fuzz robustness.</p>
-        <span class="metric">offline gated</span>
+        <p>A 571-task frozen ablation rejected the FunctionGemma/E2B, per-intent, matrix and Minimax challengers without post-test tuning.</p>
+        <span class="metric">571 tasks</span>
       </article>
 
       <article class="card">
         <h2>Submission shape</h2>
         <p>Public GitHub repo, Docker, CLI reproduction, static demo and no-credit release path.</p>
-        <span class="metric">zero credits</span>
+        <span class="metric">linux/amd64</span>
       </article>
 
       <article class="card wide">
         <h2>Demo command</h2>
-        <pre><code>ROUTER_MODE=competition COMPETITION_DRY_RUN=1 \
+        <pre><code>ROUTER_MODE=fireworks \
 python3 -m router ask "What is 6 * 7? Return only the number." --json</code></pre>
       </article>
 

@@ -8,15 +8,15 @@ Track 1 Token Router
 
 ## Short Description
 
-General-purpose AI routing agent that preserves answer quality while minimizing Fireworks tokens through calibrated model selection, compact prompts, Gemma readiness and mechanical validation.
+Accuracy-first token router: fail-closed local solvers, validation-selected Kimi, strict outputs, and evidence-backed rejection of unsafe local-model routes.
 
 ## Long Description
 
-Track 1 Token Router is a CLI-first competitive agent for the AMD Developer Hackathon Track 1 challenge. The project treats token efficiency as an orchestration problem, not as a single prompt trick. It handles the eight official general-purpose categories with a Fireworks-compatible router, calibrated model selection, compact answer prompts and mechanical validators that protect schema, format and high-confidence calculations without replacing the AI agent.
+Track 1 Token Router is a CLI-first competitive agent for AMD Developer Hackathon Track 1. It offers each untouched task to a fail-closed deterministic solver, then calls validation-selected Kimi K2.7 Code only when the model is authorized by the evaluator's `ALLOWED_MODELS`. Dynamic completion ceilings, strict output validation, safe mechanical repairs and ranked fallback protect accuracy while limiting scored Fireworks tokens.
 
-The repository is designed to be reproducible before credits arrive. It includes a no-credit competition mode, fuzz tests for official input uncertainty, an offline scoring arena, battle drill reports, Fireworks activation runbooks, Docker support and CI gates. It also includes AMD/Gemma runtime profiles for development and calibration, while the submitted image remains small and compatible with the official CPU/RAM grading envelope. The main goal is to maximize accuracy while spending remote tokens only when the expected quality gain justifies the cost.
+The team also trained FunctionGemma 270M on AMD and tested a quantized, text-only Gemma 4 E2B route on 2,000 tasks. That challenger fit the memory envelope but failed the frozen accuracy gate, so it was excluded from the final image. The same holdout rejected per-intent, matrix and Minimax-only policies. The promoted deterministic-plus-Kimi runtime produced the strongest eligible accuracy with fewer tokens and the smallest operational surface.
 
-The system is intentionally headless and evaluator-friendly: stdout stays clean, logs are structured JSONL, and adapters isolate official input formats from the core runner.
+The system is headless and evaluator-friendly: stdout stays clean, logs are structured JSONL, adapters isolate official formats, and the final public Linux `amd64` image requires no startup model download.
 
 ## Tags
 
@@ -24,11 +24,11 @@ The system is intentionally headless and evaluator-friendly: stdout stays clean,
 - DigitalOcean MI300X
 - Fireworks AI
 - Gemma
-- vLLM
-- SGLang
 - Token Efficiency
 - Routing Agent
-- Local-First AI
+- Model Evaluation
+- Holdout Testing
+- Game Theory
 - CLI Runner
 - Python
 - Hackathon Track 1

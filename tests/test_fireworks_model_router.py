@@ -95,14 +95,14 @@ class FireworksModelRouterTests(unittest.TestCase):
         self.assertEqual(selection.tier, "strong")
         self.assertEqual(selection.model, "accounts/fireworks/models/minimax-m3")
 
-    def test_track1_allowed_catalog_still_uses_gemma_for_medium_language_tasks(self) -> None:
+    def test_track1_allowed_catalog_uses_token_efficient_sufficient_medium_model(self) -> None:
         selection = select_fireworks_model(
             TaskEnvelope(input_text="Summarise this: Local verification reduces remote token spend."),
             TRACK1_ALLOWED_SHORT_NAMES,
         )
 
         self.assertEqual(selection.domain, "summarization")
-        self.assertTrue(selection.model.endswith("gemma-4-31b-it-nvfp4"))
+        self.assertTrue(selection.model.endswith("kimi-k2p7-code"))
 
     def test_gemma_does_not_send_reasoning_effort(self) -> None:
         self.assertIsNone(select_reasoning_effort("accounts/fireworks/models/gemma-4-31b-it", "cheap"))
@@ -302,7 +302,7 @@ class FireworksModelRouterTests(unittest.TestCase):
         self.assertEqual(selection.model, "accounts/fireworks/models/kimi-k2p6")
         self.assertIn("accounts/fireworks/models/kimi-k2p6", selection.pareto_frontier)
 
-    def test_full_catalog_routes_code_to_cheapest_sufficient_generation_model(self) -> None:
+    def test_full_catalog_routes_code_to_token_efficient_sufficient_generation_model(self) -> None:
         selection = select_fireworks_model(
             TaskEnvelope(input_text="Write a function that parses nested JSON and handles edge cases."),
             FIREWORKS_PARETO_CATALOG,
@@ -310,7 +310,7 @@ class FireworksModelRouterTests(unittest.TestCase):
 
         self.assertEqual(selection.tier, "strong")
         self.assertEqual(selection.domain, "code_generation")
-        self.assertEqual(selection.model, "accounts/fireworks/models/minimax-m3")
+        self.assertEqual(selection.model, "accounts/fireworks/models/kimi-k2p7-code")
         self.assertIn("accounts/fireworks/models/kimi-k2p7-code", selection.pareto_frontier)
 
     def test_game_theory_summary_marks_selected_model_as_equilibrium(self) -> None:
@@ -324,7 +324,7 @@ class FireworksModelRouterTests(unittest.TestCase):
         self.assertEqual(selection.game_theory["equilibrium_type"], "pure_strategy_nash_equilibrium")
         self.assertGreater(selection.game_theory["selected_nash_product"], 0.0)
 
-    def test_correlation_matrix_penalizes_expensive_overescalation(self) -> None:
+    def test_correlation_matrix_uses_tokens_instead_of_dollar_price(self) -> None:
         selection = select_fireworks_model(
             TaskEnvelope(input_text="Write a function that parses nested JSON and handles edge cases."),
             FIREWORKS_PARETO_CATALOG,
@@ -335,9 +335,9 @@ class FireworksModelRouterTests(unittest.TestCase):
         self.assertEqual(DOMAIN_CORRELATION_MATRIX["code_generation"]["code_generation"], 1.0)
         self.assertEqual(minimax["correlation"], 1.0)
         self.assertEqual(kimi["correlation"], 1.0)
-        self.assertGreater(minimax["nash_product"], kimi["nash_product"])
-        self.assertEqual(minimax["game_label"], "cooperate_token_efficient")
-        self.assertEqual(kimi["game_label"], "defect_expensive_overescalation")
+        self.assertGreater(kimi["nash_product"], minimax["nash_product"])
+        self.assertEqual(kimi["game_label"], "cooperate_token_efficient")
+        self.assertEqual(minimax["game_label"], "dominated_strategy")
 
     def test_embedding_and_reranker_models_never_enter_response_frontier(self) -> None:
         selection = select_fireworks_model(
@@ -350,7 +350,7 @@ class FireworksModelRouterTests(unittest.TestCase):
             for candidate in selection.candidates
             if candidate["kind"] in {"embedding", "reranker"}
         }
-        self.assertEqual(selection.model, "accounts/fireworks/models/gpt-oss-20b")
+        self.assertEqual(selection.model, "accounts/fireworks/models/glm-5p1")
         self.assertEqual(
             sorted(auxiliary),
             [
@@ -388,7 +388,7 @@ class FireworksModelRouterTests(unittest.TestCase):
         self.assertEqual(selection.domain, "logic")
         self.assertLess(selection.estimated_cost_usd, 0.001)
 
-    def test_fast_variant_is_available_but_not_selected_when_standard_is_cheaper(self) -> None:
+    def test_fast_variant_wins_when_quality_and_tokens_tie(self) -> None:
         selection = select_fireworks_model(
             TaskEnvelope(input_text="Summarise this: token routing matters."),
             [
@@ -397,14 +397,16 @@ class FireworksModelRouterTests(unittest.TestCase):
             ],
         )
 
-        self.assertEqual(selection.model, "accounts/fireworks/models/glm-5p2")
-        self.assertEqual(selection.service_path, "standard")
+        self.assertEqual(selection.model, "accounts/fireworks/routers/glm-5p2-fast")
+        self.assertEqual(selection.service_path, "fast")
         fast = next(candidate for candidate in selection.candidates if candidate["service_path"] == "fast")
         self.assertFalse(fast["dominated"])
 
     def test_reasoning_effort_none_for_simple_non_gpt_oss_tasks(self) -> None:
         self.assertEqual(select_reasoning_effort("accounts/fireworks/models/glm-5p1", "cheap"), "none")
         self.assertEqual(select_reasoning_effort("accounts/fireworks/models/kimi-k2p6", "medium"), "none")
+        self.assertEqual(select_reasoning_effort("accounts/fireworks/models/minimax-m3", "strong"), "none")
+        self.assertEqual(select_reasoning_effort("accounts/fireworks/models/kimi-k2p7-code", "strong"), "none")
 
     def test_gpt_oss_uses_supported_reasoning_effort_values(self) -> None:
         self.assertEqual(select_reasoning_effort("accounts/fireworks/models/gpt-oss-120b", "cheap"), "low")

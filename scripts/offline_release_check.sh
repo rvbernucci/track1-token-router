@@ -12,6 +12,9 @@ python3 scripts/prompt_ablation.py --check >/dev/null
 python3 scripts/generate_fuzz_eval.py --check >/dev/null
 python3 scripts/run_fuzz_eval.py --check >/dev/null
 python3 scripts/check_runtime_profiles.py >/dev/null
+python3 scripts/freeze_championship_evidence.py --check >/dev/null
+python3 scripts/championship_ablation.py --bootstrap-repetitions 200 >/dev/null
+python3 scripts/score_shift_stress.py >/dev/null
 python3 scripts/build_submission_artifacts.py --check >/dev/null
 python3 scripts/submission_readiness_check.py >/dev/null
 python3 scripts/analyze_traces.py --logs fixtures/logs/sample-run.jsonl >/dev/null

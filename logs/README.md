@@ -13,10 +13,10 @@ JSONL, uma linha por task:
 ```json
 {
   "task_id": "abc",
-  "route": "m1_approved",
-  "model_1_ms": 120,
-  "model_2a_ms": 450,
-  "model_2b_ms": 0,
+  "route": "deterministic",
+  "functiongemma_ms": 12,
+  "deterministic_ms": 1,
+  "e2b_ms": 0,
   "remote_ms": 0,
   "remote_prompt_tokens": 0,
   "remote_completion_tokens": 0,

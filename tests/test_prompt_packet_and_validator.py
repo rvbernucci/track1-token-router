@@ -1,7 +1,11 @@
 import unittest
 
 from router.core.contracts import TaskEnvelope
-from router.orchestration.final_validator import repair_final_answer, validate_final_answer
+from router.orchestration.final_validator import (
+    repair_final_answer,
+    validate_final_answer,
+    validate_or_safely_repair_final_answer,
+)
 from router.orchestration.prompt_packet import (
     build_remote_audit_packet,
     estimate_policy_packet_tokens,
@@ -47,6 +51,26 @@ class FinalValidatorTests(unittest.TestCase):
 
         self.assertFalse(result.valid)
         self.assertEqual(result.repaired_answer, '{"answer":4}')
+
+    def test_safely_releases_repaired_json(self) -> None:
+        task = TaskEnvelope(input_text="Return only JSON with key answer.")
+
+        result = validate_or_safely_repair_final_answer(task, '```json\n{"answer":4}\n```')
+
+        self.assertTrue(result.valid)
+        self.assertEqual(result.reason, "safe_repair:markdown_fence_in_strict_format")
+        self.assertEqual(result.repaired_answer, '{"answer":4}')
+
+    def test_does_not_extract_first_number_from_fenced_explanation(self) -> None:
+        task = TaskEnvelope(input_text="What is 12 - 5? Return only the number.")
+
+        result = validate_or_safely_repair_final_answer(
+            task,
+            "```text\n12 minus 5 equals 7\n```",
+        )
+
+        self.assertFalse(result.valid)
+        self.assertEqual(result.reason, "markdown_fence_in_strict_format")
 
     def test_repairs_python_code_wrapped_in_markdown(self) -> None:
         task = TaskEnvelope(input_text="Return only Python code. Define a function add(a, b).")
@@ -153,6 +177,35 @@ class FinalValidatorTests(unittest.TestCase):
         task = TaskEnvelope(input_text="Explain Nash equilibrium briefly.")
 
         result = validate_final_answer(task, "A stable strategy profile.")
+
+        self.assertTrue(result.valid)
+
+    def test_free_text_rejects_repeated_generation_loop(self) -> None:
+        task = TaskEnvelope(input_text="Who is the president of Brazil?")
+        answer = (
+            "The president of Brazil is the elected head of state. "
+            "president of Brazil and president of Brazil and president of Brazil and "
+            "president of Brazil and president of Brazil"
+        )
+
+        result = validate_final_answer(task, answer)
+
+        self.assertFalse(result.valid)
+        self.assertEqual(result.reason, "degenerate_repetition")
+
+    def test_free_text_rejects_unclosed_markdown_fence(self) -> None:
+        task = TaskEnvelope(input_text="Summarize this paragraph briefly.")
+
+        result = validate_final_answer(task, "```text\nA summary that never closes")
+
+        self.assertFalse(result.valid)
+        self.assertEqual(result.reason, "unclosed_markdown_fence")
+
+    def test_free_text_does_not_reject_repeated_entities_in_a_list(self) -> None:
+        task = TaskEnvelope(input_text="Extract all named entities from the text.")
+        answer = "Ana; Ana; Bruno; Carla; Ana"
+
+        result = validate_final_answer(task, answer)
 
         self.assertTrue(result.valid)
 

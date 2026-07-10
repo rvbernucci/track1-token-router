@@ -1,102 +1,34 @@
 # Sprints
 
-Indice operacional do `Track 1 Token Router CLI`.
+## Active Championship Sequence
 
-## Estado atual
+The architecture reset starts at Sprint 45. These sprints are sequential and all finish with executable evidence.
 
-As Sprints 01-05 ja entregaram a base executavel:
+- [x] [Sprint 45 - Assessment And Decision Contracts](./45-three-route-architecture-migration/README.md)
+- [x] [Sprint 46 - FunctionGemma Assessment Training](./46-functiongemma-router-training/README.md)
+- [x] [Sprint 47 - Engine Outcome Matrix](./47-gemma-e2b-text-only-runtime/README.md)
+- [x] [Sprint 48 - Regression And Game-Theory Decision Engine](./48-three-route-orchestration/README.md)
+- [Sprint 49 - Championship Calibration](./49-championship-calibration/README.md)
 
-- CLI e contratos;
-- M1 local;
-- cascata local M1 -> M2A -> M2B;
-- auditor Fireworks em modo hibrido;
-- Docker, CI, README e submissao.
+## Completed Foundation
 
-## Regra nova
+Sprints 01-44 produced reusable infrastructure: CLI contracts, adapters, tests, deterministic solvers, Fireworks integration, Pareto/game-theory selection, eval packs, observability, Docker and release automation.
 
-A rota principal nao pode depender de credito AMD ou Fireworks.
+The detailed retired-cascade sprint documents were removed. Git history preserves the experiment without allowing it to compete with the current specification.
 
-Enquanto os creditos nao forem liberados, seguimos na trilha `offline`, usando datasets, simuladores, fake providers, eval harness e politicas de roteamento. Quando os creditos chegarem, a trilha `credit-gated` entra como acelerador, nao como bloqueio.
+## Rule Of Completion
 
-## Sprints concluidas
+Every active sprint must end with:
 
-- [Sprint 01 - Fundacao e contratos](./01-foundation/README.md)
-- [Sprint 02 - Modelo local e M1](./02-local-m1/README.md)
-- [Sprint 03 - Verificador M2A e M2B](./03-local-verifier/README.md)
-- [Sprint 04 - Fireworks e scoring](./04-fireworks-scoring/README.md)
-- [Sprint 05 - Hardening e entrega](./05-hardening-submission/README.md)
-- [Sprint 06 - Offline Evaluation Arena](./06-offline-eval-arena/README.md)
-- [Sprint 07 - Routing Policy Lab](./07-routing-policy-lab/README.md)
-- [Sprint 08 - Fake Provider Chaos Lab](./08-fake-provider-chaos-lab/README.md)
-- [Sprint 09 - Official Adapter Readiness](./09-official-adapter-readiness/README.md)
-- [Sprint 10 - Offline Release Candidate](./10-offline-release-candidate/README.md)
-- [Sprint 11 - Testing Culture Lab](./11-testing-culture-lab/README.md)
-- [Sprint 12 - Offline Scoring Simulator](./12-offline-scoring-simulator/README.md)
-- [Sprint 13 - Prompt Versioning & Ablation Lab](./13-prompt-versioning-ablation-lab/README.md)
-- [Sprint 14 - Deterministic Guardrails](./14-deterministic-guardrails/README.md)
-- [Sprint 15 - Trace Analytics](./15-trace-analytics/README.md)
-- [Sprint 16 - Release Automation & GHCR](./16-release-automation-ghcr/README.md)
-- [Sprint 17 - Orchestration State Machine](./17-orchestration-state-machine/README.md)
-- [Sprint 18 - Budget Manager & Token-Latency Governor](./18-budget-manager-token-latency-governor/README.md)
-- [Sprint 19 - Adaptive Policy Engine & Risk Signals](./19-adaptive-policy-engine-risk-signals/README.md)
-- [Sprint 20 - Compact Prompt Packet & Final Validator](./20-compact-prompt-packet-final-validator/README.md)
-- [Sprint 21 - Calibration Loop & Battle Drill](./21-calibration-loop-battle-drill/README.md)
-- [Sprint 22 - Competition Mode Integration](./22-competition-mode-integration/README.md)
-- [Sprint 23 - Official Input Fuzz Pack](./23-official-input-fuzz-pack/README.md)
-- [Sprint 24 - Deterministic Solver Pack](./24-deterministic-solver-pack/README.md)
-- [Sprint 25 - Platform Runbooks & Runtime Profiles](./25-platform-runbooks-runtime-profiles/README.md)
-- [Sprint 26 - Submission Readiness Kit](./26-submission-readiness-kit/README.md)
-- [Sprint 27 - Static Demo And Public Reports](./27-static-demo-public-reports/README.md)
-- [Sprint 28 - Evaluator Contract And Adapter Drill](./28-evaluator-contract-adapter-drill/README.md)
-- [Sprint 29 - Latency And Token Envelope Lab](./29-latency-token-envelope-lab/README.md)
-- [Sprint 30 - Artifact Build Kit](./30-artifact-build-kit/README.md)
-- [Sprint 31 - Policy Pareto And Decision Replay](./31-policy-pareto-decision-replay/README.md)
+- one executable command;
+- one versioned artifact;
+- one measurable gate;
+- tests for success and failure paths;
+- one documented promotion or rejection decision.
 
-## Proximas sprints sem credito
+## Source Of Truth
 
-Estas sprints formam a terceira onda de readiness: publicar, ensaiar e endurecer o projeto contra surpresas externas sem depender de AMD/Fireworks.
-
-- [Sprint 32 - Public Demo Deploy And Strict Readiness](./32-public-demo-deploy-strict-readiness/README.md)
-- [Sprint 33 - Bad Local Model Chaos Lab](./33-bad-local-model-chaos-lab/README.md)
-- [Sprint 34 - Semantic Validation Harness](./34-semantic-validation-harness/README.md)
-- [Sprint 35 - Batch Throughput And Timeout Stress](./35-batch-throughput-timeout-stress/README.md)
-- [Sprint 36 - Submission Rehearsal And Log Redaction](./36-submission-rehearsal-log-redaction/README.md)
-- [Sprint 37 - Mechanical Validation Evidence For M2A](./37-mechanical-validation-evidence-for-m2a/README.md)
-- [Sprint 38 - Fireworks Model Router Cost Optimizer](./38-fireworks-model-router-cost-optimizer/README.md)
-- [Sprint 39 - Spec-Driven Governance](./39-spec-driven-governance/README.md)
-- [Sprint 40 - Pareto Spec Operationalization](./40-pareto-spec-operationalization/README.md)
-- [Sprint 41 - Domain Correlation Eval Pack](./41-domain-correlation-eval-pack/README.md)
-- [Sprint 42 - Nash Payoff Replay Lab](./42-nash-payoff-replay-lab/README.md)
-- [Sprint 43 - Router Telemetry Calibration Dashboard](./43-router-telemetry-calibration-dashboard/README.md)
-
-## Sprints dependentes de credito
-
-Estas sprints so devem comecar quando houver acesso real a AMD Developer Cloud e/ou Fireworks.
-
-- [Credit Sprint A - AMD Runtime Bring-up](./credit-a-amd-runtime-bringup/README.md)
-- [Credit Sprint B - Fireworks Real Audit Calibration](./credit-b-fireworks-real-calibration/README.md)
-- [Credit Sprint C - End-to-End Cost Benchmark](./credit-c-e2e-cost-benchmark/README.md)
-- [Credit Sprint D - Final Cloud Submission Drill](./credit-d-final-cloud-drill/README.md)
-- [Sprint 44 - Fireworks Minimal Credit Calibration](./44-fireworks-minimal-credit-calibration/README.md)
-
-## Regra de ouro
-
-Cada sprint precisa terminar com:
-
-- um comando rodando;
-- um artefato testavel;
-- uma metrica nova;
-- uma decisao documentada;
-- uma lista curta do que ficou para depois.
-
-## Anti-escopo
-
-Evitar nas proximas sprints:
-
-- esperar credito para fazer trabalho offline;
-- depender de notebook manual;
-- calibrar prompt sem dataset;
-- adicionar UI antes de melhorar scoring;
-- trocar arquitetura sem ablation;
-- publicar segredo em log, README, env ou CI;
-- misturar debug com `stdout`.
+- Architecture: [`../docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md)
+- Router contract: [`../docs/FUNCTIONGEMMA_ROUTER_SPEC.md`](../docs/FUNCTIONGEMMA_ROUTER_SPEC.md)
+- Training: [`../docs/FUNCTIONGEMMA_270M_AMD_TRAINING_TUTORIAL.md`](../docs/FUNCTIONGEMMA_270M_AMD_TRAINING_TUTORIAL.md)
+- E2B runtime: [`../docs/GEMMA_E2B_TEXT_ONLY_RUNTIME.md`](../docs/GEMMA_E2B_TEXT_ONLY_RUNTIME.md)

@@ -19,7 +19,7 @@ Open `http://localhost:8080`.
 ## What To Show In 90 Seconds
 
 1. State the thesis: the router protects accuracy while spending remote Fireworks tokens only when risk justifies it.
-2. Point to the flow: deterministic solver, local candidate, local verifier, compact remote audit.
+2. Point to the flow: FunctionGemma assessment, regression/minimax decision, deterministic/E2B/Fireworks execution.
 3. Run or show the arithmetic example: `solver_arithmetic` answers `42` with zero remote tokens.
 4. Open the public battle, fuzz and submission readiness reports.
 5. Close with reproducibility: `scripts/offline_release_check.sh` validates the no-credit path.

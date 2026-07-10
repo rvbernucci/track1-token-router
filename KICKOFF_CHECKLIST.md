@@ -25,12 +25,13 @@ Use this when the official Track 1 task format is revealed.
 - Tests: `tests/test_official_adapters.py`.
 - CLI integration if needed: `router/cli/main.py`.
 
-## Do not touch unless necessary
+## Keep stable unless the official contract requires change
 
 - `router/core/contracts.py`
-- `router/core/local_cascade.py`
-- `router/core/hybrid_cascade.py`
-- `router/core/prompts.py`
+- FunctionGemma tool schemas
+- deterministic solver manifest
+- E2B family allowlist
+- Fireworks allowed-model boundary
 
 The core should stay stable. The adapter absorbs official format changes.
 

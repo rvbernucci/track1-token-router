@@ -80,7 +80,7 @@ class PublicReportExportTests(unittest.TestCase):
         self.assertIn("public-reports/submission-readiness.md", content)
         self.assertIn("README.md", content)
         self.assertIn("SUBMISSION.md", content)
-        self.assertIn("Remote audit dry-run", content)
+        self.assertIn("FunctionGemma", content)
         self.assertIn("python3 -m http.server 8080", content)
         self.assertIn("solver_arithmetic", content)
 

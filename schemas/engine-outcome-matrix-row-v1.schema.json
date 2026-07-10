@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rvbernucci/track1-token-router/schemas/engine-outcome-matrix-row-v1.schema.json",
+  "title": "Engine Outcome Matrix Row v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "task_id", "candidate_id", "engine", "engine_version", "model_id", "status",
+    "correct", "consensus", "judge_models", "format_valid", "latency_ms", "fireworks_prompt_tokens",
+    "fireworks_completion_tokens", "runtime_failure", "peak_memory_mb", "memory_observed", "token_ceiling",
+    "assessment", "features", "regression_split", "mutation_lineage", "source", "missing_reason"
+  ],
+  "properties": {
+    "schema_version": {"const": "engine-outcome-matrix-row-v1"},
+    "task_id": {"type": "string", "minLength": 1},
+    "candidate_id": {"type": ["string", "null"]},
+    "engine": {"enum": ["deterministic", "gemma_e2b", "fireworks"]},
+    "engine_version": {"type": "string", "minLength": 1},
+    "model_id": {"type": ["string", "null"]},
+    "status": {"enum": ["answered", "refused", "runtime_failure", "unavailable"]},
+    "correct": {"type": ["boolean", "null"]},
+    "consensus": {"enum": ["unanimous_correct", "unanimous_incorrect", "disagree", "insufficient_judges", "not_judged", "refused", "runtime_failure", "unavailable"]},
+    "judge_models": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "format_valid": {"type": ["boolean", "null"]},
+    "latency_ms": {"type": "number", "minimum": 0},
+    "fireworks_prompt_tokens": {"type": "integer", "minimum": 0},
+    "fireworks_completion_tokens": {"type": "integer", "minimum": 0},
+    "runtime_failure": {"type": "boolean"},
+    "peak_memory_mb": {"type": "number", "minimum": 0},
+    "memory_observed": {"type": "boolean"},
+    "token_ceiling": {"type": "integer", "minimum": 0},
+    "assessment": {"type": "object"},
+    "features": {"type": "object"},
+    "regression_split": {"enum": ["train", "validation", "test", null]},
+    "mutation_lineage": {"type": ["string", "null"]},
+    "source": {"type": ["string", "null"]},
+    "missing_reason": {"type": ["string", "null"]}
+  }
+}

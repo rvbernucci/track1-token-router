@@ -14,7 +14,7 @@ Do not route everything to the strongest model. Route only when risk signals jus
 
 ## Slide 4 - Architecture
 
-Mechanical validators protect schema and high-confidence cases, then the router selects the cheapest sufficient Fireworks/Gemma-capable path for each task.
+Fail-closed solvers answer only provable templates. All other tasks use validation-selected Kimi when authorized, then strict output validation and allowed-model fallback.
 
 ## Slide 5 - Competition Mode
 
@@ -26,7 +26,7 @@ Fuzz pack, battle drill, scoring simulator, Docker, CI, secret scan and runtime 
 
 ## Slide 7 - AMD/Fireworks Activation
 
-Runtime profiles are ready for AMD/Gemma development and Fireworks calibration, while the submitted Docker image stays compatible with the official CPU/RAM grading envelope.
+The AMD pod trained FunctionGemma and benchmarked E2B. Memory passed, accuracy did not, so the final image intentionally excludes both local models.
 
 ## Slide 8 - Demo
 
@@ -36,6 +36,6 @@ Show CLI `ask`, JSON output, route trace, model selection and battle drill readi
 
 The router avoids unnecessary token spend, keeps prompts compact and escalates only when the expected accuracy gain justifies the Fireworks cost.
 
-## Slide 10 - Remaining Kickoff Work
+## Slide 10 - Championship Decision
 
-Plug in real AMD endpoint, calibrate Fireworks model, adapt official input format and run final benchmark.
+The frozen ablation selected deterministic-then-Kimi: 75% binary locked-test accuracy, 73,870 tokens, and no post-test tuning.

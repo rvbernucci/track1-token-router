@@ -15,52 +15,40 @@ from router.evals.offline_dataset import SECRET_PATTERNS
 
 
 PROFILE_REQUIREMENTS = {
-    "amd-mi300x-vllm.env.example": {
-        "runbook": "docs/RUNBOOK_VLLM_OPENAI.md",
-        "required": {
-            "ROUTER_MODE",
-            "COMPETITION_DRY_RUN",
-            "LOCAL_BASE_URL",
-            "LOCAL_MODEL",
-            "VLLM_MODEL",
-            "VLLM_PORT",
-        },
-    },
-    "amd-mi300x-sglang.env.example": {
-        "runbook": "docs/RUNBOOK_SGLANG_OPENAI.md",
-        "required": {
-            "ROUTER_MODE",
-            "COMPETITION_DRY_RUN",
-            "LOCAL_BASE_URL",
-            "LOCAL_MODEL",
-            "SGLANG_MODEL",
-            "SGLANG_PORT",
-        },
-    },
-    "gemma-local.env.example": {
+    "functiongemma-router.env.example": {
         "runbook": "docs/RUNBOOK_GEMMA.md",
         "required": {
             "ROUTER_MODE",
             "COMPETITION_DRY_RUN",
-            "LOCAL_BASE_URL",
-            "LOCAL_MODEL",
-            "GEMMA_MODEL_FAMILY",
-            "GEMMA_PROMPT_FORMAT",
+            "FUNCTIONGEMMA_MODEL",
+            "FUNCTIONGEMMA_QUANTIZATION",
+            "FUNCTIONGEMMA_MAX_TOKENS",
         },
     },
-    "gemma-small-local.env.example": {
-        "runbook": "docs/RUNBOOK_GEMMA.md",
+    "gemma-e2b-text-only.env.example": {
+        "runbook": "docs/GEMMA_E2B_TEXT_ONLY_RUNTIME.md",
         "required": {
             "ROUTER_MODE",
             "COMPETITION_DRY_RUN",
-            "LOCAL_BASE_URL",
-            "LOCAL_MODEL",
-            "LOCAL_CONTEXT_TOKENS",
+            "E2B_MODEL",
+            "E2B_RUNTIME",
+            "E2B_CONTEXT_TOKENS",
+            "E2B_MAX_TOKENS",
             "LOCAL_MEMORY_BUDGET_MB",
-            "GEMMA_MODEL_FAMILY",
-            "GEMMA_MODEL_SIZE",
-            "GEMMA_QUANTIZATION",
-            "GEMMA_PROMPT_FORMAT",
+        },
+    },
+    "three-route.env.example": {
+        "runbook": "docs/ARCHITECTURE.md",
+        "required": {
+            "ROUTER_MODE",
+            "COMPETITION_DRY_RUN",
+            "FUNCTIONGEMMA_MODEL",
+            "E2B_MODEL",
+            "E2B_CONTEXT_TOKENS",
+            "E2B_MAX_TOKENS",
+            "LOCAL_MEMORY_BUDGET_MB",
+            "FIREWORKS_BASE_URL",
+            "FIREWORKS_API_KEY",
         },
     },
     "fireworks-serverless.env.example": {
@@ -168,26 +156,21 @@ def _check_safe_defaults(filename: str, values: dict[str, str], errors: list[str
     local_base_url = values.get("LOCAL_BASE_URL", "")
     if local_base_url and not local_base_url.startswith(("http://127.0.0.1", "http://localhost")):
         errors.append("LOCAL_BASE_URL must default to localhost/127.0.0.1 in examples")
-    if filename.startswith("amd-mi300x") and values.get("COMPETITION_DRY_RUN") != "0":
-        errors.append("AMD runtime profile must show COMPETITION_DRY_RUN=0 for credit activation")
-    if filename == "gemma-small-local.env.example":
-        if values.get("ROUTER_MODE") != "hybrid":
-            errors.append("Small Gemma profile must use ROUTER_MODE=hybrid")
-        if values.get("LOCAL_MODEL", "").lower() != "local-gemma-small":
-            errors.append("Small Gemma profile must use LOCAL_MODEL=local-gemma-small placeholder")
-        if values.get("GEMMA_MODEL_SIZE", "").upper() not in {"E2B", "2B", "3B"}:
-            errors.append("Small Gemma profile must stay in the E2B/2B/3B class")
+    if filename in {"gemma-e2b-text-only.env.example", "three-route.env.example"}:
+        if values.get("ROUTER_MODE") != "three_route":
+            errors.append("E2B championship profiles must use ROUTER_MODE=three_route")
+        if values.get("E2B_RUNTIME") not in {"", "litert-lm"}:
+            errors.append("E2B runtime must be litert-lm")
         try:
-            if int(values.get("LOCAL_MEMORY_BUDGET_MB", "0")) > 3400:
-                errors.append("Small Gemma memory budget must leave margin below 4 GB")
+            if int(values.get("LOCAL_MEMORY_BUDGET_MB", "0")) > 3500:
+                errors.append("Local model memory budget must leave margin below 4 GB")
         except ValueError:
             errors.append("LOCAL_MEMORY_BUDGET_MB must be an integer")
-        for key in ("M1_MAX_TOKENS", "M2A_MAX_TOKENS", "M2B_MAX_TOKENS"):
-            try:
-                if int(values.get(key, "9999")) > 128:
-                    errors.append(f"{key} must stay <= 128 for small Gemma profile")
-            except ValueError:
-                errors.append(f"{key} must be an integer")
+        try:
+            if int(values.get("E2B_MAX_TOKENS", "9999")) > 128:
+                errors.append("E2B_MAX_TOKENS must stay <= 128")
+        except ValueError:
+            errors.append("E2B_MAX_TOKENS must be an integer")
     if filename == "fireworks-serverless.env.example":
         if values.get("ROUTER_MODE") != "fireworks":
             errors.append("Fireworks serverless profile must default to ROUTER_MODE=fireworks")

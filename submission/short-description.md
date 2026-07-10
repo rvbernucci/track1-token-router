@@ -1,1 +1,1 @@
-General-purpose AI routing agent that preserves answer quality while minimizing Fireworks tokens through calibrated model selection, compact prompts, Gemma readiness and mechanical validation.
+Accuracy-first token router: fail-closed local solvers, validation-selected Kimi, strict outputs, and evidence-backed rejection of unsafe local-model routes.

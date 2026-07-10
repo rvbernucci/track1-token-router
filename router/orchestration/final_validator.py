@@ -21,6 +21,17 @@ class FinalValidationResult:
         return asdict(self)
 
 
+SAFE_REPAIR_REASONS = {
+    "markdown_fence_in_strict_format",
+    "invalid_json",
+    "python_code_with_extra_text",
+    "code_with_extra_text",
+    "not_yes_no",
+    "not_uppercase",
+    "literal_echo_mismatch",
+}
+
+
 def validate_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationResult:
     expected_format = infer_expected_format(task)
     stripped = answer.strip()
@@ -68,7 +79,29 @@ def validate_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationRes
         if repaired and repaired != stripped:
             return FinalValidationResult(False, expected_format, "code_with_extra_text", repaired)
         return FinalValidationResult(True, expected_format, "valid_code")
+    degradation = _free_text_degradation(stripped)
+    if degradation:
+        return FinalValidationResult(False, expected_format, degradation)
     return FinalValidationResult(True, expected_format, "valid_free_text")
+
+
+def validate_or_safely_repair_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationResult:
+    initial = validate_final_answer(task, answer)
+    if initial.valid or initial.reason not in SAFE_REPAIR_REASONS or not initial.repaired_answer:
+        return initial
+    if initial.reason == "markdown_fence_in_strict_format" and initial.expected_format == "number":
+        unfenced = _strip_markdown_fence(answer.strip())
+        if not re.fullmatch(r"-?\d+(?:\.\d+)?", unfenced):
+            return initial
+    repaired = validate_final_answer(task, initial.repaired_answer)
+    if not repaired.valid:
+        return initial
+    return FinalValidationResult(
+        True,
+        initial.expected_format,
+        f"safe_repair:{initial.reason}",
+        initial.repaired_answer,
+    )
 
 
 def repair_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationResult:
@@ -206,3 +239,21 @@ def _is_valid_python(value: str) -> bool:
     except SyntaxError:
         return False
     return bool(value.strip())
+
+
+def _free_text_degradation(value: str) -> str:
+    # These checks intentionally target only high-confidence corruption. Natural
+    # lists and short answers often omit terminal punctuation and remain valid.
+    if value.count("```") % 2:
+        return "unclosed_markdown_fence"
+    tokens = re.findall(r"[\w'-]+", value.casefold())
+    if len(tokens) < 16:
+        return ""
+    for width in (6, 5, 4):
+        counts: dict[tuple[str, ...], int] = {}
+        for index in range(len(tokens) - width + 1):
+            gram = tuple(tokens[index : index + width])
+            counts[gram] = counts.get(gram, 0) + 1
+        if counts and max(counts.values()) >= 4:
+            return "degenerate_repetition"
+    return ""

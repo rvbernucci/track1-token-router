@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rvbernucci/track1-token-router/schemas/functiongemma-experiment-v1.schema.json",
+  "title": "FunctionGemma experiment configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "model", "environment", "data", "generation", "variants"],
+  "properties": {
+    "schema_version": {"const": "functiongemma-experiment-v1"},
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision"],
+      "properties": {
+        "id": {"const": "google/functiongemma-270m-it"},
+        "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python", "torch", "transformers", "datasets", "accelerate", "peft", "trl"],
+      "properties": {
+        "python": {"const": "3.10.12"},
+        "torch": {"const": "2.9.1+gitff65f5b"},
+        "transformers": {"const": "4.57.6"},
+        "datasets": {"const": "4.8.2"},
+        "accelerate": {"const": "1.13.0"},
+        "peft": {"const": "0.18.1"},
+        "trl": {"const": "0.26.2"}
+      }
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_length", "seed"],
+      "properties": {
+        "max_length": {"type": "integer", "minimum": 128, "maximum": 2048},
+        "seed": {"type": "integer", "minimum": 0}
+      }
+    },
+    "generation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_new_tokens"],
+      "properties": {
+        "max_new_tokens": {"type": "integer", "minimum": 32, "maximum": 256}
+      }
+    },
+    "variants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full_sft", "lora_r8", "lora_r16"],
+      "properties": {
+        "full_sft": {"$ref": "#/$defs/fullVariant"},
+        "lora_r8": {"$ref": "#/$defs/loraVariant"},
+        "lora_r16": {"$ref": "#/$defs/loraVariant"}
+      }
+    }
+  },
+  "$defs": {
+    "common": {
+      "type": "object",
+      "required": ["method", "epochs", "learning_rate", "batch_size", "gradient_accumulation_steps"]
+    },
+    "fullVariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "epochs", "learning_rate", "batch_size", "gradient_accumulation_steps"],
+      "properties": {
+        "method": {"const": "full"},
+        "epochs": {"type": "integer", "minimum": 1, "maximum": 100},
+        "learning_rate": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.01},
+        "batch_size": {"type": "integer", "minimum": 1, "maximum": 128},
+        "gradient_accumulation_steps": {"type": "integer", "minimum": 1, "maximum": 128}
+      }
+    },
+    "loraVariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "rank", "alpha", "epochs", "learning_rate", "batch_size", "gradient_accumulation_steps"],
+      "properties": {
+        "method": {"const": "lora"},
+        "rank": {"enum": [8, 16]},
+        "alpha": {"type": "integer", "minimum": 1, "maximum": 128},
+        "epochs": {"type": "integer", "minimum": 1, "maximum": 100},
+        "learning_rate": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.01},
+        "batch_size": {"type": "integer", "minimum": 1, "maximum": 128},
+        "gradient_accumulation_steps": {"type": "integer", "minimum": 1, "maximum": 128}
+      }
+    }
+  }
+}

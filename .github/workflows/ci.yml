@@ -55,3 +55,7 @@ jobs:
             -v /tmp/track1-output:/output \
             track1-token-router
           python -m json.tool /tmp/track1-output/results.json >/dev/null
+
+      - name: Docker 4GB 2vCPU linux-amd64 gate
+        if: matrix.python-version == '3.12'
+        run: bash scripts/docker_resource_gate.sh track1-token-router

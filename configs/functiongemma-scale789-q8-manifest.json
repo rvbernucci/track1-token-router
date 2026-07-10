@@ -1,0 +1,94 @@
+{
+  "artifact_files": {
+    "functiongemma-scale789-q8_0.gguf": "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77"
+  },
+  "calibration_sha256": "0078565ab90a6c93981e954d13daabdaa11a4535da9257eae03f3a034afcc1e1",
+  "config_sha256": "c94adab8fe5c176ef0cd991e8fbd62fae25438411eb2e7077b24a02b5633a036",
+  "data_manifest_sha256": "8b999cffe6b1da3bda5fa357ce67bad4313aa4ee057c2c3025a8260942336523",
+  "environment": {
+    "config_sha256": "acd30fe32237561f395102355cbbc65eae5844762dde81eebcc3233f30b136e7",
+    "environment_matches": true,
+    "environment_mismatches": {},
+    "expected_environment": {
+      "accelerate": "1.13.0",
+      "datasets": "4.8.2",
+      "peft": "0.18.1",
+      "python": "3.10.12",
+      "torch": "2.9.1+gitff65f5b",
+      "transformers": "4.57.6",
+      "trl": "0.26.2"
+    },
+    "gpu": {
+      "available": true,
+      "bf16": true,
+      "device": "",
+      "hip": "7.2.53211-e1a6bc5663",
+      "torch": "2.9.1+gitff65f5b"
+    },
+    "observed_environment": {
+      "accelerate": "1.13.0",
+      "datasets": "4.8.2",
+      "peft": "0.18.1",
+      "python": "3.10.12",
+      "torch": "2.9.1+gitff65f5b",
+      "transformers": "4.57.6",
+      "trl": "0.26.2"
+    },
+    "packages": {
+      "accelerate": "1.13.0",
+      "datasets": "4.8.2",
+      "peft": "0.18.1",
+      "safetensors": "0.7.0",
+      "torch": "2.9.1+gitff65f5b",
+      "transformers": "4.57.6",
+      "trl": "0.26.2"
+    },
+    "platform": "Linux-6.8.0-79-generic-x86_64-with-glibc2.35",
+    "python": "3.10.12 (main, Mar  3 2026, 11:56:32) [GCC 11.4.0]",
+    "schema_version": "functiongemma-doctor-v1"
+  },
+  "environment_report_sha256": "2ac26eadc0fbde821e94dfe5e2e1274503ba00e3019788722caddd346941bfc4",
+  "git_commit": "7b4572fc2b331c1e63b4ad532ec9f0414605f241",
+  "git_dirty": true,
+  "model": {
+    "id": "google/functiongemma-270m-it",
+    "revision": "39eccb091651513a5dfb56892d3714c1b5b8276c"
+  },
+  "runtime": {
+    "artifact": {
+      "bytes": 291557568,
+      "filename": "functiongemma-scale789-q8_0.gguf",
+      "sha256": "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77"
+    },
+    "evaluation": {
+      "boundary_report_sha256": "55c1e99e912e963a76f5b8baf85bfd2b78d17bcab9face18fa7831605e7ce388",
+      "examples": 93,
+      "intent_accuracy": 0.967741935483871,
+      "p50_latency_ms": 990.108813974075,
+      "p95_latency_ms": 1201.046325196511,
+      "report_sha256": "744993ec6350f713833748d13263f8a318fbbe92e7c710c5e1132c03440bde3a",
+      "schema_validity": 1.0
+    },
+    "format": "GGUF",
+    "llama_cpp": {
+      "commit": "074944998d3f25e7001ede30d152b59dff741c8c",
+      "release": "b9948",
+      "source_archive_sha256": "3dbdef51ef14e4faf4103dde97ad027ea80f31fa4eb200be7f04d5675fdb003f",
+      "ubuntu_x64_archive_sha256": "9fd15007f9058e2cf6d8d81e0856ffc351f59a70ff3ad08720992835cbb9320a"
+    },
+    "quantization": "Q8_0",
+    "schema_version": "functiongemma-gguf-runtime-v1",
+    "server": {
+      "context_tokens": 2048,
+      "jinja": true,
+      "max_completion_tokens": 64,
+      "stop": "<end_function_call>",
+      "temperature": 0,
+      "threads": 2,
+      "tool_choice": "required"
+    }
+  },
+  "runtime_sha256": "32f38d2557dab515f1093a50dc80009d6849e681138b467f2db48061f691409c",
+  "schema_version": "functiongemma-artifact-manifest-v1",
+  "tool_sha256": "9b2f6852cd993c77349fc2cb50be10fa6190c4e35cef6244e2ea6fb32661f648"
+}

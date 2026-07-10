@@ -1,5 +1,11 @@
 # Mechanical Validator And Solver Pack
 
+## Championship False-Positive Audit
+
+On the frozen 571-task validation/test corpus, the pre-hardening registry accepted 14 tasks. Independent Claude Sonnet 5 and Gemini judges agreed that 13 were incorrect and one was correct. Incidental `max`, `lowercase`, character-count and JSON-schema language had triggered solvers outside their complete contracts.
+
+The championship revision replaced those keyword checks with full task-contract matches and explicit code/JSON guards. Replaying the same 571 tasks produced zero acceptances and 571 safe refusals. Deterministic execution remains available only for the separately tested exact-template pack; broad corpus prompts fall through to E2B or Fireworks.
+
 ## Papel
 
 O solver pack resolve tarefas mecanicas antes do caminho de modelo no `ROUTER_MODE=competition`.
@@ -91,4 +97,4 @@ O relatorio gerado tambem lista rotas nao deterministicas restantes. Em 2026-07-
 
 Se a regra precisa interpretar contexto amplo, ela nao e solver deterministico.
 
-O caminho correto nesses casos e deixar a cascata local ou serverless decidir.
+O caminho correto nesses casos e o decisor matricial escolher E2B ou Fireworks; o solver deve recusar.

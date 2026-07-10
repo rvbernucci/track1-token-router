@@ -152,9 +152,9 @@ def _render_report(
     lines.extend(_selection_replay_lines(rows, tasks, models, weights))
     lines.extend(["", "## Interpretation", ""])
     lines.append("- Positive coefficients increase the learned utility for a model/task pair.")
-    lines.append("- Negative coefficients reduce utility and usually indicate observed failures, overthinking, cost drag, or mode mismatch.")
+    lines.append("- Negative coefficients reduce utility and usually indicate observed failures, token drag, or mode mismatch.")
     lines.append("- Domain/model empirical validity is smoothed before scoring, so one lucky or unlucky call cannot dominate Nash welfare.")
-    lines.append("- The runtime combines ridge utility, Nash welfare, token utility and empirical risk; it does not hardcode domain winners.")
+    lines.append("- The runtime applies an empirical accuracy gate before combining ridge utility, token-aligned Nash welfare and token utility; dollar cost is telemetry only.")
     lines.append("")
     return "\n".join(lines)
 

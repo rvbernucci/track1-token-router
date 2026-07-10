@@ -4,11 +4,11 @@
 - DigitalOcean MI300X
 - Fireworks AI
 - Gemma
-- vLLM
-- SGLang
 - Token Efficiency
 - Routing Agent
-- Local-First AI
+- Model Evaluation
+- Holdout Testing
+- Game Theory
 - CLI Runner
 - Python
 - Hackathon Track 1

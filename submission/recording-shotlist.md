@@ -20,7 +20,7 @@ Target duration: 4 to 5 minutes.
 
 - Timebox: 0:55-1:45.
 - Visual: router flow in `demo-site/index.html`.
-- Message: deterministic guardrails, local candidate, local verification, local repair and compact remote audit.
+- Message: FunctionGemma assesses; regression and minimax choose deterministic, Gemma E2B or Fireworks.
 - Command on screen:
 
 ```bash

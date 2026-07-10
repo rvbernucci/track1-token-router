@@ -14,4 +14,12 @@ logs/*.jsonl
 logs/*.log
 runs/
 reports/generated/
+reports/
+data/
+artifacts/
+tests/
+docs/
+sprints/
+submission/
+demo-site/
 .DS_Store

@@ -338,6 +338,131 @@ class FireworksDirectRunnerTests(unittest.TestCase):
             "matrix_regression_plus_nash",
         )
 
+    def test_validation_intent_policy_takes_precedence_over_matrix(self) -> None:
+        weights = MatrixRegressionWeights(
+            feature_names=FEATURE_NAMES,
+            coefficients=_coefficients({"family_kimi": 10.0}),
+            ridge_lambda=0.35,
+            training_rows=1,
+            target_mean=1.0,
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            weights_path = root / "weights.json"
+            save_weights(weights, weights_path)
+            policy_path = root / "policy.json"
+            policy_path.write_text(
+                json.dumps(
+                    {
+                        "schema_version": "fireworks-intent-policy-v1",
+                        "default_enabled": True,
+                        "selection_split": "validation",
+                        "locked_test_used_for_selection": False,
+                        "selection_rule": "validation only",
+                        "default_model": "accounts/fireworks/models/kimi-k2p7-code",
+                        "allowed_models": [
+                            "accounts/fireworks/models/kimi-k2p7-code",
+                            "accounts/fireworks/models/minimax-m3",
+                        ],
+                        "intent_models": {"logic_puzzle": "accounts/fireworks/models/minimax-m3"},
+                        "source": {"comparison_report_sha256": "a" * 64},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with FakeOpenAIServer(response_text="Yes") as server:
+                client = FireworksClient(base_url=server.url, model="fallback-model", api_key="test", max_retries=0)
+                runner = FireworksDirectRunner(
+                    client,
+                    allowed_models=["minimax-m3", "kimi-k2p7-code"],
+                    matrix_weights_path=weights_path,
+                    intent_policy_path=policy_path,
+                )
+
+                result = runner.run(
+                    TaskEnvelope(
+                        id="logic",
+                        input_text="All daxes are wugs. No wugs are zibs. Can any dax be a zib?",
+                    )
+                )
+
+        self.assertEqual(server.requests[0]["payload"]["model"], "accounts/fireworks/models/minimax-m3")
+        self.assertEqual(
+            result.metadata["fireworks_intent_policy_selection"]["selection_rule"],
+            "validation_only_intent_policy",
+        )
+        self.assertEqual(result.metadata["fireworks_matrix_selection"]["model"], "accounts/fireworks/models/kimi-k2p7-code")
+
+    def test_global_champion_takes_precedence_when_allowed(self) -> None:
+        weights = MatrixRegressionWeights(
+            feature_names=FEATURE_NAMES,
+            coefficients=_coefficients({"family_minimax": 10.0}),
+            ridge_lambda=0.35,
+            training_rows=1,
+            target_mean=1.0,
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            weights_path = Path(tmp) / "weights.json"
+            save_weights(weights, weights_path)
+            with FakeOpenAIServer(response_text="Kimi answer.") as server:
+                client = FireworksClient(base_url=server.url, model="fallback-model", api_key="test", max_retries=0)
+                runner = FireworksDirectRunner(
+                    client,
+                    allowed_models=["minimax-m3", "kimi-k2p7-code"],
+                    champion_model="accounts/fireworks/models/kimi-k2p7-code",
+                    matrix_weights_path=weights_path,
+                )
+
+                result = runner.run(TaskEnvelope(id="summary", input_text="Summarize this: routing saves tokens."))
+
+        self.assertEqual(server.requests[0]["payload"]["model"], "accounts/fireworks/models/kimi-k2p7-code")
+        self.assertEqual(
+            result.metadata["fireworks_champion_selection"]["selection_rule"],
+            "validation_selected_global_champion",
+        )
+
+    def test_champion_outside_allowed_models_falls_back_without_invalid_call(self) -> None:
+        with FakeOpenAIServer(response_text="Minimax fallback.") as server:
+            client = FireworksClient(base_url=server.url, model="fallback-model", api_key="test", max_retries=0)
+            runner = FireworksDirectRunner(
+                client,
+                allowed_models=["minimax-m3"],
+                champion_model="accounts/fireworks/models/kimi-k2p7-code",
+            )
+
+            result = runner.run(TaskEnvelope(id="summary", input_text="Summarize this: routing saves tokens."))
+
+        self.assertEqual(server.requests[0]["payload"]["model"], "accounts/fireworks/models/minimax-m3")
+        self.assertEqual(result.metadata["fireworks_champion_selection"]["reason"], "champion_not_runtime_allowed")
+
+    def test_invalid_intent_policy_falls_back_to_matrix(self) -> None:
+        weights = MatrixRegressionWeights(
+            feature_names=FEATURE_NAMES,
+            coefficients=_coefficients({"family_kimi": 10.0}),
+            ridge_lambda=0.35,
+            training_rows=1,
+            target_mean=1.0,
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            weights_path = root / "weights.json"
+            save_weights(weights, weights_path)
+            policy_path = root / "policy.json"
+            policy_path.write_text("{}", encoding="utf-8")
+            with FakeOpenAIServer(response_text="A summary.") as server:
+                client = FireworksClient(base_url=server.url, model="fallback-model", api_key="test", max_retries=0)
+                runner = FireworksDirectRunner(
+                    client,
+                    allowed_models=["minimax-m3", "kimi-k2p7-code"],
+                    matrix_weights_path=weights_path,
+                    intent_policy_path=policy_path,
+                )
+
+                result = runner.run(TaskEnvelope(id="summary", input_text="Summarize this: routing saves tokens."))
+
+        self.assertEqual(server.requests[0]["payload"]["model"], "accounts/fireworks/models/kimi-k2p7-code")
+        self.assertIn("error", result.metadata["fireworks_intent_policy_selection"])
+
     def test_invalid_strict_output_falls_back_to_next_ranked_model(self) -> None:
         weights = MatrixRegressionWeights(
             feature_names=FEATURE_NAMES,

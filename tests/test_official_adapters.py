@@ -143,11 +143,13 @@ class OfficialAdapterTests(unittest.TestCase):
             output_dir.mkdir()
             input_path = input_dir / "tasks.json"
             output_path = output_dir / "results.json"
+            resource_path = output_dir / "resource-usage.json"
             input_path.write_text((FIXTURES / "lablab_track1_tasks.json").read_text(encoding="utf-8"), encoding="utf-8")
             env = {
                 **os.environ,
                 "ROUTER_MODE": "mock",
                 "ROUTER_LOG_PATH": str(root / "run.jsonl"),
+                "ROUTER_RESOURCE_REPORT": str(resource_path),
             }
 
             completed = subprocess.run(
@@ -167,10 +169,14 @@ class OfficialAdapterTests(unittest.TestCase):
                 env=env,
             )
             payload = json.loads(output_path.read_text(encoding="utf-8"))
+            resources = json.loads(resource_path.read_text(encoding="utf-8"))
 
         self.assertEqual(completed.stdout, "")
         self.assertEqual([row["task_id"] for row in payload], ["t1", "t2"])
         self.assertTrue(all(isinstance(row["answer"], str) and row["answer"] for row in payload))
+        self.assertEqual(resources["schema_version"], "router-resource-report-v1")
+        self.assertEqual(resources["tasks"], 2)
+        self.assertGreater(resources["max_rss_mib"], 0)
 
     def test_lablab_track1_cli_writes_fallbacks_when_runtime_budget_is_exhausted(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

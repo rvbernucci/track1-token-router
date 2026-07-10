@@ -1,0 +1,519 @@
+{
+  "intent_model_summary": {
+    "code_debugging": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "test": {
+          "average_tokens": 317.3863636363636,
+          "binary_accuracy": 0.6,
+          "binary_rows": 35,
+          "binary_wilson_lower_95": 0.435727090128925,
+          "conservative_accuracy": 0.4772727272727273,
+          "conservative_wilson_lower_95": 0.33754991032251097,
+          "correct": 21,
+          "incorrect_or_uncertain": 23,
+          "rows": 44,
+          "tokens": 13965
+        },
+        "validation": {
+          "average_tokens": 327.0833333333333,
+          "binary_accuracy": 0.5714285714285714,
+          "binary_rows": 28,
+          "binary_wilson_lower_95": 0.3907078562746876,
+          "conservative_accuracy": 0.4444444444444444,
+          "conservative_wilson_lower_95": 0.29541268740080223,
+          "correct": 16,
+          "incorrect_or_uncertain": 20,
+          "rows": 36,
+          "tokens": 11775
+        }
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "test": {
+          "average_tokens": 424.25,
+          "binary_accuracy": 0.625,
+          "binary_rows": 32,
+          "binary_wilson_lower_95": 0.4525440735307745,
+          "conservative_accuracy": 0.45454545454545453,
+          "conservative_wilson_lower_95": 0.31705234142220895,
+          "correct": 20,
+          "incorrect_or_uncertain": 24,
+          "rows": 44,
+          "tokens": 18667
+        },
+        "validation": {
+          "average_tokens": 456.19444444444446,
+          "binary_accuracy": 0.4482758620689655,
+          "binary_rows": 29,
+          "binary_wilson_lower_95": 0.284131680230372,
+          "conservative_accuracy": 0.3611111111111111,
+          "conservative_wilson_lower_95": 0.2247559294651537,
+          "correct": 13,
+          "incorrect_or_uncertain": 23,
+          "rows": 36,
+          "tokens": 16423
+        }
+      }
+    },
+    "code_generation": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "test": {
+          "average_tokens": 257.64516129032256,
+          "binary_accuracy": 0.7037037037037037,
+          "binary_rows": 27,
+          "binary_wilson_lower_95": 0.5151931703585185,
+          "conservative_accuracy": 0.6129032258064516,
+          "conservative_wilson_lower_95": 0.4382410861966073,
+          "correct": 19,
+          "incorrect_or_uncertain": 12,
+          "rows": 31,
+          "tokens": 7987
+        },
+        "validation": {
+          "average_tokens": 269.9047619047619,
+          "binary_accuracy": 0.6388888888888888,
+          "binary_rows": 36,
+          "binary_wilson_lower_95": 0.47575075485558044,
+          "conservative_accuracy": 0.5476190476190477,
+          "conservative_wilson_lower_95": 0.39949119034733493,
+          "correct": 23,
+          "incorrect_or_uncertain": 19,
+          "rows": 42,
+          "tokens": 11336
+        }
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "test": {
+          "average_tokens": 369.51612903225805,
+          "binary_accuracy": 0.6086956521739131,
+          "binary_rows": 23,
+          "binary_wilson_lower_95": 0.4078552239138171,
+          "conservative_accuracy": 0.45161290322580644,
+          "conservative_wilson_lower_95": 0.29161735980520015,
+          "correct": 14,
+          "incorrect_or_uncertain": 17,
+          "rows": 31,
+          "tokens": 11455
+        },
+        "validation": {
+          "average_tokens": 370.3809523809524,
+          "binary_accuracy": 0.7333333333333333,
+          "binary_rows": 30,
+          "binary_wilson_lower_95": 0.555520383048111,
+          "conservative_accuracy": 0.5238095238095238,
+          "conservative_wilson_lower_95": 0.37722464131344974,
+          "correct": 22,
+          "incorrect_or_uncertain": 20,
+          "rows": 42,
+          "tokens": 15556
+        }
+      }
+    },
+    "factual_qa": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "test": {
+          "average_tokens": 182.30769230769232,
+          "binary_accuracy": 0.8333333333333334,
+          "binary_rows": 18,
+          "binary_wilson_lower_95": 0.6077796189608428,
+          "conservative_accuracy": 0.5769230769230769,
+          "conservative_wilson_lower_95": 0.3894861374659171,
+          "correct": 15,
+          "incorrect_or_uncertain": 11,
+          "rows": 26,
+          "tokens": 4740
+        },
+        "validation": {
+          "average_tokens": 212.86486486486487,
+          "binary_accuracy": 0.7666666666666667,
+          "binary_rows": 30,
+          "binary_wilson_lower_95": 0.5907167384187784,
+          "conservative_accuracy": 0.6216216216216216,
+          "conservative_wilson_lower_95": 0.46100430439217654,
+          "correct": 23,
+          "incorrect_or_uncertain": 14,
+          "rows": 37,
+          "tokens": 7876
+        }
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "test": {
+          "average_tokens": 294.0769230769231,
+          "binary_accuracy": 0.9375,
+          "binary_rows": 16,
+          "binary_wilson_lower_95": 0.7167126242970107,
+          "conservative_accuracy": 0.5769230769230769,
+          "conservative_wilson_lower_95": 0.3894861374659171,
+          "correct": 15,
+          "incorrect_or_uncertain": 11,
+          "rows": 26,
+          "tokens": 7646
+        },
+        "validation": {
+          "average_tokens": 298.7837837837838,
+          "binary_accuracy": 0.6896551724137931,
+          "binary_rows": 29,
+          "binary_wilson_lower_95": 0.5076986576690685,
+          "conservative_accuracy": 0.5405405405405406,
+          "conservative_wilson_lower_95": 0.38384046892179496,
+          "correct": 20,
+          "incorrect_or_uncertain": 17,
+          "rows": 37,
+          "tokens": 11055
+        }
+      }
+    },
+    "logic_puzzle": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "test": {
+          "average_tokens": 261.27272727272725,
+          "binary_accuracy": 0.8285714285714286,
+          "binary_rows": 35,
+          "binary_wilson_lower_95": 0.6731771770095504,
+          "conservative_accuracy": 0.6590909090909091,
+          "conservative_wilson_lower_95": 0.5113914121793824,
+          "correct": 29,
+          "incorrect_or_uncertain": 15,
+          "rows": 44,
+          "tokens": 11496
+        },
+        "validation": {
+          "average_tokens": 243.09677419354838,
+          "binary_accuracy": 0.7727272727272727,
+          "binary_rows": 22,
+          "binary_wilson_lower_95": 0.5656004682477829,
+          "conservative_accuracy": 0.5483870967741935,
+          "conservative_wilson_lower_95": 0.3777216763735451,
+          "correct": 17,
+          "incorrect_or_uncertain": 14,
+          "rows": 31,
+          "tokens": 7536
+        }
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "test": {
+          "average_tokens": 366.09090909090907,
+          "binary_accuracy": 0.6333333333333333,
+          "binary_rows": 30,
+          "binary_wilson_lower_95": 0.45513563654794864,
+          "conservative_accuracy": 0.4318181818181818,
+          "conservative_wilson_lower_95": 0.296827234085178,
+          "correct": 19,
+          "incorrect_or_uncertain": 25,
+          "rows": 44,
+          "tokens": 16108
+        },
+        "validation": {
+          "average_tokens": 342.258064516129,
+          "binary_accuracy": 0.75,
+          "binary_rows": 24,
+          "binary_wilson_lower_95": 0.55100555994846,
+          "conservative_accuracy": 0.5806451612903226,
+          "conservative_wilson_lower_95": 0.40766262495369715,
+          "correct": 18,
+          "incorrect_or_uncertain": 13,
+          "rows": 31,
+          "tokens": 10610
+        }
+      }
+    },
+    "math_reasoning": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "test": {
+          "average_tokens": 222.63636363636363,
+          "binary_accuracy": 0.8125,
+          "binary_rows": 16,
+          "binary_wilson_lower_95": 0.5699111903802586,
+          "conservative_accuracy": 0.5909090909090909,
+          "conservative_wilson_lower_95": 0.38734818476315125,
+          "correct": 13,
+          "incorrect_or_uncertain": 9,
+          "rows": 22,
+          "tokens": 4898
+        },
+        "validation": {
+          "average_tokens": 250.08823529411765,
+          "binary_accuracy": 0.5862068965517241,
+          "binary_rows": 29,
+          "binary_wilson_lower_95": 0.40737835987878585,
+          "conservative_accuracy": 0.5,
+          "conservative_wilson_lower_95": 0.340693256456825,
+          "correct": 17,
+          "incorrect_or_uncertain": 17,
+          "rows": 34,
+          "tokens": 8503
+        }
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "test": {
+          "average_tokens": 296.95454545454544,
+          "binary_accuracy": 0.75,
+          "binary_rows": 16,
+          "binary_wilson_lower_95": 0.5050168346449122,
+          "conservative_accuracy": 0.5454545454545454,
+          "conservative_wilson_lower_95": 0.34659795320734943,
+          "correct": 12,
+          "incorrect_or_uncertain": 10,
+          "rows": 22,
+          "tokens": 6533
+        },
+        "validation": {
+          "average_tokens": 357.52941176470586,
+          "binary_accuracy": 0.6071428571428571,
+          "binary_rows": 28,
+          "binary_wilson_lower_95": 0.4240904429659718,
+          "conservative_accuracy": 0.5,
+          "conservative_wilson_lower_95": 0.340693256456825,
+          "correct": 17,
+          "incorrect_or_uncertain": 17,
+          "rows": 34,
+          "tokens": 12156
+        }
+      }
+    },
+    "ner": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "test": {
+          "average_tokens": 261.43243243243245,
+          "binary_accuracy": 0.8,
+          "binary_rows": 30,
+          "binary_wilson_lower_95": 0.6269430358685175,
+          "conservative_accuracy": 0.6486486486486487,
+          "conservative_wilson_lower_95": 0.4875902312255084,
+          "correct": 24,
+          "incorrect_or_uncertain": 13,
+          "rows": 37,
+          "tokens": 9673
+        },
+        "validation": {
+          "average_tokens": 268.5208333333333,
+          "binary_accuracy": 0.8095238095238095,
+          "binary_rows": 42,
+          "binary_wilson_lower_95": 0.6669922598996131,
+          "conservative_accuracy": 0.7083333333333334,
+          "conservative_wilson_lower_95": 0.5682074019042831,
+          "correct": 34,
+          "incorrect_or_uncertain": 14,
+          "rows": 48,
+          "tokens": 12889
+        }
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "test": {
+          "average_tokens": 346.0810810810811,
+          "binary_accuracy": 0.6428571428571429,
+          "binary_rows": 28,
+          "binary_wilson_lower_95": 0.45830306514427804,
+          "conservative_accuracy": 0.4864864864864865,
+          "conservative_wilson_lower_95": 0.3344640430301664,
+          "correct": 18,
+          "incorrect_or_uncertain": 19,
+          "rows": 37,
+          "tokens": 12805
+        },
+        "validation": {
+          "average_tokens": 351.3125,
+          "binary_accuracy": 0.7906976744186046,
+          "binary_rows": 43,
+          "binary_wilson_lower_95": 0.6479435728926356,
+          "conservative_accuracy": 0.7083333333333334,
+          "conservative_wilson_lower_95": 0.5682074019042831,
+          "correct": 34,
+          "incorrect_or_uncertain": 14,
+          "rows": 48,
+          "tokens": 16863
+        }
+      }
+    },
+    "sentiment": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "test": {
+          "average_tokens": 212.94285714285715,
+          "binary_accuracy": 0.7575757575757576,
+          "binary_rows": 33,
+          "binary_wilson_lower_95": 0.5897538017044264,
+          "conservative_accuracy": 0.7142857142857143,
+          "conservative_wilson_lower_95": 0.5494506513681737,
+          "correct": 25,
+          "incorrect_or_uncertain": 10,
+          "rows": 35,
+          "tokens": 7453
+        },
+        "validation": {
+          "average_tokens": 205.80645161290323,
+          "binary_accuracy": 0.8620689655172413,
+          "binary_rows": 29,
+          "binary_wilson_lower_95": 0.6944100627964797,
+          "conservative_accuracy": 0.8064516129032258,
+          "conservative_wilson_lower_95": 0.6371974218820453,
+          "correct": 25,
+          "incorrect_or_uncertain": 6,
+          "rows": 31,
+          "tokens": 6380
+        }
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "test": {
+          "average_tokens": 298.42857142857144,
+          "binary_accuracy": 0.8333333333333334,
+          "binary_rows": 30,
+          "binary_wilson_lower_95": 0.6643564949358397,
+          "conservative_accuracy": 0.7142857142857143,
+          "conservative_wilson_lower_95": 0.5494506513681737,
+          "correct": 25,
+          "incorrect_or_uncertain": 10,
+          "rows": 35,
+          "tokens": 10445
+        },
+        "validation": {
+          "average_tokens": 296.7096774193548,
+          "binary_accuracy": 0.9285714285714286,
+          "binary_rows": 28,
+          "binary_wilson_lower_95": 0.7735463743160095,
+          "conservative_accuracy": 0.8387096774193549,
+          "conservative_wilson_lower_95": 0.6736564604120674,
+          "correct": 26,
+          "incorrect_or_uncertain": 5,
+          "rows": 31,
+          "tokens": 9198
+        }
+      }
+    },
+    "summarization": {
+      "accounts/fireworks/models/kimi-k2p7-code": {
+        "test": {
+          "average_tokens": 284.5416666666667,
+          "binary_accuracy": 0.7352941176470589,
+          "binary_rows": 34,
+          "binary_wilson_lower_95": 0.5688285871705533,
+          "conservative_accuracy": 0.5208333333333334,
+          "conservative_wilson_lower_95": 0.38329232303342803,
+          "correct": 25,
+          "incorrect_or_uncertain": 23,
+          "rows": 48,
+          "tokens": 13658
+        },
+        "validation": {
+          "average_tokens": 301.2,
+          "binary_accuracy": 0.55,
+          "binary_rows": 20,
+          "binary_wilson_lower_95": 0.34208534245034233,
+          "conservative_accuracy": 0.44,
+          "conservative_wilson_lower_95": 0.2666563888106735,
+          "correct": 11,
+          "incorrect_or_uncertain": 14,
+          "rows": 25,
+          "tokens": 7530
+        }
+      },
+      "accounts/fireworks/models/minimax-m3": {
+        "test": {
+          "average_tokens": 370.5833333333333,
+          "binary_accuracy": 0.7333333333333333,
+          "binary_rows": 30,
+          "binary_wilson_lower_95": 0.555520383048111,
+          "conservative_accuracy": 0.4583333333333333,
+          "conservative_wilson_lower_95": 0.32575242292867446,
+          "correct": 22,
+          "incorrect_or_uncertain": 26,
+          "rows": 48,
+          "tokens": 17788
+        },
+        "validation": {
+          "average_tokens": 384.2,
+          "binary_accuracy": 0.5789473684210527,
+          "binary_rows": 19,
+          "binary_wilson_lower_95": 0.3627590353425504,
+          "conservative_accuracy": 0.44,
+          "conservative_wilson_lower_95": 0.2666563888106735,
+          "correct": 11,
+          "incorrect_or_uncertain": 14,
+          "rows": 25,
+          "tokens": 9605
+        }
+      }
+    }
+  },
+  "locked_test_policy": {
+    "average_tokens": 283.8815331010453,
+    "binary_accuracy": 0.7318181818181818,
+    "binary_rows": 220,
+    "binary_wilson_lower_95": 0.6696680835672358,
+    "conservative_accuracy": 0.5609756097560976,
+    "conservative_wilson_lower_95": 0.5031302353953993,
+    "correct": 161,
+    "incorrect_or_uncertain": 126,
+    "rows": 287,
+    "tokens": 81474
+  },
+  "model_summary": {
+    "accounts/fireworks/models/kimi-k2p7-code": {
+      "test": {
+        "average_tokens": 257.3867595818815,
+        "binary_accuracy": 0.75,
+        "binary_rows": 228,
+        "binary_wilson_lower_95": 0.6899657235157824,
+        "conservative_accuracy": 0.5958188153310104,
+        "conservative_wilson_lower_95": 0.5381408543996131,
+        "correct": 171,
+        "incorrect_or_uncertain": 116,
+        "rows": 287,
+        "tokens": 73870
+      },
+      "validation": {
+        "average_tokens": 259.94718309859155,
+        "binary_accuracy": 0.7033898305084746,
+        "binary_rows": 236,
+        "binary_wilson_lower_95": 0.6422339413685216,
+        "conservative_accuracy": 0.5845070422535211,
+        "conservative_wilson_lower_95": 0.526437152931169,
+        "correct": 166,
+        "incorrect_or_uncertain": 118,
+        "rows": 284,
+        "tokens": 73825
+      }
+    },
+    "accounts/fireworks/models/minimax-m3": {
+      "test": {
+        "average_tokens": 353.47386759581883,
+        "binary_accuracy": 0.7073170731707317,
+        "binary_rows": 205,
+        "binary_wilson_lower_95": 0.6416773649246345,
+        "conservative_accuracy": 0.5052264808362369,
+        "conservative_wilson_lower_95": 0.447697329665989,
+        "correct": 145,
+        "incorrect_or_uncertain": 142,
+        "rows": 287,
+        "tokens": 101447
+      },
+      "validation": {
+        "average_tokens": 357.27464788732397,
+        "binary_accuracy": 0.7,
+        "binary_rows": 230,
+        "binary_wilson_lower_95": 0.6378876533445714,
+        "conservative_accuracy": 0.5669014084507042,
+        "conservative_wilson_lower_95": 0.5087590993831237,
+        "correct": 161,
+        "incorrect_or_uncertain": 123,
+        "rows": 284,
+        "tokens": 101466
+      }
+    }
+  },
+  "schema_version": "fireworks-baseline-comparison-v1",
+  "selection_protocol": {
+    "locked_test_used_for_selection": false,
+    "primary_metric": "conservative_accuracy",
+    "selection_split": "validation",
+    "tie_breaker": "lower_average_total_tokens"
+  },
+  "validation_selected_model_by_intent": {
+    "code_debugging": "accounts/fireworks/models/kimi-k2p7-code",
+    "code_generation": "accounts/fireworks/models/kimi-k2p7-code",
+    "factual_qa": "accounts/fireworks/models/kimi-k2p7-code",
+    "logic_puzzle": "accounts/fireworks/models/minimax-m3",
+    "math_reasoning": "accounts/fireworks/models/kimi-k2p7-code",
+    "ner": "accounts/fireworks/models/kimi-k2p7-code",
+    "sentiment": "accounts/fireworks/models/minimax-m3",
+    "summarization": "accounts/fireworks/models/kimi-k2p7-code"
+  }
+}

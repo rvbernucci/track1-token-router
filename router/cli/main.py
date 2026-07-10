@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import resource
 import sys
 from pathlib import Path
 from time import perf_counter
@@ -113,6 +114,9 @@ def _handle_submit_track1(args: argparse.Namespace, runner: TaskRunner) -> int:
     started_at = perf_counter()
     max_runtime_s = _float_env("TRACK1_MAX_RUNTIME_S", 570.0)
     reserve_s = _float_env("TRACK1_RUNTIME_RESERVE_S", 5.0)
+    set_run_deadline = getattr(runner, "set_run_deadline", None)
+    if callable(set_run_deadline):
+        set_run_deadline(started_at + max(0.0, max_runtime_s - reserve_s))
     results = []
     for task in tasks:
         if _runtime_budget_exhausted(started_at, max_runtime_s, reserve_s):
@@ -121,6 +125,7 @@ def _handle_submit_track1(args: argparse.Namespace, runner: TaskRunner) -> int:
         results.append(runner.run(task))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(adapter.format(results), encoding="utf-8")
+    _write_optional_resource_report(started_at, tasks=len(tasks), results=len(results))
     print(json.dumps({"tasks": len(results), "out": str(args.output)}, ensure_ascii=False), file=sys.stderr)
     return 0
 
@@ -154,6 +159,33 @@ def _float_env(name: str, default: float) -> float:
     if raw is None or not raw.strip():
         return default
     return float(raw)
+
+
+def _write_optional_resource_report(started_at: float, *, tasks: int, results: int) -> None:
+    raw_path = os.getenv("ROUTER_RESOURCE_REPORT")
+    if not raw_path or not raw_path.strip():
+        return
+    usage = resource.getrusage(resource.RUSAGE_SELF)
+    max_rss = int(usage.ru_maxrss)
+    # Linux reports KiB; macOS reports bytes. The official image is Linux.
+    max_rss_kib = max_rss // 1024 if sys.platform == "darwin" else max_rss
+    path = Path(raw_path.strip())
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(
+            {
+                "schema_version": "router-resource-report-v1",
+                "tasks": tasks,
+                "results": results,
+                "elapsed_ms": round((perf_counter() - started_at) * 1000),
+                "max_rss_kib": max_rss_kib,
+                "max_rss_mib": round(max_rss_kib / 1024, 3),
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
 
 
 def _handle_eval(args: argparse.Namespace, runner: TaskRunner) -> int:

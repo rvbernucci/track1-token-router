@@ -1,34 +1,28 @@
-# Core
+# Core Runtime
 
-Responsavel pela logica competitiva do router.
+The core runtime implements the evaluator-facing contracts and the championship three-route orchestration.
 
-## O que mora aqui
+## Target Components
 
-- `TaskEnvelope`: contrato generico de entrada.
-- `AnswerResult`: contrato generico de saida.
-- `CascadeRunner`: orquestrador da cascata.
-- `LocalModelClient`: cliente para modelo local OpenAI-compatible.
-- `FireworksClient`: cliente remoto Fireworks.
-- `M1Generator`: gera candidato livre, sem reasoning.
-- `M2AVerifier`: valida candidato em JSON pequeno, com reasoning.
-- `M2BGenerator`: gera alternativa livre, com reasoning.
-- `FireworksAuditor`: aprova alternativa ou substitui resposta.
-- `TokenUsage`: metricas de tokens remotos.
+- `TaskEnvelope`: normalized official input.
+- `RouteDecision`: one strict FunctionGemma tool call.
+- `DeterministicExecutor`: calls one registered solver and accepts refusal.
+- `E2BExecutor`: local text-only generation with fixed budgets.
+- `FireworksExecutor`: allowed-model Pareto selection and remote inference.
+- `FinalValidator`: output shape and evaluator contract checks.
+- `AnswerResult`: final answer, route, latency and token metadata.
 
-## Contrato mental
+## Invariants
 
-```text
-M1 = resposta livre, estado natural rapido
-M2A = juiz estruturado, com rubrica e JSON
-M2B = resposta livre, estado natural com reasoning
-Fireworks = auditor externo forte, approve-or-replace
-```
+- FunctionGemma never writes the user answer.
+- A deterministic prediction is not proof; the solver must accept independently.
+- E2B cannot select its own context or token budget.
+- Fireworks model IDs must belong to `ALLOWED_MODELS`.
+- Any local parse, timeout, refusal or validation failure falls back to Fireworks.
+- Internal tool calls and metadata never leak into the final answer.
+- `stdout` remains evaluator-safe; diagnostics go to structured logs.
 
-## Nao fazer aqui
+## Migration Note
 
-- UI.
-- HTML.
-- Dashboard.
-- Codigo especifico de um evaluator ainda desconhecido.
-- Dependencia direta em paths de AMD/DigitalOcean.
+Legacy local generation/verification classes remain temporarily under `router/core` while Sprint 45 replaces their factory wiring and tests. They are not part of the active architecture described in [`../docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md).
 

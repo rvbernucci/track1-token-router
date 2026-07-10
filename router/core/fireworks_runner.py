@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import math
 import re
 from pathlib import Path
@@ -11,7 +12,12 @@ from router.core.fireworks import FireworksClient
 from router.core.logging import JsonlRunLogger
 from router.core.model_client import ModelClientError, ModelResponse
 from router.core.prompts import build_m1_messages
-from router.orchestration.fireworks_model_router import select_fireworks_model, select_reasoning_effort
+from router.orchestration.fireworks_model_router import (
+    normalize_fireworks_model_id,
+    select_fireworks_model,
+    select_reasoning_effort,
+)
+from router.orchestration.fireworks_intent_policy import FireworksIntentPolicy
 from router.orchestration.final_validator import validate_final_answer
 from router.orchestration.matrix_regression_selector import (
     MatrixRegressionWeights,
@@ -34,21 +40,31 @@ class FireworksDirectRunner:
         max_tokens: int = 512,
         allowed_models: list[str] | None = None,
         service_tier: str | None = None,
+        champion_model: str | None = None,
         matrix_weights_path: Path | None = None,
+        intent_policy_path: Path | None = None,
+        intent_policy_sha256: str | None = None,
+        enable_deterministic_solvers: bool = True,
     ) -> None:
         self.client = client
         self.logger = logger
         self.temperature = temperature
         self.max_tokens = max_tokens
-        self.allowed_models = allowed_models or []
+        self.allowed_models = [normalize_fireworks_model_id(model) for model in (allowed_models or [])]
         self.service_tier = service_tier
+        self.champion_model = normalize_fireworks_model_id(champion_model) or None
         self.matrix_weights_path = matrix_weights_path
+        self.intent_policy_path = intent_policy_path
+        self.intent_policy_sha256 = intent_policy_sha256
+        self.enable_deterministic_solvers = enable_deterministic_solvers
         self._matrix_weights: MatrixRegressionWeights | None = None
         self._matrix_error: str | None = None
+        self._intent_policy: FireworksIntentPolicy | None = None
+        self._intent_policy_error: str | None = None
         self._unavailable_models: set[str] = set()
 
     def run(self, task: TaskEnvelope) -> AnswerResult:
-        solver = solve_deterministic(task)
+        solver = solve_deterministic(task) if self.enable_deterministic_solvers else None
         if solver is not None:
             result = AnswerResult(
                 id=task.id,
@@ -65,9 +81,7 @@ class FireworksDirectRunner:
             return result
 
         started_at = perf_counter()
-        selection = select_fireworks_model(task, self.allowed_models, default_model=self.client.model)
-        matrix_selection = self._matrix_selection(task)
-        selected_model = str(matrix_selection.get("model") or selection.model) if matrix_selection else selection.model
+        selection, matrix_selection, intent_policy_selection, champion_selection, selected_model = self._selection_plan(task)
         request_options = _request_options_for_selection(selected_model, selection.tier, service_tier=self.service_tier)
         request_options_fallback: str | None = None
         original_model = self.client.model
@@ -179,6 +193,8 @@ class FireworksDirectRunner:
                     "fireworks_model": selected_model,
                     "fireworks_model_selection": selection.to_dict(),
                     "fireworks_matrix_selection": matrix_selection,
+                    "fireworks_intent_policy_selection": intent_policy_selection,
+                    "fireworks_champion_selection": champion_selection,
                     "fireworks_request_options": request_options,
                     "fireworks_completion_token_policy": token_policy,
                     "fireworks_attempt_errors": attempt_errors,
@@ -199,6 +215,8 @@ class FireworksDirectRunner:
                 fireworks_attempt_errors=attempt_errors,
                 fireworks_invalid_attempts=invalid_attempts,
                 fireworks_matrix_selection=matrix_selection,
+                fireworks_intent_policy_selection=intent_policy_selection,
+                fireworks_champion_selection=champion_selection,
                 fireworks_unavailable_models=sorted(self._unavailable_models),
             )
             return result
@@ -217,6 +235,8 @@ class FireworksDirectRunner:
                 "fireworks_model": selected_model,
                 "fireworks_model_selection": selection.to_dict(),
                 "fireworks_matrix_selection": matrix_selection,
+                "fireworks_intent_policy_selection": intent_policy_selection,
+                "fireworks_champion_selection": champion_selection,
                 "fireworks_request_options": request_options,
                 "fireworks_request_options_fallback": request_options_fallback,
                 "fireworks_completion_token_policy": token_policy,
@@ -241,9 +261,29 @@ class FireworksDirectRunner:
             fireworks_attempt_errors=attempt_errors,
             fireworks_invalid_attempts=invalid_attempts,
             fireworks_matrix_selection=matrix_selection,
+            fireworks_intent_policy_selection=intent_policy_selection,
+            fireworks_champion_selection=champion_selection,
             fireworks_unavailable_models=sorted(self._unavailable_models),
         )
         return result
+
+    def planned_model(self, task: TaskEnvelope) -> str:
+        return self._selection_plan(task)[4]
+
+    def _selection_plan(self, task: TaskEnvelope):
+        selection = select_fireworks_model(task, self.allowed_models, default_model=self.client.model)
+        matrix_selection = self._matrix_selection(task)
+        intent_policy_selection = self._intent_policy_selection(selection.domain)
+        champion_selection = self._champion_selection(selection.domain)
+        if champion_selection and champion_selection.get("model"):
+            selected_model = str(champion_selection["model"])
+        elif intent_policy_selection and intent_policy_selection.get("model"):
+            selected_model = str(intent_policy_selection["model"])
+        elif matrix_selection:
+            selected_model = str(matrix_selection.get("model") or selection.model)
+        else:
+            selected_model = selection.model
+        return selection, matrix_selection, intent_policy_selection, champion_selection, selected_model
 
     def _log(self, task: TaskEnvelope, result: AnswerResult, **extra: object) -> None:
         if self.logger:
@@ -262,6 +302,41 @@ class FireworksDirectRunner:
         except Exception as exc:
             self._matrix_error = str(exc)
             return {"error": self._matrix_error}
+
+    def _intent_policy_selection(self, domain: str) -> dict[str, Any] | None:
+        if self.intent_policy_path is None:
+            return None
+        if self._intent_policy_error:
+            return {"error": self._intent_policy_error}
+        try:
+            if self._intent_policy is None:
+                self._intent_policy = FireworksIntentPolicy.load(
+                    self.intent_policy_path,
+                    expected_sha256=self.intent_policy_sha256,
+                )
+            models = self.allowed_models or [self.client.model]
+            return self._intent_policy.select(domain=domain, runtime_allowed_models=models)
+        except (OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
+            self._intent_policy_error = str(exc)
+            return {"error": self._intent_policy_error}
+
+    def _champion_selection(self, domain: str) -> dict[str, Any] | None:
+        if not self.champion_model:
+            return None
+        runtime_allowed = set(self.allowed_models or [self.client.model])
+        if self.champion_model not in runtime_allowed:
+            return {
+                "domain": domain,
+                "preferred_model": self.champion_model,
+                "reason": "champion_not_runtime_allowed",
+                "selection_rule": "validation_selected_global_champion",
+            }
+        return {
+            "domain": domain,
+            "model": self.champion_model,
+            "reason": "champion_is_runtime_allowed",
+            "selection_rule": "validation_selected_global_champion",
+        }
 
 
 def _elapsed_ms(started_at: float) -> int:

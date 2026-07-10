@@ -1,0 +1,34 @@
+{
+  "schema_version": "functiongemma-gguf-runtime-v1",
+  "format": "GGUF",
+  "quantization": "Q8_0",
+  "artifact": {
+    "filename": "functiongemma-scale789-q8_0.gguf",
+    "bytes": 291557568,
+    "sha256": "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77"
+  },
+  "llama_cpp": {
+    "release": "b9948",
+    "commit": "074944998d3f25e7001ede30d152b59dff741c8c",
+    "ubuntu_x64_archive_sha256": "9fd15007f9058e2cf6d8d81e0856ffc351f59a70ff3ad08720992835cbb9320a",
+    "source_archive_sha256": "3dbdef51ef14e4faf4103dde97ad027ea80f31fa4eb200be7f04d5675fdb003f"
+  },
+  "server": {
+    "context_tokens": 2048,
+    "threads": 2,
+    "jinja": true,
+    "temperature": 0,
+    "max_completion_tokens": 64,
+    "tool_choice": "required",
+    "stop": "<end_function_call>"
+  },
+  "evaluation": {
+    "examples": 93,
+    "schema_validity": 1.0,
+    "intent_accuracy": 0.967741935483871,
+    "p50_latency_ms": 990.108813974075,
+    "p95_latency_ms": 1201.046325196511,
+    "report_sha256": "744993ec6350f713833748d13263f8a318fbbe92e7c710c5e1132c03440bde3a",
+    "boundary_report_sha256": "55c1e99e912e963a76f5b8baf85bfd2b78d17bcab9face18fa7831605e7ce388"
+  }
+}

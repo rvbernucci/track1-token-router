@@ -1,5 +1,33 @@
 # Fireworks Track 1 Allowed Models Calibration
 
+## Championship Runtime Finding
+
+On the frozen validation/test corpus, omitting `reasoning_effort` for strong Minimax M3 tasks produced repeated OpenAI-compatible responses without usable `message.content`. The same model completed the earlier 571-task run without this failure when `reasoning_effort="none"` was present. The promoted router therefore sends `none` for Minimax and Kimi in every tier, while Gemma continues to omit the unsupported field. The exact-runtime `v4` baseline reproduces `M1_SYSTEM_PROMPT`, dynamic completion caps, `user`, temperature and reasoning options.
+
+The exact-runtime baseline uses cross-model judging: Kimi judges Minimax candidates, Minimax judges Kimi candidates, and Gemini 3.5 Flash Medium independently judges both sets. A model never judges its own answer. Only unanimous decisions become binary outcomes; disagreement remains conservatively not correct for policy comparison. Claude Sonnet 5 rows collected during a slow subscription-CLI pilot are retained as auxiliary provenance but are not members of the pinned baseline judge policy.
+
+The competition selector now treats Fireworks tokens, not API dollar price, as the scarce-resource player. Capability and a 95% Wilson empirical accuracy lower bound form hard feasibility gates; Nash welfare, Pareto dominance and the matrix target optimize token count only among feasible models. Dollar price remains visible in traces and acts only after accuracy and token ties.
+
+## Frozen 571-Task Baseline
+
+The larger exact-runtime experiment evaluates the frozen validation and locked-test portions of the 2,000-task corpus. Both candidates receive the same user task, `M1_SYSTEM_PROMPT`, temperature, dynamic token cap, `reasoning_effort="none"` and request metadata used by the runtime.
+
+| Model | Answered | Fireworks tokens | Validation conservative accuracy | Locked-test conservative accuracy | Locked-test avg tokens |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `kimi-k2p7-code` | 571/571 | 147,695 | 58.45% | 59.58% | 257.4 |
+| `minimax-m3` | 570/571 | 202,913 | 56.69% | 50.52% | 353.5 |
+
+The single Minimax runtime failure is retained rather than retried away. Two independent non-self judges evaluate each answered candidate. Unanimous judgments are binary; disagreement counts as incorrect in conservative promotion metrics.
+
+Per-intent selection was frozen on validation. It selected Minimax for `logic_puzzle` and `sentiment`, and Kimi for the other six intents. On the locked test that candidate achieved `56.10%` conservative accuracy, a `50.31%` Wilson lower bound, and `81,474` tokens over 287 tasks. It failed the predeclared `60%` promotion gate. The candidate therefore remains `default_enabled=false`; the locked test did not trigger any post-hoc intent reselection.
+
+Authoritative artifacts:
+
+- comparison: `reports/generated/e2b-2000-baselines/fireworks-baseline-comparison.json`;
+- human report: `reports/generated/e2b-2000-baselines/fireworks-baseline-comparison.md`;
+- candidate runtime policy: `configs/fireworks-intent-policy-v1.json`;
+- policy SHA-256: `f10e31382bb39378834b9ec76c1d11b5b9c6e3e17f5d9bc782909004c8344c91`.
+
 Last run: 2026-07-09
 
 Primary dataset: `evals/fireworks-pareto/track1-category-microbench.jsonl`
@@ -75,9 +103,9 @@ Additional runtime-router eval spend across three iterative escape runs: `$0.005
 | `accounts/fireworks/models/gemma-4-26b-a4b-it` | 0 | 64 | 64 | 0 | 0.00000000 | 371 |
 | `accounts/fireworks/models/gemma-4-31b-it-nvfp4` | 0 | 64 | 64 | 0 | 0.00000000 | 372 |
 
-## Observations
+## Historical Microbench Observations
 
-- `minimax-m3` is the current cheapest high-accuracy Fireworks fallback among accessible Track 1 allowed models.
+- `minimax-m3` was cheaper in development dollars on the initial microbench, but Track 1 scores tokens rather than USD and the larger exact-runtime baseline now favors Kimi globally.
 - Escape rerun with 80 focused calls cost `$0.00557805`; `minimax-m3` passed `16/16`, while `kimi-k2p7-code` passed `14/16` with fewer tokens but failed two code tasks under strict output validation.
 - Frontier rerun with 28 focused calls passed `27/28`; `kimi-k2p7-code` passed `14/14` with `1397` tokens, while `minimax-m3` passed `13/14` with `2846` tokens.
 - Structure-heldout rerun with 120 calls cost `$0.00738105`; `kimi-k2p7-code` and `minimax-m3` both passed `21/24`, but Kimi used `2510` tokens versus Minimax `4398`.
@@ -95,7 +123,10 @@ After tightening the `ner_money_date` prompt to require date and amount exactly 
 ## Operational Policy
 
 - Use local Gemma first for AMD pod development/calibration when an endpoint is available and validated; do not assume Gemma 26B/31B fits the final `4 GB` RAM / `2 vCPU` grading container.
-- In Fireworks-only mode, the Docker image now enables `FIREWORKS_MATRIX_WEIGHTS=/app/router/data/fireworks_track1_allowed_weights.json` by default.
+- In Fireworks-only mode, the Docker image promotes `FIREWORKS_CHAMPION_MODEL=accounts/fireworks/models/kimi-k2p7-code`; the preference applies only when Kimi is present in `ALLOWED_MODELS`.
+- The matrix artifact remains bundled for fallback research and contingency ordering, but it cannot override the promoted champion. On the locked test it lost five conservative-correct answers and used 4,983 more tokens than Kimi.
+- The Docker image loads the SHA-pinned intent-policy candidate for audit, but it cannot override the matrix while `default_enabled=false` after its failed locked-test gate.
+- If a future promoted policy selects a model absent from runtime `ALLOWED_MODELS`, the policy yields no model and the runner falls back to the matrix/Pareto/Nash ordering without making an invalid call.
 - The checked-in matrix weights now use `183` completed, deduplicated, observed Track 1 rows from category, hidden-variant, championship, frontier, structure-heldout, and escape result files.
 - Transport/access failures such as Gemma `404` are excluded from quality fitting by default. The weights record `observed_models`, and the matrix selector filters unobserved allowed models when observed alternatives exist.
 - The matrix selector uses ridge-regression utility plus Nash welfare, predicted token-efficiency utility, and smoothed empirical validity by domain/shape/model because Track 1 ranks by Fireworks token count after the accuracy gate.
@@ -127,4 +158,4 @@ This does not answer tasks by regex. It only prevents format words like `Return 
 
 - Re-run this benchmark if the official page, Participant Guide, or Discord announces a model-access change.
 - If Gemma becomes available through Fireworks serverless, repeat this run and fit `FIREWORKS_MATRIX_WEIGHTS` from the new result file.
-- If local Gemma is served from AMD pod, compare `ROUTER_MODE=hybrid` against `ROUTER_MODE=fireworks` for calibration and demo. Promote local-first to the final path only if the local model also fits the official grading envelope or the harness provides an endpoint.
+- Keep `ROUTER_MODE=three_route` as reproducible research. It may be reconsidered only with a new frozen corpus; the current E2B and intent-policy candidates failed their locked promotion gates.

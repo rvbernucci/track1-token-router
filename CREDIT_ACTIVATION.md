@@ -15,40 +15,40 @@ Do not activate paid resources if this fails locally.
 
 ## 1. AMD Developer Cloud / DigitalOcean
 
-Goal: expose the local model as an OpenAI-compatible endpoint.
+Goal: train FunctionGemma and benchmark the local E2B text-only runtime.
 
 Primary runbooks:
 
 - `docs/RUNBOOK_AMD_DIGITALOCEAN.md`
-- `docs/RUNBOOK_VLLM_OPENAI.md`
-- `docs/RUNBOOK_SGLANG_OPENAI.md`
 - `docs/RUNBOOK_GEMMA.md`
+- `docs/FUNCTIONGEMMA_270M_AMD_TRAINING_TUTORIAL.md`
+- `docs/GEMMA_E2B_TEXT_ONLY_RUNTIME.md`
 
 Profiles:
 
-- `runtime-profiles/amd-mi300x-vllm.env.example`
-- `runtime-profiles/amd-mi300x-sglang.env.example`
-- `runtime-profiles/gemma-local.env.example`
+- `runtime-profiles/functiongemma-router.env.example`
+- `runtime-profiles/gemma-e2b-text-only.env.example`
+- `runtime-profiles/three-route.env.example`
 
 ```bash
-cp runtime-profiles/amd-mi300x-vllm.env.example .env.amd-vllm
+cp runtime-profiles/three-route.env.example .env.three-route
 set -a
-. ./.env.amd-vllm
+. ./.env.three-route
 set +a
-python3 -m router ask "What is 6 * 7? Return only the number." --json
+/opt/venv/bin/python scripts/amd_pod_doctor.py --json
 ```
 
 Validation:
 
-- `ROUTER_MODE=local` returns a free-form M1 answer.
-- `ROUTER_MODE=cascade` runs M1 -> M2A -> optional M2B.
-- `ROUTER_MODE=competition` runs guardrails, solvers, risk, budget and final validation.
-- Logs include `latency_m1_ms`, `latency_m2a_ms`, and `latency_m2b_ms`.
-- Paid GPU VM is destroyed when the session ends.
+- FunctionGemma training artifact is persisted privately.
+- E2B starts on Linux `x86_64` without loading vision/audio.
+- Combined FunctionGemma/E2B RSS is measured under 4 GB.
+- Logs include route, local latency, peak RSS and fallback reason.
+- The GPU pod is shut down when training and artifact upload finish.
 
 ## 2. Fireworks
 
-Goal: enable remote audit only after local escalation.
+Goal: calibrate the accuracy fallback and cheapest-sufficient allowed model.
 
 Primary runbook:
 
@@ -69,10 +69,10 @@ python3 -m router ask "What is 2+2?" --json
 
 Validation:
 
-- Easy tasks should stay at `m1_approved` with zero remote tokens.
-- Escalated tasks should record `remote_tokens`.
-- Fireworks output should be compact `approve` or `replace`.
-- `FIREWORKS_MAX_TOKENS` should stay small unless a report justifies raising it.
+- Local routes should record zero Fireworks tokens.
+- Fireworks routes should record prompt and completion tokens.
+- The exact remote model must come from `ALLOWED_MODELS`.
+- Matrix/Pareto selection must be recalibrated against the current allowed set.
 
 ## 3. Benchmark
 

@@ -1,40 +1,52 @@
-# Track 1 Token Router CLI
+# Track 1 Token Router
 
-Projeto separado para o `Track 1 - Hybrid Token-Efficient Routing Agent`.
+General-purpose, token-efficient agent for AMD Developer Hackathon ACT II Track 1.
 
-Objetivo: construir um runner headless, CLI-first, capaz de receber uma task em texto/arquivo/stdin/JSONL, executar a cascata local + Fireworks, registrar metricas e devolver uma resposta final limpa.
+The runner handles factual Q&A, math reasoning, sentiment, summarization, NER, code debugging, logic puzzles and code generation. It targets the official accuracy gate first, then minimizes tokens routed through Fireworks.
 
-## Principio
+## Championship Design
 
-Nao estamos construindo um app visual. Estamos construindo um runner competitivo.
+```text
+task
+-> registered deterministic solver (accept or refuse)
+-> Kimi K2.7 Code when present in ALLOWED_MODELS
+-> strict output validation and allowed-model fallback
+-> final answer
+```
 
-Prioridades:
+- Deterministic solvers must independently accept the original input or refuse it.
+- Kimi is a validation-selected preference and is never called unless the harness includes it in `ALLOWED_MODELS`.
+- Strict-format failures can retry another ranked allowed model; model unavailability is cached per batch.
+- FunctionGemma 270M and Gemma 4 E2B were trained and evaluated as the local challenger, but E2B failed its frozen accuracy gate and neither model is bundled in the submitted image.
 
-- stdout limpo para resposta final;
-- logs estruturados separados;
-- input adaptavel ao formato revelado no kickoff;
-- modelo local e Fireworks configuraveis por env vars;
-- container reproduzivel;
-- minimo acoplamento com UI ou framework web.
+The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
-## Quickstart limpo
+## Competition Constraints
 
-Do zero, use virtualenv. O projeto suporta Python `3.10+`, que cobre o pod AMD observado no hackathon. Em macOS/Homebrew, `python3 -m pip install -e .` fora de uma venv pode falhar por PEP 668.
+- input is adapted to the official task contract and final output is valid `/output/results.json`;
+- exit code 0 on success;
+- maximum runtime 10 minutes;
+- final environment 4 GB RAM and 2 vCPU;
+- public Docker image with a `linux/amd64` manifest;
+- compressed image below 10 GB;
+- no hardcoded or cached answers;
+- Fireworks calls only through `FIREWORKS_BASE_URL` and only to `ALLOWED_MODELS`;
+- local model tokens count as zero Fireworks tokens.
+
+## Status
+
+Sprints 45-48 are complete. The frozen 571-task ablation selected deterministic-then-Kimi over matrix, per-intent, Minimax and local-E2B challengers. Sprint 49 is validating the exact public Linux `amd64` image and final submission assets.
+
+## Quickstart
 
 ```bash
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install -e .
-router ask "What is 2+2?"
+python -m router ask "What is 2+2?"
 ```
 
-Sem instalacao local, tambem funciona:
-
-```bash
-python3 -m router ask "What is 2+2?"
-```
-
-Checks principais:
+Run the current offline checks:
 
 ```bash
 python3 -m unittest discover -s tests
@@ -45,28 +57,7 @@ python3 scripts/secret_scan.py
 git diff --check
 ```
 
-Atalhos equivalentes:
-
-```bash
-make setup
-make smoke
-make test
-make deterministic-coverage
-make submission-audit
-make release-check
-make doctor
-```
-
-No AMD Developer Cloud/Jupyter pod:
-
-```bash
-git clone https://github.com/rvbernucci/track1-token-router.git
-cd track1-token-router
-scripts/amd_pod_doctor.py
-SKIP_TESTS=1 scripts/bootstrap_amd_pod.sh
-```
-
-Contrato oficial Track 1 em modo offline:
+## Official Offline Contract
 
 ```bash
 ROUTER_MODE=mock \
@@ -75,467 +66,78 @@ python3 -m router submit-track1 \
   --output reports/generated/official-smoke-results.json
 ```
 
-Leitura atual do Participant Guide:
+## Documentation
 
-- Track 1 e um agente general-purpose em 8 categorias: factual, matematica, sentimento, resumo, NER, debug de codigo, logica e geracao de codigo.
-- O container final roda em ambiente padronizado de `4 GB` RAM e `2 vCPU`.
-- Modelos locais contam para accuracy e usam zero Fireworks tokens, mas precisam caber nesse envelope; o guia chama `2B-3B` 4-bit de seguro e alerta que `7B` 4-bit pode consumir quase toda a RAM.
-- Gemma 26B/31B e uma trilha forte para AMD pod, calibracao, demo, fine-tuning e uso via Fireworks quando aparecer em `ALLOWED_MODELS`, mas nao deve ser presumido como modelo local dentro da imagem final.
-- Gemma pequeno, especialmente classe E2B/2B-3B 4-bit, agora e um candidato serio para triagem/verificacao local se passar memoria, latencia e accuracy.
-- O Docker default fica `ROUTER_MODE=fireworks` para respeitar `FIREWORKS_BASE_URL` e `ALLOWED_MODELS`; `ROUTER_MODE=hybrid` so vira candidato final se um modelo local compacto for provado no mesmo envelope.
-
-## Pastas
-
-| Pasta | Papel |
+| Document | Purpose |
 |---|---|
-| [`core`](./core/README.md) | Logica da cascata: M1, M2A, M2B, Fireworks auditor, contratos e metricas. |
-| [`cli`](./cli/README.md) | Comandos para interagir com o runner: `ask`, `solve`, `run`, `eval`. |
-| [`adapters`](./adapters/README.md) | Entrada e saida: stdin, JSONL, arquivos, formato do evaluator. |
-| [`logs`](./logs/README.md) | Logs locais JSONL, traces, tokens, rotas e resultados de runs. |
-| [`docker`](./docker/README.md) | Container, imagem, env vars e comandos de execucao reproduzivel. |
-| [`planning`](./planning/README.md) | Builder plan, principios, definition of done e estrategia-mestra. |
-| [`sprints`](./sprints/README.md) | Plano operacional em 5 sprints com checklists e criterios de aceite. |
-| [`docs/COMPETITION_GAP_ANALYSIS.md`](./docs/COMPETITION_GAP_ANALYSIS.md) | Lacunas restantes sem credito e trilha de Sprints 22-26. |
-| [`docs/NEXT_NO_CREDIT_IMPROVEMENTS.md`](./docs/NEXT_NO_CREDIT_IMPROVEMENTS.md) | Terceira onda sem credito: deploy publico, caos de modelo local, validacao semantica, batch stress e redaction. |
-| [`docs/NO_CREDIT_WAVE_3_PLAN.md`](./docs/NO_CREDIT_WAVE_3_PLAN.md) | Plano executivo das Sprints 32-36, com dependencias, gates e anti-escopo. |
-| [`docs/TRACK1_FINAL_ENVIRONMENT_STRATEGY.md`](./docs/TRACK1_FINAL_ENVIRONMENT_STRATEGY.md) | Correcao operacional do guia atual: Docker final `4 GB`/`2 vCPU`, Gemma grande via Fireworks/pod, e validadores como camada de seguranca. |
-| [`docs/GEMMA_SMALL_LOCAL_STRATEGY.md`](./docs/GEMMA_SMALL_LOCAL_STRATEGY.md) | Trilha challenger para Gemma pequeno local dentro do envelope final, com gates de memoria, latencia, accuracy e tokens. |
+| [Architecture](./docs/ARCHITECTURE.md) | Canonical three-route design and fallback policy |
+| [Assessment contracts](./docs/ASSESSMENT_DECISION_CONTRACTS.md) | Taxonomy, score anchors, feature vector, outcomes and fail-closed trace |
+| [FunctionGemma assessment spec](./docs/FUNCTIONGEMMA_ROUTER_SPEC.md) | Intent, five score rubrics and evaluation contract |
+| [AMD training tutorial](./docs/FUNCTIONGEMMA_270M_AMD_TRAINING_TUTORIAL.md) | Full SFT and LoRA workflow on ROCm |
+| [Gemma E2B token ladder](./docs/E2B_TOKEN_LADDER.md) | Adaptive 96/192/384 experiment, quantization and CPU runtime audit |
+| [Public E2B evidence](./reports/public/e2b-token-ladder.md) | Aggregate recovery, feature and latency results |
+| [E2B runtime](./docs/GEMMA_E2B_TEXT_ONLY_RUNTIME.md) | Text-only LiteRT-LM packaging and 4 GB gates |
+| [Deterministic solvers](./docs/DETERMINISTIC_SOLVERS.md) | Mechanical registry and proof rules |
+| [Fireworks calibration](./docs/FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md) | Allowed-model microbench workflow |
+| [Pareto routing](./docs/PARETO_MODEL_ROUTING.md) | Cheapest-sufficient remote selection |
+| [Game theory](./docs/GAME_THEORY_MODEL_SELECTION.md) | Payoff and equilibrium model selection |
+| [Final environment](./docs/TRACK1_FINAL_ENVIRONMENT_STRATEGY.md) | Official resource and submission constraints |
+| [Testing culture](./docs/TESTING_CULTURE.md) | Promotion and regression discipline |
+| [Sprints](./sprints/README.md) | Active implementation plan |
 
-## Roadmap atual
+## Repository Map
 
-A rota principal do projeto nao depende de creditos AMD ou Fireworks.
+| Path | Role |
+|---|---|
+| `router/` | Runtime, adapters, solvers, Fireworks and orchestration |
+| `tests/` | Unit and integration regression suite |
+| `evals/` | Golden, adversarial, semantic and Fireworks calibration sets |
+| `scripts/` | Training support, audits, benchmarks and release checks |
+| `docs/` | Current technical documentation |
+| `sprints/` | Completed history and active migration work |
+| `submission/` | Pitch, demo and delivery assets |
 
-Enquanto os creditos nao chegam, seguimos nas sprints offline. As sprints 06-21 ja criaram dataset, simuladores, testes, scoring, guardrails, analytics, release automation, state machine, budget manager, policy engine, prompt packet, final validator e battle drill.
+## Runtime Modes
 
-A primeira trilha de readiness competitivo sem credito foi fechada:
-
-- Sprint 22: competition mode integration.
-- Sprint 23: official input fuzz pack.
-- Sprint 24: deterministic solver pack.
-- Sprint 25: platform runbooks e runtime profiles.
-- Sprint 26: submission readiness kit.
-
-A segunda trilha de readiness tambem foi fechada:
-
-- Sprint 27: static demo e public reports.
-- Sprint 28: evaluator contract e adapter drill.
-- Sprint 29: latency/token envelope.
-- Sprint 30: artifact build kit.
-- Sprint 31: policy Pareto e decision replay.
-
-O proximo bloco sem credito e a terceira onda:
-
-- Sprint 32: public demo deploy e strict readiness.
-- Sprint 33: bad local model chaos lab.
-- Sprint 34: semantic validation harness.
-- Sprint 35: batch throughput e timeout stress.
-- Sprint 36: submission rehearsal e log redaction.
-
-O proximo bloco recomendado esta em [`docs/NEXT_NO_CREDIT_IMPROVEMENTS.md`](./docs/NEXT_NO_CREDIT_IMPROVEMENTS.md).
-
-Quando os creditos chegarem, entramos na trilha paralela `credit-gated`:
-
-- Credit A: AMD runtime bring-up.
-- Credit B: Fireworks real audit calibration.
-- Credit C: end-to-end cost benchmark.
-- Credit D: final cloud submission drill.
-
-Detalhes em [`sprints`](./sprints/README.md).
-
-## Fluxo alvo
+`fireworks` is the promoted Docker mode. `three_route` remains available for reproducing the rejected local-model research path.
 
 ```text
-TaskEnvelope
--> validadores mecanicos seguros protegem formato, contas simples e schema
--> se houver modelo local compacto aprovado: M1 gera resposta livre
--> M2A valida em JSON pequeno
--> se approve: entrega resposta local
--> se escalate ou sem local compacto: Fireworks escolhe menor modelo suficiente em ALLOWED_MODELS
--> resposta final limpa em /output/results.json
+ROUTER_MODE=fireworks
+ROUTER_MODE=three_route
 ```
 
-## CLI alvo
+## Public Image
 
-```bash
-router ask "What is 2+2?"
-router ask --file ./task.txt
-router solve --json < task.json
-router run --jsonl ./tasks.jsonl --out ./runs/output.jsonl
-router eval --jsonl ./tasks.jsonl --expected ./expected.jsonl
-router eval --jsonl ./tasks.jsonl --expected ./expected.jsonl --report ./reports/generated/report.md
-```
-
-Regra importante:
-
-- `stdout`: resposta final ou JSON final esperado pelo evaluator.
-- `stderr`: mensagens humanas de debug.
-- `logs/`: metricas e traces estruturados.
-
-## Instalacao local
-
-```bash
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install -e .
-```
-
-Tambem e possivel rodar sem instalar:
-
-```bash
-python3 -m router ask "What is 2+2?"
-```
-
-## Variaveis de ambiente
-
-| Variavel | Padrao | Papel |
-|---|---|---|
-| `ROUTER_LOG_PATH` | `logs/run.jsonl` | Caminho dos logs estruturados JSONL. |
-| `ROUTER_MODE` | `mock` | Modo de execucao: `mock`, `auto`, `local`, `cascade`, `hybrid`, `competition` ou `fireworks`. |
-| `ROUTER_POLICY` | `balanced` | Politica de roteamento: `aggressive`, `balanced` ou `conservative`. |
-| `LOCAL_BASE_URL` | vazio | Endpoint OpenAI-compatible do modelo local. |
-| `ENABLE_GUARDRAILS` | `0` | Liga regras deterministicas conservadoras antes do runner. |
-| `ENABLE_ORCHESTRATOR` | `0` | Liga trace de state machine em torno do runner. |
-| `COMPETITION_DRY_RUN` | `1` | Mantem `ROUTER_MODE=competition` sem chamadas reais de modelo remoto/local por padrao. |
-| `MAX_REMOTE_TOKENS_PER_TASK` | `300` | Budget remoto simulado por task. |
-| `MAX_REMOTE_TOKENS_PER_RUN` | `6000` | Budget remoto simulado por run offline. |
-| `MAX_REMOTE_LATENCY_MS` | `3000` | Limite de risco de latencia remota por decisao. |
-| `LOCAL_MODEL` | vazio | Nome do modelo local. |
-| `LOCAL_API_KEY` | vazio | API key opcional para endpoint local protegido. |
-| `LOCAL_TIMEOUT_S` | `30` | Timeout por chamada local. |
-| `LOCAL_MAX_RETRIES` | `1` | Tentativas extras em falha local. |
-| `M1_TEMPERATURE` | `0.2` | Temperatura do gerador local M1. |
-| `M1_MAX_TOKENS` | `512` | Limite de output do M1. |
-| `M2A_TEMPERATURE` | `0.0` | Temperatura do verificador local M2A. |
-| `M2A_MAX_TOKENS` | `256` | Limite de output do M2A. |
-| `M2B_TEMPERATURE` | `0.2` | Temperatura do gerador local M2B. |
-| `M2B_MAX_TOKENS` | `768` | Limite de output do M2B. |
-| `FIREWORKS_BASE_URL` | `https://api.fireworks.ai/inference/v1` | Endpoint Fireworks OpenAI-compatible. |
-| `ALLOWED_MODELS` | vazio | Lista oficial de modelos permitidos injetada pelo harness ACT II; aceita CSV, espacos/quebras de linha ou JSON array. |
-| `FIREWORKS_MODEL` | vazio | Override local; se vazio, usa o primeiro item de `ALLOWED_MODELS`. |
-| `FIREWORKS_API_KEY` | vazio | API key Fireworks, usada apenas nas sprints remotas. |
-| `FIREWORKS_TIMEOUT_S` | `24` | Timeout por chamada Fireworks, mantido abaixo do limite oficial de 30s por request. |
-| `FIREWORKS_MAX_RETRIES` | `0` | Tentativas extras em falha Fireworks; no Track 1 evitamos cascata lenta por retry. |
-| `FIREWORKS_TEMPERATURE` | `0.0` | Temperatura do auditor remoto. |
-| `FIREWORKS_MAX_TOKENS` | `256` | Teto global de output Fireworks; o runner aplica um cap menor por formato esperado quando seguro. |
-| `FIREWORKS_SERVICE_TIER` | vazio | Vazio usa Standard; `priority` deve ser usado apenas como fallback manual de confiabilidade. |
-| `FIREWORKS_MATRIX_WEIGHTS` | vazio localmente; `/app/router/data/fireworks_track1_allowed_weights.json` no Docker | Caminho para pesos calibrados por microbench; quando presente, os runners Fireworks e hibrido usam regressao matricial + Nash para escolher o modelo. |
-| `TRACK1_MAX_RUNTIME_S` | `570` | Orçamento total do comando `submit-track1`, deixando margem abaixo dos 10 minutos oficiais. |
-| `TRACK1_RUNTIME_RESERVE_S` | `5` | Reserva final para escrever JSON valido em `/output/results.json` antes do limite. |
-
-## Modo local M1
-
-```bash
-ROUTER_MODE=local \
-LOCAL_BASE_URL=http://localhost:8000/v1 \
-LOCAL_MODEL=local-model \
-python3 -m router ask "What is 2+2?"
-```
-
-## Modo cascata local
-
-```bash
-ROUTER_MODE=cascade \
-LOCAL_BASE_URL=http://localhost:8000/v1 \
-LOCAL_MODEL=local-model \
-python3 -m router ask "What is 2+2?"
-```
-
-## Modo hibrido com Fireworks
-
-```bash
-ROUTER_MODE=hybrid \
-LOCAL_BASE_URL=http://localhost:8000/v1 \
-LOCAL_MODEL=local-model \
-FIREWORKS_API_KEY=<fireworks-api-key> \
-FIREWORKS_MODEL=accounts/fireworks/models/... \
-python3 -m router ask "What is 2+2?"
-```
-
-Nesse modo, Fireworks so e chamado quando o M2A escala a tarefa.
-
-No Track 1 atual, esse e o modo campeonato quando ha um modelo local confiavel: respostas locais corretas contam para accuracy e usam zero Fireworks tokens. Se nao houver endpoint local estavel no ambiente final, use `ROUTER_MODE=fireworks`.
-
-Nota importante: o guia atual informa que o ambiente final tem `4 GB` RAM e `2 vCPU`. Portanto, neste projeto `hybrid` nao significa empacotar Gemma 26B/31B dentro do Docker final; significa usar um modelo compacto provado no envelope oficial, ou um endpoint local explicitamente fornecido pelo avaliador.
-
-## Modo oficial Fireworks direto
-
-```bash
-ROUTER_MODE=fireworks \
-FIREWORKS_API_KEY=<harness-key> \
-FIREWORKS_BASE_URL=<harness-base-url> \
-ALLOWED_MODELS=accounts/fireworks/models/... \
-python3 -m router submit-track1 --input /input/tasks.json --output /output/results.json
-```
-
-Esse modo implementa o contrato oficial ACT II: le `/input/tasks.json`, escreve `/output/results.json`, usa validadores mecanicos conservadores antes de Fireworks e escolhe entre modelos de `ALLOWED_MODELS` por tier de tarefa. Esses validadores existem para proteger schema, formato e casos mecanicos seguros; a inteligencia general-purpose continua no roteamento e nos modelos permitidos.
-
-No Docker de submissao, `FIREWORKS_MATRIX_WEIGHTS` ja aponta para `router/data/fireworks_track1_allowed_weights.json`, treinado com microbench real dos modelos permitidos Track 1 em 2026-07-09. A politica atual combina regressao ridge, Nash welfare, eficiencia de tokens, tokens observados por dominio/estrutura/modelo e risco empirico: `kimi-k2p7-code` vence quando sua validade observada e comparavel e ele economiza tokens; `minimax-m3` vence quando robustez empirica supera a economia, especialmente em escapes de codigo, extracao e sentimento misto. O runtime tambem aplica um completion budget por formato esperado: yes/no, numero e literal recebem caps curtos; JSON, resumo e codigo mantem folga maior. Se a primeira resposta Fireworks falhar validacao mecanica e nao puder ser reparada, o runner tenta o proximo candidato ranqueado e soma os tokens das tentativas, protegendo o accuracy gate sem esconder custo.
-
-Para usar calibracao por microbench:
-
-```bash
-python3 scripts/fit_fireworks_matrix_regression.py \
-  --dataset evals/fireworks-pareto/track1-category-microbench.jsonl \
-  --results reports/generated/fireworks-track1-category-20260709-results.jsonl
-ROUTER_MODE=fireworks \
-FIREWORKS_MATRIX_WEIGHTS=router/data/fireworks_track1_allowed_weights.json \
-FIREWORKS_API_KEY=<harness-key> \
-ALLOWED_MODELS=minimax-m3,kimi-k2p7-code,gemma-4-31b-it,gemma-4-26b-a4b-it,gemma-4-31b-it-nvfp4 \
-python3 -m router ask "Summarise token-efficient routing in one sentence."
-```
-
-Em clone limpo, o `fit` usa `evals/fireworks-pareto/seed-microbench-results.jsonl` como seed offline. Depois de rodar microbench real com creditos Fireworks, os resultados em `reports/generated/fireworks-microbench-*.jsonl` passam a alimentar pesos mais fortes.
-
-Para testar o roteador real, incluindo solvers, regressao matricial, Nash/Pareto, fallback e completion budget dinamico:
-
-```bash
-python3 scripts/fireworks_runtime_eval.py \
-  --dataset evals/fireworks-pareto/escape-microbench.jsonl \
-  --max-tasks 16 \
-  --budget-usd 0.25 \
-  --output-jsonl reports/generated/fireworks-runtime-escape-results.jsonl \
-  --report reports/generated/fireworks-runtime-escape-report.md
-```
-
-## Modo competicao dry-run
-
-```bash
-ROUTER_MODE=competition \
-COMPETITION_DRY_RUN=1 \
-python3 -m router ask "What is 10 + 5? Return only the number."
-```
-
-Esse modo integra guardrails, sinais de risco, budget, policy engine, prompt packet, state trace e validacao final sem consumir creditos por padrao.
-
-## Docker
-
-Build:
-
-```bash
-docker build -t track1-token-router .
-```
-
-Smoke test:
-
-```bash
-docker run --rm track1-token-router --help
-docker run --rm -e ROUTER_MODE=mock track1-token-router ask "What is 2+2?"
-```
-
-Official Track 1 file contract:
-
-```bash
-mkdir -p /tmp/track1-input /tmp/track1-output
-cp fixtures/official/lablab_track1_tasks.json /tmp/track1-input/tasks.json
-docker run --rm \
-  -e ROUTER_MODE=mock \
-  -v /tmp/track1-input:/input:ro \
-  -v /tmp/track1-output:/output \
-  track1-token-router
-```
-
-Run JSONL:
-
-```bash
-docker run --rm \
-  -v "$PWD/reports/generated:/app/reports/generated" \
-  track1-token-router eval \
-  --jsonl evals/golden/tasks.jsonl \
-  --expected evals/golden/expected.jsonl \
-  --out reports/generated/golden-output.jsonl \
-  --report reports/generated/golden-report.md
-```
-
-Hybrid run:
-
-```bash
-docker run --rm \
-  -e ROUTER_MODE=hybrid \
-  -e LOCAL_BASE_URL=http://host.docker.internal:8000/v1 \
-  -e LOCAL_MODEL=local-model \
-  -e FIREWORKS_API_KEY="$FIREWORKS_API_KEY" \
-  -e FIREWORKS_MODEL=accounts/fireworks/models/replace-me \
-  track1-token-router ask "What is 2+2?"
-```
-
-## Avaliacao local
-
-```bash
-scripts/verify.sh
-```
-
-Esse script roda:
-
-- suite de testes;
-- smoke test do CLI;
-- eval do golden set;
-- validacao do offline evaluation arena;
-- eval offline por categoria;
-- relatorio Markdown em `reports/generated/golden-report.md`.
-
-Eval offline direto:
-
-```bash
-python3 scripts/generate_offline_eval.py --check
-python3 -m router eval \
-  --jsonl evals/offline/tasks.jsonl \
-  --expected evals/offline/expected.jsonl \
-  --report reports/generated/offline-report.md
-```
-
-Comparacao offline de politicas:
-
-```bash
-python3 scripts/compare_policies.py \
-  --jsonl evals/offline/tasks.jsonl \
-  --expected evals/offline/expected.jsonl \
-  --report reports/generated/policy-comparison.md
-```
-
-Scoreboard offline:
-
-```bash
-python3 scripts/offline_score_simulator.py \
-  --jsonl evals/offline/tasks.jsonl \
-  --expected evals/offline/expected.jsonl \
-  --report reports/generated/offline-scoreboard.md
-```
-
-Formula usada no simulador:
+Release tags publish the Linux `amd64` image at:
 
 ```text
-score = exact_match_rate * accuracy_weight
-  - remote_tokens_total * remote_token_weight
-  - latency_ms_total * latency_ms_weight
-  - parse_failures * parse_failure_weight
+ghcr.io/rvbernucci/track1-token-router:TAG
 ```
 
-Prompt ablation offline:
+## Fireworks
 
 ```bash
-python3 scripts/prompt_ablation.py --check \
-  --manifest prompts/manifest.json \
-  --report reports/generated/prompt-ablation.md
+set -a
+. ./.env.fireworks.local
+set +a
+
+python3 scripts/fireworks_smoke.py \
+  --model accounts/fireworks/models/gemma-4-31b-it \
+  --json
 ```
 
-Guardrails deterministicos opcionais:
+Never commit real credentials. The harness-provided `ALLOWED_MODELS` always overrides local preference during scoring.
+
+## AMD Pod
 
 ```bash
-ENABLE_GUARDRAILS=1 python3 -m router ask "What is 12 - 5? Return only the number."
+git clone https://github.com/rvbernucci/track1-token-router.git
+cd track1-token-router
+/opt/venv/bin/python scripts/amd_pod_doctor.py --json
 ```
 
-As regras sao conservadoras e cobrem apenas input vazio, saudacoes simples, soma/subtracao triviais e eco literal. Qualquer caso ambiguo segue para o runner normal.
+Use the preinstalled ROCm/PyTorch stack. Training instructions are in the AMD FunctionGemma tutorial linked above.
 
-Trace analytics offline:
+## Promotion Rule
 
-```bash
-python3 scripts/analyze_traces.py \
-  --logs "logs/*.jsonl" \
-  --report reports/generated/trace-summary.md
-```
-
-State machine report:
-
-```bash
-python3 scripts/state_machine_report.py \
-  --report reports/generated/state-machine-report.md
-```
-
-Adaptive policy ablation:
-
-```bash
-python3 scripts/policy_ablation.py \
-  --jsonl evals/offline/tasks.jsonl \
-  --report reports/generated/policy-ablation.md
-```
-
-O scoreboard tambem estima `remote_packet_tokens`, isto e, o tamanho do pacote compacto que iria ao auditor remoto.
-
-Battle drill offline:
-
-```bash
-python3 scripts/battle_drill.py \
-  --report reports/generated/battle-report.md \
-  --out-json reports/generated/battle-report.json
-```
-
-Release notes dry-run:
-
-```bash
-python3 scripts/generate_release_notes.py \
-  --tag offline-dry-run \
-  --output reports/generated/release-notes.md
-```
-
-Publicacao GHCR fica em `.github/workflows/release.yml` e acontece apenas em tags `v*` ou `offline-*`.
-
-Audit final da submissao, sem depender de Docker local:
-
-```bash
-python3 scripts/competition_submission_audit.py --skip-network
-python3 scripts/competition_submission_audit.py \
-  --image ghcr.io/rvbernucci/track1-token-router:offline-rc-20260709-1708 \
-  --expected-revision 0b43bbde64237839f9594ef42446aa9325967c40 \
-  --expected-version offline-rc-20260709-1708
-```
-
-O primeiro comando valida contrato oficial, release workflow, README e gates offline. O segundo consulta o GHCR diretamente e confirma que a imagem final e publica, tem manifesto `linux/amd64`, fica abaixo do limite de 10GB e carrega labels OCI de commit/tag.
-
-## Estrategia de token efficiency
-
-- M1 tenta responder localmente com formato livre.
-- M2A valida localmente com uma decisao curta `approve/escalate`.
-- Tarefas aprovadas por M2A saem com zero token remoto.
-- Tarefas escaladas passam por M2B local antes de Fireworks.
-- Fireworks recebe um pacote compacto e audita M2B com `approve/replace`.
-- Completion remota tende a ser pequena porque `approve` devolve `answer=""`.
-
-## Tradeoffs
-
-- Escalar pouco economiza tokens, mas aumenta risco de erro.
-- Escalar demais melhora seguranca, mas pode perder no custo.
-- M2A e o ponto de calibracao mais importante.
-- Logs guardam respostas candidatas para analise local; nao use dados sensiveis nos evals publicos.
-- O golden set usa exact match simples, suficiente para regressao, mas limitado para avaliar qualidade aberta.
-
-## Limites conhecidos
-
-- O formato oficial das tasks pode mudar no kickoff.
-- A qualidade final depende do modelo local disponivel na AMD Developer Cloud.
-- O modo `hybrid` exige um endpoint local OpenAI-compatible e credenciais Fireworks.
-- O projeto e CLI/headless de proposito; UI fica fora do caminho critico de scoring.
-
-## Submissao
-
-Leia [`SUBMISSION.md`](./SUBMISSION.md) para a narrativa tecnica, estrategia e pitch curto.
-
-O sync mais recente com a pagina oficial da competicao esta em [`docs/OFFICIAL_COMPETITION_SYNC.md`](./docs/OFFICIAL_COMPETITION_SYNC.md).
-
-## Chaos lab sem credito
-
-O fake provider permite simular local model e Fireworks sem chaves reais:
-
-```bash
-python3 -m router.dev.fake_provider --help
-```
-
-Guia completo em [`docs/CHAOS_LAB.md`](./docs/CHAOS_LAB.md).
-
-## Kickoff adapters
-
-Quando o formato oficial aparecer, use:
-
-- [`KICKOFF_CHECKLIST.md`](./KICKOFF_CHECKLIST.md)
-- [`router/adapters/official`](./router/adapters/official/README.md)
-- [`fixtures/official`](./fixtures/official)
-
-## Cultura de testes
-
-Use `playground/` para experimentos rapidos no estilo de um `test.ts` e `tests/` para garantias automatizadas:
-
-```bash
-python3 playground/test_policy_logic.py
-python3 scripts/list_test_coverage.py --check
-```
-
-Guia completo em [`docs/TESTING_CULTURE.md`](./docs/TESTING_CULTURE.md) e matriz em [`docs/TEST_MATRIX.md`](./docs/TEST_MATRIX.md).
+The final runtime was promoted because it had the highest eligible validation accuracy, preserved that result on the locked test, and used fewer tokens than every remote-routing challenger. See [the public ablation](./reports/public/championship-ablation.md).

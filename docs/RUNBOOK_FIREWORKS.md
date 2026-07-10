@@ -6,6 +6,18 @@ Ativar Fireworks como o caminho oficial seguro para o Track 1, usando o menor mo
 
 Perfil recomendado: `runtime-profiles/fireworks-serverless.env.example`.
 
+## Politica Promovida
+
+O baseline congelado de 571 tarefas selecionou `kimi-k2p7-code` globalmente. No teste bloqueado, Kimi obteve `59.58%` de acuracia conservadora, `75.0%` entre julgamentos binarios e `73,870` tokens. Minimax, regressao matricial e politica por intencao perderam acuracia e usaram mais tokens. O E2B economizou tokens, mas perdeu acuracia de forma estatisticamente significativa.
+
+Configure:
+
+```bash
+FIREWORKS_CHAMPION_MODEL=accounts/fireworks/models/kimi-k2p7-code
+```
+
+Esse valor e apenas preferencia. O runtime chama Kimi somente se o ID estiver em `ALLOWED_MODELS`; caso contrario, usa o seletor de fallback entre os modelos oficialmente permitidos.
+
 Nota Track 1 atual: local models sao uma estrategia valida de scoring. Respostas locais contam para accuracy e usam zero Fireworks tokens. Porem o guia atual tambem define o ambiente final como `4 GB` RAM e `2 vCPU`; logo, Fireworks continua sendo o caminho oficial mais seguro quando nao ha um modelo local compacto provado dentro desse limite.
 
 Nota LoRA/model fine-tuning: fine-tunar a decisao do roteador e permitido; usar um LoRA/deployment Fireworks como modelo respondedor nao entra no caminho principal sem confirmacao explicita do avaliador. A decisao operacional esta em [`docs/FIREWORKS_LORA_FINE_TUNING_STRATEGY.md`](./FIREWORKS_LORA_FINE_TUNING_STRATEGY.md).
@@ -17,6 +29,7 @@ Nota LoRA/model fine-tuning: fine-tunar a decisao do roteador e permitido; usar 
 - `FIREWORKS_MODEL`: override local para desenvolvimento.
 - `FIREWORKS_BASE_URL`: `https://api.fireworks.ai/inference/v1`.
 - `FIREWORKS_SERVICE_TIER`: opcional; vazio usa Standard, `priority` so para fallback manual.
+- `FIREWORKS_CHAMPION_MODEL`: primeira opcao validada, condicionada a `ALLOWED_MODELS`.
 
 ## Ativacao
 
@@ -195,14 +208,13 @@ Falhas observadas:
 - `kimi-k2p7-code` falhou em `debug_first_even` por devolver explicacao junto e codigo truncado;
 - `reasoning_effort=none` global reduziu custo para `0.00282810` USD, mas piorou validade para `28/32`; portanto nao forcar `none` em tarefas fortes.
 
-Politica atual para o caminho oficial:
+Politica historica anterior ao baseline congelado:
 
-- cheap/medium linguagem: Gemma-first quando Gemma estiver acessivel no harness via `ALLOWED_MODELS`;
-- strong math/logic/code/debug: `minimax-m3` first;
+- os experimentos iniciais testaram Gemma-first e Minimax-first por dominio;
 - fallback entre modelos permitidos se o modelo escolhido retornar erro rapido de API, 404 ou resposta sem `message.content`;
 - timeout nao cascata para outro modelo no mesmo request, porque o envelope oficial exige resposta abaixo de 30s;
-- `kimi-k2p7-code` permanece como fallback/candidato, especialmente para codigo/logica, mas nao como default atual.
-- se um modelo local compacto e confiavel estiver disponivel dentro do envelope `4 GB` RAM / `2 vCPU`, `ROUTER_MODE=hybrid` deve ser comparado contra `ROUTER_MODE=fireworks`, porque respostas locais corretas custam zero Fireworks tokens.
+- o baseline maior de Sprint 49 substituiu essa heuristica e promoveu Kimi globalmente;
+- `ROUTER_MODE=three_route` permanece apenas para reproduzir o challenger FunctionGemma/E2B rejeitado.
 
 Calibracao complementar de 2026-07-09 com todos os modelos permitidos esta em [`docs/FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md`](./FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md).
 
@@ -293,12 +305,12 @@ Decisao operacional:
 - Gemma local 26B/31B no AMD pod: usar para desenvolvimento/calibracao/demo, nao assumir como final-container runtime;
 - nunca criar deployment automaticamente em script de teste sem aprovacao humana, porque pode abrir custo recorrente.
 
-## Smoke hibrido
+## Smoke three-route
 
-O modo hibrido exige endpoint local ativo.
+Este comando passa a ser operacional na Sprint 48, com os dois modelos locais empacotados.
 
 ```bash
-ROUTER_MODE=hybrid \
+ROUTER_MODE=three_route \
 python3 -m router ask "What is 2+2?" --json
 ```
 
@@ -310,14 +322,14 @@ Esperado para tarefa facil:
 Teste de escalacao controlada:
 
 ```bash
-ROUTER_MODE=hybrid \
+ROUTER_MODE=three_route \
 python3 -m router ask "Who is the CEO of AMD today?" --json
 ```
 
 Esperado:
 
-- chamada remota apenas se a cascata local escalar;
-- resposta Fireworks em formato compacto `approve` ou `replace`;
+- chamada remota quando o decisor matricial escolhe Fireworks ou uma rota local falha;
+- resposta Fireworks final no formato solicitado pela tarefa;
 - `remote_tokens` registrado.
 
 ## Modo oficial sem endpoint local

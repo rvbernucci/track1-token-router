@@ -78,7 +78,7 @@ python3 -m http.server 8080
 3. Show the first-scroll story:
 
 - thesis: accuracy first, remote tokens only when needed;
-- architecture: deterministic solver, local candidate, local verifier, compact remote audit;
+- architecture: FunctionGemma assessment, regression/minimax decision and deterministic/E2B/Fireworks execution;
 - proof: public battle, fuzz and submission readiness reports;
 - reproduction: `scripts/offline_release_check.sh`.
 

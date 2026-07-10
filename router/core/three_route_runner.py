@@ -1,0 +1,176 @@
+from __future__ import annotations
+
+from time import monotonic
+from router.core.contracts import AnswerResult, Engine, EngineDecision, EnginePrediction, RoutingTrace, TaskEnvelope, TokenUsage
+from router.core.logging import JsonlRunLogger
+from router.core.runner import TaskRunner
+from router.functiongemma.provider import FunctionGemmaAssessmentProvider, FunctionGemmaProviderError
+from router.orchestration.assessment import build_feature_vector, compute_structural_features
+from router.orchestration.final_validator import validate_or_safely_repair_final_answer
+from router.orchestration.game_theory_selector import MinimaxRegretSelector, deterministic_solver_prediction
+from router.orchestration.outcome_models import OutcomeModelPredictor
+from router.orchestration.solvers import SolverResult, solve_deterministic
+
+
+class ThreeRouteRunner:
+    def __init__(
+        self,
+        *,
+        assessment_provider: FunctionGemmaAssessmentProvider,
+        predictor: OutcomeModelPredictor,
+        selector: MinimaxRegretSelector,
+        e2b_runner: TaskRunner,
+        fireworks_runner: TaskRunner,
+        logger: JsonlRunLogger | None = None,
+        task_deadline_ms: int = 10 * 60 * 1000,
+    ) -> None:
+        self.assessment_provider = assessment_provider
+        self.predictor = predictor
+        self.selector = selector
+        self.e2b_runner = e2b_runner
+        self.fireworks_runner = fireworks_runner
+        self.logger = logger
+        self.task_deadline_ms = task_deadline_ms
+        self.run_deadline: float | None = None
+
+    def set_run_deadline(self, deadline_monotonic: float) -> None:
+        if deadline_monotonic <= 0:
+            raise ValueError("Run deadline must be a positive monotonic timestamp.")
+        self.run_deadline = deadline_monotonic
+
+    def run(self, task: TaskEnvelope) -> AnswerResult:
+        started = monotonic()
+        try:
+            invocation = self.assessment_provider.assess_with_trace(task)
+            task_remaining = self.task_deadline_ms - round((monotonic() - started) * 1000)
+            run_remaining = (
+                round((self.run_deadline - monotonic()) * 1000)
+                if self.run_deadline is not None
+                else self.task_deadline_ms
+            )
+            remaining = max(0, min(task_remaining, run_remaining))
+            features = build_feature_vector(
+                invocation.assessment,
+                compute_structural_features(task, deadline_remaining_ms=remaining),
+            )
+            solver = solve_deterministic(task)
+            predictions = self._predictions(task, features, solver)
+            uncertainty = {
+                engine: 0.0 if engine is Engine.DETERMINISTIC else self.predictor.uncertainty(prediction)
+                for engine, prediction in predictions.items()
+            }
+            selection = self.selector.select_with_trace(
+                features,
+                predictions,
+                probability_uncertainty=uncertainty,
+            )
+        except (FunctionGemmaProviderError, OSError, TimeoutError, ValueError) as exc:
+            return self._fireworks_fallback(task, reason=f"assessment_or_decision_failure:{type(exc).__name__}")
+
+        decision = selection.decision
+        fallback: str | None = None
+        if decision.engine is Engine.DETERMINISTIC:
+            if solver is None:
+                return self._fireworks_fallback(task, reason="selected_solver_did_not_accept_task")
+            candidate = _solver_result(task, solver)
+        elif decision.engine is Engine.GEMMA_E2B:
+            try:
+                candidate = self.e2b_runner.run(task)
+                validation = validate_or_safely_repair_final_answer(task, candidate.answer)
+                if candidate.route == "e2b_error" or not validation.valid:
+                    fallback = f"e2b_rejected:{validation.reason}"
+                    candidate = self.fireworks_runner.run(task)
+                elif validation.repaired_answer:
+                    candidate = AnswerResult(
+                        id=candidate.id,
+                        answer=validation.repaired_answer,
+                        route="e2b_local_repaired",
+                        remote_tokens=candidate.remote_tokens,
+                        metadata={
+                            **candidate.metadata,
+                            "mechanical_repair": validation.to_dict(),
+                        },
+                    )
+            except (MemoryError, OSError, RuntimeError, TimeoutError, ValueError) as exc:
+                fallback = f"e2b_runtime_failure:{type(exc).__name__}"
+                candidate = self.fireworks_runner.run(task)
+        else:
+            candidate = self.fireworks_runner.run(task)
+
+        trace = RoutingTrace(
+            task_id=task.id,
+            assessment=invocation.assessment,
+            features=features,
+            predictions=tuple(predictions[engine] for engine in sorted(predictions, key=lambda item: item.value)),
+            decision=decision,
+            fallback=fallback,
+        )
+        metadata = dict(candidate.metadata)
+        metadata.update(
+            {
+                "runner": "three_route",
+                "assessment_invocation": invocation.to_dict(),
+                "robust_selection": selection.to_dict(),
+                "routing_trace": trace.to_dict(),
+            }
+        )
+        result = AnswerResult(
+            id=candidate.id,
+            answer=candidate.answer,
+            route=candidate.route,
+            remote_tokens=candidate.remote_tokens,
+            metadata=metadata,
+        )
+        self._log(task, result, trace)
+        return result
+
+    def _predictions(self, task: TaskEnvelope, features, solver: SolverResult | None) -> dict[Engine, EnginePrediction]:
+        planned_model = getattr(self.fireworks_runner, "planned_model", None)
+        if callable(planned_model):
+            model_id = str(planned_model(task))
+            try:
+                fireworks_prediction = self.predictor.predict_fireworks_model(features, model_id)
+            except ValueError:
+                fireworks_prediction = self.predictor.predict(features, Engine.FIREWORKS)
+        else:
+            fireworks_prediction = self.predictor.predict(features, Engine.FIREWORKS)
+        return {
+            Engine.DETERMINISTIC: deterministic_solver_prediction(accepted=solver is not None),
+            Engine.GEMMA_E2B: self.predictor.predict(features, Engine.GEMMA_E2B),
+            Engine.FIREWORKS: fireworks_prediction,
+        }
+
+    def _fireworks_fallback(self, task: TaskEnvelope, *, reason: str) -> AnswerResult:
+        candidate = self.fireworks_runner.run(task)
+        decision = EngineDecision.fireworks_safe_fallback(reason)
+        trace = RoutingTrace(
+            task_id=task.id,
+            assessment=None,
+            features=None,
+            predictions=(),
+            decision=decision,
+            fallback=reason,
+        )
+        result = AnswerResult(
+            id=candidate.id,
+            answer=candidate.answer,
+            route=candidate.route,
+            remote_tokens=candidate.remote_tokens,
+            metadata={**candidate.metadata, "runner": "three_route", "routing_trace": trace.to_dict()},
+        )
+        self._log(task, result, trace)
+        return result
+
+    def _log(self, task: TaskEnvelope, result: AnswerResult, trace: RoutingTrace) -> None:
+        if self.logger:
+            self.logger.log_result(task, result, extra={"stage": "three_route", "routing_trace": trace.to_dict()})
+
+
+def _solver_result(task: TaskEnvelope, solver: SolverResult) -> AnswerResult:
+    return AnswerResult(
+        id=task.id,
+        answer=solver.answer,
+        route=solver.route,
+        remote_tokens=TokenUsage.empty(),
+        metadata={"runner": "three_route_solver", "solver": solver.to_dict()},
+    )

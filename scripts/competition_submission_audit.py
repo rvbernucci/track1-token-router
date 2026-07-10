@@ -34,6 +34,7 @@ REQUIRED_FILES = (
     ".github/workflows/release.yml",
     "router/adapters/official/lablab_track1.py",
     "scripts/offline_release_check.sh",
+    "scripts/docker_resource_gate.sh",
     "scripts/track1_deterministic_coverage.py",
 )
 
@@ -331,7 +332,7 @@ def _check_readme_contract(path: Path) -> Check:
     required_tokens = [
         "submit-track1",
         "ROUTER_MODE=fireworks",
-        "ROUTER_MODE=hybrid",
+        "ROUTER_MODE=three_route",
         "ALLOWED_MODELS",
         "ghcr.io/rvbernucci/track1-token-router",
     ]
@@ -339,7 +340,7 @@ def _check_readme_contract(path: Path) -> Check:
     return Check(
         "readme_submission_instructions",
         not missing,
-        "README documents official, hybrid and GHCR submission paths." if not missing else "README is missing submission-critical instructions.",
+        "README documents official, three-route and GHCR submission paths." if not missing else "README is missing submission-critical instructions.",
         {"path": str(path), "missing": missing},
     )
 

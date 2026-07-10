@@ -40,7 +40,7 @@ python3 -m router.dev.fake_provider --port 8001 --scenario fireworks-approve
 Terminal 3:
 
 ```bash
-ROUTER_MODE=hybrid \
+ROUTER_MODE=three_route \
 LOCAL_BASE_URL=http://127.0.0.1:8000/v1 \
 LOCAL_MODEL=fake-local \
 FIREWORKS_BASE_URL=http://127.0.0.1:8001/v1 \

@@ -6,7 +6,7 @@ import re
 from dataclasses import asdict, dataclass
 from typing import Callable
 
-from router.core.contracts import TaskEnvelope
+from router.core.contracts import Intent, TaskAssessment, TaskEnvelope
 
 
 @dataclass(frozen=True)
@@ -30,30 +30,131 @@ class SolverResult:
 class SolverRegistration:
     name: str
     solve: Callable[[TaskEnvelope], SolverResult | None]
+    capabilities: tuple[tuple[Intent, str], ...] = ()
 
 
 SOLVERS: tuple[SolverRegistration, ...] = (
-    SolverRegistration("arithmetic", lambda task: _solve_arithmetic(task)),
-    SolverRegistration("percent_fee_math", lambda task: _solve_percent_fee_math(task)),
-    SolverRegistration("proportional_rate", lambda task: _solve_proportional_rate(task)),
-    SolverRegistration("numeric_compare", lambda task: _solve_numeric_compare(task)),
-    SolverRegistration("literal_echo", lambda task: _solve_literal_echo(task)),
-    SolverRegistration("stable_factual_qa", lambda task: _solve_stable_factual_qa(task)),
-    SolverRegistration("sentiment_lexicon", lambda task: _solve_sentiment_lexicon(task)),
-    SolverRegistration("constrained_summary", lambda task: _solve_constrained_summary(task)),
-    SolverRegistration("entity_extract", lambda task: _solve_entity_extract(task)),
-    SolverRegistration("logic_ordering", lambda task: _solve_logic_ordering(task)),
-    SolverRegistration("modus_ponens", lambda task: _solve_modus_ponens(task)),
-    SolverRegistration("modus_tollens", lambda task: _solve_modus_tollens(task)),
-    SolverRegistration("python_code_debug", lambda task: _solve_python_code_debug(task)),
-    SolverRegistration("python_code_generation", lambda task: _solve_python_code_generation(task)),
-    SolverRegistration("char_count", lambda task: _solve_char_count(task)),
-    SolverRegistration("word_count", lambda task: _solve_word_count(task)),
-    SolverRegistration("case_transform", lambda task: _solve_case_transform(task)),
-    SolverRegistration("whitespace", lambda task: _solve_whitespace(task)),
-    SolverRegistration("json_transform", lambda task: _solve_json_transform(task)),
-    SolverRegistration("list_item", lambda task: _solve_list_item(task)),
+    SolverRegistration("arithmetic", lambda task: _solve_arithmetic(task), ((Intent.MATH_REASONING, "arithmetic"),)),
+    SolverRegistration(
+        "percent_fee_math",
+        lambda task: _solve_percent_fee_math(task),
+        ((Intent.MATH_REASONING, "percent_fee_math"),),
+    ),
+    SolverRegistration(
+        "proportional_rate",
+        lambda task: _solve_proportional_rate(task),
+        ((Intent.MATH_REASONING, "proportional_rate"),),
+    ),
+    SolverRegistration(
+        "numeric_compare",
+        lambda task: _solve_numeric_compare(task),
+        ((Intent.MATH_REASONING, "numeric_compare"),),
+    ),
+    SolverRegistration(
+        "literal_echo",
+        lambda task: _solve_literal_echo(task),
+        ((Intent.FACTUAL_QA, "context_qa"),),
+    ),
+    SolverRegistration(
+        "stable_factual_qa",
+        lambda task: _solve_stable_factual_qa(task),
+        ((Intent.FACTUAL_QA, "stable_fact"),),
+    ),
+    SolverRegistration(
+        "sentiment_lexicon",
+        lambda task: _solve_sentiment_lexicon(task),
+        ((Intent.SENTIMENT, "polarity"),),
+    ),
+    SolverRegistration(
+        "constrained_summary",
+        lambda task: _solve_constrained_summary(task),
+        ((Intent.SUMMARIZATION, "constrained_summary"),),
+    ),
+    SolverRegistration(
+        "entity_extract",
+        lambda task: _solve_entity_extract(task),
+        ((Intent.NER, "entity_extract"), (Intent.NER, "typed_entity_extract")),
+    ),
+    SolverRegistration(
+        "logic_ordering",
+        lambda task: _solve_logic_ordering(task),
+        ((Intent.LOGIC_PUZZLE, "ordering"),),
+    ),
+    SolverRegistration(
+        "modus_ponens",
+        lambda task: _solve_modus_ponens(task),
+        ((Intent.LOGIC_PUZZLE, "modus_ponens"), (Intent.LOGIC_PUZZLE, "deduction")),
+    ),
+    SolverRegistration(
+        "modus_tollens",
+        lambda task: _solve_modus_tollens(task),
+        ((Intent.LOGIC_PUZZLE, "modus_tollens"), (Intent.LOGIC_PUZZLE, "deduction")),
+    ),
+    SolverRegistration(
+        "python_code_debug",
+        lambda task: _solve_python_code_debug(task),
+        ((Intent.CODE_DEBUGGING, "python_debug"),),
+    ),
+    SolverRegistration(
+        "python_code_generation",
+        lambda task: _solve_python_code_generation(task),
+        ((Intent.CODE_GENERATION, "python_generation"),),
+    ),
+    SolverRegistration("char_count", lambda task: _solve_char_count(task), ((Intent.FACTUAL_QA, "context_qa"),)),
+    SolverRegistration("word_count", lambda task: _solve_word_count(task), ((Intent.FACTUAL_QA, "context_qa"),)),
+    SolverRegistration(
+        "case_transform",
+        lambda task: _solve_case_transform(task),
+        ((Intent.SUMMARIZATION, "extractive_summary"),),
+    ),
+    SolverRegistration(
+        "whitespace",
+        lambda task: _solve_whitespace(task),
+        ((Intent.SUMMARIZATION, "extractive_summary"),),
+    ),
+    SolverRegistration(
+        "json_transform",
+        lambda task: _solve_json_transform(task),
+        ((Intent.NER, "typed_entity_extract"),),
+    ),
+    SolverRegistration(
+        "list_item",
+        lambda task: _solve_list_item(task),
+        ((Intent.NER, "entity_extract"),),
+    ),
 )
+
+
+def solver_names() -> tuple[str, ...]:
+    return tuple(registration.name for registration in SOLVERS)
+
+
+def solver_manifest() -> tuple[dict[str, object], ...]:
+    return tuple(
+        {
+            "name": registration.name,
+            "capabilities": tuple(
+                {"intent": intent.value, "sub_intent": sub_intent}
+                for intent, sub_intent in registration.capabilities
+            ),
+        }
+        for registration in SOLVERS
+    )
+
+
+def solver_hints_for_assessment(assessment: TaskAssessment) -> tuple[str, ...]:
+    if assessment.sub_intent is None:
+        return tuple(
+            registration.name
+            for registration in SOLVERS
+            if any(intent is assessment.intent for intent, _ in registration.capabilities)
+        )
+    capability = (assessment.intent, assessment.sub_intent)
+    return tuple(
+        registration.name
+        for registration in SOLVERS
+        if capability in registration.capabilities
+    )
 
 
 def solve_deterministic(task: TaskEnvelope) -> SolverResult | None:
@@ -198,19 +299,25 @@ def _solve_numeric_compare(task: TaskEnvelope) -> SolverResult | None:
     json_aggregate = _solve_json_numeric_aggregate(text, lowered)
     if json_aggregate is not None:
         return json_aggregate
-    if not any(token in lowered for token in ("larger", "greater", "maximum", "max", "smaller", "lower", "minimum", "min")):
-        return None
     json_minmax = _solve_json_minmax(text, lowered)
     if json_minmax is not None:
         return json_minmax
+    if not any(token in lowered for token in ("larger", "greater", "maximum", "smaller", "minimum")):
+        return None
     if "json" in lowered:
         return None
-    numbers = re.findall(r"-?\d+(?:\.\d+)?", text)
-    if len(numbers) != 2:
+    patterns = (
+        r"(?i)choose\s+the\s+(larger|smaller)\s+number\s+and\s+return\s+only\s+it:\s*"
+        r"(-?\d+(?:\.\d+)?)\s+or\s+(-?\d+(?:\.\d+)?)[.]?",
+        r"(?i)which\s+is\s+(larger|greater|smaller)\s*[:,]\s*"
+        r"(-?\d+(?:\.\d+)?)\s+or\s+(-?\d+(?:\.\d+)?)\?\s*return\s+only\s+the\s+number[.]?",
+    )
+    match = next((candidate for pattern in patterns if (candidate := re.fullmatch(pattern, text))), None)
+    if not match:
         return None
-    left = float(numbers[0])
-    right = float(numbers[1])
-    choose_max = any(token in lowered for token in ("larger", "greater", "maximum", "max"))
+    left = float(match.group(2))
+    right = float(match.group(3))
+    choose_max = match.group(1).lower() in {"larger", "greater"}
     chosen = max(left, right) if choose_max else min(left, right)
     return _result(_format_number(chosen), "numeric_compare", "exactly_two_numbers_with_compare_keyword")
 
@@ -335,6 +442,8 @@ def _solve_constrained_summary(task: TaskEnvelope) -> SolverResult | None:
     text = _single_line(task.input_text)
     lowered = text.lower()
     if not re.search(r"\bsummari[sz]e\b", lowered):
+        return None
+    if "json" in lowered or "schema" in lowered:
         return None
     limit_match = re.search(r"\b(?:at\s+most|no\s+more\s+than)\s+(\d{1,2})\s+words?\b", lowered)
     if not limit_match:
@@ -746,7 +855,13 @@ def _solve_python_code_generation(task: TaskEnvelope) -> SolverResult | None:
 
 def _solve_char_count(task: TaskEnvelope) -> SolverResult | None:
     lowered = task.input_text.lower()
-    if "character" not in lowered and "chars" not in lowered:
+    if re.search(r"\b(code|function|base64|sha-?256|json)\b", lowered):
+        return None
+    if not re.search(
+        r"\b(?:how\s+many\s+(?:characters|chars)|count\s+(?:the\s+)?(?:characters|chars)|"
+        r"(?:character|char)\s+count|number\s+of\s+(?:characters|chars)|length\s+in\s+(?:characters|chars))\b",
+        lowered,
+    ):
         return None
     value = _quoted_value(task.input_text)
     if value is None:
@@ -756,7 +871,11 @@ def _solve_char_count(task: TaskEnvelope) -> SolverResult | None:
 
 def _solve_word_count(task: TaskEnvelope) -> SolverResult | None:
     lowered = task.input_text.lower()
-    if "word" not in lowered:
+    if not re.search(
+        r"\b(?:how\s+many\s+words|count\s+(?:the\s+)?words|word\s+count|number\s+of\s+words|"
+        r"length\s+in\s+words)\b",
+        lowered,
+    ):
         return None
     value = _quoted_value(task.input_text)
     if value is None:
@@ -767,6 +886,28 @@ def _solve_word_count(task: TaskEnvelope) -> SolverResult | None:
 
 def _solve_case_transform(task: TaskEnvelope) -> SolverResult | None:
     lowered = task.input_text.lower()
+    exact_match = re.fullmatch(
+        r"(?i)(uppercase|lowercase|titlecase)\s+exactly\s+([\"'])(.*?)\2[.]?",
+        task.input_text.strip(),
+        flags=re.DOTALL,
+    )
+    if exact_match:
+        operation = exact_match.group(1).lower()
+        value = exact_match.group(3)
+        transformed = value.upper() if operation == "uppercase" else value.lower() if operation == "lowercase" else value.title()
+        return _result(transformed, "case_transform", "exact_quoted_case_transform")
+    explicit_transform = bool(
+        re.search(
+            r"\b(?:convert|transform)\b.*\b(?:text|string)\b.*\b(?:uppercase|upper case|lowercase|lower case|titlecase|title case)\b",
+            lowered,
+        )
+        or re.search(
+            r"\b(?:return|output)\s+(?:only\s+)?(?:the\s+)?(?:uppercase|upper case|lowercase|lower case|titlecase|title case)\s+version\b",
+            lowered,
+        )
+    )
+    if not explicit_transform:
+        return None
     value = _quoted_value(task.input_text)
     if value is None:
         value = _text_after_unquoted_transform_marker(task.input_text)

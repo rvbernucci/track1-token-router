@@ -198,7 +198,7 @@ Immediate implications:
 - Docker default command should implement `/input/tasks.json` to `/output/results.json`;
 - `linux/amd64` build path must be documented and tested;
 - timeout and per-request latency are hard constraints;
-- M2A/mechanical validation must cover all eight categories, not only math and format;
+- FunctionGemma assessment and downstream decision evaluation must cover all eight categories, not only math and format;
 - Fireworks client must prefer `ALLOWED_MODELS` rather than a hardcoded model when in official mode;
 - official mode must choose the cheapest sufficient Fireworks model per task, not always the first allowed model;
 - logs must not pollute stdout or output JSON.

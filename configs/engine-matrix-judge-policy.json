@@ -1,0 +1,14 @@
+{
+  "accounts/fireworks/models/kimi-k2p7-code": [
+    "accounts/fireworks/models/minimax-m3",
+    "Gemini 3.5 Flash (Medium)"
+  ],
+  "accounts/fireworks/models/minimax-m3": [
+    "claude-sonnet-5",
+    "Gemini 3.5 Flash (Medium)"
+  ],
+  "gemma4-e2b": [
+    "accounts/fireworks/models/minimax-m3",
+    "accounts/fireworks/models/kimi-k2p7-code"
+  ]
+}

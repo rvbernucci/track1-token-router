@@ -12,11 +12,13 @@ The official evaluator can send broad tasks, strict formats and unexpected input
 
 ## 1:00 - Architecture
 
-The runner receives a `TaskEnvelope` and first applies mechanical validators: schema checks, output constraints, high-confidence arithmetic and format safety. Then the router reads `ALLOWED_MODELS`, estimates category and risk, and chooses the cheapest sufficient Fireworks model. A compact local model can be added only if it fits the official `4 GB` RAM and `2 vCPU` grading envelope.
+The runner receives a `TaskEnvelope`. A registered solver can answer only when it proves an exact mechanical contract. Everything else goes to Kimi K2.7 Code when the evaluator authorizes it in `ALLOWED_MODELS`. Dynamic completion ceilings reduce output waste; strict validators repair only unambiguous formatting and retry another allowed model when necessary.
+
+We did not arrive here by assumption. We trained FunctionGemma 270M on the AMD pod and tested Gemma 4 E2B locally across 2,000 tasks. E2B fit memory, but its selected locked-test region reached only 51.14% accuracy. We rejected it rather than optimize the story instead of the score.
 
 ## 2:00 - Competition Mode
 
-`ROUTER_MODE=competition` integrates validators, risk signals, budget policy, prompt packet estimation, final validation and state traces. It runs in dry-run mode without credits, so the team can test the full path before AMD or Fireworks access is active.
+`ROUTER_MODE=fireworks` implements the official path. The champion preference is still constrained by `ALLOWED_MODELS`, and every request goes through `FIREWORKS_BASE_URL`. Structured traces record route, selected model, tokens, validation and fallback without exposing credentials.
 
 ## 2:45 - Demo
 
@@ -44,8 +46,8 @@ This exposes risk signals, budget decision, policy decision and final validation
 
 ## 3:45 - Readiness
 
-The repo includes Docker, CI, offline release checks, fuzz tests, Fireworks calibration, Gemma runbooks and AMD pod profiles for development. The final image remains small enough for the official CPU/RAM grading environment.
+The repo includes Docker, CI, offline release checks, adversarial routing tests, FunctionGemma training evidence, E2B rejection evidence and a 571-task Fireworks ablation. CI tests the exact Linux `amd64` image under 4 GB RAM, 2 vCPU, no network and the official input/output contract.
 
 ## 4:30 - Close
 
-The thesis is simple: use model intelligence deliberately, keep prompts compact, validate mechanically where it is safe, and route to the smallest sufficient Fireworks model. That is how we chase high accuracy with low token spend.
+The thesis is simple: accuracy first, tokens second, and evidence before complexity. We kept the zero-token solver path, promoted Kimi only when allowed, and removed every architecture that did not survive the holdout.

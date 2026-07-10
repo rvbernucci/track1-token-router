@@ -74,36 +74,32 @@ scripts/bootstrap_amd_pod.sh
 
 Se o pod vier com Python 3.10, isso e esperado e suportado pelo projeto.
 
-## Health check do endpoint
+## Health check do ambiente
 
 ```bash
-curl http://127.0.0.1:8000/v1/models
+/opt/venv/bin/python scripts/amd_pod_doctor.py --json
 ```
 
-## Router smoke
+## Training setup
 
 ```bash
-cp runtime-profiles/amd-mi300x-vllm.env.example .env.amd-vllm
+cp runtime-profiles/functiongemma-router.env.example .env.functiongemma
 set -a
-. ./.env.amd-vllm
+. ./.env.functiongemma
 set +a
-python3 -m router ask "What is 6 * 7? Return only the number." --json
+/opt/venv/bin/python scripts/amd_pod_doctor.py --json
 ```
 
 Esperado:
 
-- rota `solver_arithmetic` para tarefa mecanica;
-- zero tokens remotos;
-- logs em `logs/amd-mi300x-vllm-run.jsonl`.
+- ROCm GPU visivel ao PyTorch;
+- ambiente base preservado;
+- treino segue `docs/FUNCTIONGEMMA_270M_AMD_TRAINING_TUTORIAL.md`.
 
-## Benchmark curto
+## Benchmark alvo
 
 ```bash
-python3 -m router eval \
-  --jsonl evals/fuzz/tasks.jsonl \
-  --expected evals/fuzz/expected.jsonl \
-  --out reports/generated/amd-fuzz-output.jsonl \
-  --report reports/generated/amd-fuzz-report.md
+/opt/venv/bin/python scripts/amd_pod_doctor.py --json
 ```
 
 ## Teardown obrigatorio
@@ -111,8 +107,8 @@ python3 -m router eval \
 Antes de encerrar o trabalho:
 
 1. Salvar apenas logs e reports sem prompts sensiveis.
-2. Parar processos de inferencia.
-3. Destruir a GPU Droplet no painel.
+2. Persistir pesos, locks e relatorios em storage privado.
+3. Encerrar a sessao do pod para preservar a cota diaria.
 4. Confirmar que nao ha VM, volume pago ou IP reservado ativo.
 
 Regra: VM GPU parada ou esquecida ainda pode custar dinheiro. Destruir quando nao estiver em uso.

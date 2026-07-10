@@ -51,7 +51,14 @@ class RuntimeProfileTests(unittest.TestCase):
                     "GEMMA_MODEL_FAMILY=Gemma\n"
                     "GEMMA_MODEL_SIZE=E2B\n"
                     "GEMMA_QUANTIZATION=qat-q4_0\n"
-                    "GEMMA_PROMPT_FORMAT=gemma4\n",
+                    "GEMMA_PROMPT_FORMAT=gemma4\n"
+                    "FUNCTIONGEMMA_MODEL=google/functiongemma-270m-it\n"
+                    "FUNCTIONGEMMA_QUANTIZATION=int8\n"
+                    "FUNCTIONGEMMA_MAX_TOKENS=32\n"
+                    "E2B_MODEL=litert-community/gemma-4-E2B-it-litert-lm\n"
+                    "E2B_RUNTIME=litert-lm\n"
+                    "E2B_CONTEXT_TOKENS=1024\n"
+                    "E2B_MAX_TOKENS=96\n",
                     encoding="utf-8",
                 )
             (root / "fireworks-serverless.env.example").write_text(

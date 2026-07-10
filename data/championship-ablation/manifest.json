@@ -1,0 +1,58 @@
+{
+  "files": {
+    "deterministic-candidates.jsonl": {
+      "bytes": 582372,
+      "rows": 571,
+      "sha256": "a55dd3ef13f34dba5b8dbb6e8f98df16e3c486a2422a87c551d4a69008f77549"
+    },
+    "e2b-selected-test.jsonl": {
+      "bytes": 17881,
+      "rows": 88,
+      "sha256": "1bb62ca16b3806bce96fa6fdeadca2fbb24065c653a6b9fffc5e3d0f3b07d3e4"
+    },
+    "fireworks-baseline-comparison.json": {
+      "bytes": 18149,
+      "rows": null,
+      "sha256": "a21a5ca58df90a560d68d5ce9ddf618210bd93e82ffb751d794f797f7ccd0dac"
+    },
+    "fireworks-judgments.jsonl": {
+      "bytes": 1866564,
+      "rows": 2316,
+      "sha256": "cf9cc45bcee61007a2388e7f2b5e4fe1b53e6a93868091a0f5a06d68ed2a0073"
+    },
+    "functiongemma-assessments.jsonl": {
+      "bytes": 113797,
+      "rows": 569,
+      "sha256": "774704b0d7aaaea06ba9cf92e9bbd9ad802135edfeecd7377c4416814335b1d6"
+    },
+    "kimi-candidates.jsonl": {
+      "bytes": 802785,
+      "rows": 571,
+      "sha256": "fce42d36053833e00cb1d6fc6f9b078683cd2e0b8f2bb7f16347aaea4b22a173"
+    },
+    "minimax-candidates.jsonl": {
+      "bytes": 840034,
+      "rows": 571,
+      "sha256": "1e448bb92388da3bafc426378f45c69bb501e8abccd789676458ce4b08ad9883"
+    },
+    "tasks.jsonl": {
+      "bytes": 1057484,
+      "rows": 571,
+      "sha256": "cbe862b4e17def181833ab484cb1cfbde8232879011d30a0bf7c330c1c64928c"
+    }
+  },
+  "locked_test_used_for_tuning": false,
+  "schema_version": "championship-evidence-manifest-v1",
+  "selection_split": "validation",
+  "source_sha256": {
+    "reports/generated/amd-pod-e2b-regression-2000/e2b-outcome-matrix.jsonl": "4327f8ec8326ed7bca7d4b3bcfef32374ab9b162bbe18614285f4fdd55164fb1",
+    "reports/generated/amd-pod-e2b-regression-2000/e2b-outcome-models.json": "b4469dffc00cb102eaa7ffc9f236e9d221ea4c4a873263a2895d38d88375a68b",
+    "reports/generated/amd-pod-e2b-regression-2000/functiongemma-valid-predictions.jsonl": "ef0151696cd115d7e6059b4adbccd7e12ed6a52a02bfc3984cfea987a4b2e10c",
+    "reports/generated/e2b-2000-baselines/deterministic-candidates-v2.jsonl": "a55dd3ef13f34dba5b8dbb6e8f98df16e3c486a2422a87c551d4a69008f77549",
+    "reports/generated/e2b-2000-baselines/fireworks-baseline-comparison.json": "a21a5ca58df90a560d68d5ce9ddf618210bd93e82ffb751d794f797f7ccd0dac",
+    "reports/generated/e2b-2000-baselines/fireworks-runtime-v4-judgments.jsonl": "cf9cc45bcee61007a2388e7f2b5e4fe1b53e6a93868091a0f5a06d68ed2a0073",
+    "reports/generated/e2b-2000-baselines/kimi-k2p7-code-runtime-v4-candidates.jsonl": "fce42d36053833e00cb1d6fc6f9b078683cd2e0b8f2bb7f16347aaea4b22a173",
+    "reports/generated/e2b-2000-baselines/minimax-m3-runtime-v4-candidates.jsonl": "1e448bb92388da3bafc426378f45c69bb501e8abccd789676458ce4b08ad9883",
+    "reports/generated/e2b-2000-baselines/validation-test-tasks.jsonl": "cbe862b4e17def181833ab484cb1cfbde8232879011d30a0bf7c330c1c64928c"
+  }
+}

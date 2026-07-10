@@ -1,0 +1,42 @@
+{
+  "allowed_models": [
+    "accounts/fireworks/models/kimi-k2p7-code",
+    "accounts/fireworks/models/minimax-m3"
+  ],
+  "default_enabled": false,
+  "default_model": "accounts/fireworks/models/kimi-k2p7-code",
+  "intent_models": {
+    "code_debugging": "accounts/fireworks/models/kimi-k2p7-code",
+    "code_generation": "accounts/fireworks/models/kimi-k2p7-code",
+    "factual_qa": "accounts/fireworks/models/kimi-k2p7-code",
+    "logic_puzzle": "accounts/fireworks/models/minimax-m3",
+    "math_reasoning": "accounts/fireworks/models/kimi-k2p7-code",
+    "ner": "accounts/fireworks/models/kimi-k2p7-code",
+    "sentiment": "accounts/fireworks/models/minimax-m3",
+    "summarization": "accounts/fireworks/models/kimi-k2p7-code"
+  },
+  "intent_to_runtime_domain": {
+    "code_debugging": "code_debug",
+    "code_generation": "code_generation",
+    "factual_qa": "current_factual",
+    "logic_puzzle": "logic",
+    "math_reasoning": "math_reasoning",
+    "ner": "extraction",
+    "sentiment": "classification",
+    "summarization": "summarization"
+  },
+  "locked_test_used_for_selection": false,
+  "promotion_gate": {
+    "metric": "locked_test_conservative_accuracy",
+    "observed": 0.5609756097560976,
+    "passed": false,
+    "required": 0.6
+  },
+  "schema_version": "fireworks-intent-policy-v1",
+  "selection_rule": "maximize conservative accuracy; break ties with lower average total tokens",
+  "selection_split": "validation",
+  "source": {
+    "comparison_report": "fireworks-baseline-comparison.json",
+    "comparison_report_sha256": "a21a5ca58df90a560d68d5ce9ddf618210bd93e82ffb751d794f797f7ccd0dac"
+  }
+}

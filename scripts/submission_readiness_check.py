@@ -144,14 +144,14 @@ def _check_required_files(root: Path, required: set[str], errors: list[str]) -> 
 
 def _check_submission_notes(path: Path, errors: list[str]) -> None:
     content = _read(path)
-    for token in ("Token Efficiency Strategy", "Reproduce", "Docker", "Short Pitch"):
+    for token in ("Why It Can Win", "Reproduce", "Delivery Gates", "Current Status"):
         if token not in content:
             errors.append(f"SUBMISSION.md missing section/token: {token}")
 
 
 def _check_readme(path: Path, errors: list[str]) -> None:
     content = _read(path)
-    for token in ("Instalacao local", "Modo competicao dry-run", "Docker"):
+    for token in ("Quickstart", "Official Offline Contract", "Competition Constraints", "Promotion Rule"):
         if token not in content:
             errors.append(f"README.md missing section/token: {token}")
 

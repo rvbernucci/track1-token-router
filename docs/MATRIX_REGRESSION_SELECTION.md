@@ -45,8 +45,7 @@ O alvo de treino combina validade e eficiencia observada:
 ```text
 target =
   0.80 * valid
-  + 0.14 * observed_token_utility
-  + 0.04 * observed_cost_utility
+  + 0.18 * observed_token_utility
   + 0.02 * observed_latency_utility
 ```
 
@@ -64,20 +63,22 @@ regression_utility = clamp(beta dot x, 0, 1)
 
 O `hybrid_score` muda por tier:
 
-| Tier | Regressao | Nash | Tokens | Custo |
+| Tier | Regressao | Nash | Tokens | Custo USD |
 | --- | ---: | ---: | ---: | ---: |
-| `cheap` | 0.50 | 0.20 | 0.20 | 0.10 |
-| `medium` | 0.65 | 0.15 | 0.15 | 0.05 |
-| `strong` | 0.80 | 0.10 | 0.08 | 0.02 |
+| `cheap` | 0.50 | 0.20 | 0.30 | 0.00 |
+| `medium` | 0.65 | 0.15 | 0.20 | 0.00 |
+| `strong` | 0.80 | 0.10 | 0.10 | 0.00 |
 
-A ideia competitiva e simples: em tarefa forte, primeiro passar pelo accuracy gate; em tarefa barata, reduzir tokens agressivamente.
+A ideia competitiva e simples: primeiro passar pelo accuracy gate; depois reduzir tokens agressivamente. Quando existem pelo menos oito observacoes comparaveis, o modelo precisa atingir `0.60` no Wilson lower bound de 95%. Preco em dolares permanece apenas como telemetria e desempate posterior a precisao e tokens, porque nao entra no score oficial.
+
+`cost_utility` permanece no schema para compatibilidade com artefatos e traces historicos, mas seu valor de feature e fixado em `0.0` no fit e no runtime. Assim, uma alteracao de tabela de precos nao consegue mudar a rota competitiva quando precisao, tokens e latencia permanecem iguais.
 
 ## Artefatos
 
 - Codigo: `router/orchestration/matrix_regression_selector.py`
 - Fit offline: `scripts/fit_fireworks_matrix_regression.py`
 - Pesos Track 1 usados no Docker: `router/data/fireworks_track1_allowed_weights.json`
-- Relatorio Track 1: `reports/generated/fireworks-track1-allowed-20260709-regression.md`
+- Relatorio Track 1 token-aligned: `reports/generated/fireworks-track1-token-objective-regression.md`
 - Resultados Fireworks reais: `reports/generated/fireworks-track1-category-20260709-results.jsonl`, `reports/generated/fireworks-hidden-variant-results.jsonl`, `reports/generated/fireworks-championship-results.jsonl`, `reports/generated/fireworks-frontier-20260709-results.jsonl`, `reports/generated/fireworks-structure-heldout-20260709-results.jsonl`, `reports/generated/fireworks-escape-20260709-results.jsonl`
 
 ## Resultado Atual
@@ -91,7 +92,7 @@ As linhas `ok=false` sao excluidas por padrao para nao confundir erro de acesso/
 
 Os pesos agora tambem registram uma matriz empirica `domain_model_stats` em dois niveis: `dominio::estrutura` e `dominio`. No runtime, cada candidato recebe ajuste por taxa de validade suavizada e confianca primeiro por estrutura especifica, depois por dominio, depois por media geral. Isso evita que uma opcao barata com historico ruim naquele formato vire estrategia dominante so por custo/tokens.
 
-Top coeficientes aprendidos no fit atual:
+Os pesos do Docker foram refeitos em 2026-07-10 sobre as mesmas `183` observacoes, substituindo o antigo alvo orientado a custo pelo alvo oficial orientado a tokens. Top coeficientes aprendidos no fit atual:
 
 | Feature | Sinal |
 | --- | ---: |
@@ -134,6 +135,8 @@ A regressao confirmou alguns sinais fortes:
 
 O dataset ainda e pequeno, mas a regressao agora esta ativa como camada de calibracao do seletor principal no Docker. Ela nao substitui Nash: ela o combina com o score aprendido.
 
+Uma politica discreta por intencao tambem foi ajustada sobre `284` casos de validacao e avaliada uma unica vez sobre `287` casos bloqueados. Ela escolheu Minimax para logica e sentimento, mas obteve apenas `56.10%` de acuracia conservadora no teste, abaixo do gate de `60%` e abaixo do Kimi global. O artefato permanece versionado com `default_enabled=false`. Portanto, a regressao matricial token-aligned mais Pareto/Nash continua sendo a politica operacional; nao houve ajuste pos-teste.
+
 Principal lacuna:
 
 - a estimativa runtime de tokens ja mistura perfil teorico com `avg_total_tokens` observado por dominio/estrutura/modelo, ponderado pela confianca da amostra;
@@ -148,12 +151,12 @@ Implementar uma segunda regressao quando houver amostra suficiente:
 predicted_completion_tokens = f(model_family, domain, tier, reasoning_mode)
 ```
 
-Com isso, o Pareto deixa de usar apenas `avg_total_tokens` observado e passa a estimar custo real esperado por componente:
+Com isso, o Pareto deixa de usar apenas `avg_total_tokens` observado e passa a estimar tokens esperados por componente:
 
 ```text
-expected_cost =
-  prompt_tokens * input_price
-  + predicted_completion_tokens * output_price
+expected_scored_tokens =
+  prompt_tokens
+  + predicted_completion_tokens
 ```
 
-Essa provavelmente e a maior melhoria para escolher entre `gpt-oss-20b` e `deepseek-v4-flash` em tarefas cheap.
+Preco por token continua registrado para controle do credito de desenvolvimento, mas nao entra nessa funcao de score.

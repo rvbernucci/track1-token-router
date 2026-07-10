@@ -34,13 +34,37 @@ class RouterConfig:
     fireworks_temperature: float
     fireworks_max_tokens: int
     fireworks_service_tier: str | None
+    fireworks_champion_model: str | None
     fireworks_matrix_weights: Path | None
+    fireworks_intent_policy: Path | None
+    fireworks_intent_policy_sha256: str | None
+    functiongemma_base_url: str
+    functiongemma_model: str
+    functiongemma_api_key: str | None
+    functiongemma_timeout_s: float
+    functiongemma_max_tokens: int
+    functiongemma_calibration: Path | None
+    functiongemma_calibration_sha256: str | None
+    e2b_base_url: str
+    e2b_model: str
+    e2b_api_key: str | None
+    e2b_timeout_s: float
+    e2b_max_tokens: int
+    outcome_models_path: Path | None
+    outcome_models_sha256: str | None
+    e2b_route_policy: Path | None
+    e2b_route_policy_sha256: str | None
+    three_route_accuracy_gate: float
+    three_route_max_failure: float
+    three_route_max_memory_mb: float
+    three_route_deadline_reserve_ms: float
     enable_guardrails: bool
     enable_orchestrator: bool
     competition_dry_run: bool
     max_remote_tokens_per_task: int
     max_remote_tokens_per_run: int
     max_remote_latency_ms: int
+    enable_legacy_cascade_modes: bool = False
 
     @classmethod
     def from_env(cls) -> "RouterConfig":
@@ -68,13 +92,37 @@ class RouterConfig:
             fireworks_temperature=float(os.getenv("FIREWORKS_TEMPERATURE", "0.0")),
             fireworks_max_tokens=int(os.getenv("FIREWORKS_MAX_TOKENS", "256")),
             fireworks_service_tier=os.getenv("FIREWORKS_SERVICE_TIER") or None,
+            fireworks_champion_model=_optional_model(os.getenv("FIREWORKS_CHAMPION_MODEL")),
             fireworks_matrix_weights=_optional_path(os.getenv("FIREWORKS_MATRIX_WEIGHTS")),
+            fireworks_intent_policy=_optional_path(os.getenv("FIREWORKS_INTENT_POLICY")),
+            fireworks_intent_policy_sha256=os.getenv("FIREWORKS_INTENT_POLICY_SHA256") or None,
+            functiongemma_base_url=os.getenv("FUNCTIONGEMMA_BASE_URL", "http://127.0.0.1:8091/v1"),
+            functiongemma_model=os.getenv("FUNCTIONGEMMA_MODEL", "functiongemma-q8"),
+            functiongemma_api_key=os.getenv("FUNCTIONGEMMA_API_KEY") or None,
+            functiongemma_timeout_s=float(os.getenv("FUNCTIONGEMMA_TIMEOUT_S", "5")),
+            functiongemma_max_tokens=int(os.getenv("FUNCTIONGEMMA_MAX_TOKENS", "64")),
+            functiongemma_calibration=_optional_path(os.getenv("FUNCTIONGEMMA_CALIBRATION")),
+            functiongemma_calibration_sha256=os.getenv("FUNCTIONGEMMA_CALIBRATION_SHA256") or None,
+            e2b_base_url=os.getenv("E2B_BASE_URL", "http://127.0.0.1:9379/v1"),
+            e2b_model=os.getenv("E2B_MODEL", "gemma4-e2b"),
+            e2b_api_key=os.getenv("E2B_API_KEY") or None,
+            e2b_timeout_s=float(os.getenv("E2B_TIMEOUT_S", "30")),
+            e2b_max_tokens=int(os.getenv("E2B_MAX_TOKENS", "96")),
+            outcome_models_path=_optional_path(os.getenv("OUTCOME_MODELS_PATH")),
+            outcome_models_sha256=os.getenv("OUTCOME_MODELS_SHA256") or None,
+            e2b_route_policy=_optional_path(os.getenv("E2B_ROUTE_POLICY")),
+            e2b_route_policy_sha256=os.getenv("E2B_ROUTE_POLICY_SHA256") or None,
+            three_route_accuracy_gate=float(os.getenv("THREE_ROUTE_ACCURACY_GATE", "0.60")),
+            three_route_max_failure=float(os.getenv("THREE_ROUTE_MAX_FAILURE", "0.15")),
+            three_route_max_memory_mb=float(os.getenv("THREE_ROUTE_MAX_MEMORY_MB", "3584")),
+            three_route_deadline_reserve_ms=float(os.getenv("THREE_ROUTE_DEADLINE_RESERVE_MS", "500")),
             enable_guardrails=_env_flag("ENABLE_GUARDRAILS"),
             enable_orchestrator=_env_flag("ENABLE_ORCHESTRATOR"),
             competition_dry_run=_env_flag("COMPETITION_DRY_RUN", default=True),
             max_remote_tokens_per_task=int(os.getenv("MAX_REMOTE_TOKENS_PER_TASK", "300")),
             max_remote_tokens_per_run=int(os.getenv("MAX_REMOTE_TOKENS_PER_RUN", "6000")),
             max_remote_latency_ms=int(os.getenv("MAX_REMOTE_LATENCY_MS", "3000")),
+            enable_legacy_cascade_modes=_env_flag("ENABLE_LEGACY_CASCADE_MODES"),
         )
 
 

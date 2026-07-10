@@ -29,11 +29,11 @@ Usar Native.Builder/NativelyAI como ferramenta auxiliar de demo, documentacao ou
 
 1. Exportar `SUBMISSION.md`, `docs/DETERMINISTIC_SOLVERS.md` e report do battle drill.
 2. Criar demo auxiliar explicando:
-   - guardrails e solvers;
-   - M1 local;
-   - M2A verifier;
-   - M2B repair;
-   - Fireworks approve-or-replace.
+   - FunctionGemma assessment;
+   - regression and minimax decision engine;
+   - deterministic solver route;
+   - Gemma 4 E2B text-only route;
+   - Fireworks Pareto fallback.
 3. Usar a demo apenas como material de apresentacao.
 4. Manter a execucao real no CLI.
 

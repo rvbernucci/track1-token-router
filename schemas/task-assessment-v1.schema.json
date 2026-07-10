@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rvbernucci/track1-token-router/schemas/task-assessment-v1.schema.json",
+  "title": "TaskAssessment v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["intent", "scores"],
+  "properties": {
+    "intent": {
+      "enum": [
+        "factual_qa",
+        "math_reasoning",
+        "sentiment",
+        "summarization",
+        "ner",
+        "code_debugging",
+        "logic_puzzle",
+        "code_generation"
+      ]
+    },
+    "sub_intent": {"type": "string"},
+    "scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deterministic_fit",
+        "reasoning_demand",
+        "knowledge_uncertainty",
+        "generation_demand",
+        "format_complexity"
+      ],
+      "properties": {
+        "deterministic_fit": {"type": "integer", "minimum": 0, "maximum": 10},
+        "reasoning_demand": {"type": "integer", "minimum": 0, "maximum": 10},
+        "knowledge_uncertainty": {"type": "integer", "minimum": 0, "maximum": 10},
+        "generation_demand": {"type": "integer", "minimum": 0, "maximum": 10},
+        "format_complexity": {"type": "integer", "minimum": 0, "maximum": 10}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"intent": {"const": "factual_qa"}}},
+      "then": {"properties": {"sub_intent": {"enum": ["stable_fact", "current_fact", "context_qa", "open_domain_fact"]}}}
+    },
+    {
+      "if": {"properties": {"intent": {"const": "math_reasoning"}}},
+      "then": {"properties": {"sub_intent": {"enum": ["arithmetic", "percent_fee_math", "proportional_rate", "numeric_compare", "algebra", "geometry", "probability", "statistics", "other_math"]}}}
+    },
+    {
+      "if": {"properties": {"intent": {"const": "sentiment"}}},
+      "then": {"properties": {"sub_intent": {"enum": ["polarity", "aspect_sentiment"]}}}
+    },
+    {
+      "if": {"properties": {"intent": {"const": "summarization"}}},
+      "then": {"properties": {"sub_intent": {"enum": ["constrained_summary", "extractive_summary", "abstractive_summary"]}}}
+    },
+    {
+      "if": {"properties": {"intent": {"const": "ner"}}},
+      "then": {"properties": {"sub_intent": {"enum": ["entity_extract", "typed_entity_extract"]}}}
+    },
+    {
+      "if": {"properties": {"intent": {"const": "code_debugging"}}},
+      "then": {"properties": {"sub_intent": {"enum": ["python_debug", "javascript_debug", "typescript_debug", "other_code_debug"]}}}
+    },
+    {
+      "if": {"properties": {"intent": {"const": "logic_puzzle"}}},
+      "then": {"properties": {"sub_intent": {"enum": ["ordering", "deduction", "modus_ponens", "modus_tollens", "other_logic"]}}}
+    },
+    {
+      "if": {"properties": {"intent": {"const": "code_generation"}}},
+      "then": {"properties": {"sub_intent": {"enum": ["python_generation", "javascript_generation", "typescript_generation", "other_code_generation"]}}}
+    }
+  ]
+}
