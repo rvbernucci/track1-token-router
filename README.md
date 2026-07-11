@@ -133,13 +133,13 @@ ROUTER_MODE=three_route
 
 ## Public Image
 
-The audited championship image is:
+The final hybrid championship candidate is:
 
 ```text
-ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router
+ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid
 ```
 
-The release workflow verifies the public `linux/amd64` manifest, immutable revision label, anonymous pull and exact-image resource gate.
+It embeds FunctionGemma 270M Q8 and text-only Gemma 4 E2B, requires no startup downloads, and falls through to evaluator-authorized Fireworks models. The compact rollback remains `v2.1.0-proof-router`.
 
 ## Fireworks
 

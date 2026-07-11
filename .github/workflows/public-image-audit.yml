@@ -6,15 +6,14 @@ on:
       image:
         description: Public GHCR image tag to audit
         required: true
-        default: ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router
+        default: ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid
       expected_revision:
         description: Expected immutable OCI revision
         required: true
-        default: 8cbe0c58333486278f467d27ea9f27093eb68e99
       expected_version:
         description: Expected immutable OCI version
         required: true
-        default: v2.1.0-proof-router
+        default: v3.3.0-full-hybrid
 
 permissions:
   contents: read

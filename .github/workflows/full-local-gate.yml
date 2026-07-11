@@ -6,7 +6,7 @@ on:
       image:
         description: Public linux/amd64 image to verify
         required: true
-        default: ghcr.io/rvbernucci/track1-token-router:v3.0.0-full-local
+        default: ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid
       clean_pull:
         description: Remove local image state and pull the public image again
         required: true

@@ -6,16 +6,16 @@ Track 1 first gates on accuracy and then rewards low Fireworks token usage. Call
 
 ## Solution
 
-Track 1 Token Router first offers the untouched task to a fail-closed deterministic solver. Unsupported tasks go to the validation-selected Kimi K2.7 Code model when it is present in `ALLOWED_MODELS`. Strict output validation and allowed-model fallback protect the official response contract.
+Track 1 Token Router assesses the untouched task with embedded FunctionGemma 270M, releases proof-carrying deterministic answers when available, and selectively probes embedded Gemma 4 E2B. Remaining tasks use a validation-selected Kimi/MiniMax policy constrained by runtime `ALLOWED_MODELS`. Strict output validation protects the official response contract.
 
-We also trained FunctionGemma 270M on AMD and evaluated a text-only Gemma 4 E2B route across 2,000 post-contract answers. E2B answered 828 correctly. Of the 1,991 tasks with valid 270M parameters, an intent-specific regression selected 252 at 84.52% out-of-fold precision and 12.66% coverage. The zero-download release excludes the 2.59 GB model artifact unless it is explicitly bundled at image-build time.
+We trained FunctionGemma 270M on AMD and evaluated a text-only Gemma 4 E2B route across 2,000 post-contract answers. E2B answered 828 correctly. Of the 1,991 tasks with valid 270M parameters, an intent-specific regression selected 252 at 84.52% out-of-fold precision and 12.66% coverage. The final image embeds both local models and requires no model download at startup.
 
 ## Why It Can Win
 
 - proof-carrying deterministic tasks are solved without remote calls;
 - the expanded ordering proof recovered both known correct candidates and rejected all five incorrect candidates;
-- Kimi achieved the best eligible validation result and 75% binary accuracy on the locked test;
-- rejected matrix, per-intent and Minimax policies all used more tokens and/or lost accuracy;
+- a 46-call live Pareto calibration selected Kimi by default and MiniMax for extraction;
+- the selected policy matched the strongest 21/23 result while reducing tokens from 3,869 to 1,967;
 - the optional E2B frontier identifies a measured high-value local cohort instead of routing all tasks locally;
 - every decision is traceable and evaluator-safe.
 
@@ -45,4 +45,4 @@ No `.env` file is required or included. The harness injects `FIREWORKS_API_KEY`,
 
 ## Current Status
 
-The release image is `ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router`. The release workflow blocks publication unless the image passes CI, public pullability, manifest inspection and the exact 4 GB/2 vCPU/no-network resource gate.
+The final candidate is `ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid`; `v2.1.0-proof-router` is the compact rollback. The release workflow blocks publication unless the image passes CI, public pullability, manifest inspection and the exact 4 GB/2 vCPU/no-network resource gate.
