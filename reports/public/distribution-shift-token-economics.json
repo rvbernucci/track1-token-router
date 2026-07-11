@@ -1,0 +1,618 @@
+{
+  "ablations": {
+    "always_fireworks": "observed baseline_* metrics",
+    "current_hybrid": "observed current_* metrics",
+    "local_disabled": "same observed remote replay as always_fireworks"
+  },
+  "authorization": {
+    "cases": [
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3",
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3",
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3",
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3",
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3",
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3",
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3",
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3",
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code",
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code",
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code",
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code",
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code",
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code",
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code",
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code",
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/kimi-k2p7-code"
+        ],
+        "selected": "accounts/fireworks/models/kimi-k2p7-code",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/minimax-m3",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/minimax-m3",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/minimax-m3",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/minimax-m3",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/minimax-m3",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/minimax-m3",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/minimax-m3",
+        "valid": true
+      },
+      {
+        "allowed": [
+          "accounts/fireworks/models/minimax-m3"
+        ],
+        "selected": "accounts/fireworks/models/minimax-m3",
+        "valid": true
+      }
+    ],
+    "passed": true
+  },
+  "break_even": {
+    "interpretation": "No feasible category mixture reaches zero savings.",
+    "minimum_observed_category_savings": 348,
+    "within_category_simplex": false
+  },
+  "category_economics": {
+    "code_debugging": {
+      "accuracy": 0.9166666666666666,
+      "baseline_accuracy": 0.75,
+      "baseline_completion_tokens": 216,
+      "baseline_prompt_tokens": 708,
+      "baseline_total_tokens": 924,
+      "current_completion_tokens": 216,
+      "current_prompt_tokens": 360,
+      "current_total_tokens": 576,
+      "local_coverage": 0.0,
+      "local_precision": 1.0,
+      "local_releases": 0,
+      "observed_remote_latency_ms": 14075,
+      "token_savings": 348,
+      "worst_runtime_ms": 96000
+    },
+    "code_generation": {
+      "accuracy": 1.0,
+      "baseline_accuracy": 1.0,
+      "baseline_completion_tokens": 240,
+      "baseline_prompt_tokens": 684,
+      "baseline_total_tokens": 924,
+      "current_completion_tokens": 240,
+      "current_prompt_tokens": 336,
+      "current_total_tokens": 576,
+      "local_coverage": 0.0,
+      "local_precision": 1.0,
+      "local_releases": 0,
+      "observed_remote_latency_ms": 23487,
+      "token_savings": 348,
+      "worst_runtime_ms": 96000
+    },
+    "factual_qa": {
+      "accuracy": 1.0,
+      "baseline_accuracy": 1.0,
+      "baseline_completion_tokens": 36,
+      "baseline_prompt_tokens": 820,
+      "baseline_total_tokens": 856,
+      "current_completion_tokens": 36,
+      "current_prompt_tokens": 472,
+      "current_total_tokens": 508,
+      "local_coverage": 0.0,
+      "local_precision": 1.0,
+      "local_releases": 0,
+      "observed_remote_latency_ms": 19616,
+      "token_savings": 348,
+      "worst_runtime_ms": 96000
+    },
+    "logic_puzzle": {
+      "accuracy": 1.0,
+      "baseline_accuracy": 1.0,
+      "baseline_completion_tokens": 24,
+      "baseline_prompt_tokens": 798,
+      "baseline_total_tokens": 822,
+      "current_completion_tokens": 24,
+      "current_prompt_tokens": 450,
+      "current_total_tokens": 474,
+      "local_coverage": 0.0,
+      "local_precision": 1.0,
+      "local_releases": 0,
+      "observed_remote_latency_ms": 11992,
+      "token_savings": 348,
+      "worst_runtime_ms": 96000
+    },
+    "math_reasoning": {
+      "accuracy": 1.0,
+      "baseline_accuracy": 1.0,
+      "baseline_completion_tokens": 24,
+      "baseline_prompt_tokens": 600,
+      "baseline_total_tokens": 624,
+      "current_completion_tokens": 0,
+      "current_prompt_tokens": 0,
+      "current_total_tokens": 0,
+      "local_coverage": 1.0,
+      "local_precision": 1.0,
+      "local_releases": 12,
+      "observed_remote_latency_ms": 0,
+      "token_savings": 624,
+      "worst_runtime_ms": 12120
+    },
+    "ner": {
+      "accuracy": 0.9166666666666666,
+      "baseline_accuracy": 1.0,
+      "baseline_completion_tokens": 300,
+      "baseline_prompt_tokens": 864,
+      "baseline_total_tokens": 1164,
+      "current_completion_tokens": 299,
+      "current_prompt_tokens": 516,
+      "current_total_tokens": 815,
+      "local_coverage": 0.0,
+      "local_precision": 1.0,
+      "local_releases": 0,
+      "observed_remote_latency_ms": 19956,
+      "token_savings": 349,
+      "worst_runtime_ms": 96000
+    },
+    "sentiment": {
+      "accuracy": 0.9166666666666666,
+      "baseline_accuracy": 0.75,
+      "baseline_completion_tokens": 24,
+      "baseline_prompt_tokens": 936,
+      "baseline_total_tokens": 960,
+      "current_completion_tokens": 0,
+      "current_prompt_tokens": 0,
+      "current_total_tokens": 0,
+      "local_coverage": 1.0,
+      "local_precision": 0.9166666666666666,
+      "local_releases": 12,
+      "observed_remote_latency_ms": 0,
+      "token_savings": 960,
+      "worst_runtime_ms": 72000
+    },
+    "summarization": {
+      "accuracy": 1.0,
+      "baseline_accuracy": 1.0,
+      "baseline_completion_tokens": 144,
+      "baseline_prompt_tokens": 816,
+      "baseline_total_tokens": 960,
+      "current_completion_tokens": 144,
+      "current_prompt_tokens": 468,
+      "current_total_tokens": 612,
+      "local_coverage": 0.0,
+      "local_precision": 1.0,
+      "local_releases": 0,
+      "observed_remote_latency_ms": 19520,
+      "token_savings": 348,
+      "worst_runtime_ms": 96000
+    }
+  },
+  "checks": {
+    "accuracy_gate_all_scenarios": true,
+    "at_least_1000_mixtures": true,
+    "authorization_scenarios_valid": true,
+    "lineage_aware_confidence_intervals": true,
+    "local_precision_at_least_80pct": true,
+    "policy_frozen_before_comparison": true,
+    "required_scenarios_save_tokens": true,
+    "runtime_bounded_or_safe_policy": true
+  },
+  "ledger_rows": 96,
+  "p90_prompt_chars": 178,
+  "passed": true,
+  "random_mixture": {
+    "accuracy_mean": 0.9693333333333334,
+    "accuracy_min": 0.8645833333333334,
+    "token_savings_mean": 3631.226,
+    "token_savings_min": 2778,
+    "worst_runtime_ms_max": 768000
+  },
+  "recommendation": "keep frozen hybrid with fail-closed deadline reserve",
+  "runtime_violation_scenarios": [
+    "balanced",
+    "sentiment_ner_heavy",
+    "code_heavy",
+    "fireworks_heavy",
+    "long_context_heavy"
+  ],
+  "safe_runtime_policy": {
+    "action": "stop before deadline and exit non-zero without synthetic output",
+    "deadline_ms": 570000,
+    "enabled": true,
+    "reserve_ms": 50000
+  },
+  "scenarios": {
+    "balanced": {
+      "accuracy_mean": 0.9692708333333333,
+      "baseline_accuracy_mean": 0.9381354166666667,
+      "baseline_completion_tokens_mean": 1011.066,
+      "baseline_prompt_tokens_mean": 6223.436,
+      "baseline_total_tokens_mean": 7234.502,
+      "current_completion_tokens_mean": 962.227,
+      "current_prompt_tokens_mean": 2600.99,
+      "current_total_tokens_mean": 3563.217,
+      "local_coverage_mean": 0.24985416666666665,
+      "local_precision_mean": 0.9591600746026452,
+      "local_releases_mean": 23.986,
+      "observed_remote_latency_ms_mean": 108915.97,
+      "token_savings_ci95": [
+        3345,
+        4044
+      ],
+      "token_savings_mean": 3671.285,
+      "worst_runtime_ms_mean": 659993.31
+    },
+    "code_heavy": {
+      "accuracy_mean": 0.96215625,
+      "baseline_accuracy_mean": 0.899375,
+      "baseline_completion_tokens_mean": 1499.29,
+      "baseline_prompt_tokens_mean": 5832.088,
+      "baseline_total_tokens_mean": 7331.378,
+      "current_completion_tokens_mean": 1479.956,
+      "current_prompt_tokens_mean": 2714.223,
+      "current_total_tokens_mean": 4194.179,
+      "local_coverage_mean": 0.09926041666666667,
+      "local_precision_mean": 0.9559940236234354,
+      "local_releases_mean": 9.529,
+      "observed_remote_latency_ms_mean": 133500.33,
+      "token_savings_ci95": [
+        2932,
+        3373
+      ],
+      "token_savings_mean": 3137.199,
+      "worst_runtime_ms_mean": 725229.52
+    },
+    "fireworks_heavy": {
+      "accuracy_mean": 0.97196875,
+      "baseline_accuracy_mean": 0.95778125,
+      "baseline_completion_tokens_mean": 1279.87,
+      "baseline_prompt_tokens_mean": 6252.922,
+      "baseline_total_tokens_mean": 7532.792,
+      "current_completion_tokens_mean": 1278.471,
+      "current_prompt_tokens_mean": 3468.922,
+      "current_total_tokens_mean": 4747.393,
+      "local_coverage_mean": 0.0,
+      "local_precision_mean": 1.0,
+      "local_releases_mean": 0,
+      "observed_remote_latency_ms_mean": 144994.621,
+      "token_savings_ci95": [
+        2774,
+        2802
+      ],
+      "token_savings_mean": 2785.399,
+      "worst_runtime_ms_mean": 768000
+    },
+    "local_favorable": {
+      "accuracy_mean": 0.9587291666666666,
+      "baseline_accuracy_mean": 0.8764166666666666,
+      "baseline_completion_tokens_mean": 192,
+      "baseline_prompt_tokens_mean": 6145.4,
+      "baseline_total_tokens_mean": 6337.4,
+      "current_completion_tokens_mean": 0,
+      "current_prompt_tokens_mean": 0,
+      "current_total_tokens_mean": 0,
+      "local_coverage_mean": 1.0,
+      "local_precision_mean": 0.9587291666666666,
+      "local_releases_mean": 96,
+      "observed_remote_latency_ms_mean": 0,
+      "token_savings_ci95": [
+        6084,
+        6616
+      ],
+      "token_savings_mean": 6337.4,
+      "worst_runtime_ms_mean": 336729.5
+    },
+    "long_context_heavy": {
+      "accuracy_mean": 0.9281041666666666,
+      "baseline_accuracy_mean": 0.8032916666666666,
+      "baseline_completion_tokens_mean": 601.691,
+      "baseline_prompt_tokens_mean": 6856.208,
+      "baseline_total_tokens_mean": 7457.899,
+      "current_completion_tokens_mean": 481.094,
+      "current_prompt_tokens_mean": 1302.672,
+      "current_total_tokens_mean": 1783.766,
+      "local_coverage_mean": 0.6244166666666666,
+      "local_precision_mean": 0.90240750003108,
+      "local_releases_mean": 59.944,
+      "observed_remote_latency_ms_mean": 54446.185,
+      "token_savings_ci95": [
+        5448,
+        5923
+      ],
+      "token_savings_mean": 5674.133,
+      "worst_runtime_ms_mean": 618221.9
+    },
+    "math_logic_heavy": {
+      "accuracy_mean": 0.9876770833333334,
+      "baseline_accuracy_mean": 0.9749895833333333,
+      "baseline_completion_tokens_mean": 519.846,
+      "baseline_prompt_tokens_mean": 5847.252,
+      "baseline_total_tokens_mean": 6367.098,
+      "current_completion_tokens_mean": 442.933,
+      "current_prompt_tokens_mean": 2122.97,
+      "current_total_tokens_mean": 2565.903,
+      "local_coverage_mean": 0.3993541666666667,
+      "local_precision_mean": 0.9896381800865072,
+      "local_releases_mean": 38.338,
+      "observed_remote_latency_ms_mean": 72230.338,
+      "token_savings_ci95": [
+        3527,
+        4091
+      ],
+      "token_savings_mean": 3801.195,
+      "worst_runtime_ms_mean": 524109.1
+    },
+    "sentiment_ner_heavy": {
+      "accuracy_mean": 0.9373854166666666,
+      "baseline_accuracy_mean": 0.9003645833333334,
+      "baseline_completion_tokens_mean": 1181.76,
+      "baseline_prompt_tokens_mean": 6807.037,
+      "baseline_total_tokens_mean": 7988.797,
+      "current_completion_tokens_mean": 1102.054,
+      "current_prompt_tokens_mean": 2283.957,
+      "current_total_tokens_mean": 3386.011,
+      "local_coverage_mean": 0.398625,
+      "local_precision_mean": 0.9285089943929077,
+      "local_releases_mean": 38.268,
+      "observed_remote_latency_ms_mean": 91441.242,
+      "token_savings_ci95": [
+        4132,
+        5073
+      ],
+      "token_savings_mean": 4602.786,
+      "worst_runtime_ms_mean": 667217.59
+    }
+  },
+  "schema_version": "distribution-shift-token-economics-v1",
+  "seed": 69069,
+  "sensitivity": {
+    "local_release_scale": [
+      {
+        "local_release_share": 0,
+        "projected_accuracy": 0.9479166666666666,
+        "projected_tokens": 5145
+      },
+      {
+        "local_release_share": 0.25,
+        "projected_accuracy": 0.9479166666666666,
+        "projected_tokens": 4833
+      },
+      {
+        "local_release_share": 0.5,
+        "projected_accuracy": 0.9479166666666666,
+        "projected_tokens": 4521
+      },
+      {
+        "local_release_share": 0.75,
+        "projected_accuracy": 0.9583333333333334,
+        "projected_tokens": 4041
+      },
+      {
+        "local_release_share": 1,
+        "projected_accuracy": 0.96875,
+        "projected_tokens": 3561
+      }
+    ],
+    "remote_latency": [
+      {
+        "projected_batch_ms": 228120,
+        "remote_latency_ms": 1000
+      },
+      {
+        "projected_batch_ms": 372120,
+        "remote_latency_ms": 3000
+      },
+      {
+        "projected_batch_ms": 516120,
+        "remote_latency_ms": 5000
+      },
+      {
+        "projected_batch_ms": 660120,
+        "remote_latency_ms": 7000
+      }
+    ]
+  },
+  "simulations": 1000,
+  "worst_case_accuracy_regret": {
+    "always_fireworks": 0.12481249999999999,
+    "current_hybrid": 0.0,
+    "local_disabled": 0.12481249999999999
+  }
+}

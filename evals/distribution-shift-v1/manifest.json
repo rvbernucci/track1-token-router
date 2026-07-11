@@ -1,0 +1,8 @@
+{
+  "ledger_sha256": "775f6d5eba1996e2673d32e7dbcddbb6f788254f02bebda6edfe31b8e935ab36",
+  "policy": "frozen observed ledger; scenario analysis may only reweight rows",
+  "rows": 96,
+  "schema_version": "distribution-shift-v1-manifest",
+  "source_arena": "submission/final/live-three-route-image-audit.json",
+  "source_image_digest": "sha256:6bdf4fcfe5e99181b033a5926208c4e8627fd36e24225c920ae278918ba2ff58"
+}
