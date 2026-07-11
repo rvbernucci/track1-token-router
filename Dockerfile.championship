@@ -59,7 +59,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl libgomp1 \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates curl libgomp1 libvulkan1 mesa-vulkan-drivers \
     && rm -rf /var/lib/apt/lists/* \
     && pip install --no-cache-dir litert-lm==0.14.0
 
