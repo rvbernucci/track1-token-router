@@ -7,6 +7,7 @@ from router.core.runner import TaskRunner
 from router.functiongemma.provider import FunctionGemmaAssessmentProvider, FunctionGemmaProviderError
 from router.orchestration.assessment import build_feature_vector, compute_structural_features
 from router.orchestration.final_validator import validate_or_safely_repair_final_answer
+from router.orchestration.e2b_selective_gate import E2BSelectivePolicy
 from router.orchestration.game_theory_selector import MinimaxRegretSelector, deterministic_solver_prediction
 from router.orchestration.outcome_models import OutcomeModelPredictor
 from router.orchestration.solvers import SolverResult, solve_deterministic
@@ -21,6 +22,7 @@ class ThreeRouteRunner:
         selector: MinimaxRegretSelector,
         e2b_runner: TaskRunner,
         fireworks_runner: TaskRunner,
+        selective_policy: E2BSelectivePolicy | None = None,
         logger: JsonlRunLogger | None = None,
         task_deadline_ms: int = 10 * 60 * 1000,
     ) -> None:
@@ -29,6 +31,7 @@ class ThreeRouteRunner:
         self.selector = selector
         self.e2b_runner = e2b_runner
         self.fireworks_runner = fireworks_runner
+        self.selective_policy = selective_policy
         self.logger = logger
         self.task_deadline_ms = task_deadline_ms
         self.run_deadline: float | None = None
@@ -69,17 +72,47 @@ class ThreeRouteRunner:
 
         decision = selection.decision
         fallback: str | None = None
+        selective_probe = (
+            self.selective_policy.should_probe(features)
+            if self.selective_policy is not None and decision.engine is not Engine.DETERMINISTIC
+            else None
+        )
         if decision.engine is Engine.DETERMINISTIC:
             if solver is None:
                 return self._fireworks_fallback(task, reason="selected_solver_did_not_accept_task")
             candidate = _solver_result(task, solver)
-        elif decision.engine is Engine.GEMMA_E2B:
+        elif decision.engine is Engine.GEMMA_E2B or (selective_probe is not None and selective_probe.probe):
             try:
                 candidate = self.e2b_runner.run(task)
+                selective_decision = (
+                    self.selective_policy.evaluate(task, candidate.answer, features)
+                    if self.selective_policy is not None
+                    else None
+                )
                 validation = validate_or_safely_repair_final_answer(task, candidate.answer)
-                if candidate.route == "e2b_error" or not validation.valid:
+                if candidate.route == "e2b_error":
+                    fallback = "e2b_rejected:runtime_error"
+                    candidate = self.fireworks_runner.run(task)
+                elif selective_decision is not None and not selective_decision.accepted:
+                    fallback = f"e2b_selective_rejected:{selective_decision.reason}"
+                    candidate = self.fireworks_runner.run(task)
+                elif selective_decision is None and not validation.valid:
                     fallback = f"e2b_rejected:{validation.reason}"
                     candidate = self.fireworks_runner.run(task)
+                elif selective_decision is not None:
+                    candidate = AnswerResult(
+                        id=candidate.id,
+                        answer=selective_decision.answer,
+                        route="e2b_local_selective",
+                        remote_tokens=candidate.remote_tokens,
+                        metadata={**candidate.metadata, "selective_e2b": selective_decision.to_dict()},
+                    )
+                    decision = EngineDecision(
+                        engine=Engine.GEMMA_E2B,
+                        reason="post_response_selective_accept",
+                        feasible_engines=(Engine.GEMMA_E2B, Engine.FIREWORKS),
+                        probability_correct=selective_decision.post_probability,
+                    )
                 elif validation.repaired_answer:
                     candidate = AnswerResult(
                         id=candidate.id,
@@ -111,6 +144,7 @@ class ThreeRouteRunner:
                 "runner": "three_route",
                 "assessment_invocation": invocation.to_dict(),
                 "robust_selection": selection.to_dict(),
+                "selective_probe": selective_probe.to_dict() if selective_probe else None,
                 "routing_trace": trace.to_dict(),
             }
         )

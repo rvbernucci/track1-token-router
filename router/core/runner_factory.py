@@ -22,6 +22,7 @@ from router.orchestration.budget import TaskBudget
 from router.orchestration.competition import CompetitionRunner
 from router.orchestration.game_theory_selector import MinimaxRegretSelector, RobustSelectionConfig
 from router.orchestration.outcome_models import OutcomeModelBundle, OutcomeModelPredictor
+from router.orchestration.e2b_selective_gate import E2BSelectivePolicy
 from router.orchestration.state_machine import OrchestratedRunner
 
 
@@ -206,6 +207,14 @@ def _build_three_route_runner(config: RouterConfig, logger: JsonlRunLogger) -> T
             config.e2b_route_policy,  # type: ignore[arg-type]
             expected_sha256=config.e2b_route_policy_sha256,
         )
+        selective_policy = None
+        if config.e2b_selective_policy is not None:
+            if not config.e2b_selective_policy.is_file():
+                raise ValueError("Configured E2B selective policy does not exist.")
+            selective_policy = E2BSelectivePolicy.load(
+                config.e2b_selective_policy,
+                expected_sha256=config.e2b_selective_policy_sha256,
+            )
         policy_limit = int(e2b_policy["baseline"]["output_tokens"])
         if config.e2b_max_tokens != policy_limit:
             raise ValueError("E2B runtime token ceiling differs from its pinned route policy.")
@@ -238,7 +247,7 @@ def _build_three_route_runner(config: RouterConfig, logger: JsonlRunLogger) -> T
                 max_peak_memory_mb=config.three_route_max_memory_mb,
                 deadline_reserve_ms=config.three_route_deadline_reserve_ms,
             ),
-            e2b_enabled=bool(e2b_policy["default_enabled"]),
+            e2b_enabled=bool(e2b_policy["default_enabled"]) and selective_policy is None,
         )
         return ThreeRouteRunner(
             assessment_provider=assessment_provider,
@@ -246,6 +255,7 @@ def _build_three_route_runner(config: RouterConfig, logger: JsonlRunLogger) -> T
             selector=selector,
             e2b_runner=GemmaE2BRunner(e2b_client, max_tokens=config.e2b_max_tokens),
             fireworks_runner=fallback,
+            selective_policy=selective_policy,
             logger=logger,
         )
     except (OSError, TypeError, ValueError, json.JSONDecodeError) as exc:

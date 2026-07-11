@@ -1,0 +1,20 @@
+{
+  "candidate_policy_sha256": "89102553c25a299a5596aa861e2b463e0f5755daa177f4705a06079018ad6753",
+  "fireworks_baseline_sha256": "b9ea6b5ed66ea21d2f2b50aab35e1d2e20a9ee65757115330054b004d004df39",
+  "fireworks_judgments": {
+    "agy_sha256": "aba98b9ee7199d310efa0a00faff148d5f44bbf1ec027ee668f9e6604e6b3712",
+    "codex_sha256": "0c6447e5cccb47bc1e269309599c33cf166e831f79bb7c87765ac5e201f7884b"
+  },
+  "schema_version": "e2b-v2-championship-run-manifest-v1",
+  "threshold_or_coefficient_changes_after_unseal": false,
+  "upstream": {
+    "gates": {
+      "candidate_disabled": true,
+      "development_candidates": true,
+      "development_labels": true,
+      "sealed_candidates": true,
+      "sealed_labels": true
+    },
+    "passed": true
+  }
+}

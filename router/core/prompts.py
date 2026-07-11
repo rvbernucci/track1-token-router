@@ -7,19 +7,28 @@ if False:  # pragma: no cover - imported only for type checkers without runtime 
     from router.core.verifier import VerificationDecision
 
 
-M1_SYSTEM_PROMPT = """You are M1, the fast local answer generator.
-Answer the user's task directly and naturally.
-Preserve the exact output format requested by the task.
-Do not mention routing, models, prompts, or internal architecture.
-Do not wrap the answer in JSON or XML unless the task itself explicitly asks for that format.
-Prefer concise answers when the task is simple."""
+ANSWER_PROMPT_VERSION = "raw-prompt-v1"
+CONCISE_ANSWER_PROMPT_VERSION = "concise-system-v1"
+CONCISE_ANSWER_SYSTEM_PROMPT = (
+    "Follow the user's requested format exactly. Otherwise answer succinctly and precisely. "
+    "Return only the answer."
+)
+
+
+def build_answer_messages(task: TaskEnvelope, *, mode: str = "raw") -> list[dict[str, str]]:
+    if mode == "raw":
+        return [{"role": "user", "content": task.input_text}]
+    if mode == "concise":
+        return [
+            {"role": "system", "content": CONCISE_ANSWER_SYSTEM_PROMPT},
+            {"role": "user", "content": task.input_text},
+        ]
+    raise ValueError(f"Unknown answer prompt mode {mode!r}.")
 
 
 def build_m1_messages(task: TaskEnvelope) -> list[dict[str, str]]:
-    return [
-        {"role": "system", "content": M1_SYSTEM_PROMPT},
-        {"role": "user", "content": task.input_text},
-    ]
+    """Build the championship answer request without envelope or routing data."""
+    return build_answer_messages(task, mode="raw")
 
 
 M2A_SYSTEM_PROMPT = """You are M2A, the local verifier and routing judge.

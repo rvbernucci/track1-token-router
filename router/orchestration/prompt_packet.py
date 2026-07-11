@@ -77,35 +77,59 @@ def infer_expected_format(task: TaskEnvelope) -> str:
         "return only python code" in text
         or "return only corrected python code" in text
         or "return only code" in text
-        or re.search(r"\bwrite\s+a\s+python\s+function\b", text)
-        or re.search(r"\bdefine\s+a\s+python\s+function\b", text)
-        or re.search(r"\bimplement\s+a\s+python\s+function\b", text)
+        or re.search(r"\b(?:write|return|provide)\s+only\s+the\s+.*\bfunction signature\b", text)
+        or re.search(
+            r"\b(?:write|return|provide)\s+only\s+(?:the\s+)?(?:source|corrected|complete|working|implementation)\s+code\b",
+            text,
+        )
+        or re.search(r"\b(?:write|define|implement|create)\s+a\s+(?:rust|javascript|typescript|java|c\+\+|go)\s+function\b", text)
+        or re.search(
+            r"\b(?:write|define|implement|create)\s+(?:only\s+)?(?:a|an|the)\s+"
+            r"(?:python\s+)?(?:function|class|method)\b",
+            text,
+        )
+        or re.search(r"\b(?:provide|return)\s+(?:only\s+)?(?:a|the)\s+complete\s+(?:python\s+)?implementation\b", text)
         or ("corrected implementation" in text and re.search(r"\b(debug|bug|fix|broken)\b", text))
     ):
         return "code"
-    if "return only the number" in text or re.search(r"\bwhat is\b.*[+\-*/]", text):
+    if (
+        "return only the number" in text
+        or re.search(r"\b(?:return|provide|answer with)\s+only\s+(?:the\s+)?(?:final\s+)?numeric(?: value)?\b", text)
+        or re.search(r"\bwhat is\b.*[+\-*/]", text)
+    ):
         return "number"
     if "uppercase" in text:
         return "uppercase"
     if re.search(r"\b(?:return|answer|respond)\s+(?:exactly\s+)?(?:yes\s+or\s+no|yes/no)\b", text):
         return "yes_no"
-    if re.search(r"return exactly .+?(?: and nothing else)?[.!]?$", task.input_text, re.IGNORECASE):
+    if extract_literal_echo(task):
         return "literal_echo"
     return "free_text"
 
 
 def extract_literal_echo(task: TaskEnvelope) -> str:
-    patterns = [
+    explicit = re.search(
         r"return exactly this string and nothing else\s*:\s*(.+?)[.!]?$",
+        task.input_text,
+        re.IGNORECASE,
+    )
+    if explicit:
+        return explicit.group(1).strip().strip("\"'")
+    match = re.search(
         r"return exactly (.+?)(?: and nothing else)?[.!]?$",
-    ]
-    match = next(
-        (re.search(pattern, task.input_text, re.IGNORECASE) for pattern in patterns if re.search(pattern, task.input_text, re.IGNORECASE)),
-        None,
+        task.input_text,
+        re.IGNORECASE,
     )
     if match is None:
         return ""
-    return match.group(1).strip().strip("\"'")
+    raw = match.group(1).strip()
+    quoted = len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in "\"'"
+    candidate = raw.strip("\"'")
+    # Avoid treating natural instructions such as "return exactly one sentence"
+    # as literal payloads. Unquoted literals must be a single token.
+    if not quoted and re.search(r"\s", candidate):
+        return ""
+    return candidate
 
 
 def _compact(value: str, max_chars: int) -> str:

@@ -24,6 +24,7 @@ from router.orchestration.assessment import approximate_token_count
 CLAUDE_MODEL = "claude-sonnet-5"
 AGY_MODEL = "Gemini 3.5 Flash (Medium)"
 DEFAULT_FIREWORKS_TEACHER = "accounts/fireworks/models/minimax-m3"
+DEFAULT_CODEX_JUDGE = "codex-subscription-default"
 
 
 class ProviderError(RuntimeError):
@@ -162,6 +163,84 @@ class ClaudeCodeProvider:
             )
         self._auth = payload
         return payload
+
+
+class CodexProvider:
+    def __init__(
+        self,
+        *,
+        model: str = DEFAULT_CODEX_JUDGE,
+        executable: str = "codex",
+        timeout_s: float = 300.0,
+    ) -> None:
+        self.model = model
+        self.executable = executable
+        self.timeout_s = timeout_s
+
+    def invoke(self, *, prompt: str, response_schema: Mapping[str, Any], role: str) -> ProviderInvocation:
+        full_prompt = (
+            "Return exactly one JSON object matching the supplied response schema. "
+            "Do not use tools, read files, browse, or answer the quoted dataset tasks.\n\n"
+            f"REQUEST:\n{prompt}"
+        )
+        command_config = {"model": self.model, "sandbox": "read-only", "ephemeral": True, "role": role}
+        try:
+            with tempfile.TemporaryDirectory(prefix="dataset-forge-codex-") as tmp:
+                root = Path(tmp)
+                schema_path = root / "schema.json"
+                result_path = root / "result.json"
+                schema_path.write_text(json.dumps(response_schema, ensure_ascii=True), encoding="utf-8")
+                command = [
+                    self.executable,
+                    "exec",
+                    "--ephemeral",
+                    "--skip-git-repo-check",
+                    "--sandbox",
+                    "read-only",
+                    "--output-schema",
+                    str(schema_path),
+                    "--output-last-message",
+                    str(result_path),
+                ]
+                if self.model != DEFAULT_CODEX_JUDGE:
+                    command.extend(["--model", self.model])
+                command.append("-")
+                completed = subprocess.run(
+                    command,
+                    cwd=root,
+                    input=full_prompt,
+                    capture_output=True,
+                    text=True,
+                    timeout=self.timeout_s,
+                    check=False,
+                )
+                result_text = result_path.read_text(encoding="utf-8") if result_path.is_file() else ""
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise ProviderError(f"Codex invocation failed: {exc}") from exc
+        combined = f"{completed.stdout}\n{completed.stderr}".strip()
+        if completed.returncode != 0:
+            if _looks_like_quota_exhaustion(combined):
+                raise ProviderQuotaExhausted(_redacted_error("Codex usage window exhausted", combined))
+            raise ProviderError(_redacted_error("Codex failed", combined))
+        payload = _parse_json_object(result_text, "Codex structured response")
+        prompt_tokens = approximate_token_count(full_prompt)
+        completion_tokens = approximate_token_count(result_text)
+        request_id = stable_id("codex", self.model, role, full_prompt, result_text)
+        provenance = ProviderProvenance(
+            provider="codex",
+            model=self.model,
+            role=role,
+            auth_mode="codex_subscription",
+            usage_window=_usage_window_id(),
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=prompt_tokens + completion_tokens,
+            equivalent_cost_usd=0.0,
+            billable_cost_usd=0.0,
+            request_id=request_id,
+            config_sha256=config_sha256(command_config),
+        )
+        return ProviderInvocation(payload=payload, provenance=provenance)
 
 
 class FireworksDatasetProvider:
@@ -517,7 +596,15 @@ def _parse_json_object(raw: str, label: str) -> dict[str, Any]:
     try:
         payload = json.loads(stripped)
     except json.JSONDecodeError as exc:
-        raise ProviderError(f"{label} is malformed JSON: {exc}") from exc
+        # Some structured-output endpoints append a second object or prose even
+        # after producing a complete valid object. Preserve the first complete
+        # envelope; its exact schema is still validated by the caller.
+        try:
+            payload, end = json.JSONDecoder().raw_decode(stripped)
+        except json.JSONDecodeError:
+            raise ProviderError(f"{label} is malformed JSON: {exc}") from exc
+        if end <= 0:
+            raise ProviderError(f"{label} is malformed JSON: {exc}") from exc
     if not isinstance(payload, dict):
         raise ProviderError(f"{label} must be an object.")
     return payload

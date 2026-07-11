@@ -15,6 +15,32 @@ from tests.fake_openai_server import FakeOpenAIServer
 
 
 class FireworksDirectRunnerTests(unittest.TestCase):
+    def test_429_503_and_malformed_json_fail_closed_with_one_answer(self) -> None:
+        scenarios = (
+            {"status": 429},
+            {"status": 503},
+            {"invalid_json": True},
+        )
+        for scenario in scenarios:
+            with self.subTest(scenario=scenario), FakeOpenAIServer(**scenario) as server:
+                client = FireworksClient(
+                    base_url=server.url,
+                    model="accounts/fireworks/models/minimax-m3",
+                    api_key="test",
+                    max_retries=0,
+                )
+                runner = FireworksDirectRunner(
+                    client,
+                    allowed_models=["accounts/fireworks/models/minimax-m3"],
+                    enable_deterministic_solvers=False,
+                )
+
+                result = runner.run(TaskEnvelope(id="chaos", input_text="Summarize this sentence."))
+
+            self.assertEqual(result.id, "chaos")
+            self.assertEqual(result.route, "fireworks_error")
+            self.assertTrue(result.answer)
+
     def test_solver_runs_before_fireworks(self) -> None:
         with FakeOpenAIServer(response_text="should not be called") as server:
             client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
@@ -38,6 +64,11 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertEqual(result.route, "fireworks_direct")
         self.assertEqual(result.remote_tokens.total, 15)
         self.assertEqual(server.requests[0]["payload"]["model"], "fake-fireworks")
+        self.assertEqual(
+            server.requests[0]["payload"]["messages"],
+            [{"role": "user", "content": "Summarise this: token routing matters."}],
+        )
+        self.assertEqual(result.metadata["answer_prompt_version"], "raw-prompt-v1")
 
     def test_repairs_code_fence_for_code_only_task(self) -> None:
         fenced = "```python\ndef add(a, b):\n    return a + b\n```"
@@ -81,6 +112,22 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertNotIn("The user wants", result.answer)
         self.assertTrue(result.metadata["final_answer_repaired"])
         self.assertEqual(result.metadata["final_validation"]["reason"], "python_code_with_extra_text")
+
+    def test_does_not_replace_ambiguous_numeric_answer_with_first_number(self) -> None:
+        with FakeOpenAIServer(response_text="The candidates are 12 and 7.") as server:
+            client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
+            runner = FireworksDirectRunner(client, enable_deterministic_solvers=False)
+
+            result = runner.run(
+                TaskEnvelope(
+                    id="number",
+                    input_text="According to the supplied context, provide only the final numeric value.",
+                )
+            )
+
+        self.assertEqual(result.answer, "The candidates are 12 and 7.")
+        self.assertFalse(result.metadata["safe_final_validation"]["valid"])
+        self.assertFalse(result.metadata["final_answer_repaired"])
 
     def test_uses_selected_allowed_model_for_task(self) -> None:
         with FakeOpenAIServer(response_text="Fixed implementation.", prompt_tokens=20, completion_tokens=8) as server:
@@ -162,6 +209,33 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertEqual(server.requests[0]["payload"]["max_tokens"], 16)
         self.assertEqual(result.metadata["fireworks_completion_token_policy"]["expected_format"], "number")
         self.assertEqual(result.metadata["fireworks_completion_token_policy"]["max_tokens"], 16)
+        self.assertEqual(
+            result.metadata["fireworks_completion_token_policy"]["policy_version"],
+            "compact-contract-v2",
+        )
+
+    def test_label_and_access_code_use_small_completion_budgets(self) -> None:
+        with FakeOpenAIServer(responses=["positive", "5357"]) as server:
+            client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
+            runner = FireworksDirectRunner(client, max_tokens=512, enable_deterministic_solvers=False)
+
+            label = runner.run(
+                TaskEnvelope(
+                    id="label",
+                    input_text="Classify sentiment as positive, negative, or neutral: I love this.",
+                )
+            )
+            access = runner.run(
+                TaskEnvelope(
+                    id="access",
+                    input_text="Context: Project Fjord uses access code 5357. Return only the code.",
+                )
+            )
+
+        self.assertEqual(label.metadata["fireworks_completion_token_policy"]["expected_format"], "label")
+        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 8)
+        self.assertEqual(access.metadata["fireworks_completion_token_policy"]["expected_format"], "free_text")
+        self.assertEqual(server.requests[1]["payload"]["max_tokens"], 24)
 
     def test_strong_math_number_task_gets_reasoning_headroom(self) -> None:
         with FakeOpenAIServer(response_text="144") as server:

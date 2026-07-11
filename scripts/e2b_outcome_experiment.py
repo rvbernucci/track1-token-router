@@ -11,6 +11,8 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
+from router.core.e2b_runner import E2B_PROMPT_VERSION, build_e2b_messages
+
 
 SCHEMA_VERSION = "e2b-answer-candidate-v2"
 
@@ -111,7 +113,7 @@ def _complete(
 ) -> dict[str, Any]:
     payload = {
         "model": model,
-        "messages": [{"role": "user", "content": task_text}],
+        "messages": build_e2b_messages(task_text),
         "temperature": 0,
         # LiteRT-LM 0.14 only enforces the current OpenAI field. Keep the
         # legacy alias for compatibility with older OpenAI-style adapters.
@@ -152,6 +154,7 @@ def _complete(
         "functiongemma_assessment": dict(assessment),
         "engine": "gemma_e2b",
         "engine_version": "gemma-4-e2b-litert-lm-v1",
+        "prompt_version": E2B_PROMPT_VERSION,
         "model_id": model,
         "generation_limit_tokens": max_tokens,
         "runtime_id": runtime_id,

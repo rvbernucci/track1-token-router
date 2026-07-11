@@ -43,10 +43,13 @@ class FunctionGemmaProviderTests(unittest.TestCase):
             calibration=calibration(),
             requester=requester,
         )
-        result = provider.assess_with_trace(TaskEnvelope(id="task", input_text="Classify this."))
+        result = provider.assess_with_trace(TaskEnvelope(id="SECRET-TASK-ID", input_text="Classify this."))
         self.assertEqual(captured["tool_choice"], "required")
         self.assertEqual(captured["max_tokens"], 64)
+        self.assertEqual(captured["messages"][-1], {"role": "user", "content": "Classify this."})
+        self.assertNotIn("SECRET-TASK-ID", str(captured))
         self.assertEqual(result.usage.total, 50)
+        self.assertEqual(result.prompt_version, "functiongemma-tool-assessment-v1")
 
     def test_malformed_output_fails_closed(self):
         provider = FunctionGemmaAssessmentProvider(

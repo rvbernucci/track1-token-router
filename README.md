@@ -8,15 +8,21 @@ The runner handles factual Q&A, math reasoning, sentiment, summarization, NER, c
 
 ```text
 task
+-> strip official JSON envelope; retain task_id only in the engine
 -> registered deterministic solver (accept or refuse)
 -> Kimi K2.7 Code when present in ALLOWED_MODELS
 -> strict output validation and allowed-model fallback
+-> Answer Contract Engine normalization and validation
+-> atomically rebuild [{task_id, answer}, ...]
 -> final answer
 ```
+
+The disabled three-route challenger inserts `FunctionGemma five-parameter assessment -> routing equation -> E2B or Fireworks` after envelope removal. It is promoted only if the fresh holdout passes the frozen Kimi baseline.
 
 - Deterministic solvers must independently accept the original input or refuse it.
 - Kimi is a validation-selected preference and is never called unless the harness includes it in `ALLOWED_MODELS`.
 - Strict-format failures can retry another ranked allowed model; model unavailability is cached per batch.
+- The Answer Contract Engine performs only unambiguous mechanical transformations before the official JSON serializer.
 - FunctionGemma 270M and Gemma 4 E2B were trained and evaluated as the local challenger, but E2B failed its frozen accuracy gate and neither model is bundled in the submitted image.
 
 The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
@@ -71,11 +77,13 @@ python3 -m router submit-track1 \
 | Document | Purpose |
 |---|---|
 | [Architecture](./docs/ARCHITECTURE.md) | Canonical three-route design and fallback policy |
+| [Answer Contract Engine](./docs/ANSWER_CONTRACT_ENGINE.md) | Safe response normalization before official JSON serialization |
 | [Assessment contracts](./docs/ASSESSMENT_DECISION_CONTRACTS.md) | Taxonomy, score anchors, feature vector, outcomes and fail-closed trace |
 | [FunctionGemma assessment spec](./docs/FUNCTIONGEMMA_ROUTER_SPEC.md) | Intent, five score rubrics and evaluation contract |
 | [AMD training tutorial](./docs/FUNCTIONGEMMA_270M_AMD_TRAINING_TUTORIAL.md) | Full SFT and LoRA workflow on ROCm |
 | [Gemma E2B token ladder](./docs/E2B_TOKEN_LADDER.md) | Adaptive 96/192/384 experiment, quantization and CPU runtime audit |
 | [Public E2B evidence](./reports/public/e2b-token-ladder.md) | Aggregate recovery, feature and latency results |
+| [Raw-prompt ablation](./reports/public/raw-prompt-answer-contract-ablation.md) | Byte-identical Kimi answers with 51.9% fewer Fireworks tokens |
 | [Sprints 45-49 completion audit](./reports/public/sprints-45-49-completion-audit.md) | Requirement-to-evidence map and final release proof |
 | [E2B runtime](./docs/GEMMA_E2B_TEXT_ONLY_RUNTIME.md) | Text-only LiteRT-LM packaging and 4 GB gates |
 | [Deterministic solvers](./docs/DETERMINISTIC_SOLVERS.md) | Mechanical registry and proof rules |

@@ -7,7 +7,8 @@ import unittest
 from pathlib import Path
 
 from router.adapters.official import ADAPTERS, get_adapter
-from router.core.contracts import AnswerResult
+from router.core.contracts import AnswerResult, TaskEnvelope
+from router.cli.main import _validate_track1_alignment
 
 
 FIXTURES = Path("fixtures/official")
@@ -127,6 +128,42 @@ class OfficialAdapterTests(unittest.TestCase):
         self.assertEqual(tasks[0].metadata["input_shape"], "object.items")
         self.assertEqual(tasks[0].metadata["source_id_field"], "generated_index")
         self.assertEqual(json.loads(output), [{"task_id": "task-1", "answer": "Hi"}])
+
+    def test_lablab_track1_rejects_duplicate_ids_and_empty_answers(self) -> None:
+        adapter = get_adapter("lablab_track1")
+
+        with self.assertRaisesRegex(ValueError, "duplicate task_id"):
+            adapter.format(
+                [
+                    AnswerResult(id="same", answer="A", route="test"),
+                    AnswerResult(id="same", answer="B", route="test"),
+                ]
+            )
+        with self.assertRaisesRegex(ValueError, "non-empty string answer"):
+            adapter.format([AnswerResult(id="empty", answer="", route="test")])
+
+    def test_lablab_track1_rejects_duplicate_input_ids_before_inference(self) -> None:
+        adapter = get_adapter("lablab_track1")
+
+        with self.assertRaisesRegex(ValueError, "input contains duplicate task_id"):
+            adapter.parse(
+                json.dumps(
+                    [
+                        {"task_id": "same", "prompt": "First"},
+                        {"task_id": "same", "prompt": "Second"},
+                    ]
+                )
+            )
+
+    def test_track1_alignment_requires_exact_input_order(self) -> None:
+        tasks = [TaskEnvelope(id="t1", input_text="A"), TaskEnvelope(id="t2", input_text="B")]
+        reversed_results = [
+            AnswerResult(id="t2", answer="B", route="test"),
+            AnswerResult(id="t1", answer="A", route="test"),
+        ]
+
+        with self.assertRaisesRegex(ValueError, "exact input task_id order"):
+            _validate_track1_alignment(tasks, reversed_results)
 
     def test_lablab_track1_rejects_object_without_task_list(self) -> None:
         adapter = get_adapter("lablab_track1")

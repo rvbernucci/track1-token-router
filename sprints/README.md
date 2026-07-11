@@ -10,6 +10,26 @@ The architecture reset starts at Sprint 45. These sprints are sequential and all
 - [x] [Sprint 48 - Regression And Game-Theory Decision Engine](./48-three-route-orchestration/README.md)
 - [x] [Sprint 49 - Championship Calibration](./49-championship-calibration/README.md)
 
+## Active Offline Competitiveness Sequence
+
+Sprints 50-54 require no AMD notebook. They convert deterministic solvers into proof-carrying validators, fuse them with E2B conservatively and prepare an exact shadow championship runtime.
+
+- [x] [Sprint 50 - Proof-Carrying Math And Logic](./50-proof-carrying-math-logic/README.md)
+- [x] [Sprint 51 - Sandboxed Code Verification](./51-sandboxed-code-verification/README.md)
+- [x] [Sprint 52 - Grounded Extraction And Classification](./52-grounded-extraction-validation/README.md)
+- [x] [Sprint 53 - Bidirectional Local Adjudication](./53-bidirectional-local-adjudication/README.md)
+- [x] [Sprint 54 - Offline Championship Shadow Runtime](./54-offline-championship-shadow-runtime/README.md)
+
+## Active E2B Recalibration Sequence
+
+Sprints 55-59 recalibrate E2B from a new 2,000-task corpus. They separate pre-inference probe value from post-answer release safety, use the native `x86_64` desktop as the canonical Docker worker and keep the final 400-row holdout sealed until one exact policy candidate exists.
+
+- [x] [Sprint 55 - E2B Regression V2 Corpus](./55-e2b-regression-v2-corpus/README.md)
+- [x] [Sprint 56 - Canonical Local Inference Lab](./56-canonical-local-inference-lab/README.md)
+- [x] [Sprint 57 - Ground Truth And Contract Adjudication](./57-ground-truth-and-contract-adjudication/README.md)
+- [x] [Sprint 58 - Robust Two-Stage Regression V2](./58-robust-two-stage-regression-v2/README.md)
+- [ ] [Sprint 59 - Championship Runtime Promotion](./59-championship-runtime-promotion/README.md)
+
 ## Completed Foundation
 
 Sprints 01-44 produced reusable infrastructure: CLI contracts, adapters, tests, deterministic solvers, Fireworks integration, Pareto/game-theory selection, eval packs, observability, Docker and release automation.

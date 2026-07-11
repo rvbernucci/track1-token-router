@@ -1,0 +1,19 @@
+{
+  "amd_only": 1,
+  "amd_valid": 1988,
+  "common_valid": 1987,
+  "cpu_only": 4,
+  "cpu_valid": 1991,
+  "exact_assessment_matches": 1324,
+  "exact_assessment_rate": 0.6663311524911928,
+  "intent_match_rate": 0.9874182184197282,
+  "intent_matches": 1962,
+  "schema_version": "functiongemma-cpu-amd-parity-v1",
+  "score_exact_rates": {
+    "deterministic_fit": 0.8973326623049824,
+    "format_complexity": 0.8983392048314042,
+    "generation_demand": 0.9079013588324106,
+    "knowledge_uncertainty": 0.9280322093608455,
+    "reasoning_demand": 0.895319577252139
+  }
+}

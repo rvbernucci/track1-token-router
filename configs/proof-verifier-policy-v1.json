@@ -1,0 +1,40 @@
+{
+  "schema_version": "proof-verifier-policy-v1",
+  "default_enabled": true,
+  "evidence": {
+    "dataset_path": "evals/proof-carrying/math-logic-holdout.jsonl",
+    "dataset_sha256": "b4410091c7c3d9348df7412ac664ae6d83a5b9d33a955c56ee87a879a23c6e3f",
+    "engine_path": "router/orchestration/proof_engine.py",
+    "engine_sha256": "f0893c49ddbf6f00bff53597cb7875db46fcf39b241640f374e7780f5b0b3a13",
+    "evaluation_path": "reports/generated/math-logic-proof-coverage.json",
+    "evaluation_gate": {
+      "minimum_released": 180,
+      "minimum_wilson_lower_95": 0.9,
+      "required_false_positives": 0
+    }
+  },
+  "proof_schema_version": "proof-envelope-v1",
+  "families": {
+    "compound_projection": {"enabled": true},
+    "decimal_ast": {"enabled": true},
+    "finite_assignment": {"enabled": true},
+    "ordering": {"enabled": true},
+    "percentage": {"enabled": true},
+    "proportional_rate": {"enabled": true},
+    "propositional": {"enabled": true},
+    "quantified": {"enabled": true},
+    "unit_conversion": {"enabled": true}
+  },
+  "limits": {
+    "max_abs_value": "1e18",
+    "max_ast_nodes": 64,
+    "max_expression_chars": 256,
+    "max_logic_entities": 7
+  },
+  "promotion": {
+    "minimum_precision": 0.95,
+    "minimum_wilson_lower_95": 0.9,
+    "require_zero_false_positive": true
+  },
+  "reason": "Sprint 50 executable gate passed: 180 verified releases, 80 safe refusals, zero false positives."
+}

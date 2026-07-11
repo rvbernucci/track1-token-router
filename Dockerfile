@@ -4,7 +4,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     ROUTER_LOG_PATH=/app/logs/run.jsonl \
     ROUTER_MODE=fireworks \
-    FIREWORKS_CHAMPION_MODEL=accounts/fireworks/models/kimi-k2p7-code \
     FIREWORKS_MATRIX_WEIGHTS=/app/router/data/fireworks_track1_allowed_weights.json \
     FIREWORKS_INTENT_POLICY=/app/configs/fireworks-intent-policy-v1.json \
     FIREWORKS_INTENT_POLICY_SHA256=f10e31382bb39378834b9ec76c1d11b5b9c6e3e17f5d9bc782909004c8344c91 \
@@ -18,10 +17,9 @@ WORKDIR /app
 COPY pyproject.toml README.md ./
 COPY router ./router
 COPY configs ./configs
-COPY evals ./evals
 COPY logs ./logs
 
-RUN pip install --no-cache-dir .
+RUN pip install --no-cache-dir . && rm -rf /app/build /app/*.egg-info
 
 RUN mkdir -p /app/logs /app/reports/generated
 

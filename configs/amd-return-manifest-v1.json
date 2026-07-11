@@ -1,0 +1,103 @@
+{
+  "schema_version": "amd-return-manifest-v1",
+  "source_bundle": [
+    {
+      "path": "configs/championship-shadow-policy-v1.json",
+      "sha256": "2b8897e004a43efeb41820cbfa01b5ef04b899392a959359aea3ed81a2cebbaf"
+    },
+    {
+      "path": "configs/functiongemma-scale789-q8-runtime.json",
+      "sha256": "32f38d2557dab515f1093a50dc80009d6849e681138b467f2db48061f691409c"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "2fad066a433c066528adc9b9d29dc9bc50867e28ea5ad79db3dcea0ea0096536"
+    },
+    {
+      "path": "Dockerfile",
+      "sha256": "4419a828888813be621b9551e03dc5dcbbeafe16862e76501038022be23a7482"
+    },
+    {
+      "path": ".dockerignore",
+      "sha256": "808d7f2c4e28533a04d443deedd926ed1401c18926949acbaeed98a20ce639b6"
+    },
+    {
+      "path": "scripts/docker_resource_gate.sh",
+      "sha256": "19833d0690b2f44b60004e9690bbe21fd2b07fa8cf1b66a3e1e8b99110d2e94d"
+    },
+    {
+      "path": "docs/AMD_RETURN_RUNBOOK.md",
+      "sha256": "e0ee1b4fd0cfd2550347fb611769a253ed6672fb19884091c99fe30f39a32151"
+    },
+    {
+      "path": "router/evals/shadow_runtime.py",
+      "sha256": "144878e3167b6ef2f355a8765a0564d20510c01db2e447b184ee006ef6cafc03"
+    },
+    {
+      "path": "scripts/offline_shadow_championship.py",
+      "sha256": "974c76bf6fd7827cd067350a7ddd179d72d02d452832a7bc1e48297a047f54b5"
+    },
+    {
+      "path": "scripts/generate_shadow_championship_holdout.py",
+      "sha256": "443b45deaa8c31c0c35dc6b1aa5a3678ff9b11f6eea2a14a4048417c522cd57d"
+    },
+    {
+      "path": "scripts/verify_amd_return_manifest.py",
+      "sha256": "54507be57d1f9babe773286831bf9af06e03472e534ca8e61a86e32c47c8a0ed"
+    },
+    {
+      "path": "evals/shadow-championship/inputs.jsonl",
+      "sha256": "f2ebe27271d8f41aea8f4d2f59df15aa46e115864b2d7eaafa97d4b7cdb83c42"
+    },
+    {
+      "path": "evals/shadow-championship/labels.jsonl",
+      "sha256": "62e2a04422b83f539ef5a91389e39e9690e64aad62892e9feed51565b70a40d7"
+    }
+  ],
+  "model_pins": {
+    "functiongemma_base": {
+      "id": "google/functiongemma-270m-it",
+      "revision": "39eccb091651513a5dfb56892d3714c1b5b8276c"
+    },
+    "functiongemma_q8": {
+      "filename": "functiongemma-scale789-q8_0.gguf",
+      "sha256": "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77"
+    },
+    "llama_cpp": {
+      "release": "b9948",
+      "commit": "074944998d3f25e7001ede30d152b59dff741c8c"
+    },
+    "gemma_e2b": {
+      "status": "must-rerun-on-amd",
+      "release_blocked_without_new_artifact_hash": true
+    }
+  },
+  "upload": {
+    "method": "rsync --partial --append-verify",
+    "remote_directory": "~/track1-token-router/",
+    "resume_supported": true,
+    "checksum_path": "reports/amd-return/upload.sha256"
+  },
+  "download": {
+    "expected_paths": [
+      "reports/amd-return/environment.json",
+      "reports/amd-return/model-artifacts.sha256",
+      "reports/amd-return/combined-runtime.json",
+      "reports/amd-return/fresh-inference.jsonl",
+      "reports/amd-return/docker-resource-gate.json"
+    ],
+    "method": "rsync --partial --append-verify",
+    "checksum_path": "reports/amd-return/return.sha256"
+  },
+  "release_thresholds": {
+    "functiongemma_schema_validity": 0.99,
+    "functiongemma_intent_accuracy": 0.95,
+    "combined_peak_rss_mb": 3584,
+    "batch_runtime_seconds": 570,
+    "local_precision": 0.85,
+    "local_wilson_lower_95": 0.75,
+    "probability_perturbation_flip_rate": 0.05,
+    "docker_platform": "linux/amd64",
+    "docker_compressed_size_bytes": 10000000000
+  }
+}

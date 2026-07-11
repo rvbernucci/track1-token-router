@@ -1,0 +1,80 @@
+{
+  "schema_version": "championship-shadow-policy-v1",
+  "selected_runtime_variant": "deterministic_fireworks",
+  "candidate_variants": [
+    "fireworks_only",
+    "deterministic_fireworks",
+    "e2b_regression_without_proofs",
+    "proof_plus_e2b_cross_validation",
+    "full_cohort_binary_adjudication"
+  ],
+  "evaluation": {
+    "split": "final_holdout",
+    "inputs_path": "evals/shadow-championship/inputs.jsonl",
+    "inputs_sha256": "f2ebe27271d8f41aea8f4d2f59df15aa46e115864b2d7eaafa97d4b7cdb83c42",
+    "labels_path": "evals/shadow-championship/labels.jsonl",
+    "labels_sha256": "62e2a04422b83f539ef5a91389e39e9690e64aad62892e9feed51565b70a40d7",
+    "manifest_path": "evals/shadow-championship/manifest.json",
+    "manifest_sha256": "9784d81e7c07d9c4ec35795b53a2f1c21c13f3560a81395a2141f7c0d6d25042"
+  },
+  "frozen_runtime": {
+    "fireworks_base_url": "https://shadow.invalid/inference/v1",
+    "allowed_models": ["accounts/fireworks/models/kimi-k2p7-code"],
+    "deadline_ms": 570000,
+    "reserve_ms": 5000,
+    "local_adjudication_policy_enabled": false
+  },
+  "gates": {
+    "minimum_accuracy": 0.95,
+    "maximum_accuracy_regression": 0.01,
+    "minimum_local_precision": 0.85,
+    "maximum_simulated_runtime_ms": 570000,
+    "maximum_peak_memory_mb": 3584,
+    "require_fireworks_token_reduction": true,
+    "require_zero_output_schema_failures": true,
+    "require_zero_unauthorized_model_calls": true
+  },
+  "docker": {
+    "required_platform": "linux/amd64",
+    "maximum_compressed_size_bytes": 10000000000,
+    "memory_limit_bytes": 4294967296,
+    "cpus": 2,
+    "maximum_runtime_seconds": 600,
+    "live_rehearsal_required_for_release": true
+  },
+  "artifacts": {
+    "local_adjudication_policy": {
+      "path": "configs/local-adjudication-policy-v1.json",
+      "sha256": "a401b1252108ac2cf1e6774a4c9bc73cd8278a7af5451d88f4d662fd8558b58d"
+    },
+    "shadow_runtime": {
+      "path": "router/evals/shadow_runtime.py",
+      "sha256": "144878e3167b6ef2f355a8765a0564d20510c01db2e447b184ee006ef6cafc03"
+    },
+    "proof_policy": {
+      "path": "configs/proof-verifier-policy-v1.json",
+      "sha256": "071772c25a4b2a331a1286ddb932185166431d460f121ea28f15da6a5812a7f0"
+    },
+    "code_policy": {
+      "path": "configs/code-verifier-policy-v1.json",
+      "sha256": "e662348a2138364ac0d65f3a9e1b0a6a28ca71591229fce37f1f6433c850acb7"
+    },
+    "grounded_policy": {
+      "path": "configs/grounded-verifier-policy-v1.json",
+      "sha256": "2acccdef10de57ee0b19e4ab4e0c65a02ae012442a7b948392c92fc017f6e369"
+    },
+    "dockerfile": {
+      "path": "Dockerfile",
+      "sha256": "4419a828888813be621b9551e03dc5dcbbeafe16862e76501038022be23a7482"
+    },
+    "docker_resource_gate": {
+      "path": "scripts/docker_resource_gate.sh",
+      "sha256": "19833d0690b2f44b60004e9690bbe21fd2b07fa8cf1b66a3e1e8b99110d2e94d"
+    }
+  },
+  "decision": {
+    "local_e2b_live_enabled": false,
+    "fallback_variant": "deterministic_fireworks",
+    "reason": "Sprint 53 local E2B policy failed probability-stability promotion; shadow evaluation must not override that decision."
+  }
+}

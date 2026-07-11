@@ -14,10 +14,14 @@ class LablabTrack1Adapter:
         tasks_payload, envelope_metadata = _coerce_tasks_payload(payload)
 
         tasks: list[TaskEnvelope] = []
+        seen_ids: set[str] = set()
         for index, item in enumerate(tasks_payload, start=1):
             if not isinstance(item, dict):
                 raise ValueError(f"lablab_track1 task {index} must be an object.")
             task_id = _coerce_task_id(item, index)
+            if task_id.value in seen_ids:
+                raise ValueError(f"lablab_track1 input contains duplicate task_id {task_id.value!r}.")
+            seen_ids.add(task_id.value)
             prompt = _coerce_prompt(item)
             if not prompt.value.strip():
                 raise ValueError(f"lablab_track1 task {task_id.value} is missing prompt text.")
@@ -38,13 +42,16 @@ class LablabTrack1Adapter:
         return tasks
 
     def format(self, results: list[AnswerResult]) -> str:
-        payload = [
-            {
-                "task_id": result.id or f"task-{index}",
-                "answer": result.answer,
-            }
-            for index, result in enumerate(results, start=1)
-        ]
+        payload: list[dict[str, str]] = []
+        seen: set[str] = set()
+        for index, result in enumerate(results, start=1):
+            task_id = result.id or f"task-{index}"
+            if task_id in seen:
+                raise ValueError(f"lablab_track1 output contains duplicate task_id {task_id!r}.")
+            if not isinstance(result.answer, str) or not result.answer.strip():
+                raise ValueError(f"lablab_track1 result {task_id!r} requires a non-empty string answer.")
+            seen.add(task_id)
+            payload.append({"task_id": task_id, "answer": result.answer})
         return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 
 

@@ -1,0 +1,22 @@
+{
+  "categories": [
+    "factual_qa",
+    "math_reasoning",
+    "sentiment",
+    "summarization",
+    "ner",
+    "code_debugging",
+    "logic_puzzle",
+    "code_generation"
+  ],
+  "inputs_sha256": "f2ebe27271d8f41aea8f4d2f59df15aa46e115864b2d7eaafa97d4b7cdb83c42",
+  "labels_are_separate_from_runtime_inputs": true,
+  "labels_sha256": "62e2a04422b83f539ef5a91389e39e9690e64aad62892e9feed51565b70a40d7",
+  "rows": 240,
+  "schema_version": "shadow-championship-manifest-v1",
+  "splits": {
+    "final_holdout": 80,
+    "train": 96,
+    "validation": 64
+  }
+}

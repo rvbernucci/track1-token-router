@@ -4,6 +4,14 @@ from time import perf_counter
 
 from router.core.contracts import AnswerResult, TaskEnvelope, TokenUsage
 from router.core.model_client import LocalModelClient, ModelClientError
+from router.core.prompts import ANSWER_PROMPT_VERSION
+
+
+E2B_PROMPT_VERSION = ANSWER_PROMPT_VERSION
+
+
+def build_e2b_messages(input_text: str) -> list[dict[str, str]]:
+    return [{"role": "user", "content": input_text}]
 
 
 class GemmaE2BRunner:
@@ -24,7 +32,7 @@ class GemmaE2BRunner:
         started = perf_counter()
         try:
             response = self.client.complete(
-                [{"role": "user", "content": task.input_text}],
+                build_e2b_messages(task.input_text),
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
                 extra_body={"max_completion_tokens": self.max_tokens},
@@ -38,6 +46,7 @@ class GemmaE2BRunner:
                 metadata={
                     "runner": "gemma_e2b",
                     "model": self.client.model,
+                    "prompt_version": E2B_PROMPT_VERSION,
                     "generation_limit_tokens": self.max_tokens,
                     "latency_e2b_ms": _elapsed_ms(started),
                     "error": str(exc),
@@ -51,6 +60,7 @@ class GemmaE2BRunner:
             metadata={
                 "runner": "gemma_e2b",
                 "model": self.client.model,
+                "prompt_version": E2B_PROMPT_VERSION,
                 "generation_limit_tokens": self.max_tokens,
                 "latency_e2b_ms": _elapsed_ms(started),
                 "local_tokens": response.usage.to_dict(),

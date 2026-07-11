@@ -17,7 +17,12 @@ if str(REPOSITORY_ROOT) not in sys.path:
 from router.core.contracts import TaskEnvelope
 from router.core.fireworks import FireworksClient
 from router.core.model_client import ModelClientError
-from router.core.prompts import M1_SYSTEM_PROMPT, build_m1_messages
+from router.core.prompts import (
+    ANSWER_PROMPT_VERSION,
+    CONCISE_ANSWER_PROMPT_VERSION,
+    CONCISE_ANSWER_SYSTEM_PROMPT,
+    build_answer_messages,
+)
 from router.core.fireworks_runner import _completion_token_policy
 from router.functiongemma.tooling import jsonl_rows
 from router.orchestration.fireworks_model_router import (
@@ -30,8 +35,8 @@ from router.orchestration.solvers import solve_deterministic
 
 
 SCHEMA_VERSION = "engine-answer-candidate-v1"
-PROMPT_VERSION = "m1-system-v1"
-SYSTEM_PROMPT = M1_SYSTEM_PROMPT
+PROMPT_VERSION = ANSWER_PROMPT_VERSION
+SYSTEM_PROMPT = ""
 
 
 def parser() -> argparse.ArgumentParser:
@@ -46,6 +51,7 @@ def parser() -> argparse.ArgumentParser:
     root.add_argument("--timeout-s", type=float, default=60.0)
     root.add_argument("--budget-usd", type=float, default=0.0)
     root.add_argument("--runtime-token-policy", action="store_true")
+    root.add_argument("--prompt-mode", choices=["raw", "concise"], default="raw")
     return root
 
 
@@ -76,6 +82,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         max_tokens=args.max_tokens,
         budget_usd=args.budget_usd,
         runtime_token_policy=args.runtime_token_policy,
+        prompt_mode=args.prompt_mode,
     )
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
     return 0
@@ -92,6 +99,7 @@ def run_experiment(
     max_tokens: int,
     budget_usd: float,
     runtime_token_policy: bool = False,
+    prompt_mode: str = "raw",
 ) -> dict[str, Any]:
     if engine not in {"deterministic", "fireworks"}:
         raise ValueError("Unsupported engine.")
@@ -99,6 +107,7 @@ def run_experiment(
         raise ValueError("max_tokens must be positive and budget_usd non-negative.")
     if engine == "fireworks" and (client is None or not model):
         raise ValueError("Fireworks collection requires a client and model.")
+    prompt_version = _prompt_version(prompt_mode)
     tasks = [_task(row) for row in jsonl_rows(tasks_path)]
     assessments = _assessment_index(jsonl_rows(assessments_path))
     existing_rows = jsonl_rows(output) if output.exists() else []
@@ -129,11 +138,11 @@ def run_experiment(
                 reasoning_effort = select_reasoning_effort(model or "", selection.tier)
                 if reasoning_effort:
                     request_options["reasoning_effort"] = reasoning_effort
-            candidate_id = _candidate_id(task_id, engine, model, task_limit)
+            candidate_id = _candidate_id(task_id, engine, model, task_limit, prompt_version=prompt_version)
             if candidate_id in completed:
                 continue
             if engine == "fireworks":
-                upper = _upper_bound_cost(model or "", task_text, task_limit)
+                upper = _upper_bound_cost(model or "", task_text, task_limit, prompt_mode=prompt_mode)
                 if spent_before + spent + upper > budget_usd + 1e-12:
                     stopped_for_budget = True
                     break
@@ -146,6 +155,8 @@ def run_experiment(
                     client=client,
                     max_tokens=task_limit,
                     request_options=request_options,
+                    prompt_mode=prompt_mode,
+                    prompt_version=prompt_version,
                 )
                 spent += float(row["billable_cost_usd"])
                 if spent > budget_usd + 1e-12:
@@ -173,6 +184,8 @@ def run_experiment(
         "budget_usd": budget_usd,
         "stopped_for_budget": stopped_for_budget,
         "runtime_token_policy": runtime_token_policy,
+        "prompt_mode": prompt_mode,
+        "prompt_version": prompt_version if engine == "fireworks" else None,
     }
 
 
@@ -186,11 +199,13 @@ def _fireworks_candidate(
     client: Any,
     max_tokens: int,
     request_options: Mapping[str, Any],
+    prompt_mode: str,
+    prompt_version: str,
 ) -> dict[str, Any]:
     started = time.monotonic()
     try:
         response = client.complete(
-            build_m1_messages(TaskEnvelope(id=task_id, input_text=task_text)),
+            build_answer_messages(TaskEnvelope(id=task_id, input_text=task_text), mode=prompt_mode),
             temperature=0.0,
             max_tokens=max_tokens,
             extra_body=dict(request_options),
@@ -205,7 +220,7 @@ def _fireworks_candidate(
             task_text=task_text,
             assessment=assessment,
             engine="fireworks",
-            engine_version=f"fireworks-openai-{PROMPT_VERSION}",
+            engine_version=f"fireworks-openai-{prompt_version}",
             model_id=model,
             answer=response.text.strip(),
             status=status,
@@ -216,6 +231,7 @@ def _fireworks_candidate(
             billable_cost_usd=cost,
             error="" if status == "answered" else "empty_answer",
             request_options=request_options,
+            prompt_version=prompt_version,
         )
     except ModelClientError as exc:
         return _candidate_row(
@@ -224,7 +240,7 @@ def _fireworks_candidate(
             task_text=task_text,
             assessment=assessment,
             engine="fireworks",
-            engine_version=f"fireworks-openai-{PROMPT_VERSION}",
+            engine_version=f"fireworks-openai-{prompt_version}",
             model_id=model,
             answer="",
             status="runtime_failure",
@@ -235,6 +251,7 @@ def _fireworks_candidate(
             billable_cost_usd=0.0,
             error=str(exc),
             request_options=request_options,
+            prompt_version=prompt_version,
         )
 
 
@@ -283,6 +300,7 @@ def _candidate_row(
     error: str,
     solver_name: str | None = None,
     request_options: Mapping[str, Any] | None = None,
+    prompt_version: str | None = None,
 ) -> dict[str, Any]:
     return {
         "schema_version": SCHEMA_VERSION,
@@ -293,7 +311,7 @@ def _candidate_row(
         "engine": engine,
         "engine_version": engine_version,
         "model_id": model_id,
-        "prompt_version": PROMPT_VERSION if engine == "fireworks" else None,
+        "prompt_version": prompt_version if engine == "fireworks" else None,
         "solver_name": solver_name,
         "answer": answer,
         "status": status,
@@ -325,14 +343,30 @@ def _assessment_index(rows: Sequence[Mapping[str, Any]]) -> dict[str, Mapping[st
     return result
 
 
-def _candidate_id(task_id: str, engine: str, model: str | None, max_tokens: int) -> str:
-    raw = f"{task_id}\0{engine}\0{model or ''}\0{max_tokens}\0{PROMPT_VERSION}"
+def _candidate_id(
+    task_id: str,
+    engine: str,
+    model: str | None,
+    max_tokens: int,
+    *,
+    prompt_version: str = PROMPT_VERSION,
+) -> str:
+    raw = f"{task_id}\0{engine}\0{model or ''}\0{max_tokens}\0{prompt_version}"
     return "candidate_" + hashlib.sha256(raw.encode("utf-8")).hexdigest()[:20]
 
 
-def _upper_bound_cost(model: str, task_text: str, max_tokens: int) -> float:
-    prompt_tokens = max(1, (len(SYSTEM_PROMPT.encode("utf-8")) + len(task_text.encode("utf-8")) + 3) // 4)
+def _upper_bound_cost(model: str, task_text: str, max_tokens: int, *, prompt_mode: str = "raw") -> float:
+    system_prompt = CONCISE_ANSWER_SYSTEM_PROMPT if prompt_mode == "concise" else SYSTEM_PROMPT
+    prompt_tokens = max(1, (len(system_prompt.encode("utf-8")) + len(task_text.encode("utf-8")) + 3) // 4)
     return _usage_cost(model, prompt_tokens, max_tokens)
+
+
+def _prompt_version(prompt_mode: str) -> str:
+    if prompt_mode == "raw":
+        return ANSWER_PROMPT_VERSION
+    if prompt_mode == "concise":
+        return CONCISE_ANSWER_PROMPT_VERSION
+    raise ValueError(f"Unknown prompt mode {prompt_mode!r}.")
 
 
 def _usage_cost(model: str, prompt_tokens: int, completion_tokens: int) -> float:

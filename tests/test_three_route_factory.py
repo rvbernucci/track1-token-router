@@ -21,6 +21,8 @@ ENV = {
     "OUTCOME_MODELS_SHA256": "927a64303501d43f3b509a8f48d397d372c4211f8347890827206e82bda60712",
     "E2B_ROUTE_POLICY": "configs/e2b-route-policy-v1.json",
     "E2B_ROUTE_POLICY_SHA256": "24607dda80f861ecde022987111302590b0e17a61842ad5b3e0b17302047c4ad",
+    "E2B_SELECTIVE_POLICY": "configs/e2b-selective-policy-v1.json",
+    "E2B_SELECTIVE_POLICY_SHA256": "d65caea1cccf0ee4173fbfedbd1ba9c580642608e4def45c5f0cff9dff9a6a6b",
 }
 
 
@@ -31,6 +33,8 @@ class ThreeRouteFactoryTests(unittest.TestCase):
             runner = build_runner(config, JsonlRunLogger(Path(tmp) / "run.jsonl"))
         self.assertIsInstance(runner, ThreeRouteRunner)
         self.assertFalse(runner.selector.e2b_enabled)
+        self.assertIsNotNone(runner.selective_policy)
+        self.assertFalse(runner.selective_policy.enabled)
 
     def test_bad_artifact_hash_fails_closed(self):
         env = {**ENV, "OUTCOME_MODELS_SHA256": "0" * 64}

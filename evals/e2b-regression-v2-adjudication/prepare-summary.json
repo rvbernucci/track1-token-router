@@ -1,0 +1,15 @@
+{
+  "contract_changed": 335,
+  "contract_invalid": 297,
+  "development": 1600,
+  "idempotent": 1993,
+  "judge_queue": 830,
+  "mechanical": {
+    "correct": 578,
+    "incorrect": 592,
+    "uncertain": 830
+  },
+  "non_idempotent_quarantined": 7,
+  "rows": 2000,
+  "sealed_final": 400
+}

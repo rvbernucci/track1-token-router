@@ -2,7 +2,7 @@
 
 ## Championship Runtime Finding
 
-On the frozen validation/test corpus, omitting `reasoning_effort` for strong Minimax M3 tasks produced repeated OpenAI-compatible responses without usable `message.content`. The same model completed the earlier 571-task run without this failure when `reasoning_effort="none"` was present. The promoted router therefore sends `none` for Minimax and Kimi in every tier, while Gemma continues to omit the unsupported field. The exact-runtime `v4` baseline reproduces `M1_SYSTEM_PROMPT`, dynamic completion caps, `user`, temperature and reasoning options.
+On the frozen validation/test corpus, omitting `reasoning_effort` for strong Minimax M3 tasks produced repeated OpenAI-compatible responses without usable `message.content`. The same model completed the earlier 571-task run without this failure when `reasoning_effort="none"` was present. The router therefore sends `none` for Minimax and Kimi in every tier, while Gemma continues to omit the unsupported field. The historical exact-runtime `v4` baseline used `M1_SYSTEM_PROMPT`; it is retained as evidence but is not directly comparable with the current `raw-prompt-v1` runtime.
 
 The exact-runtime baseline uses cross-model judging: Kimi judges Minimax candidates, Minimax judges Kimi candidates, and Gemini 3.5 Flash Medium independently judges both sets. A model never judges its own answer. Only unanimous decisions become binary outcomes; disagreement remains conservatively not correct for policy comparison. Claude Sonnet 5 rows collected during a slow subscription-CLI pilot are retained as auxiliary provenance but are not members of the pinned baseline judge policy.
 
@@ -10,7 +10,9 @@ The competition selector now treats Fireworks tokens, not API dollar price, as t
 
 ## Frozen 571-Task Baseline
 
-The larger exact-runtime experiment evaluates the frozen validation and locked-test portions of the 2,000-task corpus. Both candidates receive the same user task, `M1_SYSTEM_PROMPT`, temperature, dynamic token cap, `reasoning_effort="none"` and request metadata used by the runtime.
+The larger historical exact-runtime experiment evaluates the frozen validation and locked-test portions of the 2,000-task corpus. Both candidates received the same user task, legacy `M1_SYSTEM_PROMPT`, temperature, dynamic token cap, `reasoning_effort="none"` and request metadata. New promotion evidence must use `raw-prompt-v1`, where the answer model receives only the user prompt.
+
+The 240-task concise-system ablation rejected an additional brevity prompt. It preserved 75% accuracy but increased total Fireworks tokens by 33.5%, adding 5,520 prompt tokens while saving only eight completion tokens. Output brevity must therefore come from the original task, dynamic completion ceilings, validated structured decoding, and local Answer Contract normalization rather than a global system instruction.
 
 | Model | Answered | Fireworks tokens | Validation conservative accuracy | Locked-test conservative accuracy | Locked-test avg tokens |
 | --- | ---: | ---: | ---: | ---: | ---: |

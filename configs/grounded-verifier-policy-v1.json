@@ -1,0 +1,43 @@
+{
+  "schema_version": "grounded-verifier-policy-v1",
+  "default_enabled": true,
+  "evidence": {
+    "dataset_path": "evals/grounded-verifier/grounded-holdout.jsonl",
+    "dataset_sha256": "36f2e8b336087312861d107f39f0aa7f4384484c827007c8f1bb5ace3a1c5a02",
+    "engine_path": "router/orchestration/grounded_verifier.py",
+    "engine_sha256": "743f8b3ce163a33eb308b8d376facc9c78b834ba0f245a911e0bbaadf19a1832",
+    "evaluation_path": "reports/generated/grounded-verifier-evaluation.json",
+    "evaluation_gate": {
+      "minimum_rows": 129,
+      "minimum_verified_releases": 60,
+      "minimum_source_span_precision": 1.0,
+      "minimum_expected_evidence_recall": 1.0,
+      "required_false_positives": 0
+    }
+  },
+  "cohorts": {
+    "context_qa_unique_support": {"enabled": true},
+    "context_qa_open_world": {"enabled": false},
+    "ner_payment_and_typed_spans": {"enabled": true},
+    "ner_ambiguous_or_overlapping": {"enabled": false},
+    "sentiment_en_high_margin": {"enabled": true, "minimum_margin": 2},
+    "sentiment_pt_high_margin": {"enabled": true, "minimum_margin": 2},
+    "sentiment_mixed_sarcastic_or_implicit": {"enabled": false},
+    "summary_extractive_grounded": {"enabled": true},
+    "summary_abstractive": {"enabled": false}
+  },
+  "invariants": {
+    "answer_contract_source_isolation": true,
+    "candidate_model_must_agree_for_sentiment": true,
+    "every_released_fact_requires_source_span": true,
+    "no_embedding_similarity_as_proof": true,
+    "no_llm_override_of_failed_grounding": true
+  },
+  "promotion": {
+    "minimum_cohort_precision": 0.9,
+    "require_context_unique_support": true,
+    "require_exact_source_offsets": true,
+    "require_zero_false_releases": true
+  },
+  "reason": "Sprint 52 gate passed: 129 fresh rows, 60 verified releases, 69 safe refusals, 114 exact spans, zero false releases across all four independently gated cohorts, including source-instruction injection attacks."
+}

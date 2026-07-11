@@ -1,0 +1,131 @@
+{
+  "artifacts": {
+    "generated_candidates": {
+      "bytes": 3828408,
+      "path": "evals/e2b-regression-v2/raw/generated-candidates.jsonl",
+      "sha256": "661250f609fe823323d4ae96a57bd05a8bb034a74c6171f7736024f5964e84a7"
+    },
+    "inputs_final_holdout": {
+      "bytes": 271443,
+      "path": "evals/e2b-regression-v2/inputs/final_holdout.jsonl",
+      "sha256": "ae7a992c19731edbcced8f821148c28c7d488fa49ad2353fb80cf93a4bef4c54"
+    },
+    "inputs_train": {
+      "bytes": 790698,
+      "path": "evals/e2b-regression-v2/inputs/train.jsonl",
+      "sha256": "2e8ff40ea4d42df481cc3884a08d7729954a7e56094f781064436d3c8833a31e"
+    },
+    "inputs_validation": {
+      "bytes": 260228,
+      "path": "evals/e2b-regression-v2/inputs/validation.jsonl",
+      "sha256": "9b2be25e8622c151b425f2dbccee82d4586a41a9fc00b6237d4711edbe9716b3"
+    },
+    "lineage_map": {
+      "bytes": 347050,
+      "path": "evals/e2b-regression-v2/lineage-map.jsonl",
+      "sha256": "f9cdb7db76fadf3042b7ee5b2afee55dc5456e6f07858f5d6cb554e4ed97b366"
+    },
+    "metadata": {
+      "bytes": 1657300,
+      "path": "evals/e2b-regression-v2/metadata.jsonl",
+      "sha256": "33d1388c007c7b8b3eeda04f28e705fac6f315ef1236569c1e33490cb5c896a0"
+    },
+    "plan": {
+      "bytes": 1215551,
+      "path": "evals/e2b-regression-v2/plan.jsonl",
+      "sha256": "922effc49c9cde4014161ab13d3ccfb2e37ba52d9c5376080a5a651151507bc7"
+    },
+    "references_final_holdout": {
+      "bytes": 214683,
+      "path": "evals/e2b-regression-v2/sealed/final_holdout.jsonl",
+      "sha256": "60f18cc585912a9b9c55a1c76abfad2717fd96814989b1f9f76c6748d502b16f"
+    },
+    "references_train": {
+      "bytes": 645521,
+      "path": "evals/e2b-regression-v2/references/train.jsonl",
+      "sha256": "d8bb429573f8f8bd515803ce6c437e76b62d1562cfc45ede9706fc4c0f514b44"
+    },
+    "references_validation": {
+      "bytes": 221436,
+      "path": "evals/e2b-regression-v2/references/validation.jsonl",
+      "sha256": "9d42c4494de3d7f814acadec1e44fe197c3a5dd152fd59441a4d739925a2c342"
+    }
+  },
+  "audits": {
+    "exact_duplicate_prompts": 0,
+    "gates": {
+      "exact_population": true,
+      "exact_split_counts": true,
+      "generator_excluded_from_eligible_judges": true,
+      "lineage_template_seed_disjoint": true,
+      "minimum_boundary_coverage": true,
+      "minimum_development_lineages": true,
+      "minimum_output_contract_coverage": true,
+      "no_exact_duplicate_prompts": true,
+      "no_near_duplicate_cross_lineage_pairs": true,
+      "no_quarantined_prompts": true,
+      "provider_balance": true
+    },
+    "near_duplicate_cross_lineage_pairs": 0,
+    "quarantined_prompts": 0
+  },
+  "judge_policy": {
+    "available": [
+      "agy",
+      "fireworks",
+      "codex"
+    ],
+    "exclude_generator_provider": true
+  },
+  "lineages": 1000,
+  "provider_models": {
+    "agy": "Gemini 3.5 Flash (Medium)",
+    "fireworks": "accounts/fireworks/models/minimax-m3"
+  },
+  "rows": 2000,
+  "schema_version": "e2b-regression-v2-corpus-manifest-v1",
+  "seed": 55059,
+  "summary": {
+    "boundary_cases": 500,
+    "categories": {
+      "code_debugging": 250,
+      "code_generation": 250,
+      "factual_qa": 250,
+      "logic_puzzle": 250,
+      "math_reasoning": 250,
+      "ner": 250,
+      "sentiment": 250,
+      "summarization": 250
+    },
+    "evidence_modes": {
+      "grounded": 622,
+      "mechanical": 1000,
+      "semantic": 378
+    },
+    "languages": {
+      "en": 1600,
+      "es": 200,
+      "pt-BR": 200
+    },
+    "lineages": 1000,
+    "mutations": {
+      "canonical": 1000,
+      "long_context": 200,
+      "paraphrase": 200,
+      "prompt_injection": 200,
+      "strict_format": 200,
+      "typo": 200
+    },
+    "output_contract_variants": 400,
+    "providers": {
+      "agy": 1000,
+      "fireworks": 1000
+    },
+    "rows": 2000,
+    "splits": {
+      "final_holdout": 400,
+      "train": 1200,
+      "validation": 400
+    }
+  }
+}

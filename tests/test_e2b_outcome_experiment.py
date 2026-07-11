@@ -63,6 +63,8 @@ class E2BOutcomeExperimentTests(unittest.TestCase):
         payload = json.loads(request.data)
         self.assertEqual(payload["max_completion_tokens"], 16)
         self.assertEqual(payload["max_tokens"], 16)
+        self.assertEqual(payload["messages"], [{"role": "user", "content": "question"}])
+        self.assertEqual(row["prompt_version"], "raw-prompt-v1")
 
     @patch("urllib.request.urlopen")
     def test_run_is_append_only_and_resumable(self, urlopen) -> None:

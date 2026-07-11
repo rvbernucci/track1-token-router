@@ -1,10 +1,17 @@
 import unittest
 
-from router.dataset_forge.providers import FireworksDatasetProvider
+from router.dataset_forge.providers import FireworksDatasetProvider, ProviderError, _parse_json_object
 from tests.fake_openai_server import FakeOpenAIServer
 
 
 class FireworksDatasetProviderTests(unittest.TestCase):
+    def test_structured_parser_preserves_first_complete_object_with_trailing_output(self) -> None:
+        self.assertEqual(_parse_json_object('{"items": []}\n{"duplicate": true}', "test"), {"items": []})
+
+    def test_structured_parser_rejects_malformed_first_object(self) -> None:
+        with self.assertRaises(ProviderError):
+            _parse_json_object('prefix {"items": []}', "test")
+
     def test_minimax_judge_uses_proven_reasoning_option(self):
         with FakeOpenAIServer(response_text='{"judgments": []}') as server:
             provider = FireworksDatasetProvider(

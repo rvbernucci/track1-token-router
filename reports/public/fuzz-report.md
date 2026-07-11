@@ -4,7 +4,7 @@
 - contract_success: `True`
 - traces_complete: `True`
 - exact_match_rate: `1.0`
-- final_answer_repaired: `2`
+- final_answer_repaired: `1`
 - remote_would_call: `0`
 - routes: `{"guardrail_arithmetic": 2, "guardrail_echo": 4, "guardrail_empty": 2, "guardrail_greeting": 1, "m1_approved": 4, "m2b_candidate": 1, "solver_json_transform": 2}`
 

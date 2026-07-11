@@ -1,0 +1,24 @@
+{
+  "correct_to_binary": 1,
+  "default_enabled": false,
+  "development_candidates_sha256": "09330d648b251349ddc9c123a19fd33602b5bd2aa44fbe0eb340d44395906b46",
+  "development_labels_sha256": "1a4ba53bba5bf849b632f847b6bb33cb10355cecc9c80ec2159ce7ef441a4fec",
+  "generator_may_not_be_sole_judge": true,
+  "incorrect_to_binary": 0,
+  "invalid_assessment_route": "fireworks",
+  "judge_consensus_required": 2,
+  "judge_ledgers_sha256": {
+    "development_adjudicator": "4e0db7a41675316f844c3e17be736da45b30c16f9758aed695edaeb60a6e0498",
+    "development_agy": "72494ea250c384d589ecf36bd6ce496d81daaa1eb27eecfa860715f9d2501db2",
+    "development_fireworks": "bf858cd0c3755f6343ad4a41e715e1dea51d4eff14cbb87f5dcd8f53b6254c5a",
+    "sealed_adjudicator": "fd330e8bb00e43ae5e57919411c47cf7d0f3b8c39ed01bc50b44967e1660b327",
+    "sealed_agy": "01e9e3f57ef0bdb9fd3cfea780ae4e444d551493e65c1cab1db79094529eac9c",
+    "sealed_fireworks": "e861dd3bd5f313dd6469d4cefdd62de95307971307a130d720a329859a99ba5e"
+  },
+  "mechanical_precedence": true,
+  "schema_version": "e2b-regression-v2-label-policy-v1",
+  "sealed_final_candidates_sha256": "a2014f40e1866f85193c79bedbe28405bfa9ef52cd6c58006716ab99ba2b0b24",
+  "sealed_final_labels_sha256": "c4926749e8eeb47300e7d22bc2af4b91e18d55d4e1d460d8366dfb8c9e425170",
+  "third_judge_on_pair_disagreement": true,
+  "uncertain_to_binary": 0
+}

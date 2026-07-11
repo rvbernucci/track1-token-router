@@ -1,0 +1,22 @@
+{
+  "all_runtime_solver_refusals": true,
+  "deterministic_acceptances_excluded": 0,
+  "evaluator_counts": {
+    "exact": 120,
+    "json_object": 60,
+    "label": 60
+  },
+  "generation_policy": "template_combinatorics_with_gold_known_before_model_inference",
+  "intent_counts": {
+    "factual_qa": 60,
+    "ner": 60,
+    "sentiment": 60,
+    "summarization": 60
+  },
+  "output_sha256": "1c13229e98103d365011ccf5d8d556baf7ea4517ce6dab4515237563c2cfbb87",
+  "per_intent": 60,
+  "promotion_use": "fresh_holdout_only; never fit thresholds or coefficients on these rows",
+  "rows": 240,
+  "schema_version": "e2b-mechanical-holdout-v1",
+  "seed": 4927
+}

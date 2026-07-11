@@ -14,10 +14,12 @@ class _Client:
     def __init__(self) -> None:
         self.calls = 0
         self.max_tokens = []
+        self.messages = []
 
-    def complete(self, *_args, **kwargs) -> ModelResponse:
+    def complete(self, *args, **kwargs) -> ModelResponse:
         self.calls += 1
         self.max_tokens.append(kwargs["max_tokens"])
+        self.messages.append(args[0])
         return ModelResponse("answer", TokenUsage(prompt=10, completion=2, total=12))
 
 
@@ -64,6 +66,36 @@ class EngineCandidateExperimentTests(unittest.TestCase):
         self.assertEqual(client.calls, 1)
         self.assertEqual(row["id"], _candidate_id("one", "fireworks", row["model_id"], 16))
         self.assertEqual(row["status"], "answered")
+        self.assertEqual(row["prompt_version"], "raw-prompt-v1")
+
+    def test_concise_prompt_mode_is_explicit_and_versioned(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            tasks = root / "tasks.jsonl"
+            assessments = root / "assessments.jsonl"
+            output = root / "candidates.jsonl"
+            tasks.write_text(
+                json.dumps({"id": "one", "messages": [{"role": "developer"}, {"content": "task"}]}) + "\n",
+                encoding="utf-8",
+            )
+            assessments.write_text("", encoding="utf-8")
+            client = _Client()
+
+            run_experiment(
+                tasks_path=tasks,
+                assessments_path=assessments,
+                output=output,
+                engine="fireworks",
+                model="accounts/fireworks/models/kimi-k2p7-code",
+                client=client,
+                max_tokens=16,
+                budget_usd=1.0,
+                prompt_mode="concise",
+            )
+            row = json.loads(output.read_text())
+
+        self.assertEqual(row["prompt_version"], "concise-system-v1")
+        self.assertEqual([message["role"] for message in client.messages[0]], ["system", "user"])
 
     def test_zero_budget_stops_before_fireworks_call(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

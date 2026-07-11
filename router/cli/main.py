@@ -16,6 +16,7 @@ from router.core.contracts import AnswerResult, TaskEnvelope
 from router.core.logging import JsonlRunLogger
 from router.core.runner import TaskRunner
 from router.core.runner_factory import build_runner
+from router.orchestration.final_validator import finalize_answer_result
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -57,6 +58,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     try:
         config = RouterConfig.from_env()
+        if args.command == "submit-track1":
+            _validate_track1_runtime_environment(config)
         logger = JsonlRunLogger(config.log_path)
         runner = build_runner(config, logger)
         if args.command == "ask":
@@ -75,6 +78,26 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     parser.error(f"Unknown command: {args.command}")
     return 2
+
+
+def _validate_track1_runtime_environment(config: RouterConfig) -> None:
+    remote_modes = {"fireworks", "three_route", "hybrid"}
+    uses_fireworks = config.mode.casefold() in remote_modes or (
+        config.mode.casefold() == "competition" and not config.competition_dry_run
+    )
+    if not uses_fireworks:
+        return
+    missing = [
+        name
+        for name in ("FIREWORKS_API_KEY", "FIREWORKS_BASE_URL", "ALLOWED_MODELS")
+        if not os.environ.get(name, "").strip()
+    ]
+    if missing:
+        raise ValueError("Official Fireworks runtime requires harness variables: " + ", ".join(missing))
+    if not config.allowed_models:
+        raise ValueError("ALLOWED_MODELS did not contain any valid model IDs.")
+    if config.fireworks_model not in config.allowed_models:
+        raise ValueError("Selected Fireworks model is not authorized by ALLOWED_MODELS.")
 
 
 def _handle_ask(args: argparse.Namespace, runner: TaskRunner) -> int:
@@ -120,11 +143,11 @@ def _handle_submit_track1(args: argparse.Namespace, runner: TaskRunner) -> int:
     results = []
     for task in tasks:
         if _runtime_budget_exhausted(started_at, max_runtime_s, reserve_s):
-            results.append(_track1_timeout_result(task, started_at, max_runtime_s, reserve_s))
+            results.append(finalize_answer_result(task, _track1_timeout_result(task, started_at, max_runtime_s, reserve_s)))
             continue
-        results.append(runner.run(task))
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(adapter.format(results), encoding="utf-8")
+        results.append(finalize_answer_result(task, runner.run(task)))
+    _validate_track1_alignment(tasks, results)
+    _write_atomic_text(args.output, adapter.format(results))
     _write_optional_resource_report(started_at, tasks=len(tasks), results=len(results))
     print(json.dumps({"tasks": len(results), "out": str(args.output)}, ensure_ascii=False), file=sys.stderr)
     return 0
@@ -132,6 +155,28 @@ def _handle_submit_track1(args: argparse.Namespace, runner: TaskRunner) -> int:
 
 def _runtime_budget_exhausted(started_at: float, max_runtime_s: float, reserve_s: float) -> bool:
     return (perf_counter() - started_at) >= max(0.0, max_runtime_s - reserve_s)
+
+
+def _write_atomic_text(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    try:
+        with temporary.open("w", encoding="utf-8") as handle:
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary.replace(path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def _validate_track1_alignment(tasks: list[TaskEnvelope], results: list[AnswerResult]) -> None:
+    task_ids = [task.id for task in tasks]
+    result_ids = [result.id for result in results]
+    if len(task_ids) != len(set(task_ids)):
+        raise ValueError("Track 1 input contains duplicate task_id values.")
+    if result_ids != task_ids:
+        raise ValueError("Track 1 results must preserve the exact input task_id order and cardinality.")
 
 
 def _track1_timeout_result(

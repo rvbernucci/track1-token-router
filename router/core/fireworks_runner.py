@@ -11,21 +11,29 @@ from router.core.contracts import AnswerResult, TaskEnvelope, TokenUsage
 from router.core.fireworks import FireworksClient
 from router.core.logging import JsonlRunLogger
 from router.core.model_client import ModelClientError, ModelResponse
-from router.core.prompts import build_m1_messages
+from router.core.prompts import ANSWER_PROMPT_VERSION, build_m1_messages
 from router.orchestration.fireworks_model_router import (
     normalize_fireworks_model_id,
     select_fireworks_model,
     select_reasoning_effort,
 )
 from router.orchestration.fireworks_intent_policy import FireworksIntentPolicy
-from router.orchestration.final_validator import validate_final_answer
+from router.orchestration.final_validator import (
+    AnswerContractKind,
+    infer_answer_contract,
+    validate_final_answer,
+    validate_or_safely_repair_final_answer,
+)
 from router.orchestration.matrix_regression_selector import (
     MatrixRegressionWeights,
     load_weights,
     select_model_by_matrix_regression,
 )
-from router.orchestration.prompt_packet import extract_literal_echo, infer_expected_format
+from router.orchestration.prompt_packet import extract_literal_echo
 from router.orchestration.solvers import solve_deterministic
+
+
+FIREWORKS_COMPLETION_POLICY_VERSION = "compact-contract-v2"
 
 
 class FireworksDirectRunner:
@@ -89,8 +97,10 @@ class FireworksDirectRunner:
         invalid_attempts: list[dict[str, object]] = []
         response: ModelResponse | None = None
         final_validation = None
+        safe_validation = None
         last_invalid_response: ModelResponse | None = None
         last_invalid_validation = None
+        last_invalid_safe_validation = None
         total_usage = TokenUsage.empty()
         token_policy = _completion_token_policy(
             task,
@@ -123,10 +133,10 @@ class FireworksDirectRunner:
                     )
                     total_usage = _add_usage(total_usage, response.usage)
                     final_validation = validate_final_answer(task, response.text)
+                    safe_validation = validate_or_safely_repair_final_answer(task, response.text)
                     if (
-                        not final_validation.valid
-                        and not final_validation.repaired_answer
-                        and _should_retry_invalid_final_answer(final_validation.reason)
+                        not safe_validation.valid
+                        and _should_retry_invalid_final_answer(safe_validation.reason)
                     ):
                         invalid_attempts.append(
                             {
@@ -139,6 +149,7 @@ class FireworksDirectRunner:
                         )
                         last_invalid_response = response
                         last_invalid_validation = final_validation
+                        last_invalid_safe_validation = safe_validation
                         response = None
                         continue
                     break
@@ -146,11 +157,11 @@ class FireworksDirectRunner:
                     response = fallback.response
                     total_usage = _add_usage(total_usage, response.usage)
                     final_validation = validate_final_answer(task, response.text)
+                    safe_validation = validate_or_safely_repair_final_answer(task, response.text)
                     request_options_fallback = fallback.reason
                     if (
-                        not final_validation.valid
-                        and not final_validation.repaired_answer
-                        and _should_retry_invalid_final_answer(final_validation.reason)
+                        not safe_validation.valid
+                        and _should_retry_invalid_final_answer(safe_validation.reason)
                     ):
                         invalid_attempts.append(
                             {
@@ -163,6 +174,7 @@ class FireworksDirectRunner:
                         )
                         last_invalid_response = response
                         last_invalid_validation = final_validation
+                        last_invalid_safe_validation = safe_validation
                         response = None
                         continue
                     break
@@ -180,6 +192,7 @@ class FireworksDirectRunner:
         if response is None and last_invalid_response is not None:
             response = last_invalid_response
             final_validation = last_invalid_validation
+            safe_validation = last_invalid_safe_validation
 
         if response is None:
             latency_ms = _elapsed_ms(started_at)
@@ -190,6 +203,7 @@ class FireworksDirectRunner:
                 remote_tokens=TokenUsage.empty(),
                 metadata={
                     "runner": "fireworks_direct",
+                    "answer_prompt_version": ANSWER_PROMPT_VERSION,
                     "fireworks_model": selected_model,
                     "fireworks_model_selection": selection.to_dict(),
                     "fireworks_matrix_selection": matrix_selection,
@@ -224,7 +238,9 @@ class FireworksDirectRunner:
         latency_ms = _elapsed_ms(started_at)
         if final_validation is None:
             final_validation = validate_final_answer(task, response.text)
-        final_answer = final_validation.repaired_answer if not final_validation.valid and final_validation.repaired_answer else response.text
+        if safe_validation is None:
+            safe_validation = validate_or_safely_repair_final_answer(task, response.text)
+        final_answer = safe_validation.repaired_answer if safe_validation.valid and safe_validation.repaired_answer else response.text
         result = AnswerResult(
             id=task.id,
             answer=final_answer,
@@ -232,6 +248,7 @@ class FireworksDirectRunner:
             remote_tokens=total_usage,
             metadata={
                 "runner": "fireworks_direct",
+                "answer_prompt_version": ANSWER_PROMPT_VERSION,
                 "fireworks_model": selected_model,
                 "fireworks_model_selection": selection.to_dict(),
                 "fireworks_matrix_selection": matrix_selection,
@@ -245,6 +262,7 @@ class FireworksDirectRunner:
                 "fireworks_unavailable_models": sorted(self._unavailable_models),
                 "latency_fireworks_ms": latency_ms,
                 "final_validation": final_validation.to_dict(),
+                "safe_final_validation": safe_validation.to_dict(),
                 "final_answer_repaired": final_answer != response.text,
             },
         )
@@ -379,11 +397,13 @@ def _completion_token_policy(
     domain: str,
     configured_max_tokens: int,
 ) -> dict[str, object]:
-    expected_format = infer_expected_format(task)
+    contract = infer_answer_contract(task)
+    expected_format = contract.kind.value
     policy_cap = _completion_token_cap(task, expected_format=expected_format, tier=tier, domain=domain)
     configured_cap = max(1, configured_max_tokens)
     max_tokens = min(configured_cap, policy_cap)
     return {
+        "policy_version": FIREWORKS_COMPLETION_POLICY_VERSION,
         "max_tokens": max_tokens,
         "configured_max_tokens": configured_cap,
         "policy_cap": policy_cap,
@@ -398,6 +418,8 @@ def _completion_token_cap(task: TaskEnvelope, *, expected_format: str, tier: str
     lowered = text.lower()
     if expected_format == "yes_no":
         return 8
+    if expected_format == AnswerContractKind.LABEL.value:
+        return 8
     if expected_format == "number":
         if domain == "math_reasoning" and tier == "strong":
             return 48
@@ -410,6 +432,8 @@ def _completion_token_cap(task: TaskEnvelope, *, expected_format: str, tier: str
     if expected_format == "uppercase":
         return _bounded_token_cap(_approx_tokens_for_chars(len(text)) + 16, lower=32, upper=160)
     if expected_format == "json":
+        if infer_answer_contract(task).json_keys:
+            return 96
         return _bounded_token_cap(_approx_tokens_for_chars(len(text)) + 48, lower=96, upper=224)
     if expected_format == "code":
         return 384
@@ -419,6 +443,11 @@ def _completion_token_cap(task: TaskEnvelope, *, expected_format: str, tier: str
         return _bounded_token_cap(math.ceil(explicit_word_cap * 1.5) + 16, lower=32, upper=224)
     if re.search(r"\b(one|single)\s+(word|label|sentence)\b", lowered):
         return 48
+    if re.search(
+        r"\b(?:return|provide|answer with)\s+only\s+(?:the\s+)?(?:access\s+code|code|value|name|entity|word|answer)\b",
+        lowered,
+    ):
+        return 24
     if domain in {"classification", "formatting"} or tier == "cheap":
         return 64
     if domain in {"extraction", "summarization"}:

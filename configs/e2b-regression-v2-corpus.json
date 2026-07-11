@@ -1,0 +1,18 @@
+{
+  "default_enabled": false,
+  "final_holdout_policy": "sealed_one_time_promotion_only",
+  "fit_splits": [
+    "train",
+    "validation"
+  ],
+  "manifest": {
+    "path": "evals/e2b-regression-v2/manifest.json",
+    "sha256": "5997eaefb6fb0350145d3faa1ae79d008e3fd67ec025afb6475edea7decb7902"
+  },
+  "promotion_split": "final_holdout",
+  "provider_models": {
+    "agy": "Gemini 3.5 Flash (Medium)",
+    "fireworks": "accounts/fireworks/models/minimax-m3"
+  },
+  "schema_version": "e2b-regression-v2-corpus-config-v1"
+}

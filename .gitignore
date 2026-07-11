@@ -24,9 +24,21 @@ logs/*.jsonl
 logs/*.log
 runs/
 reports/generated/
+reports/amd-return/
 data/dataset-forge/
 data/e2b-regression-2000/
 artifacts/
+
+# Sealed evaluation references, answers and judge ledgers must never be published.
+evals/e2b-regression-v2/sealed/
+evals/e2b-regression-v2-adjudication/sealed/
+evals/e2b-regression-v2-championship/sealed/
+
+# Ephemeral experiment process state and high-frequency resource samples.
+evals/**/state/
+evals/**/metrics/
+evals/**/quarantine/
+evals/**/*.lock
 
 # OS/editor noise
 .DS_Store

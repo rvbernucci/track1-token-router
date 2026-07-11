@@ -65,6 +65,39 @@ The promoted 93-task run, combined-memory run and 2,000-task regression experime
 - no speculative draft model until baseline memory and latency pass.
 - system packages: `libvulkan1`, `mesa-vulkan-drivers` and GNU `time` for the benchmark image.
 
+## Output Contract And Failure Analysis
+
+The answer runtime and experiments now share the pinned `raw-prompt-v1`
+protocol. E2B receives one user message containing exactly the original prompt:
+no `task_id`, JSON envelope, routing scores, inferred contract or system prompt.
+This minimizes local prefill and prevents orchestration metadata from changing
+the model's interpretation of the task.
+
+Format responsibility moves to the deterministic Answer Contract Engine. It
+infers explicit constraints from the same original prompt, normalizes the raw
+candidate only when the transformation is unique, validates the result, and
+then returns the string to the official JSON adapter. The original 2,000-task
+raw-prompt run did not have this post-generation engine, so a fresh holdout is
+required before making a championship claim.
+
+Failure decomposition from the frozen original matrix:
+
+| Population | Non-approved | Invalid format | Valid format but wrong/uncertain |
+|---|---:|---:|---:|
+| All evaluated rows | 1,272 | 1,105 (86.9%) | 167 (13.1%) |
+| Old selector region | 43 | 27 (62.8%) | 16 (37.2%) |
+
+Therefore format is the dominant observed failure, but it is not the only one.
+The router must never treat format repair as proof of semantic correctness.
+After generation, the selective gate rejects malformed output, refusals,
+explicit constraint violations, noncanonical sentiment labels, and candidates
+below its calibrated post-response probability.
+
+The current selective policy is intentionally `default_enabled=false`. It tied
+the Kimi baseline on validation while saving 7,418 Fireworks tokens, but lost
+nine answers on the old locked test. It can be promoted only after a fresh,
+mechanically scored holdout using the new contract engine is non-inferior to Kimi.
+
 ## OpenAI Adapter Compatibility
 
 LiteRT-LM `0.14.0` enforces `max_completion_tokens` on `/v1/chat/completions`; it silently ignores the legacy `max_tokens` field. The E2B client therefore sends both aliases, with the same value, so LiteRT-LM receives a hard cap while the request remains compatible with older OpenAI-style adapters.

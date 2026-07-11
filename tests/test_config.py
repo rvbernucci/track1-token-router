@@ -2,6 +2,7 @@ import os
 import unittest
 from pathlib import Path
 
+from router.cli.main import _validate_track1_runtime_environment
 from router.core.config import RouterConfig
 
 
@@ -19,14 +20,23 @@ class RouterConfigTests(unittest.TestCase):
             ["accounts/fireworks/models/first", "accounts/fireworks/models/second"],
         )
 
-    def test_fireworks_model_env_overrides_allowed_models(self) -> None:
+    def test_allowed_models_rejects_unauthorized_local_override(self) -> None:
         with patched_env(
             FIREWORKS_MODEL="accounts/fireworks/models/explicit",
             ALLOWED_MODELS="accounts/fireworks/models/first",
         ):
             config = RouterConfig.from_env()
 
-        self.assertEqual(config.fireworks_model, "accounts/fireworks/models/explicit")
+        self.assertEqual(config.fireworks_model, "accounts/fireworks/models/first")
+
+    def test_allowed_models_accepts_authorized_override(self) -> None:
+        with patched_env(
+            FIREWORKS_MODEL="accounts/fireworks/models/second",
+            ALLOWED_MODELS="accounts/fireworks/models/first,accounts/fireworks/models/second",
+        ):
+            config = RouterConfig.from_env()
+
+        self.assertEqual(config.fireworks_model, "accounts/fireworks/models/second")
 
     def test_fireworks_service_tier_is_optional(self) -> None:
         with patched_env(FIREWORKS_SERVICE_TIER=None):
@@ -134,6 +144,41 @@ class RouterConfigTests(unittest.TestCase):
 
         self.assertLess(config.fireworks_timeout_s, 30)
         self.assertEqual(config.fireworks_max_retries, 0)
+
+    def test_official_remote_runtime_requires_all_harness_variables(self) -> None:
+        with patched_env(
+            ROUTER_MODE="fireworks",
+            FIREWORKS_API_KEY="test-key",
+            FIREWORKS_BASE_URL=None,
+            ALLOWED_MODELS="minimax-m3",
+            FIREWORKS_MODEL=None,
+        ):
+            config = RouterConfig.from_env()
+            with self.assertRaisesRegex(ValueError, "FIREWORKS_BASE_URL"):
+                _validate_track1_runtime_environment(config)
+
+    def test_official_remote_runtime_accepts_harness_authorized_model(self) -> None:
+        with patched_env(
+            ROUTER_MODE="fireworks",
+            FIREWORKS_API_KEY="test-key",
+            FIREWORKS_BASE_URL="https://proxy.invalid/inference/v1",
+            ALLOWED_MODELS="minimax-m3,kimi-k2p7-code",
+            FIREWORKS_MODEL="not-allowed",
+        ):
+            config = RouterConfig.from_env()
+            _validate_track1_runtime_environment(config)
+
+        self.assertEqual(config.fireworks_model, "accounts/fireworks/models/minimax-m3")
+
+    def test_official_local_runtime_does_not_require_fireworks_variables(self) -> None:
+        with patched_env(
+            ROUTER_MODE="local",
+            FIREWORKS_API_KEY=None,
+            FIREWORKS_BASE_URL=None,
+            ALLOWED_MODELS=None,
+        ):
+            config = RouterConfig.from_env()
+            _validate_track1_runtime_environment(config)
 
 
 class patched_env:

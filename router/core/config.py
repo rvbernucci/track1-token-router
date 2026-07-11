@@ -54,6 +54,8 @@ class RouterConfig:
     outcome_models_sha256: str | None
     e2b_route_policy: Path | None
     e2b_route_policy_sha256: str | None
+    e2b_selective_policy: Path | None
+    e2b_selective_policy_sha256: str | None
     three_route_accuracy_gate: float
     three_route_max_failure: float
     three_route_max_memory_mb: float
@@ -68,6 +70,7 @@ class RouterConfig:
 
     @classmethod
     def from_env(cls) -> "RouterConfig":
+        allowed_models = _allowed_models(os.getenv("ALLOWED_MODELS"))
         return cls(
             log_path=Path(os.getenv("ROUTER_LOG_PATH", "logs/run.jsonl")),
             mode=os.getenv("ROUTER_MODE", "mock"),
@@ -84,8 +87,8 @@ class RouterConfig:
             m2b_temperature=float(os.getenv("M2B_TEMPERATURE", "0.2")),
             m2b_max_tokens=int(os.getenv("M2B_MAX_TOKENS", "768")),
             fireworks_base_url=os.getenv("FIREWORKS_BASE_URL", "https://api.fireworks.ai/inference/v1"),
-            fireworks_model=_optional_model(os.getenv("FIREWORKS_MODEL") or _first_allowed_model(os.getenv("ALLOWED_MODELS"))),
-            allowed_models=_allowed_models(os.getenv("ALLOWED_MODELS")),
+            fireworks_model=_authorized_fireworks_model(os.getenv("FIREWORKS_MODEL"), allowed_models),
+            allowed_models=allowed_models,
             fireworks_api_key=os.getenv("FIREWORKS_API_KEY"),
             fireworks_timeout_s=float(os.getenv("FIREWORKS_TIMEOUT_S", "24")),
             fireworks_max_retries=int(os.getenv("FIREWORKS_MAX_RETRIES", "0")),
@@ -112,6 +115,8 @@ class RouterConfig:
             outcome_models_sha256=os.getenv("OUTCOME_MODELS_SHA256") or None,
             e2b_route_policy=_optional_path(os.getenv("E2B_ROUTE_POLICY")),
             e2b_route_policy_sha256=os.getenv("E2B_ROUTE_POLICY_SHA256") or None,
+            e2b_selective_policy=_optional_path(os.getenv("E2B_SELECTIVE_POLICY")),
+            e2b_selective_policy_sha256=os.getenv("E2B_SELECTIVE_POLICY_SHA256") or None,
             three_route_accuracy_gate=float(os.getenv("THREE_ROUTE_ACCURACY_GATE", "0.60")),
             three_route_max_failure=float(os.getenv("THREE_ROUTE_MAX_FAILURE", "0.15")),
             three_route_max_memory_mb=float(os.getenv("THREE_ROUTE_MAX_MEMORY_MB", "3584")),
@@ -134,9 +139,11 @@ def _env_flag(name: str, *, default: bool = False) -> bool:
     return value in {"1", "true", "yes", "on"}
 
 
-def _first_allowed_model(raw: str | None) -> str | None:
-    models = _allowed_models(raw)
-    return models[0] if models else None
+def _authorized_fireworks_model(raw: str | None, allowed_models: list[str]) -> str | None:
+    if allowed_models:
+        requested = _optional_model(raw)
+        return requested if requested in allowed_models else allowed_models[0]
+    return _optional_model(raw)
 
 
 def _allowed_models(raw: str | None) -> list[str]:

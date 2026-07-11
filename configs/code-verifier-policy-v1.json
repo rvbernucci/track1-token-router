@@ -1,0 +1,43 @@
+{
+  "schema_version": "code-verifier-policy-v1",
+  "default_enabled": true,
+  "evidence": {
+    "dataset_path": "evals/code-verifier/code-verifier-holdout.jsonl",
+    "dataset_sha256": "c28ba905364b78e8a7c452c40ccecacb198b0dfa0d9bbd00d77461cb02b3bd7f",
+    "engine_path": "router/orchestration/code_verifier.py",
+    "engine_sha256": "b01bc27a602766bfa88fe635ad85c8715d7dfd1fb58e7b49a638ed31599914a0",
+    "evaluation_path": "reports/generated/code-verifier-evaluation.json",
+    "evaluation_gate": {
+      "minimum_accepted": 18,
+      "minimum_mutation_score": 0.9,
+      "minimum_adversarial_containment_rate": 1.0,
+      "required_false_positives": 0
+    }
+  },
+  "families": {
+    "add": {"enabled": true},
+    "max_list": {"enabled": true},
+    "normalize_slug": {"enabled": true},
+    "palindrome": {"enabled": true},
+    "second_largest": {"enabled": true},
+    "square": {"enabled": true},
+    "unique_preserve_order": {"enabled": true}
+  },
+  "limits": {
+    "max_ast_depth": 40,
+    "max_ast_nodes": 600,
+    "max_literal_chars": 4096,
+    "max_literal_items": 256,
+    "max_source_chars": 8000,
+    "worker_address_space_mib": 256,
+    "worker_cpu_seconds": 1,
+    "worker_timeout_seconds": 1.5
+  },
+  "promotion": {
+    "minimum_mutation_score": 0.9,
+    "require_all_reference_candidates": true,
+    "require_all_adversarial_contained": true,
+    "require_zero_false_accepts": true
+  },
+  "reason": "Sprint 51 executable gate passed: 18 verified releases, 22/22 mutants killed, 8/8 adversarial programs contained, zero false accepts."
+}

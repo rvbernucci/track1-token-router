@@ -16,6 +16,16 @@ class FunctionGemmaProviderError(RuntimeError):
     pass
 
 
+ASSESSMENT_PROMPT_VERSION = "functiongemma-tool-assessment-v1"
+
+
+def build_assessment_messages(input_text: str) -> list[dict[str, str]]:
+    return [
+        {"role": "developer", "content": DEVELOPER_INSTRUCTION},
+        {"role": "user", "content": input_text},
+    ]
+
+
 @dataclass(frozen=True)
 class AssessmentInvocation:
     assessment: TaskAssessment
@@ -23,6 +33,7 @@ class AssessmentInvocation:
     latency_ms: float
     usage: TokenUsage
     model: str
+    prompt_version: str = ASSESSMENT_PROMPT_VERSION
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -31,6 +42,7 @@ class AssessmentInvocation:
             "latency_ms": self.latency_ms,
             "usage": self.usage.to_dict(),
             "model": self.model,
+            "prompt_version": self.prompt_version,
         }
 
 
@@ -62,10 +74,7 @@ class FunctionGemmaAssessmentProvider:
     def assess_with_trace(self, task: TaskEnvelope) -> AssessmentInvocation:
         payload = {
             "model": self.model,
-            "messages": [
-                {"role": "developer", "content": DEVELOPER_INSTRUCTION},
-                {"role": "user", "content": task.input_text},
-            ],
+            "messages": build_assessment_messages(task.input_text),
             "tools": [ASSESS_TASK_TOOL],
             "tool_choice": "required",
             "temperature": 0,

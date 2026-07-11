@@ -14,6 +14,7 @@ from router.core.contracts import (
 from router.core.three_route_runner import ThreeRouteRunner
 from router.functiongemma.provider import AssessmentInvocation, FunctionGemmaProviderError
 from router.orchestration.game_theory_selector import MinimaxRegretSelector
+from router.orchestration.e2b_selective_gate import E2BSelectiveDecision
 
 
 ASSESSMENT = TaskAssessment(
@@ -79,6 +80,24 @@ class BrokenRunner:
         raise MemoryError("simulated local allocation failure")
 
 
+class SelectivePolicy:
+    def __init__(self, *, accepted: bool):
+        self.accepted = accepted
+
+    def should_probe(self, _features):
+        return E2BSelectiveDecision(True, False, 0.8, None, "probe_e2b_candidate")
+
+    def evaluate(self, _task, answer, _features):
+        return E2BSelectiveDecision(
+            True,
+            self.accepted,
+            0.8,
+            0.95 if self.accepted else 0.4,
+            "selective_local_accept" if self.accepted else "post_probability_below_accept_threshold",
+            answer=answer if self.accepted else "",
+        )
+
+
 class ThreeRouteRunnerTests(unittest.TestCase):
     def test_disabled_e2b_routes_to_fireworks(self):
         e2b = Runner("local", "e2b_local")
@@ -121,6 +140,40 @@ class ThreeRouteRunnerTests(unittest.TestCase):
         result = runner.run(TaskEnvelope(id="task", input_text="Explain why the sky is blue."))
         self.assertEqual(result.answer, "remote")
         self.assertIn("e2b_rejected", result.metadata["routing_trace"]["fallback"])
+
+    def test_selective_policy_can_probe_after_preselector_chose_fireworks(self):
+        e2b = Runner("positive", "e2b_local")
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(),
+            predictor=Predictor(e2b=0.2, fireworks=0.9),
+            selector=MinimaxRegretSelector(e2b_enabled=False),
+            e2b_runner=e2b,
+            fireworks_runner=remote,
+            selective_policy=SelectivePolicy(accepted=True),
+        )
+
+        result = runner.run(TaskEnvelope(id="task", input_text="Classify sentiment."))
+
+        self.assertEqual(result.route, "e2b_local_selective")
+        self.assertEqual(remote.calls, 0)
+        self.assertEqual(result.metadata["routing_trace"]["decision"]["engine"], "gemma_e2b")
+
+    def test_selective_rejection_falls_closed_to_fireworks(self):
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(),
+            predictor=Predictor(e2b=0.2, fireworks=0.9),
+            selector=MinimaxRegretSelector(e2b_enabled=False),
+            e2b_runner=Runner("candidate", "e2b_local"),
+            fireworks_runner=remote,
+            selective_policy=SelectivePolicy(accepted=False),
+        )
+
+        result = runner.run(TaskEnvelope(id="task", input_text="Classify sentiment."))
+
+        self.assertEqual(result.answer, "remote")
+        self.assertIn("e2b_selective_rejected", result.metadata["routing_trace"]["fallback"])
 
     def test_degenerate_e2b_answer_falls_back_to_fireworks(self):
         e2b = Runner(

@@ -1,0 +1,20 @@
+{
+  "families": [
+    "code_sandbox",
+    "grounded_context_qa",
+    "grounded_ner",
+    "grounded_sentiment",
+    "grounded_summary",
+    "none",
+    "proof_logic",
+    "proof_math"
+  ],
+  "lineages_per_family": 42,
+  "rows": 731,
+  "schema_version": "local-adjudication-dataset-manifest-v1",
+  "splits": {
+    "fresh_holdout": 104,
+    "train": 312,
+    "validation": 315
+  }
+}

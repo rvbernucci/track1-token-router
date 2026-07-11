@@ -58,9 +58,9 @@ class LocalM1Tests(unittest.TestCase):
 
             result = runner.run(TaskEnvelope(input_text=long_prompt))
 
-        sent_user_message = server.requests[0]["payload"]["messages"][1]["content"]
+        messages = server.requests[0]["payload"]["messages"]
         self.assertEqual(result.answer, "short summary")
-        self.assertEqual(sent_user_message, long_prompt)
+        self.assertEqual(messages, [{"role": "user", "content": long_prompt}])
 
     def test_local_m1_returns_controlled_error_on_model_failure(self) -> None:
         with FakeOpenAIServer(status=500) as server:

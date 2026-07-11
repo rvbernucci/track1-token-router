@@ -5,8 +5,10 @@ import json
 import re
 import textwrap
 from dataclasses import asdict, dataclass
+from enum import Enum
+from typing import Any
 
-from router.core.contracts import TaskEnvelope
+from router.core.contracts import AnswerResult, TaskEnvelope
 from router.orchestration.prompt_packet import extract_literal_echo, infer_expected_format
 
 
@@ -21,11 +23,161 @@ class FinalValidationResult:
         return asdict(self)
 
 
+ANSWER_CONTRACT_SCHEMA_VERSION = "answer-contract-v2"
+
+
+class AnswerContractKind(str, Enum):
+    FREE_TEXT = "free_text"
+    JSON = "json"
+    NUMBER = "number"
+    LITERAL_ECHO = "literal_echo"
+    YES_NO = "yes_no"
+    UPPERCASE = "uppercase"
+    CODE = "code"
+    LABEL = "label"
+
+
+@dataclass(frozen=True)
+class AnswerContract:
+    kind: AnswerContractKind
+    strict: bool
+    allowed_values: tuple[str, ...] = ()
+    json_keys: tuple[str, ...] = ()
+    exact_words: int | None = None
+    max_words: int | None = None
+    exact_sentences: int | None = None
+    max_sentences: int | None = None
+    exact_items: int | None = None
+    max_items: int | None = None
+    schema_version: str = ANSWER_CONTRACT_SCHEMA_VERSION
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["kind"] = self.kind.value
+        return payload
+
+
+@dataclass(frozen=True)
+class AnswerContractResult:
+    valid: bool
+    answer: str
+    original_answer: str
+    reason: str
+    contract: AnswerContract
+    actions: tuple[str, ...] = ()
+    ambiguous: bool = False
+
+    @property
+    def changed(self) -> bool:
+        return self.answer != self.original_answer.strip()
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": ANSWER_CONTRACT_SCHEMA_VERSION,
+            "valid": self.valid,
+            "reason": self.reason,
+            "changed": self.changed,
+            "actions": list(self.actions),
+            "ambiguous": self.ambiguous,
+            "contract": self.contract.to_dict(),
+        }
+
+
+def infer_answer_contract(task: TaskEnvelope) -> AnswerContract:
+    prompt = task.input_text
+    expected = infer_expected_format(task)
+    kind = AnswerContractKind(expected)
+    labels = _extract_allowed_labels(prompt)
+    if kind is AnswerContractKind.FREE_TEXT and labels:
+        kind = AnswerContractKind.LABEL
+    return AnswerContract(
+        kind=kind,
+        strict=bool(
+            re.search(
+                r"\b(?:return|answer|respond)(?:\s+with)?\s+(?:only|exactly)\b|"
+                r"\bno commentary\b|\bnothing else\b|"
+                r"\bexactly\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+"
+                r"(?:words?|sentences?|items?|bullet(?: points?)?)\b",
+                prompt,
+                re.IGNORECASE,
+            )
+        ),
+        allowed_values=labels if kind is AnswerContractKind.LABEL else (),
+        json_keys=_extract_json_keys(prompt) if kind is AnswerContractKind.JSON else (),
+        exact_words=_constraint_integer(prompt, r"exactly\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+words?"),
+        max_words=_constraint_integer(prompt, r"(?:at most|no more than|maximum(?: of)?)\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+words?"),
+        exact_sentences=_exact_sentence_constraint(prompt),
+        max_sentences=_constraint_integer(prompt, r"(?:at most|no more than|maximum(?: of)?)\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+sentences?"),
+        exact_items=_constraint_integer(prompt, r"exactly\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:items?|bullet(?: points?)?)"),
+        max_items=_constraint_integer(
+            prompt,
+            r"(?:at most|no more than|maximum(?: of)?)\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+"
+            r"(?:items?|bullet(?: points?)?)",
+        ),
+    )
+
+
+def apply_answer_contract(task: TaskEnvelope, answer: str) -> AnswerContractResult:
+    contract = infer_answer_contract(task)
+    original = answer.strip()
+    if not original:
+        return AnswerContractResult(False, "", original, "empty_answer", contract)
+
+    if contract.kind is AnswerContractKind.LABEL:
+        candidate, action, ambiguous = _normalize_label(original, contract.allowed_values)
+        if not candidate:
+            reason = "ambiguous_label" if ambiguous else "label_not_found"
+            return AnswerContractResult(False, original, original, reason, contract, ambiguous=ambiguous)
+        actions = (action,) if action else ()
+    else:
+        validation = validate_or_safely_repair_final_answer(task, original)
+        if not validation.valid:
+            return AnswerContractResult(
+                False,
+                original,
+                original,
+                validation.reason,
+                contract,
+                ambiguous=_is_ambiguous_repair(task, original, validation),
+            )
+        candidate = validation.repaired_answer or original
+        actions = (validation.reason,) if validation.reason.startswith("safe_repair:") else ()
+
+    normalized_json = _normalize_singleton_json_values(task.input_text, candidate, contract)
+    if normalized_json and normalized_json != candidate:
+        candidate = normalized_json
+        actions = (*actions, "unwrapped_singleton_json_values")
+
+    if contract.strict and contract.exact_items is not None:
+        normalized_list = _normalize_item_wrapper(candidate, contract.exact_items)
+        if normalized_list and normalized_list != candidate:
+            candidate = normalized_list
+            actions = (*actions, "removed_list_preface")
+
+    constraint_reason = _validate_contract_constraints(contract, candidate)
+    if constraint_reason:
+        return AnswerContractResult(False, candidate, original, constraint_reason, contract, actions)
+    return AnswerContractResult(True, candidate, original, "contract_satisfied", contract, actions)
+
+
+def finalize_answer_result(task: TaskEnvelope, result: AnswerResult) -> AnswerResult:
+    application = apply_answer_contract(task, result.answer)
+    final_answer = application.answer if application.valid else result.answer.strip()
+    return AnswerResult(
+        id=result.id,
+        answer=final_answer,
+        route=result.route,
+        remote_tokens=result.remote_tokens,
+        metadata={**result.metadata, "answer_contract": application.to_dict()},
+    )
+
+
 SAFE_REPAIR_REASONS = {
     "markdown_fence_in_strict_format",
     "invalid_json",
     "python_code_with_extra_text",
     "code_with_extra_text",
+    "not_number_only",
     "not_yes_no",
     "not_uppercase",
     "literal_echo_mismatch",
@@ -48,7 +200,7 @@ def validate_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationRes
             return FinalValidationResult(False, expected_format, "invalid_json", repaired)
         return FinalValidationResult(True, expected_format, "valid_json")
     if expected_format == "number":
-        if re.fullmatch(r"-?\d+(?:\.\d+)?", stripped):
+        if _is_canonical_number(stripped):
             return FinalValidationResult(True, expected_format, "valid_number")
         repaired = repair_final_answer(task, answer).repaired_answer
         return FinalValidationResult(False, expected_format, "not_number_only", repaired)
@@ -89,9 +241,10 @@ def validate_or_safely_repair_final_answer(task: TaskEnvelope, answer: str) -> F
     initial = validate_final_answer(task, answer)
     if initial.valid or initial.reason not in SAFE_REPAIR_REASONS or not initial.repaired_answer:
         return initial
-    if initial.reason == "markdown_fence_in_strict_format" and initial.expected_format == "number":
+    if initial.expected_format == "number" and initial.reason in {"markdown_fence_in_strict_format", "not_number_only"}:
         unfenced = _strip_markdown_fence(answer.strip())
-        if not re.fullmatch(r"-?\d+(?:\.\d+)?", unfenced):
+        numbers = _numeric_candidates(unfenced)
+        if len(numbers) != 1:
             return initial
     repaired = validate_final_answer(task, initial.repaired_answer)
     if not repaired.valid:
@@ -108,11 +261,11 @@ def repair_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationResul
     expected_format = infer_expected_format(task)
     stripped = _strip_markdown_fence(answer.strip())
     if expected_format == "json":
-        extracted = _extract_json_object(stripped)
+        extracted = _extract_single_json_value(stripped)
         return FinalValidationResult(bool(extracted), expected_format, "json_repair", extracted)
     if expected_format == "number":
-        match = re.search(r"-?\d+(?:\.\d+)?", stripped)
-        repaired = match.group(0) if match else ""
+        candidates = _numeric_candidates(stripped)
+        repaired = _canonicalize_number(candidates[0]) if len(candidates) == 1 else ""
         return FinalValidationResult(bool(repaired), expected_format, "number_repair", repaired)
     if expected_format == "literal_echo":
         expected = extract_literal_echo(task)
@@ -143,15 +296,60 @@ def _strip_markdown_fence(value: str) -> str:
     return stripped.strip()
 
 
-def _extract_json_object(value: str) -> str:
+def _extract_single_json_value(value: str) -> str:
     stripped = _strip_markdown_fence(value)
-    if stripped.startswith("{") and stripped.endswith("}"):
+    try:
+        json.loads(stripped)
+    except json.JSONDecodeError:
+        pass
+    else:
         return stripped
-    start = stripped.find("{")
-    end = stripped.rfind("}")
-    if start == -1 or end == -1 or end <= start:
-        return ""
-    return stripped[start : end + 1]
+
+    maximal = _embedded_json_values(stripped)
+    return maximal[0] if len(maximal) == 1 else ""
+
+
+def _embedded_json_values(value: str) -> list[str]:
+    decoder = json.JSONDecoder()
+    spans: list[tuple[int, int, str]] = []
+    for start, char in enumerate(value):
+        if char not in "[{":
+            continue
+        try:
+            _, length = decoder.raw_decode(value[start:])
+        except json.JSONDecodeError:
+            continue
+        spans.append((start, start + length, value[start : start + length]))
+
+    maximal = [
+        span
+        for span in spans
+        if not any(
+            other[0] <= span[0] and span[1] <= other[1] and (other[0], other[1]) != (span[0], span[1])
+            for other in spans
+        )
+    ]
+    return [span[2] for span in maximal]
+
+
+_NUMBER_PATTERN = re.compile(
+    r"(?<![\w.])[-+]?(?:(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?)|(?:\d+(?:\.\d+)?)|(?:\.\d+))"
+    r"(?:[eE][-+]?\d+)?(?!\w|\.\d)"
+)
+
+
+def _numeric_candidates(value: str) -> list[str]:
+    return [match.group(0) for match in _NUMBER_PATTERN.finditer(value)]
+
+
+def _canonicalize_number(value: str) -> str:
+    normalized = value.replace(",", "")
+    return normalized[1:] if normalized.startswith("+") else normalized
+
+
+def _is_canonical_number(value: str) -> bool:
+    candidates = _numeric_candidates(value)
+    return len(candidates) == 1 and _canonicalize_number(candidates[0]) == value
 
 
 def _repair_code_answer(task: TaskEnvelope, value: str) -> str:
@@ -257,3 +455,222 @@ def _free_text_degradation(value: str) -> str:
         if counts and max(counts.values()) >= 4:
             return "degenerate_repetition"
     return ""
+
+
+def _extract_allowed_labels(prompt: str) -> tuple[str, ...]:
+    lowered = prompt.casefold()
+    strict_sentiment = bool(
+        re.search(r"\bclassif(?:y|ique|ica)\b.*\b(?:as|como)\b", lowered)
+        or re.search(r"\b(?:answer|return|respond)\b.*\b(?:only|exactly one)\b.*\blabel\b", lowered)
+    ) and not re.search(r"\b(?:explain|justify|assessment|analysis|reasoning)\b", lowered)
+    if strict_sentiment and all(label in lowered for label in ("positive", "negative", "neutral")):
+        labels = ["positive", "negative", "neutral"]
+        if re.search(r"\bmixed\b", lowered):
+            labels.append("mixed")
+        return tuple(labels)
+    matches = (
+        re.search(r"(?:one\s+)?label\s*:\s*([^\n.?!]+)", prompt, re.IGNORECASE),
+        re.search(
+            r"(?:choose|select|answer with|return)\s+(?:exactly\s+)?one\s+(?:of|from)\s*:?\s*([^\n.?!]+)",
+            prompt,
+            re.IGNORECASE,
+        ),
+    )
+    match = next((item for item in matches if item), None)
+    if match is None:
+        return ()
+    raw = re.sub(r"\s+or\s+", ",", match.group(1), flags=re.IGNORECASE)
+    values: list[str] = []
+    for item in raw.split(","):
+        value = item.strip().strip("\"'` ")
+        if re.fullmatch(r"[A-Za-z][A-Za-z0-9 _-]{0,39}", value):
+            values.append(value)
+    return tuple(dict.fromkeys(values)) if len(values) >= 2 else ()
+
+
+def _extract_json_keys(prompt: str) -> tuple[str, ...]:
+    marker = re.search(r"\b(?:exactly\s+)?(?:these\s+)?(keys?)\b", prompt, re.IGNORECASE)
+    if marker is None:
+        return ()
+    tail = prompt[marker.end() : marker.end() + 300]
+    keys = re.findall(r"[\"']([A-Za-z_][A-Za-z0-9_-]{0,63})[\"']", tail)
+    if marker.group(1).casefold() == "key":
+        if keys:
+            return (keys[0],)
+        singular = re.match(r"\s*(?:is|:)?\s*([A-Za-z_][A-Za-z0-9_-]{0,63})", tail)
+        return (singular.group(1),) if singular else ()
+    if not keys:
+        compact = re.match(
+            r"\s*(?:are|:)?\s*([A-Za-z_][A-Za-z0-9_-]*(?:\s*,\s*[A-Za-z_][A-Za-z0-9_-]*)+)",
+            tail,
+        )
+        keys = [item.strip() for item in compact.group(1).split(",")] if compact else []
+    return tuple(dict.fromkeys(keys))
+
+
+def _constraint_integer(prompt: str, pattern: str) -> int | None:
+    match = re.search(pattern, prompt, re.IGNORECASE)
+    if match is None:
+        return None
+    raw = match.group(1).casefold()
+    words = {
+        "one": 1,
+        "two": 2,
+        "three": 3,
+        "four": 4,
+        "five": 5,
+        "six": 6,
+        "seven": 7,
+        "eight": 8,
+        "nine": 9,
+        "ten": 10,
+    }
+    return int(raw) if raw.isdigit() else words[raw]
+
+
+def _exact_sentence_constraint(prompt: str) -> int | None:
+    if re.search(
+        r"\b(?:exactly\s+(?:the\s+)?(?:single|one)|in\s+(?:exactly\s+)?(?:one|a single))\s+sentence\b",
+        prompt,
+        re.IGNORECASE,
+    ):
+        return 1
+    return _constraint_integer(
+        prompt,
+        r"exactly\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+sentences?",
+    )
+
+
+def _normalize_label(answer: str, allowed_values: tuple[str, ...]) -> tuple[str, str, bool]:
+    candidate = _strip_markdown_fence(answer.strip()).strip(" \t\r\n.\"'`")
+    by_folded = {value.casefold(): value for value in allowed_values}
+    if candidate.casefold() in by_folded:
+        normalized = by_folded[candidate.casefold()]
+        action = "canonicalized_label" if normalized != answer.strip() else ""
+        return normalized, action, False
+    found: list[str] = []
+    for folded, canonical in by_folded.items():
+        pattern = rf"(?<![\w-]){re.escape(folded)}(?![\w-])"
+        for match in re.finditer(pattern, candidate.casefold()):
+            prefix = candidate.casefold()[max(0, match.start() - 16) : match.start()]
+            if re.search(r"\b(?:not|isn't|is not|never)\s*$", prefix):
+                return "", "", True
+            found.append(canonical)
+    unique = tuple(dict.fromkeys(found))
+    if len(unique) != 1:
+        return "", "", len(unique) > 1
+    return unique[0], "extracted_unique_label", False
+
+
+def _normalize_singleton_json_values(
+    prompt: str,
+    answer: str,
+    contract: AnswerContract,
+) -> str:
+    if contract.kind is not AnswerContractKind.JSON or not contract.json_keys:
+        return answer
+    if re.search(r"\b(?:array|arrays|list|lists|multiple|all values|zero or more)\b", prompt, re.IGNORECASE):
+        return answer
+    if any(_looks_plural_json_key(key) for key in contract.json_keys):
+        return answer
+    try:
+        payload = json.loads(answer)
+    except json.JSONDecodeError:
+        return answer
+    if not isinstance(payload, dict) or set(payload) != set(contract.json_keys):
+        return answer
+    if not payload or not all(
+        isinstance(value, list)
+        and len(value) == 1
+        and isinstance(value[0], (str, int, float, bool))
+        for value in payload.values()
+    ):
+        return answer
+    normalized = {key: value[0] for key, value in payload.items()}
+    return json.dumps(normalized, ensure_ascii=False, separators=(",", ":"))
+
+
+def _looks_plural_json_key(key: str) -> bool:
+    lowered = key.casefold().replace("-", "_")
+    plural_terms = {
+        "entities",
+        "items",
+        "people",
+        "persons",
+        "locations",
+        "organizations",
+        "results",
+        "values",
+    }
+    return lowered in plural_terms or lowered.endswith("_list") or lowered.endswith("_items")
+
+
+def _validate_contract_constraints(contract: AnswerContract, answer: str) -> str:
+    if contract.kind is AnswerContractKind.JSON and contract.json_keys:
+        try:
+            payload = json.loads(answer)
+        except json.JSONDecodeError:
+            return "invalid_json_after_normalization"
+        if not isinstance(payload, dict) or set(payload) != set(contract.json_keys):
+            return "json_keys_mismatch"
+    words = re.findall(r"[A-Za-zÀ-ÿ0-9_'-]+", answer)
+    if contract.exact_words is not None and len(words) != contract.exact_words:
+        return "exact_word_count_mismatch"
+    if contract.max_words is not None and len(words) > contract.max_words:
+        return "maximum_word_count_exceeded"
+    sentences = _sentence_count(answer)
+    if contract.exact_sentences is not None and sentences != contract.exact_sentences:
+        return "exact_sentence_count_mismatch"
+    if contract.max_sentences is not None and sentences > contract.max_sentences:
+        return "maximum_sentence_count_exceeded"
+    if contract.exact_items is not None and _item_count(answer) != contract.exact_items:
+        return "exact_item_count_mismatch"
+    if contract.max_items is not None and _item_count(answer) > contract.max_items:
+        return "maximum_item_count_exceeded"
+    return ""
+
+
+def _sentence_count(value: str) -> int:
+    stripped = value.strip()
+    if not stripped:
+        return 0
+    return len([item for item in re.split(r"(?<=[.!?])(?:\s+|$)", stripped) if item.strip()])
+
+
+def _item_count(value: str) -> int:
+    bullets = re.findall(r"(?m)^\s*(?:[-*+] |\d+[.)]\s+)", value)
+    if bullets:
+        return len(bullets)
+    try:
+        payload = json.loads(value)
+    except json.JSONDecodeError:
+        return 0
+    return len(payload) if isinstance(payload, list) else 0
+
+
+def _normalize_item_wrapper(value: str, expected_items: int) -> str:
+    lines = value.splitlines()
+    indexes = [
+        index
+        for index, line in enumerate(lines)
+        if re.match(r"^\s*(?:[-*+] |\d+[.)]\s+)", line)
+    ]
+    if len(indexes) != expected_items or not indexes or indexes[0] == 0:
+        return value
+    return "\n".join(lines[indexes[0] :]).strip()
+
+
+def _is_ambiguous_repair(
+    task: TaskEnvelope,
+    answer: str,
+    validation: FinalValidationResult,
+) -> bool:
+    del task
+    if validation.expected_format == "number":
+        return len(_numeric_candidates(answer)) != 1
+    if validation.expected_format == "json":
+        return len(_embedded_json_values(_strip_markdown_fence(answer.strip()))) > 1
+    if validation.expected_format == "yes_no":
+        lowered = answer.casefold()
+        return bool(re.search(r"\byes\b", lowered)) == bool(re.search(r"\bno\b", lowered))
+    return False

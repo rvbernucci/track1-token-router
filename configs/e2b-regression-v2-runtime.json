@@ -1,0 +1,24 @@
+{
+  "artifacts": {
+    "e2b_sha256": "181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c",
+    "functiongemma_sha256": "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77"
+  },
+  "combined_peak_pss_kb": 3582872,
+  "context_tokens": 2048,
+  "corpus_manifest_sha256": "5997eaefb6fb0350145d3faa1ae79d008e3fd67ec025afb6475edea7decb7902",
+  "cpu_threads": 2,
+  "default_enabled": false,
+  "e2b_ledger_sha256": "05d199a3788cbdd30390e93b8b255d692327448c19642a59fff72f4e227c95eb",
+  "e2b_max_completion_tokens": 96,
+  "functiongemma_ledger_sha256": "cfdfef083188616578684d6d6beda7582ac5f24397a8af5f4a2cbb622d0ee892",
+  "models": [
+    "functiongemma-q8",
+    "gemma-4-E2B-it"
+  ],
+  "protocol": "raw-prompt-v1",
+  "runtimes": {
+    "litert_lm": "0.14.0",
+    "llama_cpp_release": "b9948"
+  },
+  "schema_version": "e2b-regression-v2-inference-v1"
+}
