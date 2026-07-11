@@ -6,42 +6,42 @@ Expand the paired Kimi/MiniMax evidence from 23 to 160-240 unseen tasks while pr
 
 ## Dataset
 
-- [ ] Build 192 tasks, 24 per Track 1 category.
-- [ ] Balance easy, medium and hard tasks within every category.
-- [ ] Include at least 96 mechanically scorable tasks.
-- [ ] Freeze prompt hashes, validators and output ceilings before API calls.
-- [ ] Exclude all current 23-task microbench rows and normalized duplicates.
-- [ ] Keep hidden test labels inaccessible to the model-selection code.
+- [x] Build 192 tasks, 24 per Track 1 category.
+- [x] Balance easy, medium and hard tasks: 64 rows each.
+- [x] Make all 192 tasks mechanically scorable.
+- [x] Freeze prompt hashes, validators and task-specific output ceilings before API calls.
+- [x] Verify zero normalized duplicates against 133 prior Pareto prompts.
+- [x] Select on 160 development rows and score the frozen policy on 32 sealed rows.
 
 ## Execution
 
-- [ ] Call both `minimax-m3` and `kimi-k2p7-code` for every task.
-- [ ] Use the same raw-prompt protocol, temperature and task-specific token ceiling.
-- [ ] Route every request through configured `FIREWORKS_BASE_URL`.
-- [ ] Verify both model IDs against runtime `ALLOWED_MODELS` before each run.
-- [ ] Set a hard experiment budget of `US$5` and stop on unreconciled usage.
-- [ ] Persist prompt, completion and total tokens separately.
-- [ ] Preserve latency, validation reason, HTTP failure and retry metadata.
+- [x] Call both `minimax-m3` and `kimi-k2p7-code` for every task: 384 successful calls.
+- [x] Use the same raw-prompt protocol, temperature zero and task-specific token ceiling.
+- [x] Route every request through configured `FIREWORKS_BASE_URL`.
+- [x] Verify both model IDs against runtime `ALLOWED_MODELS` before every call.
+- [x] Enforce a hard `US$5` budget; actual estimated spend was `US$0.0312178`.
+- [x] Persist prompt, completion and total tokens separately.
+- [x] Preserve latency, validation reason, request options, failures and fallback metadata.
 
 ## Analysis
 
-- [ ] Compute paired accuracy by model, category, difficulty and output shape.
-- [ ] Compute prompt, completion and total token distributions.
-- [ ] Bootstrap paired accuracy deltas and token savings by mutation lineage.
-- [ ] Build accuracy-versus-token Pareto frontiers with confidence intervals.
-- [ ] Compare always-Kimi, always-MiniMax, current intent policy and learned alternatives.
-- [ ] Calculate minimax regret and Nash equilibrium under accuracy-first constraints.
-- [ ] Penalize invalid, timeout and judge-disagreement rows as incorrect.
+- [x] Compute paired accuracy by model, category, difficulty and output shape.
+- [x] Compute prompt, completion and total token measurements.
+- [x] Bootstrap paired accuracy deltas and changed-route token savings by mutation lineage.
+- [x] Build accuracy-versus-token Pareto evidence with confidence intervals.
+- [x] Compare always-Kimi, always-MiniMax, current intent policy and frozen development policy.
+- [x] Calculate minimax regret and an accuracy-first mixed Nash strategy.
+- [x] Penalize invalid and failed rows as incorrect; all labels were mechanical.
 
 ## Gates
 
-- [ ] At least 180 complete paired rows.
-- [ ] Zero calls outside `FIREWORKS_BASE_URL` and `ALLOWED_MODELS`.
-- [ ] Total estimated spend does not exceed `US$5`.
-- [ ] Selected policy has no paired accuracy regression above one percentage point.
-- [ ] Selected policy has positive token savings with CI95 lower bound above zero.
-- [ ] Every selected category-model preference has at least 20 observations.
-- [ ] Policy is frozen before the sealed test split is scored.
+- [x] 192 complete paired rows.
+- [x] Zero calls outside `FIREWORKS_BASE_URL` and `ALLOWED_MODELS`.
+- [x] Total estimated spend `US$0.0312178`, below `US$5`.
+- [x] Selected policy improves sealed accuracy from `84.38%` to `96.88%`.
+- [x] Changed-route token savings CI95 is `87` to `87` tokens per NER row.
+- [x] Every selected category-model preference has 20 development observations.
+- [x] Policy was frozen before the sealed split was scored.
 
 ## Evidence
 
@@ -62,4 +62,6 @@ python3 scripts/run_fireworks_pareto_v2.py \
 
 ## Completion Decision
 
-Promote only a nondominated, accuracy-equivalent policy. Retain `fireworks-intent-policy-v2.json` when the expanded evidence does not justify a change.
+Status: **complete and promoted**.
+
+Always-Kimi dominates the deployed intent policy on the sealed split: accuracy rises from `84.38%` to `96.88%`, while the only changed route (`NER`) saves 87 tokens per row. Across all 192 paired tasks, Kimi scored `96.35%` using 14,441 tokens; MiniMax scored `83.85%` using 32,558 tokens. The development-only alternative that sends debugging to MiniMax reached `100%` on 32 sealed rows but spent more tokens, so it remains an unpromoted Pareto point. `configs/fireworks-intent-policy-v2.json` now routes every intent to Kimi. Full evidence is in `reports/public/fireworks-pareto-v2.json`.

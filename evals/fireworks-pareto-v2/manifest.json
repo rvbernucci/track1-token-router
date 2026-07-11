@@ -1,0 +1,26 @@
+{
+  "category_counts": {
+    "code_debugging": 24,
+    "code_generation": 24,
+    "factual_qa": 24,
+    "logic_puzzle": 24,
+    "math_reasoning": 24,
+    "ner": 24,
+    "sentiment": 24,
+    "summarization": 24
+  },
+  "difficulty_counts": {
+    "easy": 64,
+    "hard": 64,
+    "medium": 64
+  },
+  "mechanically_scorable": 192,
+  "policy": "development selects category policy; sealed rows score frozen policy",
+  "rows": 192,
+  "schema_version": "fireworks-pareto-v2-corpus-v1",
+  "split_counts": {
+    "development": 160,
+    "sealed": 32
+  },
+  "tasks_sha256": "d1e9a70c18902989e0db7b658f7ced2381088977306fe2addb1aae5bafb2bb21"
+}

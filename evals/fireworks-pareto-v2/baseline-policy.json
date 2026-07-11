@@ -1,0 +1,13 @@
+{
+  "schema_version": "fireworks-pareto-v2-baseline-policy-v1",
+  "intent_models": {
+    "code_debugging": "accounts/fireworks/models/kimi-k2p7-code",
+    "code_generation": "accounts/fireworks/models/kimi-k2p7-code",
+    "factual_qa": "accounts/fireworks/models/kimi-k2p7-code",
+    "logic_puzzle": "accounts/fireworks/models/kimi-k2p7-code",
+    "math_reasoning": "accounts/fireworks/models/kimi-k2p7-code",
+    "ner": "accounts/fireworks/models/minimax-m3",
+    "sentiment": "accounts/fireworks/models/kimi-k2p7-code",
+    "summarization": "accounts/fireworks/models/kimi-k2p7-code"
+  }
+}
