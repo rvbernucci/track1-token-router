@@ -15,6 +15,7 @@ from router.core.three_route_runner import ThreeRouteRunner
 from router.functiongemma.provider import AssessmentInvocation, FunctionGemmaProviderError
 from router.orchestration.game_theory_selector import MinimaxRegretSelector
 from router.orchestration.e2b_selective_gate import E2BSelectiveDecision
+from router.orchestration.e2b_matrix_gate import E2BMatrixDecision
 
 
 ASSESSMENT = TaskAssessment(
@@ -43,6 +44,34 @@ class Provider:
 class BrokenProvider:
     def assess_with_trace(self, _task):
         raise FunctionGemmaProviderError("bad output")
+
+
+class CalibratedProvider:
+    def assess_with_trace(self, _task):
+        calibrated = TaskAssessment(
+            intent=Intent.SENTIMENT,
+            scores=AssessmentScores(5, 3, 0, 4, 2),
+        )
+        raw = TaskAssessment(
+            intent=Intent.SENTIMENT,
+            scores=AssessmentScores(5, 2, 0, 2, 2),
+        )
+        return AssessmentInvocation(
+            assessment=calibrated,
+            raw_assessment=raw,
+            latency_ms=1.0,
+            usage=TokenUsage.empty(),
+            model="functiongemma",
+        )
+
+
+class RecordingMatrixGate:
+    def __init__(self):
+        self.assessment = None
+
+    def decide(self, assessment):
+        self.assessment = assessment
+        return E2BMatrixDecision(True, 0.77, 0.75, "probe_e2b")
 
 
 class Predictor:
@@ -99,6 +128,24 @@ class SelectivePolicy:
 
 
 class ThreeRouteRunnerTests(unittest.TestCase):
+    def test_matrix_gate_uses_raw_not_calibrated_assessment(self):
+        matrix = RecordingMatrixGate()
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=CalibratedProvider(),
+            predictor=Predictor(e2b=0.2, fireworks=0.9),
+            selector=MinimaxRegretSelector(e2b_enabled=False),
+            e2b_runner=Runner("positive", "e2b_local"),
+            fireworks_runner=remote,
+            matrix_gate=matrix,
+        )
+
+        result = runner.run(TaskEnvelope(id="task", input_text="Classify sentiment as positive or negative."))
+
+        self.assertEqual(matrix.assessment.scores.generation_demand, 2)
+        self.assertEqual(result.route, "e2b_local")
+        self.assertEqual(remote.calls, 0)
+
     def test_disabled_e2b_routes_to_fireworks(self):
         e2b = Runner("local", "e2b_local")
         remote = Runner("remote", "fireworks_direct")

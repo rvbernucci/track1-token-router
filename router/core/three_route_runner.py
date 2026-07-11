@@ -70,7 +70,9 @@ class ThreeRouteRunner:
                 predictions,
                 probability_uncertainty=uncertainty,
             )
-            matrix_decision = self.matrix_gate.decide(invocation.assessment) if self.matrix_gate else None
+            # The matrix was fitted on raw FunctionGemma outputs; calibrated scores belong
+            # to the legacy outcome selector and would shift the learned decision boundary.
+            matrix_decision = self.matrix_gate.decide(invocation.raw_assessment) if self.matrix_gate else None
         except (FunctionGemmaProviderError, OSError, TimeoutError, ValueError) as exc:
             return self._fireworks_fallback(task, reason=f"assessment_or_decision_failure:{type(exc).__name__}")
 
