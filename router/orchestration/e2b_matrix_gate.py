@@ -24,6 +24,7 @@ class E2BMatrixGate:
     threshold: float
     score_names: tuple[str, ...]
     models: Mapping[str, tuple[float, ...]]
+    allowed_intents: frozenset[str]
     artifact_sha256: str
 
     @classmethod
@@ -50,11 +51,24 @@ class E2BMatrixGate:
         threshold = float(payload["decision_threshold"])
         if not 0.0 <= threshold <= 1.0:
             raise ValueError("E2B matrix threshold is invalid.")
-        return cls(payload.get("default_enabled") is True, threshold, score_names, models, digest)
+        configured_intents = payload.get("allowed_intents", list(models))
+        if not isinstance(configured_intents, list) or not all(isinstance(value, str) for value in configured_intents):
+            raise ValueError("E2B allowed intents are invalid.")
+        allowed_intents = frozenset(configured_intents)
+        if not allowed_intents.issubset(models):
+            raise ValueError("E2B allowed intents contain an unknown intent.")
+        return cls(
+            payload.get("default_enabled") is True,
+            threshold,
+            score_names,
+            models,
+            allowed_intents,
+            digest,
+        )
 
     def decide(self, assessment: TaskAssessment) -> E2BMatrixDecision:
         coefficients = self.models.get(assessment.intent.value)
-        if not self.enabled or coefficients is None:
+        if not self.enabled or coefficients is None or assessment.intent.value not in self.allowed_intents:
             return E2BMatrixDecision(False, 0.0, self.threshold, "matrix_disabled_or_unknown_intent")
         scores = assessment.scores.to_dict()
         values = [float(scores[name]) / 10.0 for name in self.score_names]

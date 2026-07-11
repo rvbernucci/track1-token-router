@@ -1,4 +1,7 @@
 {
+  "allowed_intents": [
+    "sentiment"
+  ],
   "coefficients": [
     0.21229811824010014,
     0.5001244296202647,
