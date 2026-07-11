@@ -145,7 +145,10 @@ def _handle_submit_track1(args: argparse.Namespace, runner: TaskRunner) -> int:
         if _runtime_budget_exhausted(started_at, max_runtime_s, reserve_s):
             results.append(finalize_answer_result(task, _track1_timeout_result(task, started_at, max_runtime_s, reserve_s)))
             continue
-        results.append(finalize_answer_result(task, runner.run(task)))
+        result = finalize_answer_result(task, runner.run(task))
+        if result.route == "fireworks_error":
+            raise RuntimeError(f"Fireworks failed for task_id={task.id}; refusing to publish a synthetic answer.")
+        results.append(result)
     _validate_track1_alignment(tasks, results)
     _write_atomic_text(args.output, adapter.format(results))
     _write_optional_resource_report(started_at, tasks=len(tasks), results=len(results))

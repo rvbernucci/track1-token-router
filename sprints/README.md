@@ -35,7 +35,7 @@ Sprints 55-59 recalibrate E2B from a new 2,000-task corpus. They separate pre-in
 Sprints 60-64 validate the exact public hybrid image rather than a source-tree approximation. They use the remaining AMD notebook window and a bounded Fireworks budget to prove real local inference, exercise every route, measure the ten-minute batch envelope, calibrate the Pareto frontier and publish one final auditable release decision.
 
 - [x] [Sprint 60 - Exact-Image Local Inference Proof](./60-exact-image-local-inference-proof/README.md)
-- [ ] [Sprint 61 - Three-Route Failure And Contract Drill](./61-three-route-failure-contract-drill/README.md)
+- [x] [Sprint 61 - Three-Route Failure And Contract Drill](./61-three-route-failure-contract-drill/README.md)
 - [ ] [Sprint 62 - Eight-Category Ten-Minute Arena](./62-eight-category-ten-minute-arena/README.md)
 - [ ] [Sprint 63 - Fireworks Pareto Threshold Calibration](./63-fireworks-pareto-threshold-calibration/README.md)
 - [ ] [Sprint 64 - Final Hybrid Promotion And Submission Lock](./64-final-hybrid-promotion-submission-lock/README.md)

@@ -622,6 +622,46 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertEqual(completed.stdout, "")
         self.assertEqual(payload, [{"task_id": "t1", "answer": "Token routing matters."}])
 
+    def test_submit_track1_remote_failure_exits_nonzero_without_output(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            input_path = root / "tasks.json"
+            output_path = root / "results.json"
+            input_path.write_text(
+                json.dumps([{"task_id": "remote-failure", "prompt": "Summarise this: token routing matters."}]),
+                encoding="utf-8",
+            )
+            with FakeOpenAIServer(status=503) as server:
+                env = {
+                    **os.environ,
+                    "ROUTER_MODE": "fireworks",
+                    "FIREWORKS_API_KEY": "test-key",
+                    "FIREWORKS_BASE_URL": server.url,
+                    "ALLOWED_MODELS": "minimax-m3",
+                    "FIREWORKS_MAX_RETRIES": "0",
+                    "ROUTER_LOG_PATH": str(root / "run.jsonl"),
+                }
+                completed = subprocess.run(
+                    [
+                        sys.executable,
+                        "-m",
+                        "router",
+                        "submit-track1",
+                        "--input",
+                        str(input_path),
+                        "--output",
+                        str(output_path),
+                    ],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    env=env,
+                )
+
+            self.assertNotEqual(completed.returncode, 0)
+            self.assertFalse(output_path.exists())
+            self.assertIn("refusing to publish a synthetic answer", completed.stderr)
+
 class _RejectReasoningOnceClient:
     def __init__(self) -> None:
         self.model = "accounts/fireworks/models/glm-5p1"

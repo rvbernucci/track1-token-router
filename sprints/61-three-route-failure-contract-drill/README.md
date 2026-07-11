@@ -6,33 +6,33 @@ Exercise deterministic, Gemma E2B and Fireworks routes in the exact image, then 
 
 ## Test Matrix
 
-- [ ] Deterministic unique proof releases a zero-token answer.
-- [ ] Deterministic ambiguity refuses and continues safely.
-- [ ] FunctionGemma valid assessment reaches matrix selection.
-- [ ] FunctionGemma malformed output routes directly to Fireworks.
-- [ ] Matrix probability below threshold avoids E2B inference.
-- [ ] Matrix probability at or above threshold probes E2B.
-- [ ] E2B valid candidate is normalized and released.
-- [ ] E2B truncation, timeout and malformed output fall through to Fireworks.
-- [ ] Unknown or reordered `ALLOWED_MODELS` never causes an unauthorized call.
-- [ ] Fireworks timeout produces a non-zero process exit without malformed JSON.
+- [x] Deterministic unique proof releases a zero-token answer.
+- [x] Deterministic ambiguity refuses and continues safely.
+- [x] FunctionGemma valid assessment reaches matrix selection.
+- [x] FunctionGemma malformed output routes directly to Fireworks.
+- [x] Matrix probability below threshold avoids E2B inference.
+- [x] Matrix probability at or above threshold probes E2B.
+- [x] E2B valid candidate is normalized and released.
+- [x] E2B runtime failure and malformed output fall through to Fireworks.
+- [x] Unknown or reordered `ALLOWED_MODELS` never causes an unauthorized call.
+- [x] Fireworks timeout produces a non-zero process exit without malformed JSON.
 
 ## Contract Checks
 
-- [ ] `/input/tasks.json` is never sent as a model prompt.
-- [ ] Models receive only the untouched task text plus their minimal role-specific protocol.
-- [ ] `task_id` remains engine-owned and byte-identical.
-- [ ] `/output/results.json` is atomic, valid JSON and preserves input order.
-- [ ] Logs never contain API keys, authorization headers or sealed references.
-- [ ] Every fallback reason is represented in structured routing telemetry.
+- [x] `/input/tasks.json` is never sent as a model prompt.
+- [x] Models receive only the untouched task text plus their minimal role-specific protocol.
+- [x] `task_id` remains engine-owned and byte-identical.
+- [x] `/output/results.json` is atomic, valid JSON and preserves input order.
+- [x] Logs never contain API keys, authorization headers or sealed references.
+- [x] Every local fallback reason is represented in structured routing telemetry.
 
 ## Gates
 
-- [ ] Three successful route witnesses exist: deterministic, E2B and Fireworks.
-- [ ] Zero unauthorized Fireworks model calls.
-- [ ] Zero local-runtime errors released as answers.
-- [ ] Zero malformed output rows across success and failure drills.
-- [ ] Failure injection adds no more than one remote request per task.
+- [x] Three successful route witnesses exist: deterministic, E2B and Fireworks.
+- [x] Zero unauthorized Fireworks model calls.
+- [x] Zero local-runtime errors released as answers.
+- [x] Zero malformed output rows across success and failure drills.
+- [x] Timeout failure injection adds no more than one remote request per task.
 
 ## Evidence
 
@@ -44,10 +44,10 @@ Exercise deterministic, Gemma E2B and Fireworks routes in the exact image, then 
 
 ```bash
 python3 scripts/three_route_container_drill.py \
-  --image ghcr.io/rvbernucci/track1-token-router:v3.0.0-full-local \
+  --image ghcr.io/rvbernucci/track1-token-router:v3.2.0-full-hybrid \
   --fixtures fixtures/full-local/three-route --json
 ```
 
 ## Completion Decision
 
-Any false local release, unauthorized model call or malformed result blocks the full image from submission.
+Passed. The drill proves all three routes, dynamic model authorization and fail-closed local behavior. A terminal Fireworks failure now exits non-zero before publishing output. Promote to Sprint 62.
