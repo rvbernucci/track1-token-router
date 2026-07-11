@@ -44,7 +44,7 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-The final `v3.3.0-full-hybrid` image passed public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract and real local-inference gates. It is the promoted submission image; `v2.1.0-proof-router` remains the compact rollback.
+The integrated `v3.5.0-full-hybrid` image passed public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract and fail-closed runtime gates. It includes the Sprint 65-69 routing, Pareto, contract-fuzzing and deadline hardening; `v2.1.0-proof-router` remains the compact rollback.
 
 ## Quickstart
 
@@ -138,7 +138,7 @@ ROUTER_MODE=three_route
 The final hybrid championship candidate is:
 
 ```text
-ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid
+ghcr.io/rvbernucci/track1-token-router:v3.5.0-full-hybrid
 ```
 
 It embeds FunctionGemma 270M Q8 and text-only Gemma 4 E2B, requires no startup downloads, and falls through to evaluator-authorized Fireworks models. The compact rollback remains `v2.1.0-proof-router`.

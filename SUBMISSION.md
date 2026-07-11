@@ -45,4 +45,4 @@ No `.env` file is required or included. The harness injects `FIREWORKS_API_KEY`,
 
 ## Current Status
 
-The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid`; `v2.1.0-proof-router` is the compact rollback. Release run `29158458646` and exact local-inference run `29158947843` are green. The image is 2,666,216,379 compressed bytes and requires no startup downloads.
+The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.5.0-full-hybrid`; `v2.1.0-proof-router` is the compact rollback. Integrated release run `29171230908` and the 96-task live predecessor arena are green. The image is 2,666,207,512 compressed bytes and requires no startup downloads.
