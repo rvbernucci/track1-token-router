@@ -42,6 +42,18 @@ Sprints 60-64 validate the exact public hybrid image rather than a source-tree a
 
 ## Completed Foundation
 
+## Post-Submission Robustness Sequence
+
+Sprints 65-69 attack the largest remaining uncertainty: routing accuracy under unseen prompts and shifted evaluator distributions. They are sequential so that E2B safety is established before remote-policy expansion, live integration, contract fuzzing and distribution economics.
+
+- [ ] [Sprint 65 - Adversarial E2B Boundary Audit](./65-adversarial-e2b-boundary-audit/README.md)
+- [ ] [Sprint 66 - Expanded Fireworks Pareto Arena](./66-expanded-fireworks-pareto-arena/README.md)
+- [ ] [Sprint 67 - Live Three-Route End-to-End Arena](./67-live-three-route-end-to-end-arena/README.md)
+- [ ] [Sprint 68 - Answer Contract Adversarial Fuzzing](./68-answer-contract-adversarial-fuzzing/README.md)
+- [ ] [Sprint 69 - Distribution Shift And Token Economics](./69-distribution-shift-token-economics/README.md)
+
+## Completed Foundation
+
 Sprints 01-44 produced reusable infrastructure: CLI contracts, adapters, tests, deterministic solvers, Fireworks integration, Pareto/game-theory selection, eval packs, observability, Docker and release automation.
 
 The detailed retired-cascade sprint documents were removed. Git history preserves the experiment without allowing it to compete with the current specification.
