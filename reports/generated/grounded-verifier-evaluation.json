@@ -1,0 +1,355 @@
+{
+  "by_family": {
+    "context_qa": {
+      "accepted": 8,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 23,
+      "true_negative": 15,
+      "true_positive": 8
+    },
+    "ner": {
+      "accepted": 17,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 34,
+      "true_negative": 17,
+      "true_positive": 17
+    },
+    "sentiment": {
+      "accepted": 22,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 47,
+      "true_negative": 25,
+      "true_positive": 22
+    },
+    "summary": {
+      "accepted": 13,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 25,
+      "true_negative": 12,
+      "true_positive": 13
+    }
+  },
+  "by_language": {
+    "en": {
+      "accepted": 53,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 114,
+      "true_negative": 61,
+      "true_positive": 53
+    },
+    "pt": {
+      "accepted": 7,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 15,
+      "true_negative": 8,
+      "true_positive": 7
+    }
+  },
+  "by_subtype": {
+    "abstractive_contract": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 1,
+      "true_negative": 1
+    },
+    "abstractive_paraphrase": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 6,
+      "true_negative": 6
+    },
+    "aspect_high_margin": {
+      "accepted": 4,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 4,
+      "true_positive": 4
+    },
+    "candidate_mismatch": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 8,
+      "true_negative": 8
+    },
+    "cardinality_attack": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 1,
+      "true_negative": 1
+    },
+    "conflicting_support": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 4,
+      "true_negative": 4
+    },
+    "dropped_required_entity": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 1,
+      "true_negative": 1
+    },
+    "dropped_required_number": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 1,
+      "true_negative": 1
+    },
+    "dropped_required_term": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 1,
+      "true_negative": 1
+    },
+    "extractive_sentence": {
+      "accepted": 12,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 12,
+      "true_positive": 12
+    },
+    "format_violation": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 1,
+      "true_negative": 1
+    },
+    "hallucinated_entity": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 6,
+      "true_negative": 6
+    },
+    "high_margin": {
+      "accepted": 18,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 18,
+      "true_positive": 18
+    },
+    "incomplete_arrays": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 1,
+      "true_negative": 1
+    },
+    "incomplete_entity_list": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 3,
+      "true_negative": 3
+    },
+    "low_margin": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 2,
+      "true_negative": 2
+    },
+    "missing_support": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 1,
+      "true_negative": 1
+    },
+    "mixed": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 2,
+      "true_negative": 2
+    },
+    "model_disagreement": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 18,
+      "true_negative": 18
+    },
+    "non_unique_support": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 1,
+      "true_negative": 1
+    },
+    "open_world_temporal": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 1,
+      "true_negative": 1
+    },
+    "payment": {
+      "accepted": 6,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 6,
+      "true_positive": 6
+    },
+    "required_facts": {
+      "accepted": 1,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 1,
+      "true_positive": 1
+    },
+    "sarcasm": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 2,
+      "true_negative": 2
+    },
+    "schema_attack": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 1,
+      "true_negative": 1
+    },
+    "source_instruction_injection": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 2,
+      "true_negative": 2
+    },
+    "typed_arrays": {
+      "accepted": 5,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 5,
+      "true_positive": 5
+    },
+    "typed_entity_list": {
+      "accepted": 3,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 3,
+      "true_positive": 3
+    },
+    "unique_support": {
+      "accepted": 8,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 8,
+      "true_positive": 8
+    },
+    "wrong_entity_role": {
+      "accepted": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 5,
+      "true_negative": 5
+    },
+    "zero_entity": {
+      "accepted": 3,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 3,
+      "true_positive": 3
+    }
+  },
+  "dataset": "/Users/rvbernucci/Unidade de Vida/60-AMD Developer Hackathon/track1-token-router/evals/grounded-verifier/grounded-holdout.jsonl",
+  "failures": [],
+  "gate": {
+    "all_promoted_references_released": true,
+    "batch_below_ten_minutes": true,
+    "every_family_has_at_least_eight_verified_releases": true,
+    "every_family_precision_at_least_90_percent": true,
+    "expected_evidence_recall_100_percent": true,
+    "fresh_holdout_at_least_120_rows": true,
+    "p95_below_10_ms": true,
+    "passed": true,
+    "sentiment_en_pt_precision_at_least_90_percent": true,
+    "source_span_precision_100_percent": true,
+    "zero_context_contradiction_releases": true,
+    "zero_false_releases": true,
+    "zero_hallucinated_entity_releases": true,
+    "zero_open_world_releases": true,
+    "zero_summary_factual_violations": true
+  },
+  "rejection_reasons": {
+    "abstractive_summary_not_provably_grounded": 6,
+    "abstractive_summary_requires_remote_model": 1,
+    "ambiguous_or_wrong_entity_role:organizations": 5,
+    "answer_contract:exact_sentence_count_mismatch": 1,
+    "answer_not_present_in_context": 1,
+    "candidate_disagrees_with_unique_support": 8,
+    "cardinality_mismatch:organizations": 1,
+    "conflicting_context_mentions": 4,
+    "e2b_lexicon_disagreement": 18,
+    "entity_absent_from_source:payee": 6,
+    "missing_requested_entity:location": 3,
+    "missing_requested_entity:organizations": 1,
+    "mixed_sentiment_escalation": 2,
+    "ner_schema_key_mismatch": 1,
+    "open_world_temporal_question": 1,
+    "required_entity_dropped": 1,
+    "required_number_dropped": 1,
+    "required_summary_term_missing": 1,
+    "sarcasm_or_irony_detected": 2,
+    "sentiment_margin_below_threshold": 2,
+    "source_instruction_injection_detected": 2,
+    "support_not_unique": 1
+  },
+  "schema_version": "grounded-verifier-evaluation-v1",
+  "sentiment_by_language": {
+    "en": {
+      "accepted": 15,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 32,
+      "true_negative": 17,
+      "true_positive": 15
+    },
+    "pt": {
+      "accepted": 7,
+      "precision": 1.0,
+      "recall": 1.0,
+      "rows": 15,
+      "true_negative": 8,
+      "true_positive": 7
+    }
+  },
+  "summary": {
+    "accepted": 60,
+    "batch_runtime_ms": 42.82383399549872,
+    "estimated_fireworks_calls_avoided": 60,
+    "estimated_fireworks_tokens_avoided": 2480,
+    "exact_spans": 114,
+    "expected_accept": 60,
+    "expected_evidence": 64,
+    "expected_evidence_recall": 1.0,
+    "latency_mean_ms": 0.3228915046247141,
+    "latency_p50_ms": 0.13829099771101028,
+    "latency_p95_ms": 0.8711660047993064,
+    "local_coverage": 0.46511627906976744,
+    "recalled_evidence": 64,
+    "released_spans": 114,
+    "rows": 129,
+    "source_span_precision": 1.0,
+    "true_negative": 69,
+    "true_positive": 60
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "compressed_size_bytes": 51565149,
+  "cpus": 2,
+  "image": "linux/amd64",
+  "maximum_runtime_seconds": 600,
+  "memory_limit_bytes": 4294967296,
+  "network": "none",
+  "observed_runtime_seconds": 1,
+  "ok": true,
+  "process_elapsed_ms": 29,
+  "process_max_rss_mib": 28.484,
+  "result_rows": 2,
+  "schema_version": "docker-resource-gate-v1",
+  "uncompressed_size_bytes": 130801668
+}

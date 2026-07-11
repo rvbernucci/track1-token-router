@@ -1,0 +1,921 @@
+{
+  "decision": {
+    "gates": {
+      "accuracy_regression_at_most_one_point": true,
+      "candidate_frozen_before_unseal": true,
+      "local_precision_at_least_95pct": true,
+      "local_wilson_at_least_90pct": false,
+      "overall_accuracy_gate": true,
+      "positive_token_savings_lower_bound": false,
+      "probability_flip_rate_below_5pct": true,
+      "score_shift_flip_rate_below_5pct": true,
+      "upstream_hashes_verified": true,
+      "zero_verifier_invalid_releases": true
+    },
+    "reason": "V2 rejected on frozen evidence; retain proof-carrying deterministic plus Fireworks.",
+    "statistical_promotion": false
+  },
+  "declared_accuracy_gate": 0.6,
+  "input_mixes": {
+    "balanced": {
+      "deterministic_fireworks": {
+        "accuracy": 0.65,
+        "categories": {
+          "code_debugging": {
+            "accuracy": 0.64,
+            "correct": 32,
+            "rows": 50
+          },
+          "code_generation": {
+            "accuracy": 0.44,
+            "correct": 22,
+            "rows": 50
+          },
+          "factual_qa": {
+            "accuracy": 0.82,
+            "correct": 41,
+            "rows": 50
+          },
+          "logic_puzzle": {
+            "accuracy": 0.6,
+            "correct": 30,
+            "rows": 50
+          },
+          "math_reasoning": {
+            "accuracy": 0.78,
+            "correct": 39,
+            "rows": 50
+          },
+          "ner": {
+            "accuracy": 0.48,
+            "correct": 24,
+            "rows": 50
+          },
+          "sentiment": {
+            "accuracy": 0.94,
+            "correct": 47,
+            "rows": 50
+          },
+          "summarization": {
+            "accuracy": 0.5,
+            "correct": 25,
+            "rows": 50
+          }
+        },
+        "correct": 260,
+        "fireworks_tokens": 249646,
+        "local_coverage": 0.0,
+        "local_precision": 0.0,
+        "local_releases": 0,
+        "local_wilson_lower_95": 0.0,
+        "rows": 400,
+        "verifier_invalid_releases": 0
+      },
+      "e2b_probe": {
+        "accuracy": 0.65,
+        "categories": {
+          "code_debugging": {
+            "accuracy": 0.64,
+            "correct": 32,
+            "rows": 50
+          },
+          "code_generation": {
+            "accuracy": 0.44,
+            "correct": 22,
+            "rows": 50
+          },
+          "factual_qa": {
+            "accuracy": 0.82,
+            "correct": 41,
+            "rows": 50
+          },
+          "logic_puzzle": {
+            "accuracy": 0.6,
+            "correct": 30,
+            "rows": 50
+          },
+          "math_reasoning": {
+            "accuracy": 0.78,
+            "correct": 39,
+            "rows": 50
+          },
+          "ner": {
+            "accuracy": 0.48,
+            "correct": 24,
+            "rows": 50
+          },
+          "sentiment": {
+            "accuracy": 0.94,
+            "correct": 47,
+            "rows": 50
+          },
+          "summarization": {
+            "accuracy": 0.5,
+            "correct": 25,
+            "rows": 50
+          }
+        },
+        "correct": 260,
+        "fireworks_tokens": 248951,
+        "local_coverage": 0.0075,
+        "local_precision": 1.0,
+        "local_releases": 3,
+        "local_wilson_lower_95": 0.4385029682449545,
+        "rows": 400,
+        "verifier_invalid_releases": 0
+      },
+      "fireworks_only": {
+        "accuracy": 0.65,
+        "categories": {
+          "code_debugging": {
+            "accuracy": 0.64,
+            "correct": 32,
+            "rows": 50
+          },
+          "code_generation": {
+            "accuracy": 0.44,
+            "correct": 22,
+            "rows": 50
+          },
+          "factual_qa": {
+            "accuracy": 0.82,
+            "correct": 41,
+            "rows": 50
+          },
+          "logic_puzzle": {
+            "accuracy": 0.6,
+            "correct": 30,
+            "rows": 50
+          },
+          "math_reasoning": {
+            "accuracy": 0.78,
+            "correct": 39,
+            "rows": 50
+          },
+          "ner": {
+            "accuracy": 0.48,
+            "correct": 24,
+            "rows": 50
+          },
+          "sentiment": {
+            "accuracy": 0.94,
+            "correct": 47,
+            "rows": 50
+          },
+          "summarization": {
+            "accuracy": 0.5,
+            "correct": 25,
+            "rows": 50
+          }
+        },
+        "correct": 260,
+        "fireworks_tokens": 249646,
+        "local_coverage": 0.0,
+        "local_precision": 0.0,
+        "local_releases": 0,
+        "local_wilson_lower_95": 0.0,
+        "rows": 400,
+        "verifier_invalid_releases": 0
+      },
+      "full_v2": {
+        "accuracy": 0.65,
+        "categories": {
+          "code_debugging": {
+            "accuracy": 0.64,
+            "correct": 32,
+            "rows": 50
+          },
+          "code_generation": {
+            "accuracy": 0.44,
+            "correct": 22,
+            "rows": 50
+          },
+          "factual_qa": {
+            "accuracy": 0.82,
+            "correct": 41,
+            "rows": 50
+          },
+          "logic_puzzle": {
+            "accuracy": 0.6,
+            "correct": 30,
+            "rows": 50
+          },
+          "math_reasoning": {
+            "accuracy": 0.78,
+            "correct": 39,
+            "rows": 50
+          },
+          "ner": {
+            "accuracy": 0.48,
+            "correct": 24,
+            "rows": 50
+          },
+          "sentiment": {
+            "accuracy": 0.94,
+            "correct": 47,
+            "rows": 50
+          },
+          "summarization": {
+            "accuracy": 0.5,
+            "correct": 25,
+            "rows": 50
+          }
+        },
+        "correct": 260,
+        "fireworks_tokens": 248951,
+        "local_coverage": 0.0075,
+        "local_precision": 1.0,
+        "local_releases": 3,
+        "local_wilson_lower_95": 0.4385029682449545,
+        "rows": 400,
+        "verifier_invalid_releases": 0
+      }
+    },
+    "code_math_heavy": {
+      "deterministic_fireworks": {
+        "accuracy": 0.6341176470588236,
+        "categories": {
+          "code_debugging": {
+            "accuracy": 0.64,
+            "correct": 128,
+            "rows": 200
+          },
+          "code_generation": {
+            "accuracy": 0.44,
+            "correct": 88,
+            "rows": 200
+          },
+          "factual_qa": {
+            "accuracy": 0.82,
+            "correct": 41,
+            "rows": 50
+          },
+          "logic_puzzle": {
+            "accuracy": 0.6,
+            "correct": 30,
+            "rows": 50
+          },
+          "math_reasoning": {
+            "accuracy": 0.78,
+            "correct": 156,
+            "rows": 200
+          },
+          "ner": {
+            "accuracy": 0.48,
+            "correct": 24,
+            "rows": 50
+          },
+          "sentiment": {
+            "accuracy": 0.94,
+            "correct": 47,
+            "rows": 50
+          },
+          "summarization": {
+            "accuracy": 0.5,
+            "correct": 25,
+            "rows": 50
+          }
+        },
+        "correct": 539,
+        "fireworks_tokens": 537244,
+        "local_coverage": 0.0,
+        "local_precision": 0.0,
+        "local_releases": 0,
+        "local_wilson_lower_95": 0.0,
+        "rows": 850,
+        "verifier_invalid_releases": 0
+      },
+      "e2b_probe": {
+        "accuracy": 0.6341176470588236,
+        "categories": {
+          "code_debugging": {
+            "accuracy": 0.64,
+            "correct": 128,
+            "rows": 200
+          },
+          "code_generation": {
+            "accuracy": 0.44,
+            "correct": 88,
+            "rows": 200
+          },
+          "factual_qa": {
+            "accuracy": 0.82,
+            "correct": 41,
+            "rows": 50
+          },
+          "logic_puzzle": {
+            "accuracy": 0.6,
+            "correct": 30,
+            "rows": 50
+          },
+          "math_reasoning": {
+            "accuracy": 0.78,
+            "correct": 156,
+            "rows": 200
+          },
+          "ner": {
+            "accuracy": 0.48,
+            "correct": 24,
+            "rows": 50
+          },
+          "sentiment": {
+            "accuracy": 0.94,
+            "correct": 47,
+            "rows": 50
+          },
+          "summarization": {
+            "accuracy": 0.5,
+            "correct": 25,
+            "rows": 50
+          }
+        },
+        "correct": 539,
+        "fireworks_tokens": 536549,
+        "local_coverage": 0.0035294117647058825,
+        "local_precision": 1.0,
+        "local_releases": 3,
+        "local_wilson_lower_95": 0.4385029682449545,
+        "rows": 850,
+        "verifier_invalid_releases": 0
+      },
+      "fireworks_only": {
+        "accuracy": 0.6341176470588236,
+        "categories": {
+          "code_debugging": {
+            "accuracy": 0.64,
+            "correct": 128,
+            "rows": 200
+          },
+          "code_generation": {
+            "accuracy": 0.44,
+            "correct": 88,
+            "rows": 200
+          },
+          "factual_qa": {
+            "accuracy": 0.82,
+            "correct": 41,
+            "rows": 50
+          },
+          "logic_puzzle": {
+            "accuracy": 0.6,
+            "correct": 30,
+            "rows": 50
+          },
+          "math_reasoning": {
+            "accuracy": 0.78,
+            "correct": 156,
+            "rows": 200
+          },
+          "ner": {
+            "accuracy": 0.48,
+            "correct": 24,
+            "rows": 50
+          },
+          "sentiment": {
+            "accuracy": 0.94,
+            "correct": 47,
+            "rows": 50
+          },
+          "summarization": {
+            "accuracy": 0.5,
+            "correct": 25,
+            "rows": 50
+          }
+        },
+        "correct": 539,
+        "fireworks_tokens": 537244,
+        "local_coverage": 0.0,
+        "local_precision": 0.0,
+        "local_releases": 0,
+        "local_wilson_lower_95": 0.0,
+        "rows": 850,
+        "verifier_invalid_releases": 0
+      },
+      "full_v2": {
+        "accuracy": 0.6341176470588236,
+        "categories": {
+          "code_debugging": {
+            "accuracy": 0.64,
+            "correct": 128,
+            "rows": 200
+          },
+          "code_generation": {
+            "accuracy": 0.44,
+            "correct": 88,
+            "rows": 200
+          },
+          "factual_qa": {
+            "accuracy": 0.82,
+            "correct": 41,
+            "rows": 50
+          },
+          "logic_puzzle": {
+            "accuracy": 0.6,
+            "correct": 30,
+            "rows": 50
+          },
+          "math_reasoning": {
+            "accuracy": 0.78,
+            "correct": 156,
+            "rows": 200
+          },
+          "ner": {
+            "accuracy": 0.48,
+            "correct": 24,
+            "rows": 50
+          },
+          "sentiment": {
+            "accuracy": 0.94,
+            "correct": 47,
+            "rows": 50
+          },
+          "summarization": {
+            "accuracy": 0.5,
+            "correct": 25,
+            "rows": 50
+          }
+        },
+        "correct": 539,
+        "fireworks_tokens": 536549,
+        "local_coverage": 0.0035294117647058825,
+        "local_precision": 1.0,
+        "local_releases": 3,
+        "local_wilson_lower_95": 0.4385029682449545,
+        "rows": 850,
+        "verifier_invalid_releases": 0
+      }
+    },
+    "sentiment_ner_heavy": {
+      "deterministic_fireworks": {
+        "accuracy": 0.6757142857142857,
+        "categories": {
+          "code_debugging": {
+            "accuracy": 0.64,
+            "correct": 32,
+            "rows": 50
+          },
+          "code_generation": {
+            "accuracy": 0.44,
+            "correct": 22,
+            "rows": 50
+          },
+          "factual_qa": {
+            "accuracy": 0.82,
+            "correct": 41,
+            "rows": 50
+          },
+          "logic_puzzle": {
+            "accuracy": 0.6,
+            "correct": 30,
+            "rows": 50
+          },
+          "math_reasoning": {
+            "accuracy": 0.78,
+            "correct": 39,
+            "rows": 50
+          },
+          "ner": {
+            "accuracy": 0.48,
+            "correct": 96,
+            "rows": 200
+          },
+          "sentiment": {
+            "accuracy": 0.94,
+            "correct": 188,
+            "rows": 200
+          },
+          "summarization": {
+            "accuracy": 0.5,
+            "correct": 25,
+            "rows": 50
+          }
+        },
+        "correct": 473,
+        "fireworks_tokens": 434080,
+        "local_coverage": 0.0,
+        "local_precision": 0.0,
+        "local_releases": 0,
+        "local_wilson_lower_95": 0.0,
+        "rows": 700,
+        "verifier_invalid_releases": 0
+      },
+      "e2b_probe": {
+        "accuracy": 0.6757142857142857,
+        "categories": {
+          "code_debugging": {
+            "accuracy": 0.64,
+            "correct": 32,
+            "rows": 50
+          },
+          "code_generation": {
+            "accuracy": 0.44,
+            "correct": 22,
+            "rows": 50
+          },
+          "factual_qa": {
+            "accuracy": 0.82,
+            "correct": 41,
+            "rows": 50
+          },
+          "logic_puzzle": {
+            "accuracy": 0.6,
+            "correct": 30,
+            "rows": 50
+          },
+          "math_reasoning": {
+            "accuracy": 0.78,
+            "correct": 39,
+            "rows": 50
+          },
+          "ner": {
+            "accuracy": 0.48,
+            "correct": 96,
+            "rows": 200
+          },
+          "sentiment": {
+            "accuracy": 0.94,
+            "correct": 188,
+            "rows": 200
+          },
+          "summarization": {
+            "accuracy": 0.5,
+            "correct": 25,
+            "rows": 50
+          }
+        },
+        "correct": 473,
+        "fireworks_tokens": 431300,
+        "local_coverage": 0.017142857142857144,
+        "local_precision": 1.0,
+        "local_releases": 12,
+        "local_wilson_lower_95": 0.7575059933447591,
+        "rows": 700,
+        "verifier_invalid_releases": 0
+      },
+      "fireworks_only": {
+        "accuracy": 0.6757142857142857,
+        "categories": {
+          "code_debugging": {
+            "accuracy": 0.64,
+            "correct": 32,
+            "rows": 50
+          },
+          "code_generation": {
+            "accuracy": 0.44,
+            "correct": 22,
+            "rows": 50
+          },
+          "factual_qa": {
+            "accuracy": 0.82,
+            "correct": 41,
+            "rows": 50
+          },
+          "logic_puzzle": {
+            "accuracy": 0.6,
+            "correct": 30,
+            "rows": 50
+          },
+          "math_reasoning": {
+            "accuracy": 0.78,
+            "correct": 39,
+            "rows": 50
+          },
+          "ner": {
+            "accuracy": 0.48,
+            "correct": 96,
+            "rows": 200
+          },
+          "sentiment": {
+            "accuracy": 0.94,
+            "correct": 188,
+            "rows": 200
+          },
+          "summarization": {
+            "accuracy": 0.5,
+            "correct": 25,
+            "rows": 50
+          }
+        },
+        "correct": 473,
+        "fireworks_tokens": 434080,
+        "local_coverage": 0.0,
+        "local_precision": 0.0,
+        "local_releases": 0,
+        "local_wilson_lower_95": 0.0,
+        "rows": 700,
+        "verifier_invalid_releases": 0
+      },
+      "full_v2": {
+        "accuracy": 0.6757142857142857,
+        "categories": {
+          "code_debugging": {
+            "accuracy": 0.64,
+            "correct": 32,
+            "rows": 50
+          },
+          "code_generation": {
+            "accuracy": 0.44,
+            "correct": 22,
+            "rows": 50
+          },
+          "factual_qa": {
+            "accuracy": 0.82,
+            "correct": 41,
+            "rows": 50
+          },
+          "logic_puzzle": {
+            "accuracy": 0.6,
+            "correct": 30,
+            "rows": 50
+          },
+          "math_reasoning": {
+            "accuracy": 0.78,
+            "correct": 39,
+            "rows": 50
+          },
+          "ner": {
+            "accuracy": 0.48,
+            "correct": 96,
+            "rows": 200
+          },
+          "sentiment": {
+            "accuracy": 0.94,
+            "correct": 188,
+            "rows": 200
+          },
+          "summarization": {
+            "accuracy": 0.5,
+            "correct": 25,
+            "rows": 50
+          }
+        },
+        "correct": 473,
+        "fireworks_tokens": 431300,
+        "local_coverage": 0.017142857142857144,
+        "local_precision": 1.0,
+        "local_releases": 12,
+        "local_wilson_lower_95": 0.7575059933447591,
+        "rows": 700,
+        "verifier_invalid_releases": 0
+      }
+    }
+  },
+  "manifest": {
+    "candidate_policy_sha256": "89102553c25a299a5596aa861e2b463e0f5755daa177f4705a06079018ad6753",
+    "fireworks_baseline_sha256": "b9ea6b5ed66ea21d2f2b50aab35e1d2e20a9ee65757115330054b004d004df39",
+    "fireworks_judgments": {
+      "agy_sha256": "aba98b9ee7199d310efa0a00faff148d5f44bbf1ec027ee668f9e6604e6b3712",
+      "codex_sha256": "0c6447e5cccb47bc1e269309599c33cf166e831f79bb7c87765ac5e201f7884b"
+    },
+    "schema_version": "e2b-v2-championship-run-manifest-v1",
+    "threshold_or_coefficient_changes_after_unseal": false,
+    "upstream": {
+      "gates": {
+        "candidate_disabled": true,
+        "development_candidates": true,
+        "development_labels": true,
+        "sealed_candidates": true,
+        "sealed_labels": true
+      },
+      "passed": true
+    }
+  },
+  "paired_token_bootstrap": {
+    "deterministic_fireworks": {
+      "resamples": 1000,
+      "tokens_saved_ci95": [
+        0,
+        0
+      ]
+    },
+    "e2b_probe": {
+      "resamples": 1000,
+      "tokens_saved_ci95": [
+        0,
+        1623
+      ]
+    },
+    "full_v2": {
+      "resamples": 1000,
+      "tokens_saved_ci95": [
+        0,
+        1592
+      ]
+    }
+  },
+  "schema_version": "e2b-regression-v2-championship-v1",
+  "variants": {
+    "deterministic_fireworks": {
+      "accuracy": 0.65,
+      "categories": {
+        "code_debugging": {
+          "accuracy": 0.64,
+          "correct": 32,
+          "rows": 50
+        },
+        "code_generation": {
+          "accuracy": 0.44,
+          "correct": 22,
+          "rows": 50
+        },
+        "factual_qa": {
+          "accuracy": 0.82,
+          "correct": 41,
+          "rows": 50
+        },
+        "logic_puzzle": {
+          "accuracy": 0.6,
+          "correct": 30,
+          "rows": 50
+        },
+        "math_reasoning": {
+          "accuracy": 0.78,
+          "correct": 39,
+          "rows": 50
+        },
+        "ner": {
+          "accuracy": 0.48,
+          "correct": 24,
+          "rows": 50
+        },
+        "sentiment": {
+          "accuracy": 0.94,
+          "correct": 47,
+          "rows": 50
+        },
+        "summarization": {
+          "accuracy": 0.5,
+          "correct": 25,
+          "rows": 50
+        }
+      },
+      "correct": 260,
+      "fireworks_tokens": 249646,
+      "local_coverage": 0.0,
+      "local_precision": 0.0,
+      "local_releases": 0,
+      "local_wilson_lower_95": 0.0,
+      "rows": 400,
+      "verifier_invalid_releases": 0
+    },
+    "e2b_probe": {
+      "accuracy": 0.65,
+      "categories": {
+        "code_debugging": {
+          "accuracy": 0.64,
+          "correct": 32,
+          "rows": 50
+        },
+        "code_generation": {
+          "accuracy": 0.44,
+          "correct": 22,
+          "rows": 50
+        },
+        "factual_qa": {
+          "accuracy": 0.82,
+          "correct": 41,
+          "rows": 50
+        },
+        "logic_puzzle": {
+          "accuracy": 0.6,
+          "correct": 30,
+          "rows": 50
+        },
+        "math_reasoning": {
+          "accuracy": 0.78,
+          "correct": 39,
+          "rows": 50
+        },
+        "ner": {
+          "accuracy": 0.48,
+          "correct": 24,
+          "rows": 50
+        },
+        "sentiment": {
+          "accuracy": 0.94,
+          "correct": 47,
+          "rows": 50
+        },
+        "summarization": {
+          "accuracy": 0.5,
+          "correct": 25,
+          "rows": 50
+        }
+      },
+      "correct": 260,
+      "fireworks_tokens": 248951,
+      "local_coverage": 0.0075,
+      "local_precision": 1.0,
+      "local_releases": 3,
+      "local_wilson_lower_95": 0.4385029682449545,
+      "rows": 400,
+      "verifier_invalid_releases": 0
+    },
+    "fireworks_only": {
+      "accuracy": 0.65,
+      "categories": {
+        "code_debugging": {
+          "accuracy": 0.64,
+          "correct": 32,
+          "rows": 50
+        },
+        "code_generation": {
+          "accuracy": 0.44,
+          "correct": 22,
+          "rows": 50
+        },
+        "factual_qa": {
+          "accuracy": 0.82,
+          "correct": 41,
+          "rows": 50
+        },
+        "logic_puzzle": {
+          "accuracy": 0.6,
+          "correct": 30,
+          "rows": 50
+        },
+        "math_reasoning": {
+          "accuracy": 0.78,
+          "correct": 39,
+          "rows": 50
+        },
+        "ner": {
+          "accuracy": 0.48,
+          "correct": 24,
+          "rows": 50
+        },
+        "sentiment": {
+          "accuracy": 0.94,
+          "correct": 47,
+          "rows": 50
+        },
+        "summarization": {
+          "accuracy": 0.5,
+          "correct": 25,
+          "rows": 50
+        }
+      },
+      "correct": 260,
+      "fireworks_tokens": 249646,
+      "local_coverage": 0.0,
+      "local_precision": 0.0,
+      "local_releases": 0,
+      "local_wilson_lower_95": 0.0,
+      "rows": 400,
+      "verifier_invalid_releases": 0
+    },
+    "full_v2": {
+      "accuracy": 0.65,
+      "categories": {
+        "code_debugging": {
+          "accuracy": 0.64,
+          "correct": 32,
+          "rows": 50
+        },
+        "code_generation": {
+          "accuracy": 0.44,
+          "correct": 22,
+          "rows": 50
+        },
+        "factual_qa": {
+          "accuracy": 0.82,
+          "correct": 41,
+          "rows": 50
+        },
+        "logic_puzzle": {
+          "accuracy": 0.6,
+          "correct": 30,
+          "rows": 50
+        },
+        "math_reasoning": {
+          "accuracy": 0.78,
+          "correct": 39,
+          "rows": 50
+        },
+        "ner": {
+          "accuracy": 0.48,
+          "correct": 24,
+          "rows": 50
+        },
+        "sentiment": {
+          "accuracy": 0.94,
+          "correct": 47,
+          "rows": 50
+        },
+        "summarization": {
+          "accuracy": 0.5,
+          "correct": 25,
+          "rows": 50
+        }
+      },
+      "correct": 260,
+      "fireworks_tokens": 248951,
+      "local_coverage": 0.0075,
+      "local_precision": 1.0,
+      "local_releases": 3,
+      "local_wilson_lower_95": 0.4385029682449545,
+      "rows": 400,
+      "verifier_invalid_releases": 0
+    }
+  }
+}

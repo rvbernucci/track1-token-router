@@ -1,0 +1,128 @@
+{
+  "by_family": {
+    "assignment_underdetermined": {
+      "refused": 8,
+      "rejection:non_unique_finite_assignment": 8,
+      "rows": 8
+    },
+    "decimal_ast": {
+      "released": 20,
+      "rows": 20,
+      "true_positive": 20
+    },
+    "divide_by_zero": {
+      "refused": 8,
+      "rejection:invalid_decimal_operation": 8,
+      "rows": 8
+    },
+    "finite_assignment": {
+      "released": 10,
+      "rows": 10,
+      "true_positive": 10
+    },
+    "inexact_without_rounding": {
+      "refused": 8,
+      "rejection:inexact_result_requires_rounding_instruction": 8,
+      "rows": 8
+    },
+    "invalid_converse": {
+      "refused": 8,
+      "rejection:unsupported_or_invalid_propositional_inference": 8,
+      "rows": 8
+    },
+    "ordering": {
+      "released": 20,
+      "rows": 20,
+      "true_positive": 20
+    },
+    "ordering_cycle": {
+      "refused": 8,
+      "rejection:inconsistent_or_underdetermined_ordering": 8,
+      "rows": 8
+    },
+    "ordering_disconnected": {
+      "refused": 8,
+      "rejection:inconsistent_or_underdetermined_ordering": 8,
+      "rows": 8
+    },
+    "percentage": {
+      "released": 30,
+      "rows": 30,
+      "true_positive": 30
+    },
+    "percentage_change": {
+      "released": 20,
+      "rows": 20,
+      "true_positive": 20
+    },
+    "proportional_rate": {
+      "released": 20,
+      "rows": 20,
+      "true_positive": 20
+    },
+    "propositional": {
+      "released": 20,
+      "rows": 20,
+      "true_positive": 20
+    },
+    "quantified": {
+      "released": 20,
+      "rows": 20,
+      "true_positive": 20
+    },
+    "quantifier_mismatch": {
+      "refused": 8,
+      "rejection:quantifier_terms_do_not_align": 8,
+      "rows": 8
+    },
+    "unit_conversion": {
+      "released": 20,
+      "rows": 20,
+      "true_positive": 20
+    },
+    "unit_mismatch": {
+      "refused": 8,
+      "rejection:unit_dimension_mismatch": 8,
+      "rows": 8
+    },
+    "unsafe_expression": {
+      "refused": 8,
+      "rejection:unsafe_expression": 8,
+      "rows": 8
+    },
+    "unused_number": {
+      "refused": 8,
+      "rejection:unused_or_ambiguous_numeric_literal": 8,
+      "rows": 8
+    }
+  },
+  "dataset": "/Users/rvbernucci/Unidade de Vida/60-AMD Developer Hackathon/track1-token-router/evals/proof-carrying/math-logic-holdout.jsonl",
+  "failures": [],
+  "gate": {
+    "logic_p95_below_500_ms": true,
+    "math_p95_below_100_ms": true,
+    "passed": true,
+    "precision_at_least_95": true,
+    "static_security": true,
+    "wilson_lower_above_90": true,
+    "zero_false_positive": true
+  },
+  "schema_version": "proof-carrying-evaluation-v1",
+  "static_security": {
+    "findings": [],
+    "passed": true
+  },
+  "summary": {
+    "logic_latency_p50_ms": 0.03962499613407999,
+    "logic_latency_p95_ms": 0.32041700615081936,
+    "math_latency_p50_ms": 0.042041996493935585,
+    "math_latency_p95_ms": 0.3705830022227019,
+    "refused": 80,
+    "released": 180,
+    "released_precision": 1.0,
+    "released_wilson_lower_95": 0.9791045020783868,
+    "rows": 260,
+    "true_negative": 80,
+    "true_positive": 180
+  }
+}
