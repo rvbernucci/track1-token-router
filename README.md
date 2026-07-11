@@ -17,7 +17,7 @@ task
 -> final answer
 ```
 
-The local challenger inserts `FunctionGemma five-parameter assessment -> intent-specific matrix regression -> E2B or Fireworks` after envelope removal. Its runtime remains optional because the 2.59 GB LiteRT artifact must be bundled at image-build time; the submitted image never downloads models during evaluation.
+The full local challenger inserts `FunctionGemma five-parameter assessment -> intent-specific matrix regression -> E2B or Fireworks` after envelope removal. `Dockerfile.championship` downloads hash-pinned artifacts only while building and embeds them in the image; the submitted container never downloads models during evaluation.
 
 - Deterministic solvers must independently accept the original input or refuse it.
 - Kimi is a validation-selected preference and is never called unless the harness includes it in `ALLOWED_MODELS`.
@@ -42,7 +42,7 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-The public championship image passed the exact `linux/amd64`, 4 GB, 2 vCPU, no-network and official-contract gates. The proof-carrying deterministic route is promoted. The calibrated E2B artifact is reproducible and documented, but is not silently enabled in an image that does not contain its pinned model artifact.
+The compact public fallback image passed the exact `linux/amd64`, 4 GB, 2 vCPU, no-network and official-contract gates. The full local candidate is built separately from `Dockerfile.championship` and must pass the same gates before its tag replaces the fallback in the submission form.
 
 ## Quickstart
 

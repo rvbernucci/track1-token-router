@@ -128,13 +128,17 @@ def fit(rows: Sequence[Mapping[str, Any]], audit: Mapping[str, Any]) -> dict[str
     brier = statistics.fmean((prediction - row["target"]) ** 2 for row, prediction in zip(rows, predictions, strict=True))
     v2_rows = [row for row in rows if row["source"] == "v2"]
     v2_comparison = _compare_v2_models(v2_rows)
+    per_intent_models = _fit_per_intent_models(rows)
     artifact = {
         "schema_version": "e2b-270m-matrix-regression-v1",
-        "default_enabled": False,
+        "default_enabled": True,
         "invalid_270m_route": "fireworks",
         "feature_names": list(FEATURE_NAMES),
         "coefficients": [final_weights[0], *final_weights[1:]],
-        "decision_threshold": selection["threshold"],
+        "decision_threshold": v2_comparison["variants"]["per_intent_five_scores"]["best_operating_point"]["threshold"],
+        "runtime_variant": "per_intent_five_scores",
+        "score_feature_names": list(SCORES),
+        "models_by_intent": per_intent_models,
         "fit_rows": len(rows),
         "fit_positive": positives,
         "training_scope": "all_available_3982_after_grouped_oof_evaluation",
@@ -159,7 +163,7 @@ def check(result: Mapping[str, Any]) -> None:
         "thirteen_270m_features_only": len(result["artifact"]["feature_names"]) == 13,
         "grouped_oof": result["validation"]["lineage_overlap"] == 0,
         "finite_coefficients": all(math.isfinite(value) for value in result["artifact"]["coefficients"]),
-        "safe_default": result["artifact"]["default_enabled"] is False,
+        "explicit_runtime_default": result["artifact"]["default_enabled"] is True,
     }
     if not all(gates.values()):
         raise ValueError(f"Regression checks failed: {[name for name, passed in gates.items() if not passed]}")
@@ -193,6 +197,16 @@ def _compare_v2_models(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         "champion": champion,
         "finding": "Separate regressions are retained only if their out-of-fold discrimination beats the joint matrix.",
     }
+
+
+def _fit_per_intent_models(rows: Sequence[Mapping[str, Any]]) -> dict[str, list[float]]:
+    score_indices = range(len(INTENTS), len(FEATURE_NAMES))
+    models: dict[str, list[float]] = {}
+    for intent_index, intent in enumerate(INTENTS):
+        cohort = [row for row in rows if row["values"][intent_index] == 1.0]
+        projected = [_project(row, score_indices) for row in cohort]
+        models[intent] = _logistic_fit(projected, l2=2.0, iterations=900, dimensions=len(SCORES))
+    return models
 
 
 def _oof_variant(rows: Sequence[Mapping[str, Any]], mode: str, indices: Sequence[int] | None = None) -> dict[str, Any]:

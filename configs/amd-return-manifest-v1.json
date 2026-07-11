@@ -19,7 +19,7 @@
     },
     {
       "path": ".dockerignore",
-      "sha256": "808d7f2c4e28533a04d443deedd926ed1401c18926949acbaeed98a20ce639b6"
+      "sha256": "ff6281410c8d327141625c815729b75d88bd0001cdeb576088741ab92f990ad2"
     },
     {
       "path": "scripts/docker_resource_gate.sh",

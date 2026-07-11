@@ -23,6 +23,7 @@ from router.orchestration.competition import CompetitionRunner
 from router.orchestration.game_theory_selector import MinimaxRegretSelector, RobustSelectionConfig
 from router.orchestration.outcome_models import OutcomeModelBundle, OutcomeModelPredictor
 from router.orchestration.e2b_selective_gate import E2BSelectivePolicy
+from router.orchestration.e2b_matrix_gate import E2BMatrixGate
 from router.orchestration.state_machine import OrchestratedRunner
 
 
@@ -215,6 +216,14 @@ def _build_three_route_runner(config: RouterConfig, logger: JsonlRunLogger) -> T
                 config.e2b_selective_policy,
                 expected_sha256=config.e2b_selective_policy_sha256,
             )
+        matrix_gate = None
+        if config.e2b_matrix_policy is not None:
+            if not config.e2b_matrix_policy.is_file():
+                raise ValueError("Configured E2B matrix policy does not exist.")
+            matrix_gate = E2BMatrixGate.load(
+                config.e2b_matrix_policy,
+                expected_sha256=config.e2b_matrix_policy_sha256,
+            )
         policy_limit = int(e2b_policy["baseline"]["output_tokens"])
         if config.e2b_max_tokens != policy_limit:
             raise ValueError("E2B runtime token ceiling differs from its pinned route policy.")
@@ -256,6 +265,7 @@ def _build_three_route_runner(config: RouterConfig, logger: JsonlRunLogger) -> T
             e2b_runner=GemmaE2BRunner(e2b_client, max_tokens=config.e2b_max_tokens),
             fireworks_runner=fallback,
             selective_policy=selective_policy,
+            matrix_gate=matrix_gate,
             logger=logger,
         )
     except (OSError, TypeError, ValueError, json.JSONDecodeError) as exc:

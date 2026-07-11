@@ -34,7 +34,10 @@ jobs:
         run: scripts/offline_release_check.sh
 
       - name: Build release candidate for resource gate
-        run: docker build -t track1-token-router:release-gate .
+        run: |
+          dockerfile=Dockerfile
+          if [[ "${GITHUB_REF_NAME}" == v3.* ]]; then dockerfile=Dockerfile.championship; fi
+          docker build -f "$dockerfile" -t track1-token-router:release-gate .
 
       - name: Docker 4GB 2vCPU linux-amd64 gate
         run: bash scripts/docker_resource_gate.sh track1-token-router:release-gate
@@ -53,6 +56,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ${{ startsWith(github.ref_name, 'v3.') && 'Dockerfile.championship' || 'Dockerfile' }}
           platforms: linux/amd64
           push: true
           tags: ${{ env.IMAGE_NAME }}:${{ github.ref_name }}

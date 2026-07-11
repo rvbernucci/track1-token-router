@@ -8,6 +8,7 @@ from router.functiongemma.provider import FunctionGemmaAssessmentProvider, Funct
 from router.orchestration.assessment import build_feature_vector, compute_structural_features
 from router.orchestration.final_validator import validate_or_safely_repair_final_answer
 from router.orchestration.e2b_selective_gate import E2BSelectivePolicy
+from router.orchestration.e2b_matrix_gate import E2BMatrixGate
 from router.orchestration.game_theory_selector import MinimaxRegretSelector, deterministic_solver_prediction
 from router.orchestration.outcome_models import OutcomeModelPredictor
 from router.orchestration.solvers import SolverResult, solve_deterministic
@@ -23,6 +24,7 @@ class ThreeRouteRunner:
         e2b_runner: TaskRunner,
         fireworks_runner: TaskRunner,
         selective_policy: E2BSelectivePolicy | None = None,
+        matrix_gate: E2BMatrixGate | None = None,
         logger: JsonlRunLogger | None = None,
         task_deadline_ms: int = 10 * 60 * 1000,
     ) -> None:
@@ -32,6 +34,7 @@ class ThreeRouteRunner:
         self.e2b_runner = e2b_runner
         self.fireworks_runner = fireworks_runner
         self.selective_policy = selective_policy
+        self.matrix_gate = matrix_gate
         self.logger = logger
         self.task_deadline_ms = task_deadline_ms
         self.run_deadline: float | None = None
@@ -67,10 +70,18 @@ class ThreeRouteRunner:
                 predictions,
                 probability_uncertainty=uncertainty,
             )
+            matrix_decision = self.matrix_gate.decide(invocation.assessment) if self.matrix_gate else None
         except (FunctionGemmaProviderError, OSError, TimeoutError, ValueError) as exc:
             return self._fireworks_fallback(task, reason=f"assessment_or_decision_failure:{type(exc).__name__}")
 
         decision = selection.decision
+        if solver is None and matrix_decision is not None and matrix_decision.probe:
+            decision = EngineDecision(
+                engine=Engine.GEMMA_E2B,
+                reason="per_intent_matrix_probe",
+                feasible_engines=(Engine.GEMMA_E2B, Engine.FIREWORKS),
+                probability_correct=matrix_decision.probability,
+            )
         fallback: str | None = None
         selective_probe = (
             self.selective_policy.should_probe(features)
@@ -144,6 +155,7 @@ class ThreeRouteRunner:
                 "runner": "three_route",
                 "assessment_invocation": invocation.to_dict(),
                 "robust_selection": selection.to_dict(),
+                "e2b_matrix": matrix_decision.__dict__ if matrix_decision else None,
                 "selective_probe": selective_probe.to_dict() if selective_probe else None,
                 "routing_trace": trace.to_dict(),
             }

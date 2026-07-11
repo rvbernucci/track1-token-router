@@ -37,9 +37,9 @@
 - `global_joint`: Brier `0.1934`, selected `248`, precision `84.68%`, coverage `12.46%`
 - `per_intent_five_scores`: Brier `0.1880`, selected `252`, precision `84.52%`, coverage `12.66%`
 - `univariate_deterministic_fit`: Brier `0.2414`, selected `1160`, precision `45.09%`, coverage `58.26%`
-- `univariate_format_complexity`: Brier `0.2430`, selected `1505`, precision `43.06%`, coverage `75.59%`
-- `univariate_generation_demand`: Brier `0.2336`, selected `1011`, precision `49.95%`, coverage `50.78%`
-- `univariate_knowledge_uncertainty`: Brier `0.2431`, selected `1991`, precision `41.34%`, coverage `100.00%`
 - `univariate_reasoning_demand`: Brier `0.2430`, selected `1984`, precision `41.43%`, coverage `99.65%`
+- `univariate_knowledge_uncertainty`: Brier `0.2431`, selected `1991`, precision `41.34%`, coverage `100.00%`
+- `univariate_generation_demand`: Brier `0.2336`, selected `1011`, precision `49.95%`, coverage `50.78%`
+- `univariate_format_complexity`: Brier `0.2430`, selected `1505`, precision `43.06%`, coverage `75.59%`
 
-The final coefficient matrix is fitted on all 3,982 usable rows. It remains disabled by default until its routing threshold is accepted against the accuracy gate.
+The final coefficient matrix is fitted on all 3,982 usable rows. The per-intent challenger is enabled at the frozen 0.75 threshold and fails closed to Fireworks on invalid assessments or runtime failures.

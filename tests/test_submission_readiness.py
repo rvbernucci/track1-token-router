@@ -79,9 +79,8 @@ class SubmissionReadinessTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_root = Path(tmp)
             shutil.copytree("submission", tmp_root / "submission")
-            demo_mp4 = tmp_root / "submission" / "final" / "demo.mp4"
-            if demo_mp4.exists():
-                demo_mp4.unlink()
+            for video in (tmp_root / "submission" / "final").glob("*.mp4"):
+                video.unlink()
             status_path = tmp_root / "submission" / "final" / "submission-status.json"
             status_path.write_text(
                 status_path.read_text(encoding="utf-8")

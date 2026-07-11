@@ -1,0 +1,84 @@
+FROM debian:bookworm-slim AS llama
+
+ARG LLAMA_URL=https://github.com/ggml-org/llama.cpp/releases/download/b9948/llama-b9948-bin-ubuntu-x64.tar.gz
+ARG LLAMA_SHA256=9fd15007f9058e2cf6d8d81e0856ffc351f59a70ff3ad08720992835cbb9320a
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && test -n "$LLAMA_SHA256" \
+    && curl -fL --retry 4 -o /tmp/llama.tar.gz "$LLAMA_URL" \
+    && echo "$LLAMA_SHA256  /tmp/llama.tar.gz" | sha256sum -c - \
+    && mkdir -p /opt/llama \
+    && tar -xzf /tmp/llama.tar.gz -C /opt/llama --strip-components=1 \
+    && rm /tmp/llama.tar.gz
+
+FROM debian:bookworm-slim AS models
+
+ARG FUNCTIONGEMMA_URL=https://github.com/rvbernucci/track1-token-router/releases/download/model-assets-v1/functiongemma-scale789-q8_0.gguf
+ARG E2B_URL=https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/6664aee5fc114b486e2fec56a9f73c0146e79e74/gemma-4-E2B-it.litertlm?download=true
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /models/functiongemma /models/e2b \
+    && curl -fL --retry 8 --retry-all-errors -o /models/functiongemma/model.gguf "$FUNCTIONGEMMA_URL" \
+    && echo '74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77  /models/functiongemma/model.gguf' | sha256sum -c - \
+    && curl -fL --retry 8 --retry-all-errors -o /models/e2b/model.litertlm "$E2B_URL" \
+    && echo '181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c  /models/e2b/model.litertlm' | sha256sum -c -
+
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    LITERT_LM_DIR=/opt/litert \
+    LD_LIBRARY_PATH=/opt/llama \
+    ROUTER_LOG_PATH=/app/logs/run.jsonl \
+    ROUTER_MODE=three_route \
+    COMPETITION_DRY_RUN=0 \
+    FUNCTIONGEMMA_BASE_URL=http://127.0.0.1:8091/v1 \
+    FUNCTIONGEMMA_MODEL=functiongemma-q8 \
+    FUNCTIONGEMMA_MAX_TOKENS=64 \
+    FUNCTIONGEMMA_TIMEOUT_S=5 \
+    FUNCTIONGEMMA_CALIBRATION=/app/configs/functiongemma-scale789-q8-calibration.json \
+    FUNCTIONGEMMA_CALIBRATION_SHA256=0078565ab90a6c93981e954d13daabdaa11a4535da9257eae03f3a034afcc1e1 \
+    E2B_BASE_URL=http://127.0.0.1:9379/v1 \
+    E2B_MODEL=gemma4-e2b \
+    E2B_MAX_TOKENS=96 \
+    E2B_TIMEOUT_S=30 \
+    OUTCOME_MODELS_PATH=/app/configs/engine-outcome-models-v1.json \
+    OUTCOME_MODELS_SHA256=927a64303501d43f3b509a8f48d397d372c4211f8347890827206e82bda60712 \
+    E2B_ROUTE_POLICY=/app/configs/e2b-route-policy-v1.json \
+    E2B_ROUTE_POLICY_SHA256=24607dda80f861ecde022987111302590b0e17a61842ad5b3e0b17302047c4ad \
+    E2B_MATRIX_POLICY=/app/configs/e2b-270m-matrix-regression.json \
+    E2B_MATRIX_POLICY_SHA256=69086fb24d7e8e0f79d045acb41c915e6dab2915a1373b81fe95159973ea3ccd \
+    THREE_ROUTE_MAX_MEMORY_MB=3584 \
+    FIREWORKS_MATRIX_WEIGHTS=/app/router/data/fireworks_track1_allowed_weights.json \
+    FIREWORKS_INTENT_POLICY=/app/configs/fireworks-intent-policy-v1.json \
+    FIREWORKS_INTENT_POLICY_SHA256=f10e31382bb39378834b9ec76c1d11b5b9c6e3e17f5d9bc782909004c8344c91 \
+    FIREWORKS_TIMEOUT_S=24 \
+    FIREWORKS_MAX_RETRIES=0 \
+    ENABLE_GUARDRAILS=1 \
+    ENABLE_ORCHESTRATOR=1
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl libgomp1 \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir litert-lm==0.14.0
+
+COPY --from=llama /opt/llama /opt/llama
+COPY pyproject.toml README.md ./
+COPY router ./router
+COPY configs ./configs
+COPY scripts/litert_cpu_server.py scripts/championship_entrypoint.sh ./scripts/
+COPY --from=models /models/functiongemma/model.gguf ./artifacts/functiongemma-scale789/functiongemma-scale789-q8_0.gguf
+COPY --from=models /models/e2b/model.litertlm /opt/litert/models/gemma4-e2b/model.litertlm
+
+RUN pip install --no-cache-dir . \
+    && chmod +x /app/scripts/championship_entrypoint.sh \
+    && printf '%s  %s\n' \
+      '74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77' \
+      '/app/artifacts/functiongemma-scale789/functiongemma-scale789-q8_0.gguf' | sha256sum -c - \
+    && printf '%s  %s\n' \
+      '181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c' \
+      '/opt/litert/models/gemma4-e2b/model.litertlm' | sha256sum -c - \
+    && mkdir -p /app/logs /app/reports/generated
+
+ENTRYPOINT ["/app/scripts/championship_entrypoint.sh"]

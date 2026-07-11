@@ -3,14 +3,11 @@
     "submission/final/README.md": 768,
     "submission/final/cover.png": 54732,
     "submission/final/demo.mp4": 195503,
-    "submission/final/proofroute-retro-cli.mp4": 1256012,
-    "submission/final/proofroute-presentation.pdf": 2386394,
-    "submission/final/proofroute-presentation.pptx": 2139303,
-    "submission/final/lablab-submit-fields.md": 2757,
+    "submission/final/lablab-submit-fields.md": 2773,
     "submission/final/slides.pdf": 4441,
     "submission/final/speaker-notes.md": 1507,
     "submission/final/video-placeholder-approved.md": 178
   },
-  "notes": "Final English submission deck covering architecture, deterministic proof routing, AMD training, local-model calibration, and measured precision.",
-  "slides": 6
+  "notes": "Generated submission artifacts. Replace visuals before final submission if a designed deck/cover is available.",
+  "slides": 10
 }

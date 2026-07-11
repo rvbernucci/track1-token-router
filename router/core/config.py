@@ -56,6 +56,8 @@ class RouterConfig:
     e2b_route_policy_sha256: str | None
     e2b_selective_policy: Path | None
     e2b_selective_policy_sha256: str | None
+    e2b_matrix_policy: Path | None
+    e2b_matrix_policy_sha256: str | None
     three_route_accuracy_gate: float
     three_route_max_failure: float
     three_route_max_memory_mb: float
@@ -117,6 +119,8 @@ class RouterConfig:
             e2b_route_policy_sha256=os.getenv("E2B_ROUTE_POLICY_SHA256") or None,
             e2b_selective_policy=_optional_path(os.getenv("E2B_SELECTIVE_POLICY")),
             e2b_selective_policy_sha256=os.getenv("E2B_SELECTIVE_POLICY_SHA256") or None,
+            e2b_matrix_policy=_optional_path(os.getenv("E2B_MATRIX_POLICY")),
+            e2b_matrix_policy_sha256=os.getenv("E2B_MATRIX_POLICY_SHA256") or None,
             three_route_accuracy_gate=float(os.getenv("THREE_ROUTE_ACCURACY_GATE", "0.60")),
             three_route_max_failure=float(os.getenv("THREE_ROUTE_MAX_FAILURE", "0.15")),
             three_route_max_memory_mb=float(os.getenv("THREE_ROUTE_MAX_MEMORY_MB", "3584")),

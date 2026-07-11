@@ -17,6 +17,12 @@ reports/generated/
 reports/
 data/
 artifacts/
+!artifacts/
+artifacts/*
+!artifacts/functiongemma-scale789/
+!artifacts/functiongemma-scale789/functiongemma-scale789-q8_0.gguf
+!artifacts/gemma-e2b/
+!artifacts/gemma-e2b/gemma-4-E2B-it.litertlm
 tests/
 docs/
 sprints/
