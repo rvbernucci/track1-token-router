@@ -98,6 +98,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         sampler.join(timeout=5)
         finished = time.time()
         inspect = json.loads(_capture(["docker", "inspect", name]))[0]
+        internal_logs = temporary / "container-logs"
+        _run(["docker", "cp", f"{name}:/app/logs", str(internal_logs)], check=False)
+        if internal_logs.is_dir():
+            for source in internal_logs.rglob("*"):
+                if source.is_file():
+                    target = args.output_dir / ("runtime-" + source.name)
+                    target.write_bytes(source.read_bytes())
         _run(["docker", "rm", name], check=False)
         (args.output_dir / "container.stdout.log").write_text(stdout, encoding="utf-8")
         (args.output_dir / "container.stderr.log").write_text(stderr, encoding="utf-8")
