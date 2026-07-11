@@ -73,6 +73,20 @@ python3 -m router submit-track1 \
   --output reports/generated/official-smoke-results.json
 ```
 
+## Evaluator Environment
+
+The submitted container does **not** use or bundle a `.env` file. At evaluation time, the official harness injects the three required variables directly into the container:
+
+```text
+FIREWORKS_API_KEY=<harness-provided key>
+FIREWORKS_BASE_URL=<harness-provided scored endpoint>
+ALLOWED_MODELS=<comma-separated permitted model IDs>
+```
+
+No additional evaluator configuration is required. The runtime reads these variables through `RouterConfig.from_env()`, routes every remote request through `FIREWORKS_BASE_URL`, and only selects normalized IDs present in `ALLOWED_MODELS`. `FIREWORKS_MODEL` and `FIREWORKS_CHAMPION_MODEL` are optional preferences, never authorization overrides.
+
+Files such as `.env.example` and `runtime-profiles/*.env.example` are development templates only. `.env`, `.env.*`, credentials, tests, reports and local model artifacts are excluded from the Docker build context.
+
 ## Documentation
 
 | Document | Purpose |

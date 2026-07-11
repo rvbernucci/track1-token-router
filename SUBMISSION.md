@@ -39,6 +39,10 @@ scripts/offline_release_check.sh
 - no startup downloads or embedded secrets;
 - only allowed Fireworks models.
 
+## Evaluator Configuration
+
+No `.env` file is required or included. The harness injects `FIREWORKS_API_KEY`, `FIREWORKS_BASE_URL` and `ALLOWED_MODELS` as container environment variables. The runtime consumes them directly and treats `ALLOWED_MODELS` as the authorization boundary.
+
 ## Current Status
 
 The release image is `ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router`. The release workflow blocks publication unless the image passes CI, public pullability, manifest inspection and the exact 4 GB/2 vCPU/no-network resource gate.
