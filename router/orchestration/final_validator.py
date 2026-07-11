@@ -224,6 +224,8 @@ def validate_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationRes
             return FinalValidationResult(False, expected_format, "markdown_fence_in_code", repaired)
         if _looks_like_python_code_task(task):
             if _is_valid_python(stripped):
+                if _unsafe_python_construct(stripped):
+                    return FinalValidationResult(False, expected_format, "unsafe_python_construct")
                 return FinalValidationResult(True, expected_format, "valid_python_code")
             if repaired and repaired != stripped and _is_valid_python(repaired):
                 return FinalValidationResult(False, expected_format, "python_code_with_extra_text", repaired)
@@ -272,6 +274,8 @@ def repair_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationResul
         return FinalValidationResult(bool(expected), expected_format, "literal_echo_repair", expected)
     if expected_format == "yes_no":
         lowered = stripped.lower()
+        if re.search(r"\b(?:not|isn't|isnt|never)\s+(?:yes|no)\b", lowered):
+            return FinalValidationResult(False, expected_format, "yes_no_repair", "")
         yes = bool(re.search(r"\byes\b", lowered))
         no = bool(re.search(r"\bno\b", lowered))
         repaired = "yes" if yes and not no else "no" if no and not yes else ""
@@ -390,6 +394,20 @@ def _contains_python_code_anchor(value: str) -> bool:
         re.search(r"```(?:python|py)\b", value, re.IGNORECASE)
         or re.search(r"(?m)^\s*(?:async\s+def|def|class)\s+[a-zA-Z_]\w*\s*[\(:]", value)
         or re.search(r"(?m)^\s*(?:from\s+\w[\w.]*\s+import|import\s+\w)", value)
+    )
+
+
+def _unsafe_python_construct(value: str) -> bool:
+    try:
+        tree = ast.parse(value)
+    except (SyntaxError, ValueError, TypeError):
+        return True
+    blocked_nodes = (ast.Import, ast.ImportFrom, ast.Global, ast.Nonlocal)
+    blocked_names = {"__import__", "eval", "exec", "compile", "open", "input", "breakpoint"}
+    return any(
+        isinstance(node, blocked_nodes)
+        or isinstance(node, ast.Name) and node.id in blocked_names
+        for node in ast.walk(tree)
     )
 
 

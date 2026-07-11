@@ -75,6 +75,7 @@ def infer_expected_format(task: TaskEnvelope) -> str:
         return "json"
     if (
         "return only python code" in text
+        or re.search(r"\b(?:write|provide)\s+only\s+(?:python|javascript|typescript|java|rust|go|c\+\+)\s+code\b", text)
         or "return only corrected python code" in text
         or "return only code" in text
         or re.search(r"\b(?:write|return|provide)\s+only\s+the\s+.*\bfunction signature\b", text)

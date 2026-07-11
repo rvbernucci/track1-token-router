@@ -299,6 +299,23 @@ class AnswerContractEngineTests(unittest.TestCase):
         self.assertEqual(final.answer, "yes or no")
         self.assertFalse(final.metadata["answer_contract"]["valid"])
 
+    def test_rejects_negated_boolean_and_unsafe_python(self) -> None:
+        boolean = apply_answer_contract(TaskEnvelope(input_text="Answer exactly yes or no."), "not yes")
+        code = apply_answer_contract(
+            TaskEnvelope(input_text="Write only Python code defining function run()."),
+            "import os\ndef run():\n    return os.getcwd()",
+        )
+        self.assertFalse(boolean.valid)
+        self.assertFalse(code.valid)
+        self.assertEqual(code.reason, "unsafe_python_construct")
+
+        fenced = apply_answer_contract(
+            TaskEnvelope(input_text="Write only Python code defining function run()."),
+            "```python\ndef run():\n    return 1\n```",
+        )
+        self.assertTrue(fenced.valid)
+        self.assertEqual(fenced.answer, "def run():\n    return 1")
+
 
 if __name__ == "__main__":
     unittest.main()

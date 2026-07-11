@@ -1,0 +1,3 @@
+{"candidate": "not yes", "expected": "reject", "id": "negated_yes_no", "prompt": "Answer exactly yes or no."}
+{"candidate": "import os\ndef run():\n    return 1", "expected": "reject", "id": "unsafe_python_import", "prompt": "Write only Python code defining function run()."}
+{"candidate": "```python\ndef run():\n    return 1\n```", "expected": "repair", "id": "natural_python_fence", "prompt": "Write only Python code defining function run()."}

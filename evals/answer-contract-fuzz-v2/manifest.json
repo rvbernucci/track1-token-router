@@ -1,0 +1,23 @@
+{
+  "case_manifest_sha256": "d9d71ec2863495b92556c5c82a515773ff8dae628fc0995ac19f90114efec338",
+  "cases": 2000,
+  "category_counts": {
+    "boolean": 250,
+    "code": 250,
+    "json": 250,
+    "label": 250,
+    "list": 250,
+    "ner": 250,
+    "number": 250,
+    "summary": 250
+  },
+  "expected_outcomes": {
+    "accept": 541,
+    "reject": 686,
+    "repair": 773
+  },
+  "failures": 0,
+  "minimized_regressions": 3,
+  "schema_version": "answer-contract-fuzz-v2-manifest",
+  "seed": 68068
+}
