@@ -27,7 +27,7 @@
     },
     {
       "path": "docs/AMD_RETURN_RUNBOOK.md",
-      "sha256": "e0ee1b4fd0cfd2550347fb611769a253ed6672fb19884091c99fe30f39a32151"
+      "sha256": "85074524fa889e5edf00bb4c1572ee9b8b6f6c2c16ce70347253723d55241455"
     },
     {
       "path": "router/evals/shadow_runtime.py",
