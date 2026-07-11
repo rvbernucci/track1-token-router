@@ -1,13 +1,13 @@
 {
   "schema_version": "full-local-exact-image-smoke-v1",
   "passed": true,
-  "image": "ghcr.io/rvbernucci/track1-token-router:v3.2.0-full-hybrid",
+  "image": "ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid",
   "platform": "linux/amd64",
   "workflow_run": {
-    "id": 29157770736,
-    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29157770736",
+    "id": 29158947843,
+    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29158947843",
     "conclusion": "success",
-    "head_sha": "1068ebd3e789d4f68bbdda61ed7ea267a5a82994"
+    "head_sha": "cfeacd407ac7488883afdc6df580fb86b48a039e"
   },
   "limits": {
     "memory": "4g",
@@ -15,10 +15,10 @@
     "network": "none"
   },
   "metrics": {
-    "cold_seconds": 12.56,
-    "warm_seconds": 2.627,
-    "wall_seconds": 15.641,
-    "sampled_peak_memory_mib": 728.1
+    "cold_seconds": 12.147,
+    "warm_seconds": 1.825,
+    "wall_seconds": 15.355,
+    "sampled_peak_memory_mib": 727.5
   },
   "model_sha256": {
     "functiongemma": "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77",
@@ -53,5 +53,5 @@
     "warm_at_most_30_seconds": true,
     "zero_fireworks_tokens": true
   },
-  "source_artifact_sha256": "f3e8d34d0fee604ada0da87ea620708c5a4237fbb51e17b627acf5804ddde7ab"
+  "source_artifact_sha256": "f3b88bf1a44e093fcfe50db30f466b5433509fb1815092ab2d64e3e0c3d605dd"
 }

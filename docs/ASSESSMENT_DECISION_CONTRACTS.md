@@ -181,7 +181,7 @@ Every active three-route decision emits `routing-trace-v1` with:
 - final code-owned decision;
 - fallback reason.
 
-Until the trained assessment and regression artifacts are promoted, `ROUTER_MODE=three_route` intentionally runs Fireworks-safe mode and records why. Retired M1/M2A/M2B modes require `ENABLE_LEGACY_CASCADE_MODES=1` and exist only for historical regression tests.
+The trained assessment and regression artifacts are promoted and embedded in `v3.3.0-full-hybrid`. If any pinned artifact is missing or fails its hash/schema check, `ROUTER_MODE=three_route` enters Fireworks-safe mode and records why. Retired M1/M2A/M2B modes require `ENABLE_LEGACY_CASCADE_MODES=1` and exist only for historical regression tests.
 
 ## Verification
 

@@ -9,18 +9,20 @@ The runner handles factual Q&A, math reasoning, sentiment, summarization, NER, c
 ```text
 task
 -> strip official JSON envelope; retain task_id only in the engine
+-> embedded FunctionGemma 270M Q8 assessment
 -> proof-carrying deterministic solver (release only a unique, recomputable result)
--> Kimi K2.7 Code when present in ALLOWED_MODELS
+-> per-intent matrix selects embedded Gemma 4 E2B or Fireworks
+-> Kimi by default / MiniMax for extraction, only when authorized
 -> strict output validation and allowed-model fallback
 -> Answer Contract Engine normalization and validation
 -> atomically rebuild [{task_id, answer}, ...]
 -> final answer
 ```
 
-The full local challenger inserts `FunctionGemma five-parameter assessment -> intent-specific matrix regression -> E2B or Fireworks` after envelope removal. `Dockerfile.championship` downloads hash-pinned artifacts only while building and embeds them in the image; the submitted container never downloads models during evaluation.
+`Dockerfile.championship` downloads hash-pinned artifacts only while building and embeds them in the image; the submitted container never downloads models during evaluation.
 
 - Deterministic solvers must independently accept the original input or refuse it.
-- Kimi is a validation-selected preference and is never called unless the harness includes it in `ALLOWED_MODELS`.
+- Kimi and MiniMax are validation-selected preferences and are never called unless the harness includes them in `ALLOWED_MODELS`.
 - Strict-format failures can retry another ranked allowed model; model unavailability is cached per batch.
 - The Answer Contract Engine performs only unambiguous mechanical transformations before the official JSON serializer.
 - FunctionGemma 270M and Gemma 4 E2B were evaluated on 2,000 post-contract answers. E2B produced 828 correct answers; 823 had valid 270M parameters. The intent-specific regression selected 252 of 1,991 evaluable tasks at 84.52% out-of-fold precision and 12.66% coverage.
@@ -42,7 +44,7 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-The compact public fallback image passed the exact `linux/amd64`, 4 GB, 2 vCPU, no-network and official-contract gates. The full local candidate is built separately from `Dockerfile.championship` and must pass the same gates before its tag replaces the fallback in the submission form.
+The final `v3.3.0-full-hybrid` image passed public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract and real local-inference gates. It is the promoted submission image; `v2.1.0-proof-router` remains the compact rollback.
 
 ## Quickstart
 
@@ -124,7 +126,7 @@ Files such as `.env.example` and `runtime-profiles/*.env.example` are developmen
 
 ## Runtime Modes
 
-`fireworks` is the zero-download Docker mode. `three_route` is available when the pinned FunctionGemma and E2B endpoints are supplied.
+`three_route` is the final embedded-model mode. `fireworks` is the compact remote-only fallback profile.
 
 ```text
 ROUTER_MODE=fireworks
@@ -149,7 +151,7 @@ set -a
 set +a
 
 python3 scripts/fireworks_smoke.py \
-  --model accounts/fireworks/models/gemma-4-31b-it \
+  --model accounts/fireworks/models/minimax-m3 \
   --json
 ```
 
@@ -167,4 +169,4 @@ Use the preinstalled ROCm/PyTorch stack. Training instructions are in the AMD Fu
 
 ## Promotion Rule
 
-The release policy is accuracy-first: deterministic answers require a recomputable proof; unsupported tasks use an allowed Fireworks model. The E2B matrix is an optional token-saving challenger whose measured operating point is documented rather than overstated. See [the public ablation](./reports/public/championship-ablation.md) and [the E2B regression report](./reports/public/e2b-270m-matrix-regression.md).
+The release policy is accuracy-first: deterministic answers require a recomputable proof, E2B runs only inside its calibrated matrix cohort, and every refusal or local failure uses an allowed Fireworks model. See the [final scorecard](./reports/public/final-hybrid-scorecard.md), [Pareto calibration](./reports/public/final-pareto-calibration.md) and [E2B regression report](./reports/public/e2b-270m-matrix-regression.md).

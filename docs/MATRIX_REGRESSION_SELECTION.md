@@ -1,5 +1,7 @@
 # Matrix Regression Model Selection
 
+> Historical note: this document describes the Fireworks matrix fallback developed before the final Sprint 63 intent policy. The final image gives enabled `fireworks-intent-policy-v2.json` precedence; the matrix remains a safe fallback when that preference is unavailable.
+
 ## Objective
 
 Create an experimental layer to learn weights from real Fireworks microbenches.
@@ -135,7 +137,7 @@ The regression confirmed some strong signals:
 
 The dataset is still small, but the regression is now active as a calibration layer of the main selector in Docker. It does not replace Nash: it combines it with the learned score.
 
-A discrete intent policy was also tuned over `284` validation cases and evaluated once over `287` held-out cases. It selected Minimax for logic and sentiment, but achieved only `56.10%` conservative accuracy in the test, below the `60%` gate and below global Kimi. The artifact remains versioned with `default_enabled=false`. Therefore, the token-aligned matrix regression plus Pareto/Nash remains the operational policy; no post-test adjustments were made.
+The original `v1` discrete intent policy failed its historical gate and remains disabled. A separate final paired calibration produced `fireworks-intent-policy-v2.json`: Kimi by default and MiniMax for extraction. It matched MiniMax's 21/23 validity while reducing tokens from 3,869 to 1,967. The matrix remains the operational fallback when the preferred policy model is absent from runtime `ALLOWED_MODELS`.
 
 Main gap:
 

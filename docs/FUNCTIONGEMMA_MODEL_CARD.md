@@ -1,6 +1,6 @@
 # FunctionGemma Track 1 Assessor Model Card
 
-Status: **scale-789 Q8 runtime champion promoted; final container gate pending**
+Status: **scale-789 Q8 embedded in the final public image; exact container gate passed**
 Base: `google/functiongemma-270m-it`
 Base revision: `39eccb091651513a5dfb56892d3714c1b5b8276c`
 

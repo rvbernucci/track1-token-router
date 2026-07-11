@@ -214,7 +214,7 @@ Historical policy before the frozen baseline:
 - fallback among allowed models if the chosen model returns a quick API error, 404, or response without `message.content`;
 - timeout does not cascade to another model in the same request, because the official envelope requires a response under 30s;
 - the larger baseline of Sprint 49 replaced this heuristic and promoted Kimi globally;
-- `ROUTER_MODE=three_route` remains only to reproduce the rejected challenger FunctionGemma/E2B.
+- the final Sprint 63 calibration superseded this historical policy: `ROUTER_MODE=three_route` is promoted, with Kimi by default and MiniMax for extraction when authorized.
 
 Complementary calibration of 2026-07-09 with all allowed models is in [`docs/FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md`](./FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md).
 

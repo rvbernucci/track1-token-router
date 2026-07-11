@@ -1,8 +1,10 @@
 # AMD Return Runbook
 
+> Historical runbook. The return work and final Docker gates are complete. The promoted image is `v3.3.0-full-hybrid`; release run `29158458646` and exact local-inference run `29158947843` are green.
+
 ## Decision Boundary
 
-Offline evidence is complete for the proof-carrying deterministic+Fireworks runtime. It achieved 100% accuracy on the 80-row final shadow holdout while reducing replayed Fireworks tokens from 2,676 to 1,145. All 40 local releases carried mechanically validated evidence. This is not permission to submit: the local E2B policy is disabled and Docker was not available on the development Mac.
+The original offline evidence achieved 100% accuracy on the 80-row final shadow holdout while reducing replayed Fireworks tokens from 2,676 to 1,145. Subsequent work embedded FunctionGemma and E2B, enabled the calibrated matrix gate and passed the public 4 GB/2 vCPU image tests. Commands below are preserved for reproducibility, not as remaining release blockers.
 
 Do not regenerate the sealed shadow holdout. Verify its hashes through `configs/championship-shadow-policy-v1.json` and rerun only the checks explicitly marked below.
 

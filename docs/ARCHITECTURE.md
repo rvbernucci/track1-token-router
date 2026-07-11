@@ -1,94 +1,89 @@
 # Championship Architecture
 
-Updated: 2026-07-10
+Updated: 2026-07-11
 
-## Promoted Runtime
+## Final Runtime
 
-The submitted runtime is the smallest architecture that survived the frozen accuracy-first ablation:
+The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid` (`linux/amd64`). It embeds both local models and performs no startup download.
 
 ```text
-official task
--> registered deterministic solver (accept or refuse)
--> validation-selected Kimi K2.7 Code, only when present in ALLOWED_MODELS
--> strict output validation and safe formatting repair
--> next allowed model on fast unavailability or invalid strict output
--> /output/results.json
+/input/tasks.json
+-> engine extracts each untouched prompt
+-> FunctionGemma 270M Q8 assessment
+-> proof-carrying deterministic solver when uniquely supported
+-> per-intent E2B matrix gate at threshold 0.75
+-> text-only Gemma 4 E2B candidate plus Answer Contract Engine
+-> Fireworks Kimi/MiniMax policy on refusal, uncertainty or local failure
+-> engine reconstructs atomic /output/results.json
 ```
 
-The goal is to pass the Track 1 accuracy gate first and then minimize tokens sent through `FIREWORKS_BASE_URL`. The runtime never calls a model outside `ALLOWED_MODELS`, never downloads at startup and never embeds answers.
+The authorization boundary is always the harness-provided `ALLOWED_MODELS`. All remote calls use `FIREWORKS_BASE_URL`; no model ID outside that runtime list can be called.
 
-## Selection Evidence
+## Local Assessment
 
-All routes and model choices were frozen on validation. The locked test was opened once as a pass/fail promotion gate.
+FunctionGemma emits one structured assessment containing an intent and five scores. The matrix was fitted on raw FunctionGemma outputs, so runtime routing deliberately uses the raw assessment rather than its display calibration. Invalid, malformed or timed-out assessments fail closed to Fireworks.
 
-| Variant | Validation accuracy | Locked-test accuracy | Locked-test Fireworks tokens |
-| --- | ---: | ---: | ---: |
-| deterministic then Kimi | 58.45% | 59.58% | 73,870 |
-| Kimi only | 58.45% | 59.58% | 73,870 |
-| matrix plus Pareto/Nash | 57.39% | 57.84% | 78,853 |
-| validation intent candidate | 59.15% | 56.10% | 81,474 |
-| rejected E2B challenger | 58.45% | 54.70% | 57,103 |
-| Minimax only | 56.69% | 50.52% | 101,447 |
-
-Accuracy is conservative: judge disagreement counts as not correct. Kimi's binary locked-test accuracy is 75.0%. The full report and lineage bootstrap are in `reports/public/championship-ablation.md`.
+- Artifact: FunctionGemma scale-789 Q8 GGUF
+- SHA-256: `74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77`
+- Output ceiling: 64 tokens
 
 ## Deterministic Route
 
-Solvers receive the untouched task and must prove an exact registered contract. They cannot use a FunctionGemma label as authorization. Unknown, ambiguous or unsupported inputs refuse and continue to Fireworks. The hardened registry accepted `0/571` broad frozen tasks, demonstrating fail-closed behavior; it remains useful for exact unseen arithmetic, transforms and structured templates covered by adversarial tests.
+Registered solvers receive the untouched prompt and release an answer only with a unique, independently recomputable proof. A regression score can propose a solver but cannot override failed proof. Unsupported or ambiguous tasks continue safely.
+
+## Gemma E2B Route
+
+The per-intent five-score matrix uses the frozen grouped out-of-fold threshold `0.75`. Its development evidence selected 252 of 1,991 valid rows at 84.52% precision and 12.66% coverage; the Wilson 95% lower bound was 79.54%. Invalid assessments and runtime failures route to Fireworks.
+
+E2B receives only the original prompt and may generate at most 96 tokens. The engine, not the model, removes safe wrappers and reconstructs the official JSON envelope.
+
+- Artifact: Gemma 4 E2B LiteRT-LM, text-only execution
+- SHA-256: `181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c`
+- Exact final-image gate: 12.147 s cold, 1.825 s warm, 727.5 MiB sampled container peak
+- Exact final-image probes: two `e2b_local` answers and zero Fireworks tokens
 
 ## Fireworks Route
 
-`FIREWORKS_CHAMPION_MODEL` is a preference, not an authorization. Kimi is used first only when its normalized model ID appears in the harness-provided `ALLOWED_MODELS`. Otherwise the runtime falls back to the allowed-model Pareto/Nash ordering. A 404 is cached for the batch. A timeout does not cascade across models, preserving the deadline. Strictly invalid JSON, number, yes/no or code output can fall through to the next ranked allowed model.
+The final validation policy is Kimi K2.7 Code by default and MiniMax M3 for NER/extraction. It is a preference, never an authorization override. If the preferred model is absent, the runtime uses only another model present in `ALLOWED_MODELS`.
 
-Dynamic completion ceilings reduce scored tokens while preserving output headroom:
+| Policy | Valid | Tokens |
+| --- | ---: | ---: |
+| Always MiniMax | 21/23 | 3,869 |
+| Always Kimi | 20/23 | 1,685 |
+| Final intent policy | 21/23 | 1,967 |
 
-- yes/no: 8;
-- simple numeric: 16-48;
-- classification and short formats: 48-64;
-- extraction and summaries: up to 160;
-- JSON: up to 224;
-- code: up to 384, bounded by the global evaluator setting.
-
-## Rejected Gemma Challenger
-
-The research architecture was implemented end to end:
-
-```text
-FunctionGemma 270M assessment
--> five scores plus intent
--> outcome regression and minimax regret
--> deterministic | Gemma 4 E2B | Fireworks
-```
-
-FunctionGemma was fine-tuned on the AMD pod and quantized to Q8. Gemma 4 E2B ran text-only on CPU. Their summed process high-water RSS was 2.649 GiB, leaving 1,383 MiB below 4 GiB. However, the 2,000-task locked experiment found no safe E2B region: selected accuracy was 51.14% with a 40.87% Wilson lower bound against the 60% gate. More output tokens produced limited recoveries and did not solve the quality problem.
-
-Because E2B failed the accuracy gate, FunctionGemma could no longer create a measured token-saving route. Bundling either model would add startup, memory and image risk without improving the promoted policy. Both remain reproducible research artifacts and optional runtime modes, but are absent from the final image.
+The final policy is nondominated: it matches the strongest deterministic-validator accuracy and saves 1,902 tokens. The paired bootstrap token-savings CI95 is `[1,608, 2,185]`. These tasks are calibration evidence, not a claim about hidden-evaluator accuracy.
 
 ## Failure Policy
 
 | Failure | Action |
 | --- | --- |
-| Deterministic solver refusal | Fireworks |
-| Preferred model absent from `ALLOWED_MODELS` | Select another allowed model |
-| Fast 404 or inaccessible model | Cache and try the next allowed model |
-| Timeout | Stop model cascade and preserve batch deadline |
-| Invalid strict output | Try the next ranked allowed model when time remains |
-| Deadline reserve reached | Emit a controlled valid result and preserve `results.json` |
+| Deterministic refusal or failed proof | Continue to E2B/Fireworks |
+| Invalid FunctionGemma assessment | Fireworks |
+| E2B below threshold | Fireworks without E2B inference |
+| E2B malformed, timed out or runtime failure | Fireworks with structured fallback reason |
+| Preferred remote model not allowed | Select another runtime-authorized model |
+| Terminal Fireworks failure | Exit non-zero before publishing synthetic output |
+| Deadline reserve reached | Preserve one controlled result per remaining task |
 
-## Delivery Gates
+## Delivery Proof
 
-- public Linux `amd64` manifest;
-- compressed image below 10 GB;
-- exact run under 4 GB RAM and 2 vCPU;
-- complete run below 10 minutes;
-- valid `/output/results.json` and exit code 0;
-- no credentials, hardcoded answers or startup downloads;
-- only `FIREWORKS_BASE_URL` and `ALLOWED_MODELS` for scored inference.
+- Final image: `v3.3.0-full-hybrid`
+- OCI manifest digest: `sha256:6bcff04a9b5929b3788345d41304e3d6b98a9901116546afb16ae1e9445139ed`
+- Platform digest: `sha256:60677fbae98c2043f4c708de8cac00967cdcf5c41a0ef18f24cf0c116de9f2a0`
+- Compressed size: 2,666,216,379 bytes
+- Source revision: `cfeacd407ac7488883afdc6df580fb86b48a039e`
+- Release run: `29158458646`
+- Exact local-inference run: `29158947843`
+- Compact rollback: `v2.1.0-proof-router`
+
+## Evidence Boundaries
+
+The 80-row balanced arena is a frozen holdout replay plus exact-image envelope projection, not a live 80-row container run. Historical rejected policies remain in the repository for reproducibility and are explicitly marked as historical. Current release truth is defined by this document, `README.md`, `SUBMISSION.md` and `submission/final/final-release-decision.json`.
 
 ## Non-Goals
 
 - No LLM judge in the runtime answer path.
 - No embeddings, RAG or multimodality.
-- No post-hoc tuning on the locked test.
-- No local model retained merely for partner branding.
+- No hardcoded or cached answers.
 - No API-dollar optimization in place of the official token objective.

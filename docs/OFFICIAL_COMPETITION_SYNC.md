@@ -1,6 +1,6 @@
 # Official Competition Sync
 
-Last checked: 2026-07-09
+Last checked: 2026-07-11
 
 Source of truth: <https://lablab.ai/ai-hackathons/amd-developer-hackathon-act-ii> and the latest attached Track 1 participant guide excerpt.
 
@@ -54,14 +54,14 @@ Official objective:
 
 ## Repository Alignment
 
-- `Dockerfile` provides the container entrypoint for Track 1.
+- `Dockerfile.championship` produces the submitted full-hybrid Track 1 image.
 - `router submit-track1` implements the file contract used by the container default command.
-- `ROUTER_MODE=fireworks` is the safest official default for the current final grading envelope.
-- `ROUTER_MODE=three_route` reproduces the rejected FunctionGemma/E2B challenger; it is not the submitted default.
+- `ROUTER_MODE=three_route` is the submitted default and uses the embedded FunctionGemma/E2B runtimes.
+- `ROUTER_MODE=fireworks` remains the compact fallback profile.
 - `scripts/amd_pod_doctor.py` verifies the AMD pod before model downloads.
 - `scripts/bootstrap_amd_pod.sh` validates clone-to-smoke bootstrap on the AMD notebook.
-- `FIREWORKS_CHAMPION_MODEL` prefers validation-selected Kimi only when authorized by `ALLOWED_MODELS`.
-- `FIREWORKS_MATRIX_WEIGHTS` remains a fallback experiment and cannot override the promoted champion.
+- `FIREWORKS_INTENT_POLICY` prefers Kimi by default and MiniMax for extraction, only when authorized by `ALLOWED_MODELS`.
+- `FIREWORKS_MATRIX_WEIGHTS` remains the fallback when the intent-policy preference is unavailable.
 
 ## Watch Items
 

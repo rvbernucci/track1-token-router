@@ -1,0 +1,74 @@
+{
+  "compressed_size_bytes": 2666216379,
+  "image": "ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid",
+  "manifest_digest": "sha256:6bcff04a9b5929b3788345d41304e3d6b98a9901116546afb16ae1e9445139ed",
+  "passed": true,
+  "platform": "linux/amd64",
+  "platform_digest": "sha256:60677fbae98c2043f4c708de8cac00967cdcf5c41a0ef18f24cf0c116de9f2a0",
+  "real_local_inference": {
+    "checks": {
+      "cold_at_most_120_seconds": true,
+      "container_exit_zero": true,
+      "model_hashes": true,
+      "network_disabled": true,
+      "not_oom_killed": true,
+      "official_output_contract": true,
+      "peak_memory_at_most_3584_mib": true,
+      "platform_linux_amd64": true,
+      "two_local_routes": true,
+      "warm_at_most_30_seconds": true,
+      "zero_fireworks_tokens": true
+    },
+    "image": "ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid",
+    "limits": {
+      "cpus": "2",
+      "memory": "4g",
+      "network": "none"
+    },
+    "metrics": {
+      "cold_seconds": 12.147,
+      "sampled_peak_memory_mib": 727.5,
+      "wall_seconds": 15.355,
+      "warm_seconds": 1.825
+    },
+    "model_sha256": {
+      "e2b": "181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c",
+      "functiongemma": "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77"
+    },
+    "passed": true,
+    "platform": "linux/amd64",
+    "probes": [
+      {
+        "answer": "positive",
+        "fireworks_completion_tokens": 0,
+        "fireworks_prompt_tokens": 0,
+        "route": "e2b_local",
+        "task_id": "sprint60-cold"
+      },
+      {
+        "answer": "negative",
+        "fireworks_completion_tokens": 0,
+        "fireworks_prompt_tokens": 0,
+        "route": "e2b_local",
+        "task_id": "sprint60-warm"
+      }
+    ],
+    "schema_version": "full-local-exact-image-smoke-v1",
+    "source_artifact_sha256": "f3b88bf1a44e093fcfe50db30f466b5433509fb1815092ab2d64e3e0c3d605dd",
+    "workflow_run": {
+      "conclusion": "success",
+      "head_sha": "cfeacd407ac7488883afdc6df580fb86b48a039e",
+      "id": 29158947843,
+      "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29158947843"
+    }
+  },
+  "resource_gate": {
+    "cpus": 2,
+    "maximum_runtime_seconds": 600,
+    "memory": "4g",
+    "network": "none"
+  },
+  "revision": "cfeacd407ac7488883afdc6df580fb86b48a039e",
+  "schema_version": "final-image-audit-v1",
+  "version": "v3.3.0-full-hybrid"
+}

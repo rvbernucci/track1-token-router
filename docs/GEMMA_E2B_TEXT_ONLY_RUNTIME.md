@@ -1,6 +1,6 @@
 # Gemma 4 E2B Text-Only Runtime
 
-Updated: 2026-07-10
+Updated: 2026-07-11
 
 ## Decision
 
@@ -93,10 +93,7 @@ After generation, the selective gate rejects malformed output, refusals,
 explicit constraint violations, noncanonical sentiment labels, and candidates
 below its calibrated post-response probability.
 
-The current selective policy is intentionally `default_enabled=false`. It tied
-the Kimi baseline on validation while saving 7,418 Fireworks tokens, but lost
-nine answers on the old locked test. It can be promoted only after a fresh,
-mechanically scored holdout using the new contract engine is non-inferior to Kimi.
+The earlier post-response selective policy remains disabled as historical evidence. The final image instead enables the per-intent five-score matrix gate at the grouped out-of-fold threshold `0.75`. That gate selected 252 of 1,991 valid development rows at 84.52% precision and 12.66% coverage. Final-image run `29158947843` proved two real E2B routes under 4 GB/2 vCPU with zero Fireworks tokens; failures still fall through to Fireworks.
 
 ## OpenAI Adapter Compatibility
 
@@ -132,7 +129,7 @@ FunctionGemma Q8 and the standard E2B artifact were loaded together on the AMD `
 | Combined | 2,712.926 MiB / 2.649 GiB |
 | Remaining to 4 GiB | 1,383.074 MiB |
 
-The pod exposes cgroup v2 read-only, so the final 4 GiB limit could not be imposed there. This passes the measured-memory gate with useful margin but does not replace the final Docker `--memory=4g --cpus=2` test. Raw process, cgroup and smoke evidence is hashed in `reports/generated/amd-pod-scale789/memory/combined-memory-report.json`.
+The pod evidence was subsequently superseded by the exact public-image gate. Final run `29158947843` imposed 4 GB and 2 vCPU, measured 727.5 MiB sampled container peak and completed real cold/warm local inference in 15.355 seconds. Raw AMD measurements remain useful provenance.
 
 ## Required Benchmark
 

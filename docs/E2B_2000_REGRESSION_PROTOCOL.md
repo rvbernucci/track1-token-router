@@ -1,5 +1,7 @@
 # E2B 2,000-Task Regression Protocol
 
+> Historical protocol for the first 2,000-row challenger. Its disabled-policy conclusion was superseded by the 3,982-row grouped out-of-fold per-intent matrix and final exact-image gate. Historical numbers below remain unchanged for reproducibility.
+
 ## Question
 
 Can the calibrated FunctionGemma intent and five ordinal task scores identify a task region where the text-only Gemma E2B produces sufficiently accurate answers at a 96-output-token ceiling?

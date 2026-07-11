@@ -1,0 +1,38 @@
+{
+  "accepted_risks": [
+    "The 80-row arena is a frozen replay plus exact-image envelope projection, not a live 80-row image run.",
+    "The 23-task Fireworks microbench is deterministic-validator evidence, not hidden-evaluator accuracy.",
+    "The final lablab.ai form and screenshot require manual confirmation outside this repository."
+  ],
+  "candidate": "ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid",
+  "checks": {
+    "candidate_is_immutable_version_tag": true,
+    "compressed_size_below_10gb": true,
+    "exact_local_gate_passed": true,
+    "local_gate_run_recorded": true,
+    "manifest_digest_is_sha256": true,
+    "pareto_gate_passed": true,
+    "platform_digest_is_sha256": true,
+    "release_run_recorded": true,
+    "revision_is_sha40": true,
+    "rollback_is_distinct_version_tag": true
+  },
+  "compressed_size_bytes": 2666216379,
+  "decision": "promote_full_hybrid",
+  "exact_local_gate_run": {
+    "id": 29158947843,
+    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29158947843"
+  },
+  "manifest_digest": "sha256:6bcff04a9b5929b3788345d41304e3d6b98a9901116546afb16ae1e9445139ed",
+  "passed": true,
+  "platform_digest": "sha256:60677fbae98c2043f4c708de8cac00967cdcf5c41a0ef18f24cf0c116de9f2a0",
+  "release_run": {
+    "id": 29158458646,
+    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29158458646"
+  },
+  "revision": "cfeacd407ac7488883afdc6df580fb86b48a039e",
+  "rollback": "ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router",
+  "rollback_action": "Replace only the Docker Image field with ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router",
+  "schema_version": "final-release-decision-v1",
+  "submission_action": "Set the Docker Image field to ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid"
+}

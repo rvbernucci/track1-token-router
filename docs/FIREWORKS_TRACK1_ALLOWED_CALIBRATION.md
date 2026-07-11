@@ -1,5 +1,15 @@
 # Fireworks Track 1 Allowed Models Calibration
 
+Updated: 2026-07-11
+
+## Final Promotion
+
+The `default_enabled=false` policy below is historical Sprint 49 evidence. Sprint 63 ran a new paired 46-call benchmark under the final raw-prompt protocol and 96-token ceiling. The promoted `configs/fireworks-intent-policy-v2.json` uses Kimi by default and MiniMax for NER/extraction. It matched the strongest result at 21/23 valid answers while reducing scored tokens from 3,869 to 1,967. Estimated experiment spend was `$0.00370335`; paired token-savings CI95 was `[1,608, 2,185]`.
+
+The policy SHA-256 is `b57498d17e9d560e9990b56492e5b5aa51d0ce8ac060c83a2f56a4f847b4792a`. It remains subordinate to runtime `ALLOWED_MODELS`. See `reports/public/final-pareto-calibration.md` for current evidence.
+
+## Historical Sprint 49 Evidence
+
 ## Championship Runtime Finding
 
 On the frozen validation/test corpus, omitting `reasoning_effort` for strong Minimax M3 tasks produced repeated OpenAI-compatible responses without usable `message.content`. The same model completed the earlier 571-task run without this failure when `reasoning_effort="none"` was present. The router therefore sends `none` for Minimax and Kimi in every tier, while Gemma continues to omit the unsupported field. The historical exact-runtime `v4` baseline used `M1_SYSTEM_PROMPT`; it is retained as evidence but is not directly comparable with the current `raw-prompt-v1` runtime.
@@ -127,7 +137,7 @@ After tightening the `ner_money_date` prompt to require date and amount exactly 
 - Use local Gemma first for AMD pod development/calibration when an endpoint is available and validated; do not assume Gemma 26B/31B fits the final `4 GB` RAM / `2 vCPU` grading container.
 - In Fireworks-only mode, the Docker image promotes `FIREWORKS_CHAMPION_MODEL=accounts/fireworks/models/kimi-k2p7-code`; the preference applies only when Kimi is present in `ALLOWED_MODELS`.
 - The matrix artifact remains bundled for fallback research and contingency ordering, but it cannot override the promoted champion. On the locked test it lost five conservative-correct answers and used 4,983 more tokens than Kimi.
-- The Docker image loads the SHA-pinned intent-policy candidate for audit, but it cannot override the matrix while `default_enabled=false` after its failed locked-test gate.
+- The old `v1` policy remains disabled. The final Docker image loads the SHA-pinned `v2` policy, which can select a preferred model only when that model appears in runtime `ALLOWED_MODELS`.
 - If a future promoted policy selects a model absent from runtime `ALLOWED_MODELS`, the policy yields no model and the runner falls back to the matrix/Pareto/Nash ordering without making an invalid call.
 - The checked-in matrix weights now use `183` completed, deduplicated, observed Track 1 rows from category, hidden-variant, championship, frontier, structure-heldout, and escape result files.
 - Transport/access failures such as Gemma `404` are excluded from quality fitting by default. The weights record `observed_models`, and the matrix selector filters unobserved allowed models when observed alternatives exist.
@@ -160,4 +170,4 @@ This does not answer tasks by regex. It only prevents format words like `Return 
 
 - Re-run this benchmark if the official page, Participant Guide, or Discord announces a model-access change.
 - If Gemma becomes available through Fireworks serverless, repeat this run and fit `FIREWORKS_MATRIX_WEIGHTS` from the new result file.
-- Keep `ROUTER_MODE=three_route` as reproducible research. It may be reconsidered only with a new frozen corpus; the current E2B and intent-policy candidates failed their locked promotion gates.
+- `ROUTER_MODE=three_route` is now the promoted runtime. The older selective E2B and `v1` intent-policy artifacts remain disabled; the final runtime uses the per-intent E2B matrix and `fireworks-intent-policy-v2.json`.

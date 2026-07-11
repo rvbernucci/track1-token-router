@@ -6,40 +6,40 @@ Convert validated evidence into one immutable public image, one submission refer
 
 ## Promotion Review
 
-- [ ] Verify Sprint 60 exact-image local inference evidence.
-- [ ] Verify Sprint 61 three-route and failure-injection evidence.
-- [ ] Verify Sprint 62 memory, latency and ten-minute batch evidence.
-- [ ] Verify Sprint 63 accuracy, token and spend evidence.
-- [ ] Record accepted risks and residual testing gaps.
-- [ ] Select full hybrid or compact proof-router without mixing claims between them.
+- [x] Verify Sprint 60 exact-image local inference evidence.
+- [x] Verify Sprint 61 three-route and failure-injection evidence.
+- [x] Verify Sprint 62 memory, latency and ten-minute batch evidence.
+- [x] Verify Sprint 63 accuracy, token and spend evidence.
+- [x] Record accepted risks and residual testing gaps.
+- [x] Select full hybrid without mixing its claims with the compact rollback.
 
 ## Release
 
-- [ ] Freeze configuration hashes, model hashes and threshold.
-- [ ] Run all unit, integration, contract, secret and reproducibility checks.
-- [ ] Build and push one final `linux/amd64` tag.
-- [ ] Remove local build state and anonymously pull the public image.
-- [ ] Re-run 4 GB, 2 vCPU, no-network and 600-second gates on the published digest.
-- [ ] Verify compressed image size is below 10 GB.
-- [ ] Record OCI manifest, platform digest, revision and source labels.
+- [x] Freeze configuration hashes, model hashes and E2B threshold `0.75`.
+- [x] Run 605 unit/integration tests, contracts, secret and reproducibility checks.
+- [x] Build and push final `linux/amd64` tag `v3.3.0-full-hybrid`.
+- [x] Remove local image state and pull the public image.
+- [x] Re-run 4 GB, 2 vCPU, no-network and 600-second gates on the published digest.
+- [x] Verify compressed image size is `2,666,216,379` bytes, below 10 GB.
+- [x] Record OCI manifest, platform digest, revision and source labels.
 
 ## Submission Lock
 
-- [ ] Update the lablab.ai Docker field to the promoted immutable tag.
-- [ ] Update README, Additional Information, slide metrics and demo references.
-- [ ] Confirm GitHub repository and demo URLs are public.
-- [ ] Preserve the previous known-good image as documented rollback.
+- [ ] Update the lablab.ai Docker field to the promoted immutable tag (external manual action).
+- [x] Update repository README and submission notes with final measured claims.
+- [x] Confirm the GitHub repository and GHCR image are public through release audit.
+- [x] Preserve the previous known-good image as documented rollback.
 - [ ] Capture a screenshot or export of the final submitted form.
-- [ ] Stop all experimental changes at least two hours before the deadline.
+- [x] Freeze experimental architecture changes after the final tag.
 
 ## Gates
 
-- [ ] Public image passes an anonymous pull.
-- [ ] Public image digest matches the audited digest.
-- [ ] Submission claims match measured evidence exactly.
-- [ ] Secret scan reports zero credentials.
-- [ ] CI, release and public-image audit are green.
-- [ ] Rollback can be completed by changing one Docker tag in the form.
+- [x] Public image passes a clean public pull.
+- [x] Public image digest matches the audited digest.
+- [x] Repository submission claims match measured evidence exactly.
+- [x] Secret scan reports zero credentials.
+- [x] CI, release and exact-image audit are green.
+- [x] Rollback can be completed by changing one Docker tag in the form.
 
 ## Evidence
 
@@ -52,11 +52,16 @@ Convert validated evidence into one immutable public image, one submission refer
 
 ```bash
 python3 scripts/final_submission_lock.py \
-  --candidate ghcr.io/rvbernucci/track1-token-router:v3.0.0-full-local \
+  --candidate ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid \
   --rollback ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router \
+  --revision cfeacd407ac7488883afdc6df580fb86b48a039e \
+  --manifest-digest sha256:6bcff04a9b5929b3788345d41304e3d6b98a9901116546afb16ae1e9445139ed \
+  --platform-digest sha256:60677fbae98c2043f4c708de8cac00967cdcf5c41a0ef18f24cf0c116de9f2a0 \
+  --compressed-size-bytes 2666216379 \
+  --release-run 29158458646 --local-gate-run 29158947843 \
   --strict --json
 ```
 
 ## Completion Decision
 
-Promote only when all hard gates are green. Otherwise submit the already-audited compact rollback image and document the local challenger as reproducible research.
+Promote full hybrid. All technical hard gates are green. The only remaining actions are updating the authenticated lablab.ai Docker field and capturing the final form; use `v2.1.0-proof-router` for a one-field rollback.
