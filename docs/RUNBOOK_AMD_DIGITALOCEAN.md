@@ -1,20 +1,20 @@
 # Runbook AMD Developer Cloud + DigitalOcean MI300X
 
-## Objetivo
+## Objective
 
-Subir uma bancada MI300X, expor um endpoint local OpenAI-compatible e validar o router sem redesenhar arquitetura.
+Spin up an MI300X workbench, expose a local OpenAI-compatible endpoint, and validate the router without redesigning the architecture.
 
-Use este runbook apenas quando os creditos AMD Developer Cloud ou DigitalOcean estiverem ativos.
+Use this runbook only when AMD Developer Cloud or DigitalOcean credits are active.
 
-## Decisao operacional
+## Operational Decision
 
-- Comecar com `1x MI300X`.
-- Preferir endpoint local em `127.0.0.1` e acessar via SSH tunnel.
-- Usar `vLLM` primeiro se a imagem estiver pronta.
-- Usar `SGLang` como alternativa se vLLM falhar ou tiver melhor throughput.
-- Destruir a VM ao final da sessao para parar custo.
+- Start with `1x MI300X`.
+- Prefer local endpoint on `127.0.0.1` and access via SSH tunnel.
+- Use `vLLM` first if the image is ready.
+- Use `SGLang` as an alternative if vLLM fails or has better throughput.
+- Destroy the VM at the end of the session to stop costs.
 
-## Preflight local
+## Local Preflight
 
 ```bash
 git status --short
@@ -22,41 +22,41 @@ scripts/offline_release_check.sh
 python3 scripts/check_runtime_profiles.py
 ```
 
-## Provisionamento
+## Provisioning
 
-1. Entrar pelo fluxo AMD Developer Cloud.
-2. Abrir a opcao DigitalOcean se ela for o provedor concreto.
-3. Criar GPU Droplet AMD MI300X.
-4. Selecionar imagem ROCm ou imagem preconfigurada com vLLM/SGLang quando disponivel.
-5. Habilitar SSH key, nao senha.
-6. Anotar regiao, tamanho, imagem e horario de criacao em notas locais, nao em git.
+1. Enter via the AMD Developer Cloud flow.
+2. Open the DigitalOcean option if it is the concrete provider.
+3. Create an AMD MI300X GPU Droplet.
+4. Select a ROCm image or a preconfigured image with vLLM/SGLang when available.
+5. Enable SSH key, not a password.
+6. Note the region, size, image, and creation time in local notes, not in git.
 
 ## Scratch disk
 
-Use scratch/local disk para pesos e cache, nao o repositorio.
+Use scratch/local disk for weights and cache, not the repository.
 
 ```bash
 df -h
 mkdir -p /data/models /data/cache /data/logs
 ```
 
-Se `/data` nao existir, usar o maior volume local disponivel.
+If `/data` does not exist, use the largest local volume available.
 
-## Firewall e rede
+## Firewall and Network
 
-Padrao seguro:
+Secure default:
 
-- Endpoint do modelo escuta em `127.0.0.1`.
-- Acesso externo via SSH tunnel.
-- Nao expor porta `8000` ou `30000` publicamente sem firewall.
+- Model endpoint listens on `127.0.0.1`.
+- External access via SSH tunnel.
+- Do not expose port `8000` or `30000` publicly without a firewall.
 
-Tunnel local:
+Local tunnel:
 
 ```bash
 ssh -L 8000:127.0.0.1:8000 root@<droplet-ip>
 ```
 
-## Health checks da VM
+## VM Health Checks
 
 ```bash
 scripts/amd_pod_doctor.py
@@ -66,15 +66,15 @@ df -h
 free -h
 ```
 
-Bootstrap padrao do repositorio:
+Standard repository bootstrap:
 
 ```bash
 scripts/bootstrap_amd_pod.sh
 ```
 
-Se o pod vier com Python 3.10, isso e esperado e suportado pelo projeto.
+If the pod comes with Python 3.10, this is expected and supported by the project.
 
-## Health check do ambiente
+## Environment Health Check
 
 ```bash
 /opt/venv/bin/python scripts/amd_pod_doctor.py --json
@@ -90,25 +90,25 @@ set +a
 /opt/venv/bin/python scripts/amd_pod_doctor.py --json
 ```
 
-Esperado:
+Expected:
 
-- ROCm GPU visivel ao PyTorch;
-- ambiente base preservado;
-- treino segue `docs/FUNCTIONGEMMA_270M_AMD_TRAINING_TUTORIAL.md`.
+- ROCm GPU visible to PyTorch;
+- base environment preserved;
+- training follows `docs/FUNCTIONGEMMA_270M_AMD_TRAINING_TUTORIAL.md`.
 
-## Benchmark alvo
+## Target Benchmark
 
 ```bash
 /opt/venv/bin/python scripts/amd_pod_doctor.py --json
 ```
 
-## Teardown obrigatorio
+## Mandatory Teardown
 
-Antes de encerrar o trabalho:
+Before ending the work:
 
-1. Salvar apenas logs e reports sem prompts sensiveis.
-2. Persistir pesos, locks e relatorios em storage privado.
-3. Encerrar a sessao do pod para preservar a cota diaria.
-4. Confirmar que nao ha VM, volume pago ou IP reservado ativo.
+1. Save only logs and reports without sensitive prompts.
+2. Persist weights, locks, and reports in private storage.
+3. End the pod session to preserve the daily quota.
+4. Confirm that there is no active VM, paid volume, or reserved IP.
 
-Regra: VM GPU parada ou esquecida ainda pode custar dinheiro. Destruir quando nao estiver em uso.
+Rule: A stopped or forgotten GPU VM can still cost money. Destroy it when not in use.

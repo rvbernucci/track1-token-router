@@ -10,7 +10,7 @@
     },
     "proof_policy": {
       "path": "configs/proof-verifier-policy-v1.json",
-      "sha256": "071772c25a4b2a331a1286ddb932185166431d460f121ea28f15da6a5812a7f0"
+      "sha256": "7f15b93b93ef6dd1b407852114e8634ee585fa6b5f9067630589fcb81e02ebca"
     },
     "runtime": {
       "path": "router/orchestration/local_adjudication.py",

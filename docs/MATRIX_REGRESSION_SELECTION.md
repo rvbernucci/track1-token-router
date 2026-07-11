@@ -1,21 +1,21 @@
 # Matrix Regression Model Selection
 
-## Objetivo
+## Objective
 
-Criar uma camada experimental para aprender pesos a partir dos microbenchs reais Fireworks.
+Create an experimental layer to learn weights from real Fireworks microbenches.
 
-A ideia nao e substituir o Pareto/Nash imediatamente. A ideia e usar regressao matricial para calibrar a relacao entre:
+The idea is not to replace Pareto/Nash immediately. The idea is to use matrix regression to calibrate the relationship between:
 
-- dominio da tarefa;
-- familia do modelo;
-- capacidade estimada;
-- correlacao de dominio;
-- tokens estimados;
-- custo estimado;
-- latencia estimada;
-- modo de reasoning;
-- validade observada;
-- tokens/custo/latencia reais.
+- task domain;
+- model family;
+- estimated capability;
+- domain correlation;
+- estimated tokens;
+- estimated cost;
+- estimated latency;
+- reasoning mode;
+- observed validity;
+- real tokens/cost/latency.
 
 ## Formula
 
@@ -61,54 +61,54 @@ No runtime experimental:
 regression_utility = clamp(beta dot x, 0, 1)
 ```
 
-O `hybrid_score` muda por tier:
+The `hybrid_score` changes by tier:
 
-| Tier | Regressao | Nash | Tokens | Custo USD |
+| Tier | Regression | Nash | Tokens | Cost USD |
 | --- | ---: | ---: | ---: | ---: |
 | `cheap` | 0.50 | 0.20 | 0.30 | 0.00 |
 | `medium` | 0.65 | 0.15 | 0.20 | 0.00 |
 | `strong` | 0.80 | 0.10 | 0.10 | 0.00 |
 
-A ideia competitiva e simples: primeiro passar pelo accuracy gate; depois reduzir tokens agressivamente. Quando existem pelo menos oito observacoes comparaveis, o modelo precisa atingir `0.60` no Wilson lower bound de 95%. Preco em dolares permanece apenas como telemetria e desempate posterior a precisao e tokens, porque nao entra no score oficial.
+The competitive idea is simple: first pass the accuracy gate; then reduce tokens aggressively. When there are at least eight comparable observations, the model needs to reach `0.60` on the 95% Wilson lower bound. Price in dollars remains only as telemetry and a tiebreaker after accuracy and tokens, because it does not enter the official score.
 
-`cost_utility` permanece no schema para compatibilidade com artefatos e traces historicos, mas seu valor de feature e fixado em `0.0` no fit e no runtime. Assim, uma alteracao de tabela de precos nao consegue mudar a rota competitiva quando precisao, tokens e latencia permanecem iguais.
+`cost_utility` remains in the schema for compatibility with artifacts and historical traces, but its feature value is fixed at `0.0` in the fit and at runtime. Thus, a price list change cannot change the competitive route when accuracy, tokens, and latency remain the same.
 
-## Artefatos
+## Artifacts
 
-- Codigo: `router/orchestration/matrix_regression_selector.py`
-- Fit offline: `scripts/fit_fireworks_matrix_regression.py`
-- Pesos Track 1 usados no Docker: `router/data/fireworks_track1_allowed_weights.json`
-- Relatorio Track 1 token-aligned: `reports/generated/fireworks-track1-token-objective-regression.md`
-- Resultados Fireworks reais: `reports/generated/fireworks-track1-category-20260709-results.jsonl`, `reports/generated/fireworks-hidden-variant-results.jsonl`, `reports/generated/fireworks-championship-results.jsonl`, `reports/generated/fireworks-frontier-20260709-results.jsonl`, `reports/generated/fireworks-structure-heldout-20260709-results.jsonl`, `reports/generated/fireworks-escape-20260709-results.jsonl`
+- Code: `router/orchestration/matrix_regression_selector.py`
+- Offline fit: `scripts/fit_fireworks_matrix_regression.py`
+- Track 1 weights used in Docker: `router/data/fireworks_track1_allowed_weights.json`
+- Track 1 token-aligned report: `reports/generated/fireworks-track1-token-objective-regression.md`
+- Real Fireworks results: `reports/generated/fireworks-track1-category-20260709-results.jsonl`, `reports/generated/fireworks-hidden-variant-results.jsonl`, `reports/generated/fireworks-championship-results.jsonl`, `reports/generated/fireworks-frontier-20260709-results.jsonl`, `reports/generated/fireworks-structure-heldout-20260709-results.jsonl`, `reports/generated/fireworks-escape-20260709-results.jsonl`
 
-## Resultado Atual
+## Current Result
 
-Treino Track 1 permitido com `183` linhas uteis, filtradas de `567` linhas brutas:
+Track 1 training allowed with `183` useful rows, filtered from `567` raw rows:
 
 - `minimax-m3`
 - `kimi-k2p7-code`
 
-As linhas `ok=false` sao excluidas por padrao para nao confundir erro de acesso/transporte com qualidade do modelo. Os pesos tambem registram `observed_models`; no runtime matricial, modelos permitidos mas sem nenhuma chamada concluida no treino sao filtrados quando ha alternativa observada. Isso evita escolher Gemma cegamente enquanto os IDs serverless seguem retornando `404` na chave local.
+The `ok=false` lines are excluded by default so as not to confuse access/transport errors with model quality. The weights also record `observed_models`; in the matrix runtime, allowed models with no completed calls during training are filtered out when there is an observed alternative. This avoids blindly choosing Gemma while serverless IDs continue to return `404` with the local key.
 
-Os pesos agora tambem registram uma matriz empirica `domain_model_stats` em dois niveis: `dominio::estrutura` e `dominio`. No runtime, cada candidato recebe ajuste por taxa de validade suavizada e confianca primeiro por estrutura especifica, depois por dominio, depois por media geral. Isso evita que uma opcao barata com historico ruim naquele formato vire estrategia dominante so por custo/tokens.
+The weights now also record an empirical matrix `domain_model_stats` at two levels: `domain::structure` and `domain`. At runtime, each candidate receives adjustment by smoothed validity rate and confidence, first by specific structure, then by domain, and then by overall average. This prevents a cheap option with a poor history in that format from becoming the dominant strategy just due to cost/tokens.
 
-Os pesos do Docker foram refeitos em 2026-07-10 sobre as mesmas `183` observacoes, substituindo o antigo alvo orientado a custo pelo alvo oficial orientado a tokens. Top coeficientes aprendidos no fit atual:
+The Docker weights were rebuilt on 2026-07-10 over the same `183` observations, replacing the old cost-oriented target with the official token-oriented target. Top coefficients learned in the current fit:
 
-| Feature | Sinal |
+| Feature | Sign |
 | --- | ---: |
-| `bias` | positivo |
-| `capability` | negativo |
-| `shape_json_output` | positivo |
-| `shape_json_numeric` | negativo |
-| `shape_constrained_summary` | negativo |
-| `correlation` | positivo |
-| `interaction_kimi_code_generation` | negativo |
-| `domain_extraction` | negativo |
-| `interaction_minimax_code_generation` | positivo |
+| `bias` | positive |
+| `capability` | negative |
+| `shape_json_output` | positive |
+| `shape_json_numeric` | negative |
+| `shape_constrained_summary` | negative |
+| `correlation` | positive |
+| `interaction_kimi_code_generation` | negative |
+| `domain_extraction` | negative |
+| `interaction_minimax_code_generation` | positive |
 
-Replay atual:
+Replay actual:
 
-| Task | Modelo escolhido |
+| Task | Selected Model |
 | --- | --- |
 | `factual_author` | `kimi-k2p7-code` |
 | `summarization_tokens` | `kimi-k2p7-code` |
@@ -122,36 +122,36 @@ Replay atual:
 | `escape_factual_gold_symbol` | `kimi-k2p7-code` |
 | `escape_summary_cache_latency` | `kimi-k2p7-code` |
 
-## Leitura Competitiva
+## Competitive Analysis
 
-A regressao confirmou alguns sinais fortes:
+The regression confirmed some strong signals:
 
-- `kimi-k2p7-code` deve vencer quando a validade observada e comparavel e o `usage.total` observado por dominio/estrutura/modelo e menor, especialmente em factual QA compacto, summarization, logic, selected math e formatting;
-- `minimax-m3` ganhou peso como fallback de robustez, especialmente em code generation, code debug, extraction estruturada, mixed sentiment e math composto quando o score calibrado supera a economia de tokens;
-- Gemma serverless segue indisponivel na chave local, entao o runner precisa tentar, cachear 404 e seguir sem travar;
-- interacoes familia x dominio sao necessarias, porque uma media global por modelo esconde especializacoes.
+- `kimi-k2p7-code` should win when the observed validity is comparable and the observed `usage.total` by domain/structure/model is smaller, especially in compact factual QA, summarization, logic, selected math, and formatting;
+- `minimax-m3` gained weight as a robustness fallback, especially in code generation, code debug, structured extraction, mixed sentiment, and compound math when the calibrated score exceeds token savings;
+- Gemma serverless remains unavailable with the local key, so the runner needs to try, cache the 404, and continue without locking up;
+- family x domain interactions are necessary because a global average per model hides specializations.
 
-## Limite Atual
+## Current Limitation
 
-O dataset ainda e pequeno, mas a regressao agora esta ativa como camada de calibracao do seletor principal no Docker. Ela nao substitui Nash: ela o combina com o score aprendido.
+The dataset is still small, but the regression is now active as a calibration layer of the main selector in Docker. It does not replace Nash: it combines it with the learned score.
 
-Uma politica discreta por intencao tambem foi ajustada sobre `284` casos de validacao e avaliada uma unica vez sobre `287` casos bloqueados. Ela escolheu Minimax para logica e sentimento, mas obteve apenas `56.10%` de acuracia conservadora no teste, abaixo do gate de `60%` e abaixo do Kimi global. O artefato permanece versionado com `default_enabled=false`. Portanto, a regressao matricial token-aligned mais Pareto/Nash continua sendo a politica operacional; nao houve ajuste pos-teste.
+A discrete intent policy was also tuned over `284` validation cases and evaluated once over `287` held-out cases. It selected Minimax for logic and sentiment, but achieved only `56.10%` conservative accuracy in the test, below the `60%` gate and below global Kimi. The artifact remains versioned with `default_enabled=false`. Therefore, the token-aligned matrix regression plus Pareto/Nash remains the operational policy; no post-test adjustments were made.
 
-Principal lacuna:
+Main gap:
 
-- a estimativa runtime de tokens ja mistura perfil teorico com `avg_total_tokens` observado por dominio/estrutura/modelo, ponderado pela confianca da amostra;
-- os microbenches frontier e structure-heldout mostraram que verbosidade e validade variam por familia e formato de pergunta;
-- proximo passo e separar `prompt_tokens` e `completion_tokens` quando o provedor retornar esses campos de forma estavel, para calibrar melhor respostas longas.
+- the runtime token estimation already mixes the theoretical profile with the observed `avg_total_tokens` by domain/structure/model, weighted by sample confidence;
+- the frontier and structure-heldout microbenches showed that verbosity and validity vary by family and prompt format;
+- the next step is to separate `prompt_tokens` and `completion_tokens` when the provider returns these fields stably, to better calibrate long responses.
 
-## Proximo Passo
+## Next Step
 
-Implementar uma segunda regressao quando houver amostra suficiente:
+Implement a second regression when there is sufficient sample size:
 
 ```text
 predicted_completion_tokens = f(model_family, domain, tier, reasoning_mode)
 ```
 
-Com isso, o Pareto deixa de usar apenas `avg_total_tokens` observado e passa a estimar tokens esperados por componente:
+With this, Pareto stops using only the observed `avg_total_tokens` and starts estimating expected tokens per component:
 
 ```text
 expected_scored_tokens =
@@ -159,4 +159,4 @@ expected_scored_tokens =
   + predicted_completion_tokens
 ```
 
-Preco por token continua registrado para controle do credito de desenvolvimento, mas nao entra nessa funcao de score.
+Price per token remains recorded for development credit monitoring, but does not enter this score function.

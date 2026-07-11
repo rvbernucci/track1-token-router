@@ -1,54 +1,54 @@
 # Sprint 20 - Compact Prompt Packet & Final Validator
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Padronizar o pacote minimo enviado ao auditor remoto e adicionar um validador final de formato antes de devolver a resposta.
+Standardize the minimum packet sent to the remote auditor and add a final format validator before returning the response.
 
-## Por que importa
+## Why It Matters
 
-O remoto deve ser usado como seguro, nao como conversa longa. E resposta certa no formato errado pode valer como erro.
+The remote should be used as insurance, not as a long conversation. And a correct answer in the wrong format can count as an error.
 
-## Entregaveis
+## Deliverables
 
-- Modulo `router/orchestration/prompt_packet.py`.
-- Modulo `router/orchestration/final_validator.py`.
-- Contrato `RemoteAuditPacket`.
-- Contrato `FinalValidationResult`.
-- Medidor de tamanho do pacote.
-- Validadores de formato comum.
-- Testes de JSON, numero puro, eco literal e texto livre.
+- Module `router/orchestration/prompt_packet.py`.
+- Module `router/orchestration/final_validator.py`.
+- `RemoteAuditPacket` contract.
+- `FinalValidationResult` contract.
+- Packet size meter.
+- Common format validators.
+- JSON, pure number, literal echo, and free text tests.
 
 ## Checklist
 
-- [x] Definir pacote remoto minimo: task, candidato, concern, formato esperado.
-- [x] Remover informacao redundante do pacote.
-- [x] Medir caracteres e tokens estimados do pacote.
-- [x] Validar resposta JSON quando a task pede JSON.
-- [x] Validar numero puro quando a task pede numero.
-- [x] Validar eco literal quando a task pede texto exato.
-- [x] Validar resposta vazia indevida.
-- [x] Validar excesso de markdown em formato estrito.
-- [x] Adicionar reparo local simples quando formato falhar.
-- [x] Integrar falha de formato ao trace.
-- [x] Integrar tamanho do packet ao scoreboard.
-- [x] Adicionar testes de regressao.
+- [x] Define minimum remote packet: task, candidate, concern, expected format.
+- [x] Remove redundant information from the packet.
+- [x] Measure characters and estimated tokens of the packet.
+- [x] Validate JSON response when the task requests JSON.
+- [x] Validate pure number when the task requests a number.
+- [x] Validate literal echo when the task requests exact text.
+- [x] Validate improper empty response.
+- [x] Validate excess markdown in strict format.
+- [x] Add simple local repair when format validation fails.
+- [x] Integrate format failure into the trace.
+- [x] Integrate packet size into the scoreboard.
+- [x] Add regression tests.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- O pacote remoto e menor que o prompt bruto equivalente.
-- O validador final bloqueia formatos obviamente errados.
-- Falhas de formato viram sinal para policy/budget.
-- A resposta final continua livre quando a task nao exige formato estrito.
+- The remote packet is smaller than the equivalent raw prompt.
+- The final validator blocks obviously incorrect formats.
+- Format failures become a signal for policy/budget.
+- The final response remains free when the task does not require a strict format.
 
-## Saida esperada
+## Expected Output
 
-Menos token remoto e menos perda boba por formato.
+Fewer remote tokens and fewer silly losses due to formatting.
 
-## Evidencia local
+## Local Evidence
 
 ```bash
 python3 -m unittest tests.test_prompt_packet_and_validator
@@ -57,6 +57,6 @@ ENABLE_ORCHESTRATOR=1 python3 -m router ask "Return exactly SAFE_OUTPUT and noth
 scripts/offline_release_check.sh
 ```
 
-## Decisao
+## Decision
 
-O pacote remoto fica em `RemoteAuditPacket` com apenas task compactada, candidato, concern e formato esperado. O validador final roda dentro do `OrchestratedRunner` quando o orquestrador esta ligado, sem mudar o caminho padrao.
+The remote packet is stored in `RemoteAuditPacket` with only the compacted task, candidate, concern, and expected format. The final validator runs inside `OrchestratedRunner` when the orchestrator is enabled, without changing the default path.

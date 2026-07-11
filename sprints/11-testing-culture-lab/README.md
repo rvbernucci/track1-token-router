@@ -1,52 +1,52 @@
 # Sprint 11 - Testing Culture Lab
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Criar uma cultura explicita de testes para que toda logica importante tenha um lugar claro para ser experimentada, validada e protegida contra regressao.
+Create an explicit testing culture so that all important logic has a clear place to be experimented with, validated, and protected against regression.
 
-Em TypeScript, muitas vezes usamos um `test.ts` rapido para testar uma ideia. Em Python, vamos separar isso em tres camadas:
+In TypeScript, we often use a quick `test.ts` to test an idea. In Python, we will separate this into three layers:
 
-- `playground/`: experimentos manuais e descartaveis.
-- `tests/`: garantias automatizadas que rodam no CI.
-- `fixtures/`: exemplos estaveis usados por testes e adapters.
+- `playground/`: manual and disposable experiments.
+- `tests/`: automated guarantees that run in CI.
+- `fixtures/`: stable examples used by tests and adapters.
 
-## Entregaveis
+## Deliverables
 
-- Guia `docs/TESTING_CULTURE.md`.
-- Pasta `playground/` com exemplos executaveis.
-- Matriz de cobertura por area critica.
-- Script para listar testes por dominio.
-- Regra de promocao: playground -> teste automatizado.
-- Checklists para novas logicas.
-- CI garantindo que os exemplos principais nao apodrecem.
+- Guide `docs/TESTING_CULTURE.md`.
+- `playground/` folder with executable examples.
+- Coverage matrix by critical area.
+- Script to list tests by domain.
+- Promotion rule: playground -> automated test.
+- Checklists for new logic.
+- CI ensuring that the main examples do not rot.
 
 ## Checklist
 
-- [x] Criar `docs/TESTING_CULTURE.md`.
-- [x] Criar `playground/README.md`.
-- [x] Criar `playground/test_policy_logic.py`.
-- [x] Criar `playground/test_adapter_logic.py`.
-- [x] Criar `playground/test_prompt_packets.py`.
-- [x] Criar `docs/TEST_MATRIX.md`.
-- [x] Mapear areas: contracts, adapters, policies, prompts, cascade, fake provider, evals, CLI.
-- [x] Criar `scripts/list_test_coverage.py`.
-- [x] Adicionar teste que valida a matriz de testes.
-- [x] Documentar quando usar `playground` versus `tests`.
-- [x] Adicionar comando no README.
+- [x] Create `docs/TESTING_CULTURE.md`.
+- [x] Create `playground/README.md`.
+- [x] Create `playground/test_policy_logic.py`.
+- [x] Create `playground/test_adapter_logic.py`.
+- [x] Create `playground/test_prompt_packets.py`.
+- [x] Create `docs/TEST_MATRIX.md`.
+- [x] Map areas: contracts, adapters, policies, prompts, cascade, fake provider, evals, CLI.
+- [x] Create `scripts/list_test_coverage.py`.
+- [x] Add test validating the test matrix.
+- [x] Document when to use `playground` versus `tests`.
+- [x] Add command in README.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- [x] Existe uma forma rapida de testar logica manualmente, equivalente ao espirito de um `test.ts`.
-- [x] Toda logica critica tem pelo menos um teste automatizado mapeado.
-- [x] A matriz deixa claro o que esta coberto e o que falta cobrir.
-- [x] `scripts/offline_release_check.sh` continua passando.
-- [x] Nenhum playground depende de credito real.
+- [x] There is a fast way to test logic manually, equivalent to the spirit of a `test.ts`.
+- [x] Every piece of critical logic has at least one mapped automated test.
+- [x] The matrix makes it clear what is covered and what still needs coverage.
+- [x] `scripts/offline_release_check.sh` continues to pass.
+- [x] No playground depends on real credit.
 
-## Evidencias
+## Evidence
 
 - `docs/TESTING_CULTURE.md`
 - `docs/TEST_MATRIX.md`
@@ -57,30 +57,30 @@ Em TypeScript, muitas vezes usamos um `test.ts` rapido para testar uma ideia. Em
 - `tests/test_testing_culture.py`
 - `scripts/offline_release_check.sh`
 
-## Resultado
+## Result
 
-- 8 dominios criticos mapeados: contracts, adapters, policies, prompts, cascade, fake provider, evals, CLI.
-- 3 playgrounds executaveis sem credito.
-- 50 testes automatizados passando.
-- Release check offline agora valida matriz, playgrounds e secret scan.
+- 8 critical domains mapped: contracts, adapters, policies, prompts, cascade, fake provider, evals, CLI.
+- 3 executable playgrounds without credit.
+- 50 automated tests passing.
+- Offline release check now validates matrix, playgrounds, and secret scan.
 
-## Regra de promocao
+## Promotion Rule
 
-Um arquivo em `playground/` deve virar teste em `tests/` quando:
+A file in `playground/` should become a test in `tests/` when:
 
-- capturar um bug real;
-- validar comportamento competitivo;
-- proteger contrato de input/output;
-- envolver scoring, token usage ou roteamento;
-- for usado mais de uma vez.
+- it captures a real bug;
+- it validates competitive behavior;
+- it protects the input/output contract;
+- it involves scoring, token usage, or routing;
+- it is used more than once.
 
-## Anti-escopo
+## Out of Scope
 
-- Nao perseguir 100% coverage numerico sem criterio.
-- Nao criar testes fragilmente acoplados a texto exato de prompt quando o contrato nao exige isso.
-- Nao depender de modelos reais.
-- Nao transformar playground em segunda suite paralela obrigatoria.
+- Do not pursue 100% numerical coverage without criteria.
+- Do not create tests fragily coupled to exact prompt text when the contract does not require it.
+- Do not depend on real models.
+- Do not turn playground into a mandatory second parallel suite.
 
-## Saida esperada
+## Expected Output
 
-Uma cultura de testes clara: experimentar rapido, promover o que importa, e manter o CI protegendo a logica competitiva.
+A clear testing culture: experiment quickly, promote what matters, and keep CI protecting the competitive logic.

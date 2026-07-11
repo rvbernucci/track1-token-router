@@ -1,45 +1,45 @@
 # Sprint 44 - Fireworks Minimal Credit Calibration
 
-## Tipo
+## Type
 
-Depende parcialmente de credito Fireworks, mas tem preparacao offline.
+Partially depends on Fireworks credit, but has offline preparation.
 
-## Objetivo
+## Objective
 
-Usar o minimo possivel de credito para calibrar a matriz Pareto/Game Theory com chamadas reais: poucos prompts, max tokens baixo, modelos selecionados e medicao real de token/latencia.
+Use as little credit as possible to calibrate the Pareto/Game Theory matrix with real calls: few prompts, low max tokens, selected models, and real token/latency measurement.
 
-## Tese
+## Thesis
 
-Benchmarks publicos ajudam, mas o scoring do hackathon depende do comportamento real no endpoint Fireworks. Precisamos de uma amostra pequena, controlada e barata para corrigir preco estimado, latencia e tendencia de output.
+Public benchmarks help, but the hackathon scoring depends on the actual behavior on the Fireworks endpoint. We need a small, controlled, and cheap sample to correct estimated price, latency, and output drift.
 
-## Entregaveis
+## Deliverables
 
 - `evals/fireworks-pareto/minimal-credit-sample.jsonl`.
-- Script `scripts/fireworks_minimal_calibration.py`.
-- Budget guard obrigatorio em dolares e numero maximo de chamadas.
-- Relatorio `reports/generated/fireworks-minimal-calibration.md`.
-- Patch de calibracao em perfis do roteador, se os dados justificarem.
+- `scripts/fireworks_minimal_calibration.py` script.
+- Mandatory budget guard in dollars and maximum number of calls.
+- `reports/generated/fireworks-minimal-calibration.md` report.
+- Calibration patch in router profiles, if data justifies it.
 
-## Checklist Offline
+## Offline Checklist
 
-- [ ] Selecionar 2 prompts por dominio critico.
-- [ ] Definir `max_tokens` curto por tipo de tarefa.
-- [ ] Definir budget hard cap.
-- [ ] Garantir dry-run que imprime plano sem chamar API.
-- [ ] Garantir que `.env.fireworks.local` nunca aparece em log.
-- [ ] Testar com fake provider.
+- [ ] Select 2 prompts per critical domain.
+- [ ] Define short `max_tokens` per task type.
+- [ ] Define budget hard cap.
+- [ ] Ensure dry-run prints plan without calling the API.
+- [ ] Ensure that `.env.fireworks.local` never appears in the log.
+- [ ] Test with fake provider.
 
-## Checklist Com Credito
+## Credit Checklist
 
-- [ ] Rodar smoke com 1 prompt cheap.
-- [ ] Rodar amostra minima por modelos candidatos.
-- [ ] Capturar tokens reais de prompt/completion.
-- [ ] Capturar latencia real.
-- [ ] Comparar escolha esperada vs resultado real.
-- [ ] Atualizar perfis apenas se houver evidencia.
-- [ ] Re-rodar replay offline com os novos parametros.
+- [ ] Run smoke test with 1 cheap prompt.
+- [ ] Run minimal sample across candidate models.
+- [ ] Capture actual prompt/completion tokens.
+- [ ] Capture actual latency.
+- [ ] Compare expected choice vs. actual result.
+- [ ] Update profiles only if there is evidence.
+- [ ] Re-run offline replay with the new parameters.
 
-## Metricas
+## Metrics
 
 - total calls;
 - total estimated cost;
@@ -50,16 +50,16 @@ Benchmarks publicos ajudam, mas o scoring do hackathon depende do comportamento 
 - model rejection of request options;
 - accuracy proxy/manual pass rate.
 
-## Definition Of Done
+## Definition of Done
 
-- A calibracao real custa pouco e e reproduzivel.
-- Existe dry-run seguro.
-- Os parametros do roteador sao atualizados somente por evidencia.
-- O relatorio mostra o que mudou e por que.
+- Actual calibration costs little and is reproducible.
+- Safe dry-run exists.
+- Router parameters are updated only based on evidence.
+- The report shows what changed and why.
 
-## Anti-Escopo
+## Out of Scope
 
-- Nao rodar benchmark grande com credito limitado.
-- Nao testar todos os modelos em todos os prompts.
-- Nao aumentar `max_tokens` sem justificativa.
-- Nao usar priority/fast sem motivo explicito.
+- Do not run large benchmarks with limited credit.
+- Do not test all models on all prompts.
+- Do not increase `max_tokens` without justification.
+- Do not use priority/fast without an explicit reason.

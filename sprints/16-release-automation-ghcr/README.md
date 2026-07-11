@@ -1,46 +1,46 @@
 # Sprint 16 - Release Automation & GHCR
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Automatizar release, tags, release notes e publicacao opcional de imagem no GitHub Container Registry.
+Automate release, tags, release notes, and optional image publication to GitHub Container Registry.
 
-## Entregaveis
+## Deliverables
 
-- Workflow de release.
-- Build Docker multi-evento.
-- Publicacao GHCR em tag.
-- Script de release notes.
-- Documentacao de tags.
-- Testes/validacoes que nao exigem segredo local.
+- Release workflow.
+- Multi-event Docker build.
+- GHCR publication on tag.
+- Release notes script.
+- Tags documentation.
+- Tests/validations that do not require a local secret.
 
 ## Checklist
 
-- [x] Criar workflow `release.yml`.
-- [x] Publicar GHCR apenas em tags.
-- [x] Usar `GITHUB_TOKEN`, sem segredo manual.
-- [x] Criar `scripts/generate_release_notes.py`.
-- [x] Documentar formato de tag.
-- [x] Adicionar dry-run local de release notes.
-- [x] Validar YAML/workflow em teste estatico simples.
-- [x] Atualizar README.
-- [x] Rodar release check offline.
+- [x] Create `release.yml` workflow.
+- [x] Publish to GHCR only on tags.
+- [x] Use `GITHUB_TOKEN`, no manual secret.
+- [x] Create `scripts/generate_release_notes.py`.
+- [x] Document tag format.
+- [x] Add local dry-run for release notes.
+- [x] Validate YAML/workflow in a simple static test.
+- [x] Update README.
+- [x] Run offline release check.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- O workflow existe e e seguro para repo publico.
-- GHCR nao depende de credito AMD/Fireworks.
-- Release notes podem ser geradas localmente.
-- A automacao nao publica em pushes comuns de `main`.
+- The workflow exists and is safe for a public repo.
+- GHCR does not depend on AMD/Fireworks credit.
+- Release notes can be generated locally.
+- The automation does not publish on normal pushes to `main`.
 
-## Saida esperada
+## Expected Output
 
-Um caminho reproduzivel para distribuir imagem e release quando quisermos marcar uma versao.
+A reproducible path to distribute image and release when we want to tag a version.
 
-## Evidencia local
+## Local evidence
 
 ```bash
 python3 scripts/generate_release_notes.py --tag offline-dry-run
@@ -48,6 +48,6 @@ python3 -m unittest tests.test_release_automation
 scripts/offline_release_check.sh
 ```
 
-## Decisao
+## Decision
 
-A publicacao GHCR roda apenas em tags `v*` e `offline-*`. Push normal em `main` continua usando apenas o workflow de CI, sem publicar imagem.
+GHCR publication runs only on `v*` and `offline-*` tags. Normal push to `main` continues using only the CI workflow, without publishing the image.

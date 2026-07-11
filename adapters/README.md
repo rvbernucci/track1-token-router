@@ -1,18 +1,18 @@
 # Adapters
 
-Responsavel por converter entradas e saidas entre o mundo externo e o `core`.
+Responsible for converting inputs and outputs between the external world and the `core`.
 
-## Entradas previstas
+## Expected inputs
 
-- texto direto via CLI;
+- direct text via CLI;
 - stdin;
 - JSON;
 - JSONL;
-- arquivo `.txt`;
-- arquivo arbitrario com metadata;
-- formato oficial do evaluator quando for revelado.
+- `.txt` file;
+- arbitrary file with metadata;
+- official evaluator format when revealed.
 
-## Contrato inicial
+## Initial contract
 
 ```json
 {
@@ -29,12 +29,12 @@ Responsavel por converter entradas e saidas entre o mundo externo e o `core`.
 }
 ```
 
-## Saida inicial
+## Initial output
 
 ```json
 {
   "id": "same-task-id",
-  "answer": "resposta final livre",
+  "answer": "free-form final answer",
   "route": "deterministic|e2b|fireworks",
   "remote_tokens": {
     "prompt": 0,
@@ -44,6 +44,6 @@ Responsavel por converter entradas e saidas entre o mundo externo e o `core`.
 }
 ```
 
-## Regra
+## Rule
 
-Adapters podem mudar quando o kickoff revelar o formato real. O `core` deve mudar o minimo possivel.
+Adapters may change when the kickoff reveals the actual format. The `core` should change as little as possible.

@@ -1,57 +1,57 @@
 # Sprint 42 - Nash Payoff Replay Lab
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Construir um laboratorio de replay para comparar estrategias de selecao: menor custo puro, Pareto antigo, Nash welfare, conservative-quality e oracle esperado por fixture.
+Build a replay lab to compare selection strategies: pure lowest cost, old Pareto, Nash welfare, conservative-quality, and expected oracle per fixture.
 
-## Tese
+## Thesis
 
-Nao basta o Nash parecer elegante. Precisamos provar que ele melhora o tradeoff contra baselines simples e que nao cria regressao em cheap tasks.
+It is not enough for Nash to look elegant. We need to prove that it improves the tradeoff against simple baselines and that it does not create regression in cheap tasks.
 
-## Entregaveis
+## Deliverables
 
 - `scripts/replay_model_selection_strategies.py`.
 - Baselines: `cheapest`, `pareto_cost_first`, `nash_welfare`, `quality_first`.
-- Relatorio `reports/generated/nash-payoff-replay.md`.
-- Tabela de payoff por estrategia.
-- Testes de regressao para cenarios criticos.
+- `reports/generated/nash-payoff-replay.md` report.
+- Payoff table per strategy.
+- Regression tests for critical scenarios.
 
 ## Checklist
 
-- [ ] Extrair candidatos e scores sem chamar Fireworks.
-- [ ] Implementar replay de estrategia `cheapest`.
-- [ ] Implementar replay de estrategia `pareto_cost_first`.
-- [ ] Implementar replay de estrategia `nash_welfare`.
-- [ ] Implementar replay de estrategia `quality_first`.
-- [ ] Comparar custo estimado total por estrategia.
-- [ ] Comparar violacoes de accuracy proxy por estrategia.
-- [ ] Comparar over-escalation por estrategia.
-- [ ] Criar relatorio Markdown com tabela e conclusao.
-- [ ] Adicionar teste para garantir que `nash_welfare` nao escolhe candidato underqualified.
+- [ ] Extract candidates and scores without calling Fireworks.
+- [ ] Implement replay of the `cheapest` strategy.
+- [ ] Implement replay of the `pareto_cost_first` strategy.
+- [ ] Implement replay of the `nash_welfare` strategy.
+- [ ] Implement replay of the `quality_first` strategy.
+- [ ] Compare total estimated cost per strategy.
+- [ ] Compare accuracy proxy violations per strategy.
+- [ ] Compare over-escalation per strategy.
+- [ ] Create Markdown report with table and conclusion.
+- [ ] Add test to ensure `nash_welfare` does not choose an underqualified candidate.
 
-## Metricas
+## Metrics
 
 - estimated total cost;
 - expected accuracy proxy;
 - over-escalation count;
 - underqualification count;
 - average Nash product;
-- prisoner payoff medio;
-- modelos escolhidos por dominio.
+- average prisoner's payoff;
+- models chosen per domain.
 
-## Definition Of Done
+## Definition of Done
 
-- Temos evidencia offline de quando Nash vence ou perde.
-- Baselines simples ficam reproduziveis.
-- Regressao de strategy selection vira teste automatizado.
-- Relatorio aponta ajustes objetivos nos pesos.
+- We have offline evidence of when Nash wins or loses.
+- Simple baselines become reproducible.
+- Strategy selection regression becomes an automated test.
+- Report points to objective weight adjustments.
 
-## Anti-Escopo
+## Out of Scope
 
-- Nao alterar pesos em loop automatico ainda.
-- Nao usar resultados sem fixture como verdade.
-- Nao substituir testes existentes por relatorio.
+- Do not automatically tune weights in a loop yet.
+- Do not treat results without fixtures as truth.
+- Do not replace existing tests with a report.

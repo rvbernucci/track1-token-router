@@ -1,135 +1,135 @@
 # Fireworks Capability Study
 
-Atualizado em: 2026-07-09
+Updated on: 2026-07-09
 
-Fonte principal: [`https://docs.fireworks.ai/llms.txt`](https://docs.fireworks.ai/llms.txt)
+Main source: [`https://docs.fireworks.ai/llms.txt`](https://docs.fireworks.ai/llms.txt)
 
-Mapa completo gerado em: [`docs/FIREWORKS_DOCS_MAP.md`](./FIREWORKS_DOCS_MAP.md)
+Complete map generated at: [`docs/FIREWORKS_DOCS_MAP.md`](./FIREWORKS_DOCS_MAP.md)
 
-## Objetivo
+## Objective
 
-Entender o que a Fireworks oferece antes de gastar credito ou adicionar complexidade ao Track 1.
+Understand what Fireworks offers before spending credits or adding complexity to Track 1.
 
-Perguntas que este estudo precisa responder:
+Questions this study needs to answer:
 
-- quais superficies Fireworks podem aparecer no scoring oficial;
-- quais features reduzem tokens sem reduzir accuracy;
-- quais features so ajudam produto/operacao, mas nao o hackathon;
-- onde fine-tuning e permitido de forma segura;
-- onde deployment/LoRA pode quebrar compatibilidade com `ALLOWED_MODELS`;
-- quais docs precisam virar teste, script ou env profile no repo.
+- which Fireworks surfaces can appear in the official scoring;
+- which features reduce tokens without reducing accuracy;
+- which features only help product/operation, but not the hackathon;
+- where fine-tuning is safely permitted;
+- where deployment/LoRA can break compatibility with `ALLOWED_MODELS`;
+- which docs need to become a test, script, or env profile in the repo.
 
-## Mapa de capacidades
+## Capabilities Map
 
-| Area | O que Fireworks faz | Relevancia Track 1 |
+| Area | What Fireworks does | Track 1 Relevance |
 |---|---|---|
-| Serverless inference | Chat/completions/responses em endpoint OpenAI-compatible, serving paths, pricing, rate limits e prompt caching. | Critica. E o caminho pontuado quando usamos `FIREWORKS_BASE_URL`. |
-| Model library | Modelos serverless, modelos custom, quantizacao e familias como Kimi. | Critica. Precisamos escolher o menor modelo suficiente. |
-| API reference | Chat completions, completions, responses, evaluators, quotas, secrets, rerank. | Alta. Define parametros, formatos e endpoints. |
-| Guides | Text models, reasoning, tool calling, batch, predicted outputs, embeddings/reranking, error codes. | Alta. Pode reduzir tokens ou falhas de formato. |
-| Structured outputs | JSON schema/custom grammar. | Alta se o harness aceitar parametros; pode reduzir retries por JSON invalido. |
-| Fine-tuning | SFT, RFT, DPO/ORPO, evaluators, LoRA, managed fine-tuning. | Media. Fine-tunar roteador e seguro; LoRA respondedor depende do harness. |
-| Dedicated deployments | On-demand deployments, autoscaling, routers, benchmarking, speculative decoding. | Media/baixa para Track 1. Usar so se `ALLOWED_MODELS` incluir deployment IDs. |
-| Batch API | Jobs assincronos e desconto para processamento em lote. | Baixa para scoring; util para calibracao offline. |
-| SDK/tools | Python, TypeScript, Go, Rust, OpenAI/Anthropic compatibility, firectl. | Media. Ajuda integracao, mas Docker final deve ficar simples. |
-| Accounts/billing | Service accounts, usage export, quotas, billing. | Operacional. Ajuda controlar credito. |
-| Ecosystem | FireConnect, IDEs, BYOC, Azure Foundry, observability. | Baixa para Track 1; bom para produto depois. |
+| Serverless inference | Chat/completions/responses in OpenAI-compatible endpoint, serving paths, pricing, rate limits, and prompt caching. | Critical. It is the scored path when we use `FIREWORKS_BASE_URL`. |
+| Model library | Serverless models, custom models, quantization, and families like Kimi. | Critical. We need to choose the smallest sufficient model. |
+| API reference | Chat completions, completions, responses, evaluators, quotas, secrets, rerank. | High. Defines parameters, formats, and endpoints. |
+| Guides | Text models, reasoning, tool calling, batch, predicted outputs, embeddings/reranking, error codes. | High. Can reduce tokens or format failures. |
+| Structured outputs | JSON schema/custom grammar. | High if the harness accepts parameters; can reduce retries due to invalid JSON. |
+| Fine-tuning | SFT, RFT, DPO/ORPO, evaluators, LoRA, managed fine-tuning. | Medium. Router fine-tuning is safe; responder LoRA depends on the harness. |
+| Dedicated deployments | On-demand deployments, autoscaling, routers, benchmarking, speculative decoding. | Medium/low for Track 1. Only use if `ALLOWED_MODELS` includes deployment IDs. |
+| Batch API | Asynchronous jobs and discount for batch processing. | Low for scoring; useful for offline calibration. |
+| SDK/tools | Python, TypeScript, Go, Rust, OpenAI/Anthropic compatibility, firectl. | Medium. Helps with integration, but the final Docker should remain simple. |
+| Accounts/billing | Service accounts, usage export, quotas, billing. | Operational. Helps control credit. |
+| Ecosystem | FireConnect, IDEs, BYOC, Azure Foundry, observability. | Low for Track 1; good for product later. |
 
-## Ordem de estudo recomendada
+## Recommended Study Order
 
-1. [`getting-started/introduction.md`](https://docs.fireworks.ai/getting-started/introduction.md) para a visao geral.
-2. [`getting-started/quickstart.md`](https://docs.fireworks.ai/getting-started/quickstart.md) para chamada serverless minima.
-3. [`serverless/overview.md`](https://docs.fireworks.ai/serverless/overview.md) para billing, headers, prompt caching e quando usar Serverless.
-4. [`serverless/pricing.md`](https://docs.fireworks.ai/serverless/pricing.md) para custo por modelo.
-5. [`serverless/serving-paths.md`](https://docs.fireworks.ai/serverless/serving-paths.md) para Standard/Priority/Fast.
-6. [`guides/querying-text-models.md`](https://docs.fireworks.ai/guides/querying-text-models.md) para parametros de texto.
-7. [`guides/reasoning.md`](https://docs.fireworks.ai/guides/reasoning.md) para controlar raciocinio e evitar tokens escondidos.
-8. [`structured-responses/structured-response-formatting.md`](https://docs.fireworks.ai/structured-responses/structured-response-formatting.md) para formatos estritos.
-9. [`guides/inference-error-codes.md`](https://docs.fireworks.ai/guides/inference-error-codes.md) para fallback robusto.
-10. [`fine-tuning/managed-finetuning-intro.md`](https://docs.fireworks.ai/fine-tuning/managed-finetuning-intro.md) e [`fine-tuning/deploying-loras.md`](https://docs.fireworks.ai/fine-tuning/deploying-loras.md) para limites de LoRA.
+1. [`getting-started/introduction.md`](https://docs.fireworks.ai/getting-started/introduction.md) for the general overview.
+2. [`getting-started/quickstart.md`](https://docs.fireworks.ai/getting-started/quickstart.md) for a minimal serverless call.
+3. [`serverless/overview.md`](https://docs.fireworks.ai/serverless/overview.md) for billing, headers, prompt caching, and when to use Serverless.
+4. [`serverless/pricing.md`](https://docs.fireworks.ai/serverless/pricing.md) for cost per model.
+5. [`serverless/serving-paths.md`](https://docs.fireworks.ai/serverless/serving-paths.md) for Standard/Priority/Fast.
+6. [`guides/querying-text-models.md`](https://docs.fireworks.ai/guides/querying-text-models.md) for text parameters.
+7. [`guides/reasoning.md`](https://docs.fireworks.ai/guides/reasoning.md) to control reasoning and avoid hidden tokens.
+8. [`structured-responses/structured-response-formatting.md`](https://docs.fireworks.ai/structured-responses/structured-response-formatting.md) for strict formats.
+9. [`guides/inference-error-codes.md`](https://docs.fireworks.ai/guides/inference-error-codes.md) for robust fallback.
+10. [`fine-tuning/managed-finetuning-intro.md`](https://docs.fireworks.ai/fine-tuning/managed-finetuning-intro.md) and [`fine-tuning/deploying-loras.md`](https://docs.fireworks.ai/fine-tuning/deploying-loras.md) for LoRA limits.
 
-## Hipoteses de vantagem para testar
+## Advantage Hypotheses to Test
 
 ### 1. Prompt caching
 
-Possivel vantagem: system prompt fixo e payload variavel pequeno podem reduzir custo/latencia em chamadas repetidas.
+Possible advantage: static system prompt and small variable payload can reduce cost/latency in repeated calls.
 
-Teste local:
+Local test:
 
-- manter system prompt estatico;
-- medir tokens/custo com e sem prefixo fixo;
-- registrar headers se Fireworks expuser cache hit/miss.
+- keep system prompt static;
+- measure tokens/cost with and without fixed prefix;
+- record headers if Fireworks exposes cache hit/miss.
 
 ### 2. Reasoning controls
 
-Possivel vantagem: alguns modelos gastam tokens em raciocinio. Controlar `reasoning_effort` pode reduzir custo.
+Possible advantage: some models spend tokens on reasoning. Controlling `reasoning_effort` can reduce cost.
 
-Ja temos evidência local em `docs/RUNBOOK_FIREWORKS.md`: `reasoning_effort=none/low` melhora custo em alguns modelos, mas pode quebrar modelos fortes se for aplicado globalmente.
+We already have local evidence in `docs/RUNBOOK_FIREWORKS.md`: `reasoning_effort=none/low` improves cost in some models, but can break strong models if applied globally.
 
 ### 3. Structured outputs
 
-Possivel vantagem: forçar JSON schema/custom grammar pode reduzir retries e respostas com markdown.
+Possible advantage: forcing JSON schema/custom grammar can reduce retries and markdown responses.
 
-Risco:
+Risk:
 
-- se o parametro nao for aceito por todos os modelos permitidos, precisa fallback sem extra body;
-- pode aumentar input tokens.
+- if the parameter is not accepted by all allowed models, a fallback without extra body is needed;
+- it may increase input tokens.
 
 ### 4. Fine-tuned router
 
-Possivel vantagem: treinar um classificador pequeno/local para prever rota (`solver`, `cheap`, `strong`, `abstain`) com base nos microbenches.
+Possible advantage: train a small/local classifier to predict routing (`solver`, `cheap`, `strong`, `abstain`) based on the microbenchmarks.
 
-Seguro porque:
+Safe because:
 
-- nao muda modelo respondedor;
-- nao precisa chamar Fireworks;
-- reduz risco de over-routing para modelo caro.
+- does not change the responding model;
+- no need to call Fireworks;
+- reduces the risk of over-routing to an expensive model.
 
 ### 5. LoRA responder
 
-Possivel vantagem: modelo pequeno com melhor format-following.
+Possible advantage: small model with better format-following.
 
-Risco alto:
+High risk:
 
-- Fireworks LoRA exige deployment on-demand/dedicado;
-- o ID pode ficar fora de `ALLOWED_MODELS`;
-- tokens Fireworks continuam contando;
-- overhead de LoRA nao mergeado pode piorar latencia/throughput.
+- Fireworks LoRA requires on-demand/dedicated deployment;
+- the ID may fall outside of `ALLOWED_MODELS`;
+- Fireworks tokens still count;
+- overhead of unmerged LoRA can worsen latency/throughput.
 
-Decisao atual: estudar, mas nao usar no runtime principal.
+Current decision: study, but do not use in the main runtime.
 
 ### 6. Batch API
 
-Possivel vantagem: calibracao barata fora do scoring.
+Possible advantage: cheap calibration outside of scoring.
 
-Risco:
+Risk:
 
-- nao serve para contrato sincrono `/input/tasks.json -> /output/results.json`;
-- nao deve entrar no container final.
+- does not work for the synchronous contract `/input/tasks.json -> /output/results.json`;
+- should not enter the final container.
 
-## O que vira acao no repo
+## Repo Action Items
 
-- manter `scripts/map_fireworks_docs.py` para atualizar o mapa quando a doc mudar;
-- usar `docs/FIREWORKS_DOCS_MAP.md` como inventario completo;
-- transformar docs criticas em experimentos pequenos antes de gastar credito;
-- nao misturar features de produto com caminho final do hackathon;
-- manter submissao final serverless/local-compatible e `ALLOWED_MODELS`-first.
+- maintain `scripts/map_fireworks_docs.py` to update the map when the doc changes;
+- use `docs/FIREWORKS_DOCS_MAP.md` as the complete inventory;
+- transform critical docs into small experiments before spending credits;
+- do not mix product features with the final hackathon path;
+- keep final submission serverless/local-compatible and `ALLOWED_MODELS`-first.
 
-## Proxima rodada de estudo
+## Next Study Round
 
-Prioridade 1:
+Priority 1:
 
 - Serverless overview/pricing/serving paths/rate limits;
 - text models/reasoning/structured outputs/error codes;
-- model library e modelos permitidos Track 1.
+- model library and allowed models for Track 1.
 
-Prioridade 2:
+Priority 2:
 
-- fine-tuning do roteador;
-- evaluators e datasets;
-- prompt caching e predicted outputs.
+- router fine-tuning;
+- evaluators and datasets;
+- prompt caching and predicted outputs.
 
-Prioridade 3:
+Priority 3:
 
 - deployments/routers/speculative decoding;
 - batch API;

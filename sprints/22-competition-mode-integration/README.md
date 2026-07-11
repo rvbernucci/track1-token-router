@@ -1,64 +1,64 @@
 # Sprint 22 - Competition Mode Integration
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Criar um modo unico de competicao que integre guardrails, state machine, risk signals, budget manager, policy engine, prompt packet, final validator e battle trace em um caminho operacional coerente.
+Create a single competition mode that integrates guardrails, state machine, risk signals, budget manager, policy engine, prompt packet, final validator, and battle trace into a coherent operational path.
 
-## Por que importa
+## Why It Matters
 
-As Sprints 17-21 criaram pecas fortes. Para disputar seriamente, essas pecas precisam virar um modo de execucao plug-and-play, com comportamento previsivel e configuravel por env vars.
+Sprints 17-21 created strong pieces. To compete seriously, these pieces need to become a plug-and-play execution mode with predictable behavior configurable by env vars.
 
-## Entregaveis
+## Deliverables
 
 - `ROUTER_MODE=competition`.
-- Runner `CompetitionRunner` ou wrapper equivalente.
-- Contrato de decisao unica por task.
-- Trace consolidado com policy, budget, validation e route.
-- Modo dry-run sem provedores reais.
-- Comparacao offline entre `competition` e modos legados.
-- Testes end-to-end em CLI e JSONL.
+- Runner `CompetitionRunner` or equivalent wrapper.
+- Single-decision contract per task.
+- Consolidated trace with policy, budget, validation, and route.
+- Dry-run mode without real providers.
+- Offline comparison between `competition` and legacy modes.
+- End-to-end tests in CLI and JSONL.
 
 ## Checklist
 
-- [x] Definir contrato `CompetitionDecision`.
-- [x] Definir contrato `CompetitionTrace`.
-- [x] Criar `CompetitionRunner`.
-- [x] Ligar guardrails como etapa zero.
-- [x] Ligar risk signals antes da decisao.
-- [x] Ligar budget decision antes de qualquer remoto.
-- [x] Ligar policy engine no caminho quente.
-- [x] Ligar final validator sempre antes do output.
-- [x] Registrar `final_answer_repaired` quando houver reparo seguro.
-- [x] Registrar `remote_packet_tokens` no trace.
-- [x] Criar env var `ROUTER_MODE=competition`.
-- [x] Criar dry-run que nao chama modelo real.
-- [x] Adicionar teste CLI `ask`.
-- [x] Adicionar teste JSONL `run`.
-- [x] Adicionar teste de stdout limpo.
-- [x] Atualizar battle drill para incluir modo `competition`.
+- [x] Define `CompetitionDecision` contract.
+- [x] Define `CompetitionTrace` contract.
+- [x] Create `CompetitionRunner`.
+- [x] Enable guardrails as step zero.
+- [x] Enable risk signals before decision.
+- [x] Enable budget decision before any remote call.
+- [x] Enable policy engine in the hot path.
+- [x] Enable final validator always before output.
+- [x] Record `final_answer_repaired` when there is a secure repair.
+- [x] Record `remote_packet_tokens` in the trace.
+- [x] Create env var `ROUTER_MODE=competition`.
+- [x] Create dry-run that does not call a real model.
+- [x] Add CLI `ask` test.
+- [x] Add JSONL `run` test.
+- [x] Add clean stdout test.
+- [x] Update battle drill to include `competition` mode.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- Um comando executa o modo competicao sem creditos.
-- O modo competicao gera resposta final limpa no `stdout`.
-- O trace inclui policy, budget, validacao final e rota.
-- O modo legado continua passando no CI.
-- O battle drill compara o modo competicao contra o baseline.
+- A single command executes the competition mode without credits.
+- Competition mode generates clean final response on `stdout`.
+- Trace includes policy, budget, final validation, and route.
+- Legacy mode continues passing in CI.
+- Battle drill compares competition mode against the baseline.
 
-## Saida esperada
+## Expected Output
 
-O projeto deixa de ser um conjunto de laboratorios e passa a ter um caminho competitivo unico, pronto para receber endpoints reais.
+The project stops being a set of labs and moves to a single competitive path, ready to receive real endpoints.
 
-## Decisao
+## Decision
 
-O modo competicao deve ser opt-in ate provar vantagem no battle drill. Assim protegemos o caminho atual enquanto amadurecemos o runtime final.
+Competition mode must be opt-in until it proves an advantage in the battle drill. This protects the current path while we mature the final runtime.
 
-## Evidencia de fechamento
+## Evidence of Closure
 
-- `python3 -m unittest discover -s tests`: 101 testes passando.
+- `python3 -m unittest discover -s tests`: 101 tests passing.
 - `python3 scripts/battle_drill.py`: `competition_mode_ready=true`.
-- `ROUTER_MODE=competition COMPETITION_DRY_RUN=1 python3 -m router ask "What is 10 + 5? Return only the number."`: stdout limpo com `15`.
+- `ROUTER_MODE=competition COMPETITION_DRY_RUN=1 python3 -m router ask "What is 10 + 5? Return only the number."`: clean stdout with `15`.

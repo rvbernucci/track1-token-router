@@ -1,96 +1,96 @@
 # Sprint 28 - Evaluator Contract And Adapter Drill
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Criar uma matriz explicita de hipoteses do evaluator oficial e praticar a adaptacao rapida de novos formatos de input/output antes do kickoff.
+Create an explicit matrix of hypotheses for the official evaluator and practice rapid adaptation of new input/output formats before kickoff.
 
-## Por que importa
+## Why It Matters
 
-O maior risco tecnico sem credito nao e modelo. E contrato. Se o evaluator oficial vier com envelope inesperado, arquivo, schema diferente ou output rigido, precisamos adaptar em minutos.
+The biggest technical risk without credit is not the model. It is the contract. If the official evaluator comes with an unexpected envelope, file, different schema, or rigid output, we need to adapt in minutes.
 
-## Tese
+## Thesis
 
-O core deve continuar falando `TaskEnvelope` e `AnswerResult`. Toda surpresa oficial deve ser isolada em adapters, fixtures e testes.
+The core must continue to communicate via `TaskEnvelope` and `AnswerResult`. Any official surprise must be isolated in adapters, fixtures and tests.
 
-## Entregaveis
+## Deliverables
 
 - `docs/EVALUATOR_ASSUMPTIONS.md`.
 - `docs/KICKOFF_ADAPTER_DRILL.md`.
 - `fixtures/adapter-drill/`.
-- Pelo menos tres formatos simulados de evaluator.
-- Adapters experimentais em `router/adapters/official/`.
-- Testes de round-trip para cada formato.
-- Script `scripts/adapter_drill.py`.
-- Relatorio `reports/generated/adapter-drill-report.md`.
+- At least three simulated evaluator formats.
+- Experimental adapters in `router/adapters/official/`.
+- Round-trip tests for each format.
+- `scripts/adapter_drill.py` script.
+- `reports/generated/adapter-drill-report.md` report.
 
 ## Checklist
 
-- [x] Mapear hipoteses de input: texto, JSON, JSONL, arquivo, stdin.
-- [x] Mapear hipoteses de output: texto puro, JSON, JSONL, arquivo.
-- [x] Mapear hipoteses de scoring: accuracy, token count, latency, parse failure.
-- [x] Mapear hipoteses de ambiente: container, env vars, rede, paths.
-- [x] Mapear proibicoes provaveis: stdout sujo, estado local, segredo em log.
-- [x] Criar lista de perguntas para kickoff.
-- [x] Criar fixture `scoring_text_batch`.
-- [x] Criar fixture `scoring_json_envelope`.
-- [x] Criar fixture `scoring_file_bundle`.
-- [x] Criar adapters experimentais para os tres formatos.
-- [x] Criar testes de parse e format.
-- [x] Criar drill cronometrado.
-- [x] Medir tempo de adaptacao por formato.
-- [x] Validar que o core nao importa adapters oficiais.
-- [x] Documentar plano de decisao no kickoff.
+- [x] Map input hypotheses: plain text, JSON, JSONL, file, stdin.
+- [x] Map output hypotheses: plain text, JSON, JSONL, file.
+- [x] Map scoring hypotheses: accuracy, token count, latency, parse failure.
+- [x] Map environment hypotheses: container, env vars, network, paths.
+- [x] Map probable prohibitions: dirty stdout, local state, secret in log.
+- [x] Create list of questions for kickoff.
+- [x] Create `scoring_text_batch` fixture.
+- [x] Create `scoring_json_envelope` fixture.
+- [x] Create `scoring_file_bundle` fixture.
+- [x] Create experimental adapters for the three formats.
+- [x] Create parse and format tests.
+- [x] Create timed drill.
+- [x] Measure adaptation time per format.
+- [x] Validate that the core does not import official adapters.
+- [x] Document kickoff decision plan.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- Cada hipotese tem impacto, mitigacao e teste local.
-- Cada formato simulado tem fixture, adapter e teste.
-- O drill mostra tempo alvo menor que 30 minutos por adapter simples.
-- A adaptacao nao altera `router/core/*`.
-- `stdout` continua limpo nos caminhos simulados.
+- Each hypothesis has impact, mitigation, and local test.
+- Each simulated format has a fixture, adapter, and test.
+- The drill shows target time under 30 minutes for a simple adapter.
+- Adaptation does not alter `router/core/*`.
+- `stdout` remains clean in simulated paths.
 
-## Metricas
+## Metrics
 
-- Tempo de adapter por formato.
-- Numero de alteracoes fora de `router/adapters/official`.
-- Taxa de round-trip dos fixtures.
-- Numero de perguntas de kickoff ainda abertas.
+- Adapter time per format.
+- Number of changes outside `router/adapters/official`.
+- Round-trip rate of fixtures.
+- Number of kickoff questions still open.
 
-## Comandos esperados
+## Expected commands
 
 ```bash
 python3 scripts/adapter_drill.py --report reports/generated/adapter-drill-report.md
 python3 -m unittest tests.test_official_adapters
 ```
 
-## Riscos
+## Risks
 
-- Superotimizar para formatos inventados.
-- Criar adapters que vazam detalhes oficiais para o core.
-- Esquecer output formatting e testar so input parsing.
+- Over-optimizing for invented formats.
+- Creating adapters that leak official details to the core.
+- Forgetting output formatting and only testing input parsing.
 
-## Decisao
+## Decision
 
-Adapters sao camada de borda. O core competitivo nao deve saber se a entrada veio de texto, JSON, JSONL, zip ou dashboard oficial.
+Adapters are the edge layer. The competitive core should not know whether the input came from text, JSON, JSONL, zip, or an official dashboard.
 
 ## Definition of Done
 
-- Matriz de evaluator existe.
-- Drill de adapter existe.
-- Tres formatos simulados estao testados.
-- Tempo de adaptacao foi medido.
-- Perguntas de kickoff foram documentadas.
+- Evaluator matrix exists.
+- Adapter drill exists.
+- Three simulated formats are tested.
+- Adaptation time was measured.
+- Kickoff questions were documented.
 
-## Evidencias
+## Evidence
 
-- `docs/EVALUATOR_ASSUMPTIONS.md` documenta hipoteses, impacto, mitigacao, testes e perguntas de kickoff.
-- `docs/KICKOFF_ADAPTER_DRILL.md` define o procedimento de adaptacao em menos de 30 minutos.
-- `fixtures/adapter-drill/` contem `scoring_text_batch`, `scoring_json_envelope` e `scoring_file_bundle`.
-- `router/adapters/official/` contem adapters experimentais para os tres formatos.
-- `scripts/adapter_drill.py --check` gera `reports/generated/adapter-drill-report.md`.
-- `tests/test_official_adapters.py` cobre parse e format dos tres formatos.
-- `scripts/offline_release_check.sh` executa o drill antes do battle drill.
+- `docs/EVALUATOR_ASSUMPTIONS.md` documents hypotheses, impact, mitigation, tests, and kickoff questions.
+- `docs/KICKOFF_ADAPTER_DRILL.md` defines the adaptation procedure in under 30 minutes.
+- `fixtures/adapter-drill/` contains `scoring_text_batch`, `scoring_json_envelope`, and `scoring_file_bundle`.
+- `router/adapters/official/` contains experimental adapters for the three formats.
+- `scripts/adapter_drill.py --check` generates `reports/generated/adapter-drill-report.md`.
+- `tests/test_official_adapters.py` covers parse and format of the three formats.
+- `scripts/offline_release_check.sh` runs the drill before the battle drill.

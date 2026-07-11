@@ -1,63 +1,63 @@
 # Sprint 23 - Official Input Fuzz Pack
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credits.
 
-## Objetivo
+## Objective
 
-Criar um pacote de fuzzing para simular formatos de input/output que podem aparecer no evaluator oficial, incluindo texto livre, JSON, JSONL, arquivos, payloads grandes, unicode, schemas rigidos e casos quebrados.
+Create a fuzzing pack to simulate input/output formats that may appear in the official evaluator, including free text, JSON, JSONL, files, large payloads, unicode, strict schemas, and broken cases.
 
-## Por que importa
+## Why it matters
 
-O maior risco do kickoff nao e so modelo. E contrato. Se o input oficial vier diferente do que esperamos, o runner precisa falhar de forma controlada ou adaptar rapidamente.
+The biggest risk of the kickoff is not just the model, but the contract. If the official input is different from what we expect, the runner must fail gracefully or adapt quickly.
 
-## Entregaveis
+## Deliverables
 
 - `evals/fuzz/tasks.jsonl`.
 - `evals/fuzz/expected.jsonl`.
-- Fixtures de arquivos anexos.
+- Fixtures of attached files.
 - Script `scripts/generate_fuzz_eval.py`.
 - Script `scripts/run_fuzz_eval.py`.
-- Relatorio `reports/generated/fuzz-report.md`.
-- Testes de adapters e CLI contra payloads adversariais.
+- Report `reports/generated/fuzz-report.md`.
+- Adapter and CLI tests against adversarial payloads.
 
 ## Checklist
 
-- [x] Criar casos de texto vazio.
-- [x] Criar casos com whitespace extremo.
-- [x] Criar casos com unicode e acentos.
-- [x] Criar casos multi-linha.
-- [x] Criar casos JSON com campos alternativos.
-- [x] Criar casos JSONL com linhas invalidas controladas.
-- [x] Criar casos com arquivo `.txt`.
-- [x] Criar casos com arquivo `.json`.
-- [x] Criar casos com payload grande.
-- [x] Criar casos de resposta `number only`.
-- [x] Criar casos de resposta JSON compacta.
-- [x] Criar casos de literal echo.
-- [x] Criar casos com markdown proibido.
-- [x] Validar que erros controlados vao para `stderr`.
-- [x] Validar que `stdout` nao recebe debug.
-- [x] Integrar fuzz report ao battle drill.
+- [x] Create cases with empty text.
+- [x] Create cases with extreme whitespace.
+- [x] Create cases with unicode and accents.
+- [x] Create cases with multi-line input.
+- [x] Create JSON cases with alternative fields.
+- [x] Create JSONL cases with controlled invalid lines.
+- [x] Create cases with a `.txt` file.
+- [x] Create cases with a `.json` file.
+- [x] Create cases with large payloads.
+- [x] Create cases of `number only` responses.
+- [x] Create cases of compact JSON responses.
+- [x] Create cases of literal echo.
+- [x] Create cases with prohibited markdown.
+- [x] Validate that controlled errors go to `stderr`.
+- [x] Validate that `stdout` does not receive debug logs.
+- [x] Integrate fuzz report into the battle drill.
 
-## Criterios de aceite
+## Acceptance criteria
 
-- O pacote roda sem creditos.
-- O runner nao quebra com formatos estranhos.
-- O relatorio mostra classes de input e taxa de sucesso.
-- Falhas de parse sao controladas e testadas.
+- The pack runs without credits.
+- The runner does not break under strange formats.
+- The report shows input classes and success rate.
+- Parse failures are controlled and tested.
 
-## Saida esperada
+## Expected output
 
-Menos surpresa no kickoff e maior chance de adaptar o adapter oficial em minutos, nao horas.
+Fewer surprises at kickoff and a higher chance of adapting the official adapter in minutes, not hours.
 
-## Decisao
+## Decision
 
-O fuzz pack deve testar contrato e robustez, nao qualidade semantica profunda. Ele existe para proteger o runner contra formato inesperado.
+The fuzz pack must test contract and robustness, not deep semantic quality. It exists to protect the runner against unexpected formats.
 
-## Evidencia de fechamento
+## Closure evidence
 
-- `python3 scripts/generate_fuzz_eval.py --check`: dataset e fixtures validos.
-- `python3 scripts/run_fuzz_eval.py --check`: `contract_success=true`, 16 tasks, 15 classes e traces completos.
-- `python3 -m unittest tests.test_fuzz_pack tests.test_battle_drill`: fuzz pack, stderr controlado, stdout limpo e battle drill integrados.
+- `python3 scripts/generate_fuzz_eval.py --check`: valid dataset and fixtures.
+- `python3 scripts/run_fuzz_eval.py --check`: `contract_success=true`, 16 tasks, 15 classes, and full traces.
+- `python3 -m unittest tests.test_fuzz_pack tests.test_battle_drill`: fuzz pack, controlled stderr, clean stdout, and battle drill integrated.

@@ -1,29 +1,29 @@
 # Game Theory Model Selection
 
-## Objetivo
+## Objective
 
-Esta camada transforma a escolha de modelo em um jogo competitivo entre qualidade e custo.
+This layer transforms model selection into a competitive game between quality and cost.
 
-O Track 1 pune dois erros simetricos:
+Track 1 penalizes two symmetrical errors:
 
-- chamar modelo forte demais para uma tarefa simples;
-- chamar modelo barato demais e perder accuracy.
+- calling a model that is too strong for a simple task;
+- calling a model that is too cheap and losing accuracy.
 
-O seletor agora trata esses erros como um dilema do prisioneiro: cada decisao pode cooperar com o objetivo global ou defectar para uma estrategia localmente sedutora.
+The selector now treats these errors as a prisoner's dilemma: each decision can cooperate with the global goal or defect to a locally attractive strategy.
 
-## Jogadores
+## Players
 
-O jogo tem tres interesses:
+The game has three interests:
 
-- `accuracy_player`: maximizar aderencia da resposta ao dominio da tarefa.
-- `token_budget_player`: minimizar custo de input/output Fireworks.
-- `latency_tiebreaker`: desempatar em favor de menor latencia sem dominar custo/qualidade.
+- `accuracy_player`: maximize response adherence to the task domain.
+- `token_budget_player`: minimize Fireworks input/output cost.
+- `latency_tiebreaker`: break ties in favor of lower latency without dominating cost/quality.
 
-O equilibrio escolhido e a estrategia pura com maior produto de Nash dentro da fronteira elegivel.
+The chosen equilibrium is the pure strategy with the highest Nash product within the eligible frontier.
 
-## Matriz De Correlacao
+## Correlation Matrix
 
-Cada tarefa e mapeada para um dominio:
+Each task is mapped to a domain:
 
 - `classification`
 - `formatting`
@@ -36,7 +36,7 @@ Cada tarefa e mapeada para um dominio:
 - `current_factual`
 - `general`
 
-Cada modelo tem fortalezas:
+Each model has strengths:
 
 - `general`
 - `classification`
@@ -51,9 +51,9 @@ Cada modelo tem fortalezas:
 - `embedding`
 - `reranker`
 
-A matriz `DOMAIN_CORRELATION_MATRIX` calcula o encaixe entre dominio da tarefa e fortalezas do modelo. Exemplos:
+The `DOMAIN_CORRELATION_MATRIX` calculates the fit between task domain and model strengths. Examples:
 
-| Dominio da tarefa | Forca do modelo | Correlacao |
+| Task Domain | Model Strength | Correlation |
 | --- | --- | --- |
 | `code_generation` | `code_generation` | `1.00` |
 | `code_generation` | `code_debug` | `0.85` |
@@ -61,13 +61,13 @@ A matriz `DOMAIN_CORRELATION_MATRIX` calcula o encaixe entre dominio da tarefa e
 | `logic` | `math_reasoning` | `0.85` |
 | `summarization` | `extraction` | `0.70` |
 | `classification` | `general` | `0.55` |
-| qualquer chat | `embedding`/`reranker` | `0.00` para resposta final |
+| any chat | `embedding`/`reranker` | `0.00` for final response |
 
-Essa matriz impede um erro comum: comparar modelos apenas por preco quando eles nao sao igualmente correlacionados com a tarefa.
+This matrix prevents a common error: comparing models solely by price when they are not equally correlated with the task.
 
-## Utilidades
+## Utilities
 
-Cada candidato recebe tres utilidades normalizadas:
+Each candidate receives three normalized utilities:
 
 ```text
 cost_utility = inverse_range(estimated_cost_usd)
@@ -78,25 +78,25 @@ quality_utility =
   + 0.20 * reliability
 ```
 
-`capability_ratio` e truncado em `1.0`. Depois que o modelo passa o piso minimo, o jogo nao recompensa infinitamente modelos maiores. Isso evita over-escalation.
+`capability_ratio` is truncated at `1.0`. Once the model passes the minimum floor, the game does not infinitely reward larger models. This avoids over-escalation.
 
-## Pesos Por Tier
+## Weights By Tier
 
-| Tier | Custo | Qualidade | Latencia |
+| Tier | Cost | Quality | Latency |
 | --- | ---: | ---: | ---: |
 | `cheap` | `0.65` | `0.25` | `0.10` |
 | `medium` | `0.50` | `0.35` | `0.15` |
 | `strong` | `0.40` | `0.50` | `0.10` |
 
-Interpretacao:
+Interpretation:
 
-- em `cheap`, custo domina porque a tarefa deve ser quase mecanica;
-- em `medium`, qualidade ganha peso, mas custo ainda lidera;
-- em `strong`, qualidade lidera, mas custo ainda decide entre modelos suficientemente bons.
+- in `cheap`, cost dominates because the task should be almost mechanical;
+- in `medium`, quality gains weight, but cost still leads;
+- in `strong`, quality leads, but cost still decides between sufficiently good models.
 
-## Produto De Nash
+## Nash Product
 
-O score principal e:
+The main score is:
 
 ```text
 nash_product =
@@ -105,28 +105,28 @@ nash_product =
   * latency_utility ^ latency_weight
 ```
 
-O modelo escolhido e:
+The chosen model is:
 
 ```text
 max(nash_product, prisoner_payoff, -estimated_cost_usd, -latency_ms)
 ```
 
-Somente candidatos chat-capable e elegiveis competem na decisao final.
+Only chat-capable and eligible candidates compete in the final decision.
 
-## Dilema Do Prisioneiro
+## Prisoner's Dilemma
 
-Cada candidato recebe um rotulo estrategico:
+Each candidate receives a strategic label:
 
-| Label | Significado |
+| Label | Meaning |
 | --- | --- |
-| `cooperate_token_efficient` | modelo passa o piso de qualidade e esta perto do menor custo elegivel |
-| `cooperate_quality_safe` | modelo passa o piso de qualidade, mas nao e o menor custo |
-| `defect_unsafe_underqualified` | modelo barato demais para o dominio |
-| `defect_expensive_overescalation` | modelo forte, mas caro demais para ganho marginal de qualidade |
-| `dominated_strategy` | existe outro modelo melhor ou igual em custo/latencia/capacidade/confiabilidade |
-| `non_chat_auxiliary_strategy` | embedding/reranker; pode ajudar RAG, mas nao produz resposta final |
+| `cooperate_token_efficient` | model passes the quality floor and is close to the lowest eligible cost |
+| `cooperate_quality_safe` | model passes the quality floor but is not the lowest cost |
+| `defect_unsafe_underqualified` | model is too cheap for the domain |
+| `defect_expensive_overescalation` | strong model, but too expensive for marginal quality gain |
+| `dominated_strategy` | another model exists that is better or equal in cost/latency/capability/reliability |
+| `non_chat_auxiliary_strategy` | embedding/reranker; can help RAG, but does not produce the final response |
 
-## Exemplo Pratico
+## Practical Example
 
 Input:
 
@@ -134,36 +134,36 @@ Input:
 Write a function that parses nested JSON and handles edge cases.
 ```
 
-Dominio:
+Domain:
 
 ```text
 code_generation
 ```
 
-No catalogo completo atual:
+In the current full catalog:
 
-- `minimax-m3`: correlacao `1.0`, passa piso forte, custo baixo, vira `cooperate_token_efficient`.
-- `kimi-k2p7-code`: correlacao `1.0`, qualidade alta, mas custo muito maior, vira `defect_expensive_overescalation`.
-- `gpt-oss-20b`: custo muito baixo, mas capacidade insuficiente, vira `defect_unsafe_underqualified`.
-- `qwen3-embedding-8b`: nao e chat, vira `non_chat_auxiliary_strategy`.
+- `minimax-m3`: correlation `1.0`, passes strong floor, low cost, becomes `cooperate_token_efficient`.
+- `kimi-k2p7-code`: correlation `1.0`, high quality, but much higher cost, becomes `defect_expensive_overescalation`.
+- `gpt-oss-20b`: very low cost, but insufficient capability, becomes `defect_unsafe_underqualified`.
+- `qwen3-embedding-8b`: not chat-capable, becomes `non_chat_auxiliary_strategy`.
 
-Equilibrio:
+Equilibrium:
 
 ```text
 accounts/fireworks/models/minimax-m3
 ```
 
-Isso nao diz que M3 e "melhor" que Kimi em absoluto. Diz que, neste jogo especifico, ele e a melhor resposta estrategica dado o scoring token/accuracy.
+This does not mean that M3 is "better" than Kimi in an absolute sense. It means that, in this specific game, it is the best strategic response given the token/accuracy scoring.
 
-## Onde Isso Mora No Codigo
+## Where This Lives In The Code
 
-Arquivo:
+File:
 
 ```text
 router/orchestration/fireworks_model_router.py
 ```
 
-Campos incluidos em cada candidato:
+Fields included in each candidate:
 
 - `correlation`
 - `quality_utility`
@@ -173,7 +173,7 @@ Campos incluidos em cada candidato:
 - `prisoner_payoff`
 - `game_label`
 
-Resumo da selecao:
+Selection summary:
 
 - `game_theory.selection_rule`
 - `game_theory.equilibrium_model`
@@ -183,10 +183,10 @@ Resumo da selecao:
 - `game_theory.selected_prisoner_payoff`
 - `game_theory.selected_correlation`
 
-## Regra Competitiva
+## Competitive Rule
 
-Se dois modelos sao suficientemente bons, ganha o que coopera melhor com o objetivo global: accuracy acima do piso com menor custo de tokens.
+If two models are sufficiently good, the one that cooperates best with the global objective wins: accuracy above the floor with the lowest token cost.
 
-Se um modelo barato nao passa o piso, ele nao e economia; e risco.
+If a cheap model does not pass the floor, it is not a saving; it is a risk.
 
-Se um modelo caro nao melhora materialmente a qualidade, ele nao e seguranca; e over-escalation.
+If an expensive model does not materially improve quality, it is not safety; it is over-escalation.

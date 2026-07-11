@@ -1,49 +1,49 @@
 # Sprint 12 - Offline Scoring Simulator
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Criar um simulador de scoring offline que combine qualidade simulada, tokens remotos, latencia e falhas de parsing para comparar politicas como se fossem competidores.
+Create an offline scoring simulator that combines simulated quality, remote tokens, latency, and parsing failures to compare policies as if they were competitors.
 
-## Entregaveis
+## Deliverables
 
-- Modulo de scoring offline.
-- Script `scripts/offline_score_simulator.py`.
-- Pesos configuraveis por CLI.
-- Leaderboard Markdown e JSON.
-- Testes cobrindo calculo de score e ordenacao.
-- Integracao no release check offline.
+- Offline scoring module.
+- `scripts/offline_score_simulator.py` script.
+- Configurable weights via CLI.
+- Markdown and JSON leaderboard.
+- Tests covering score calculation and ordering.
+- Integration into the offline release check.
 
 ## Checklist
 
-- [x] Criar `router/evals/scoring.py`.
-- [x] Definir formula de score offline.
-- [x] Incluir accuracy simulada.
-- [x] Penalizar tokens remotos simulados.
-- [x] Penalizar latencia simulada.
-- [x] Penalizar parse failures.
-- [x] Criar script `scripts/offline_score_simulator.py`.
-- [x] Gerar `reports/generated/offline-scoreboard.md`.
-- [x] Gerar `reports/generated/offline-scoreboard.json`.
-- [x] Adicionar testes de score.
-- [x] Documentar pesos e interpretacao.
-- [x] Integrar no `scripts/offline_release_check.sh`.
+- [x] Create `router/evals/scoring.py`.
+- [x] Define offline score formula.
+- [x] Include simulated accuracy.
+- [x] Penalize simulated remote tokens.
+- [x] Penalize simulated latency.
+- [x] Penalize parse failures.
+- [x] Create `scripts/offline_score_simulator.py` script.
+- [x] Generate `reports/generated/offline-scoreboard.md`.
+- [x] Generate `reports/generated/offline-scoreboard.json`.
+- [x] Add score tests.
+- [x] Document weights and interpretation.
+- [x] Integrate into `scripts/offline_release_check.sh`.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- O simulador roda sem AMD e sem Fireworks.
-- O leaderboard compara `aggressive`, `balanced` e `conservative`.
-- A formula e explicita e testada.
-- O release check offline continua passando.
+- The simulator runs without AMD and without Fireworks.
+- The leaderboard compares `aggressive`, `balanced`, and `conservative`.
+- The formula is explicit and tested.
+- The offline release check continues to pass.
 
-## Saida esperada
+## Expected Output
 
-Um placar offline que ajuda a escolher politica antes de ter creditos reais.
+An offline scoreboard that helps choose a policy before having real credits.
 
-## Evidencia local
+## Local evidence
 
 ```bash
 python3 scripts/offline_score_simulator.py
@@ -60,7 +60,7 @@ score = exact_match_rate * accuracy_weight
   - parse_failures * parse_failure_weight
 ```
 
-Pesos padrao:
+Default weights:
 
 - `accuracy_weight=1000.0`
 - `remote_token_weight=0.02`

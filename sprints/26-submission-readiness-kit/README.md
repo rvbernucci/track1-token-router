@@ -1,18 +1,18 @@
 # Sprint 26 - Submission Readiness Kit
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credits.
 
-## Objetivo
+## Objective
 
-Preparar o pacote de submissao do hackathon antes dos creditos: descricoes, tags, roteiro de video, estrutura de slides, cover, demo URL, checklist de arquivos e readiness check automatizado.
+Prepare the hackathon submission package before credits: descriptions, tags, video script, slide structure, cover, demo URL, file checklist, and automated readiness check.
 
-## Por que importa
+## Why It Matters
 
-Mesmo um runner forte pode perder se a submissao estiver incompleta, confusa ou dificil de reproduzir. A plataforma lablab exige artefatos alem do codigo.
+Even a strong runner can lose if the submission is incomplete, confusing, or difficult to reproduce. The lablab platform requires artifacts beyond the code.
 
-## Entregaveis
+## Deliverables
 
 - `submission/`.
 - `submission/short-description.md`.
@@ -23,46 +23,46 @@ Mesmo um runner forte pode perder se a submissao estiver incompleta, confusa ou 
 - `submission/demo-plan.md`.
 - `submission/cover-brief.md`.
 - Script `scripts/submission_readiness_check.py`.
-- Relatorio `reports/generated/submission-readiness.md`.
-- Atualizacao de `SUBMISSION.md`.
+- Report `reports/generated/submission-readiness.md`.
+- Update of `SUBMISSION.md`.
 
 ## Checklist
 
-- [x] Escrever short description ate 255 caracteres.
-- [x] Escrever long description com mais de 100 palavras.
-- [x] Definir project title final.
-- [x] Definir technology/category tags.
-- [x] Criar roteiro de video ate 5 minutos.
-- [x] Criar estrutura de slides PDF.
-- [x] Criar plano de demo em CLI.
-- [x] Criar plano de demo visual opcional.
-- [x] Criar brief de cover image PNG/JPG.
-- [x] Criar checklist de URL de demo.
-- [x] Criar checklist de repo publico.
-- [x] Criar checklist de Docker/CI.
-- [x] Criar readiness script.
-- [x] Validar campos obrigatorios da lablab.
-- [x] Integrar readiness ao battle drill ou release check.
-- [x] Documentar o que fica pendente ate kickoff.
+- [x] Write short description up to 255 characters.
+- [x] Write long description with more than 100 words.
+- [x] Define final project title.
+- [x] Define technology/category tags.
+- [x] Create video script up to 5 minutes.
+- [x] Create PDF slide structure.
+- [x] Create CLI demo plan.
+- [x] Create optional visual demo plan.
+- [x] Create PNG/JPG cover image brief.
+- [x] Create demo URL checklist.
+- [x] Create public repo checklist.
+- [x] Create Docker/CI checklist.
+- [x] Create readiness script.
+- [x] Validate mandatory lablab fields.
+- [x] Integrate readiness into battle drill or release check.
+- [x] Document what remains pending until kickoff.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- A submissao tem todos os textos base prontos.
-- O readiness check falha quando artefato obrigatorio falta.
-- O README aponta claramente como rodar e avaliar.
-- O time consegue gravar video e montar slides sem reinventar narrativa.
+- The submission has all base texts ready.
+- The readiness check fails when a mandatory artifact is missing.
+- The README clearly points out how to run and evaluate.
+- The team can record videos and create slides without reinventing the narrative.
 
-## Saida esperada
+## Expected Output
 
-Um pacote de submissao quase pronto, esperando apenas detalhes reais do kickoff e URLs finais.
+A submission package almost ready, waiting only for real details from the kickoff and final URLs.
 
-## Decisao
+## Decision
 
-O kit deve vender o projeto como runner competitivo, nao como plataforma generica. A narrativa principal e accuracy com menor token remoto por meio de orquestracao calibrada.
+The kit must sell the project as a competitive runner, not as a generic platform. The main narrative is accuracy with lower remote tokens through calibrated orchestration.
 
-## Evidencia de fechamento
+## Closure Evidence
 
-- `python3 scripts/submission_readiness_check.py`: `ok=true`, short description com 199 caracteres, long description com 162 palavras, 12 tags e 10 slides.
-- `python3 -m unittest tests.test_submission_readiness`: readiness positivo, CLI e falha por artefato ausente testados.
-- `scripts/offline_release_check.sh`: readiness integrado a porteira pesada.
-- Pendencias ate kickoff documentadas como warnings: URL publica, video/demo URL e benchmark real AMD/Fireworks.
+- `python3 scripts/submission_readiness_check.py`: `ok=true`, short description with 199 characters, long description with 162 words, 12 tags, and 10 slides.
+- `python3 -m unittest tests.test_submission_readiness`: positive readiness, CLI and failure due to missing artifact tested.
+- `scripts/offline_release_check.sh`: readiness integrated into the strict release gate.
+- Pendencies until kickoff documented as warnings: public URL, video/demo URL, and actual AMD/Fireworks benchmark.

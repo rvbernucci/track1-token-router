@@ -6,7 +6,7 @@ on:
       image:
         description: Public GHCR image tag to audit
         required: true
-        default: ghcr.io/rvbernucci/track1-token-router:v1.0.0-championship
+        default: ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router
       expected_revision:
         description: Expected immutable OCI revision
         required: true
@@ -14,7 +14,7 @@ on:
       expected_version:
         description: Expected immutable OCI version
         required: true
-        default: v1.0.0-championship
+        default: v2.1.0-proof-router
 
 permissions:
   contents: read

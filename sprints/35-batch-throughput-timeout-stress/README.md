@@ -1,81 +1,81 @@
 # Sprint 35 - Batch Throughput And Timeout Stress
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credits.
 
-## Objetivo
+## Objective
 
-Estressar execucao em lote, timeouts, throughput e comportamento sob carga usando fake providers e JSONL grande, sem depender de AMD/Fireworks.
+Stress-test batch execution, timeouts, throughput, and behavior under load using fake providers and a large JSONL, without depending on AMD/Fireworks.
 
-## Por que importa
+## Why it matters
 
-Se o evaluator vier com lote grande ou timeout agressivo, um runner correto mas lento pode perder. Hoje temos latency drill; falta stress de volume, falha parcial e limites de tempo por lote.
+If the evaluator comes with a large batch or aggressive timeouts, a correct but slow runner might lose. Currently, we have a latency drill; we lack volume stress-testing, partial failures, and time limits per batch.
 
-## Tese
+## Thesis
 
-Performance competitiva nao e apenas p95 de uma task. E estabilidade sob lote, falha parcial e deadline.
+Competitive performance is not just the p95 of a single task. It is stability under batch loads, partial failures, and deadlines.
 
-## Entregaveis
+## Deliverables
 
 - `scripts/batch_stress.py`.
 - `fixtures/stress/`.
 - `reports/generated/batch-stress.md`.
-- Configuracao de timeouts por env.
-- Testes para lote grande, falha parcial e saida JSONL limpa.
-- Opcional: modo concorrente controlado para rotas sem estado.
+- Timeout configuration per environment.
+- Tests for large batches, partial failures, and clean JSONL output.
+- Optional: controlled concurrent mode for stateless routes.
 
 ## Checklist
 
-- [x] Criar fixture JSONL com 1k tarefas sinteticas pequenas.
-- [x] Criar fixture com mistura de facil, formato, adversarial e conhecimento instavel.
-- [x] Simular provider local lento.
-- [x] Simular provider local com erro intermitente.
-- [x] Simular Fireworks lento em dry-run/fake provider.
-- [x] Medir throughput tasks/s.
-- [x] Medir tempo total por lote.
-- [x] Medir p50/p95/p99 por task.
-- [x] Medir falhas controladas versus crashes.
-- [x] Validar que output JSONL preserva ids e ordem quando necessario.
-- [x] Validar que stderr pode conter diagnostico, mas stdout nao suja resposta.
-- [x] Definir threshold de lote para CI.
+- [x] Create a JSONL fixture with 1k small synthetic tasks.
+- [x] Create a fixture with a mix of easy, formatting, adversarial, and unstable knowledge tasks.
+- [x] Simulate a slow local provider.
+- [x] Simulate a local provider with intermittent errors.
+- [x] Simulate a slow Fireworks provider in dry-run/fake provider.
+- [x] Measure throughput in tasks/s.
+- [x] Measure total time per batch.
+- [x] Measure p50/p95/p99 per task.
+- [x] Measure controlled failures versus crashes.
+- [x] Validate that JSONL output preserves IDs and order when necessary.
+- [x] Validate that stderr can contain diagnostics, but stdout does not clutter the response.
+- [x] Define batch thresholds for CI.
 
-## Criterios de aceite
+## Acceptance criteria
 
-- Stress roda localmente sem creditos.
-- O script falha quando timeout/throughput sai do envelope.
-- Falhas parciais sao registradas sem quebrar contrato de saida.
-- O relatorio identifica gargalos.
+- Stress test runs locally without credits.
+- The script fails when timeout/throughput falls outside the envelope.
+- Partial failures are recorded without breaking the output contract.
+- The report identifies bottlenecks.
 
-## Metricas
+## Metrics
 
-- Tasks por segundo.
+- Tasks per second.
 - Batch elapsed ms.
-- p95/p99 por task.
+- p95/p99 per task.
 - Error rate.
 - Timeout rate.
 - Output contract pass rate.
 
-## Comandos esperados
+## Expected commands
 
 ```bash
 python3 scripts/batch_stress.py --check --report reports/generated/batch-stress.md
 python3 -m unittest tests.test_batch_stress
 ```
 
-## Riscos
+## Risks
 
-- Otimizar para throughput e quebrar simplicidade do evaluator.
-- Introduzir concorrencia antes de provar que o runner e stateless.
-- Fazer o CI ficar lento demais.
+- Optimizing for throughput and breaking the simplicity of the evaluator.
+- Introducing concurrency before proving that the runner is stateless.
+- Making the CI run too slowly.
 
-## Decisao
+## Decision
 
-O primeiro stress deve ser sequencial e deterministico. Concorrencia entra apenas se a medicao provar necessidade.
+The first stress test must be sequential and deterministic. Concurrency will only be introduced if measurements prove it necessary.
 
 ## Definition of Done
 
-- Stress de lote existe.
-- Thresholds sao configuraveis.
-- Report mostra gargalos.
-- CI continua rapido e estavel.
+- Batch stress testing exists.
+- Thresholds are configurable.
+- The report shows bottlenecks.
+- CI remains fast and stable.

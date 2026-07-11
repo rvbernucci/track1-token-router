@@ -1,15 +1,15 @@
 # Golden Eval Set
 
-Dataset inicial para calibrar o roteador antes do kickoff.
+Initial dataset to calibrate the router before the kickoff.
 
-Ele nao pretende representar o scoring oficial. Serve para medir regressao local, distribuicao de rotas, tokens remotos e comportamento em tarefas faceis, medias, dificeis e adversariais.
+It is not intended to represent the official scoring. It serves to measure local regression, route distribution, remote tokens, and behavior in easy, medium, hard, and adversarial tasks.
 
-## Arquivos
+## Files
 
-- `tasks.jsonl`: tarefas de entrada.
-- `expected.jsonl`: respostas esperadas para exact match simples.
+- `tasks.jsonl`: input tasks.
+- `expected.jsonl`: expected responses for simple exact matches.
 
-## Uso
+## Usage
 
 ```bash
 python3 -m router eval \

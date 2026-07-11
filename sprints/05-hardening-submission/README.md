@@ -1,51 +1,51 @@
-# Sprint 05 - Hardening e entrega
+# Sprint 05 - Hardening and delivery
 
-## Objetivo
+## Objective
 
-Transformar o prototipo competitivo em submissao confiavel: container, documentacao, testes finais, scripts de reproducao e plano de demo.
+Transform the competitive prototype into a reliable submission: container, documentation, final tests, reproduction scripts, and demo plan.
 
-Esta sprint e sobre nao perder por detalhe operacional.
+This sprint is about not losing due to an operational detail.
 
-## Entregaveis
+## Deliverables
 
-- Dockerfile final.
-- Comandos de build e run documentados.
+- Final Dockerfile.
+- Documented build and run commands.
 - `.env.example`.
-- README publico de submissao.
-- Suite final de testes.
-- Relatorio de estrategia.
-- Checklist de entrega lablab.
+- Public submission README.
+- Final test suite.
+- Strategy report.
+- lablab delivery checklist.
 
 ## Checklist
 
-- [x] Criar Dockerfile minimalista.
-- [x] Criar `.dockerignore`.
-- [x] Criar `.env.example` sem segredos.
-- [x] Garantir que `router --help` funciona no container.
-- [x] Garantir que `router ask` funciona no container.
-- [x] Garantir que `router run --jsonl` funciona no container.
-- [x] Garantir modo sem Fireworks para smoke test.
-- [x] Garantir modo com Fireworks para run real.
-- [x] Rodar eval final com golden set.
-- [x] Rodar testes de timeout.
-- [x] Rodar testes de JSON invalido.
-- [x] Rodar testes de arquivo ausente.
-- [x] Limpar logs com segredos ou dados sensiveis.
-- [x] Escrever README de instalacao.
-- [x] Escrever README de arquitetura.
-- [x] Escrever tradeoffs e limitacoes.
-- [x] Preparar pitch tecnico curto.
+- [x] Create minimalist Dockerfile.
+- [x] Create `.dockerignore`.
+- [x] Create `.env.example` without secrets.
+- [x] Ensure `router --help` works in the container.
+- [x] Ensure `router ask` works in the container.
+- [x] Ensure `router run --jsonl` works in the container.
+- [x] Ensure no-Fireworks mode for smoke testing.
+- [x] Ensure Fireworks mode for actual run.
+- [x] Run final eval with golden set.
+- [x] Run timeout tests.
+- [x] Run invalid JSON tests.
+- [x] Run missing file tests.
+- [x] Clean logs of secrets or sensitive data.
+- [x] Write installation README.
+- [x] Write architecture README.
+- [x] Write tradeoffs and limitations.
+- [x] Prepare a short technical pitch.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- [x] Qualquer pessoa consegue rodar o projeto seguindo o README.
-- [x] O container nao depende de arquivo local escondido.
-- [x] Falhas externas geram erro controlado.
-- [x] Logs sao uteis, mas nao vazam API keys.
-- [x] O projeto explica claramente por que economiza tokens.
-- [x] O projeto esta pronto para repo publico.
+- [x] Anyone can run the project following the README.
+- [x] The container does not depend on hidden local files.
+- [x] External failures produce a controlled error.
+- [x] Logs are useful but do not leak API keys.
+- [x] The project clearly explains why it saves tokens.
+- [x] The project is ready for a public repo.
 
-## Evidencias
+## Evidence
 
 - `python3 -m unittest discover -s tests`
 - `scripts/verify.sh`
@@ -53,41 +53,41 @@ Esta sprint e sobre nao perder por detalhe operacional.
 - `docker run --rm track1-token-router --help`
 - `docker run --rm track1-token-router ask "What is 2+2?"`
 - `docker run --rm track1-token-router run --jsonl evals/golden/tasks.jsonl --out /tmp/router-output.jsonl`
-- `.github/workflows/ci.yml` valida testes e Docker no GitHub Actions.
+- `.github/workflows/ci.yml` validates tests and Docker in GitHub Actions.
 - `.env.example`
 - `SUBMISSION.md`
 
-Nota: a maquina local usada nesta implementacao nao possui `docker`/`podman` instalado. Os gates de container foram codificados no CI para validacao em ambiente com Docker.
+Note: The local machine used in this implementation does not have `docker`/`podman` installed. The container gates were coded in the CI for validation in a Docker-enabled environment.
 
-## README publico deve conter
+## Public README must contain
 
-- Problema do Track 1.
-- Ideia central da cascata.
-- Como rodar localmente.
-- Como rodar com Docker.
-- Variaveis de ambiente.
-- Exemplos de CLI.
-- Estrutura do projeto.
-- Estrategia de token efficiency.
-- Limites conhecidos.
-- Como reproduzir avaliacao local.
+- Track 1 problem.
+- Core cascade concept.
+- How to run locally.
+- How to run with Docker.
+- Environment variables.
+- CLI examples.
+- Project structure.
+- Token efficiency strategy.
+- Known limits.
+- How to reproduce local evaluation.
 
-## Riscos
+## Risks
 
-- Funcionar localmente e falhar no ambiente padronizado.
-- README bonito, mas comandos quebrados.
-- Container pesado demais.
-- API key acidentalmente exposta.
-- Ultima hora virar refactor em vez de estabilizacao.
+- Working locally and failing in the standardized environment.
+- Nice README, but broken commands.
+- Too heavy container.
+- Accidental API key exposure.
+- Last-minute refactoring instead of stabilization.
 
-## Plano de congelamento
+## Freeze Plan
 
-- Congelar contratos antes da entrega.
-- Congelar prompts que tiveram melhor Pareto.
-- Aceitar melhorias pequenas apenas se houver teste.
-- Evitar dependencias novas na reta final.
-- Priorizar reproducibilidade acima de elegancia.
+- Freeze contracts before delivery.
+- Freeze prompts that had the best Pareto.
+- Accept small improvements only if there is a test.
+- Avoid new dependencies at the final stage.
+- Prioritize reproducibility over elegance.
 
-## Saida esperada da sprint
+## Expected Sprint Output
 
-Uma submissao limpa, reproduzivel e defensavel: codigo, container, README, metricas e narrativa tecnica alinhados.
+A clean, reproducible, and defensible submission: aligned code, container, README, metrics, and technical narrative.

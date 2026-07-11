@@ -1,63 +1,63 @@
 # Sprint 38 - Fireworks Model Router Cost Optimizer
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credits.
 
-## Objetivo
+## Objective
 
-Adaptar o projeto ao esclarecimento oficial do Track 1: o jogo principal e escolher, em tempo real, o modelo Fireworks mais barato que ainda deve passar o accuracy gate.
+Adapt the project to the official Track 1 clarification: the main game is choosing, in real-time, the cheapest Fireworks model that should still pass the accuracy gate.
 
-Local models continuam uteis para desenvolvimento, avaliacao offline e calibracao, mas o caminho final precisa rotear chamadas Fireworks por `FIREWORKS_BASE_URL` usando apenas modelos de `ALLOWED_MODELS`.
+Local models remain useful for development, offline evaluation, and calibration, but the final path needs to route Fireworks calls through `FIREWORKS_BASE_URL` using only models from `ALLOWED_MODELS`.
 
-## Tese
+## Thesis
 
-O vencedor nao e quem evita Fireworks a qualquer custo. O vencedor e quem escolhe o menor modelo Fireworks suficiente para cada task.
+The winner is not the one who avoids Fireworks at all costs. The winner is the one who chooses the smallest sufficient Fireworks model for each task.
 
-## Entregaveis
+## Deliverables
 
-- Roteador de modelos Fireworks baseado em `ALLOWED_MODELS`.
-- Ranking heuristico de custo/capacidade por nome/tamanho do modelo.
-- Selecionador por tipo de task: cheap, medium, strong.
-- Metadata com `fireworks_model_selection`.
-- Testes para ranking e selecao.
-- Integracao com `ROUTER_MODE=fireworks`.
+- Fireworks model router based on `ALLOWED_MODELS`.
+- Heuristic ranking of cost/capability by model name/size.
+- Selector by task type: cheap, medium, strong.
+- Metadata with `fireworks_model_selection`.
+- Tests for ranking and selection.
+- Integration with `ROUTER_MODE=fireworks`.
 
 ## Checklist
 
-- [x] Criar `router/orchestration/fireworks_model_router.py`.
-- [x] Implementar ranking por tamanho/keyword de modelo.
-- [x] Implementar selecao cheap/medium/strong.
-- [x] Usar modelo selecionado no payload OpenAI-compatible.
-- [x] Registrar selecao em metadata.
-- [x] Preservar deterministic solvers antes de Fireworks.
-- [x] Adicionar testes de ranking.
-- [x] Adicionar testes de selecao por categoria.
-- [x] Adicionar teste garantindo que o payload usa o modelo selecionado.
-- [ ] Calibrar contra `ALLOWED_MODELS` real quando sair.
-- [ ] Adicionar tabela de custo real se a organizacao publicar precos/modelos.
-- [ ] Medir accuracy/token por tier quando houver creditos.
+- [x] Create `router/orchestration/fireworks_model_router.py`.
+- [x] Implement ranking by model size/keyword.
+- [x] Implement cheap/medium/strong selection.
+- [x] Use selected model in the OpenAI-compatible payload.
+- [x] Record selection in metadata.
+- [x] Preserve deterministic solvers before Fireworks.
+- [x] Add ranking tests.
+- [x] Add category selection tests.
+- [x] Add test ensuring payload uses the selected model.
+- [ ] Calibrate against actual `ALLOWED_MODELS` when released.
+- [ ] Add actual cost table if the organization publishes prices/models.
+- [ ] Measure accuracy/token per tier when credits are available.
 
-## Categorias oficiais e tier inicial
+## Official Categories and Initial Tier
 
 - Sentiment classification: `cheap`.
 - Strict formatting/simple extraction: `cheap`.
 - Text summarisation: `medium`.
 - Named entity recognition: `medium`.
-- Factual knowledge: `medium` ou `strong` se atual/especifico.
-- Mathematical reasoning: `strong` quando multi-step.
+- Factual knowledge: `medium` or `strong` if current/specific.
+- Mathematical reasoning: `strong` when multi-step.
 - Logical / deductive reasoning: `strong`.
 - Code debugging/generation: `strong`.
 
-## Riscos
+## Risks
 
-- Nome do modelo nao refletir custo real.
-- Modelo barato passar token baixo mas falhar accuracy gate.
-- Modelo forte ser usado demais e matar ranking por tokens.
-- O prompt unico nao estar otimizado por tier.
+- Model name not reflecting real cost.
+- Cheap model passing low tokens but failing accuracy gate.
+- Strong model being overused and hurting token ranking.
+- The single prompt not being optimized per tier.
 
 ## Definition of Done
 
-- O caminho oficial nao escolhe sempre o primeiro modelo.
-- A escolha do modelo e auditavel por task.
-- A estrategia pode ser recalibrada sem trocar o contrato Docker.
+- The official path does not always choose the first model.
+- Model choice is auditable per task.
+- Strategy can be recalibrated without changing the Docker contract.

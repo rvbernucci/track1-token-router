@@ -1,81 +1,81 @@
 # Sprint 36 - Submission Rehearsal And Log Redaction
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credits.
 
-## Objetivo
+## Objective
 
-Executar um ensaio completo de submissao e endurecer a redacao de logs/traces para que nenhum artefato compartilhavel vaze prompts longos, paths locais, IPs privados, hostnames ou tokens.
+Run a complete submission rehearsal and harden the redaction of logs/traces so that no shareable artifact leaks long prompts, local paths, private IPs, hostnames, or tokens.
 
-## Por que importa
+## Why It Matters
 
-O projeto ja tem reports publicos sanitizados, mas ainda ha logs internos e traces com candidatos crus. Antes de gravar video, publicar demo ou enviar materiais, precisamos separar o que e interno do que e compartilhavel.
+The project already has sanitized public reports, but there are still internal logs and traces with raw candidates. Before recording videos, publishing demos, or sending materials, we need to separate what is internal from what is shareable.
 
-## Tese
+## Thesis
 
-Uma submissao forte nao e so codigo passando. E um ritual reproduzivel: demo, comandos, video, reports, checklist, CI e artefatos sem vazamento.
+A strong submission is not just code passing. It is a reproducible ritual: demo, commands, video, reports, checklist, CI, and leak-free artifacts.
 
-## Entregaveis
+## Deliverables
 
 - `scripts/redact_logs.py`.
-- `reports/public/traces/` ou `reports/public/trace-summary.md`.
+- `reports/public/traces/` or `reports/public/trace-summary.md`.
 - `docs/SUBMISSION_REHEARSAL.md`.
 - `reports/generated/submission-rehearsal.md`.
-- Checklist de video preenchivel.
-- Testes de redaction para logs JSONL.
+- Fillable video checklist.
+- Redaction tests for JSONL logs.
 
 ## Checklist
 
-- [x] Mapear campos sensiveis em logs e traces.
-- [x] Redigir prompts longos acima de limite configuravel.
-- [x] Redigir candidates longos acima de limite configuravel.
-- [x] Mascarar paths locais absolutos.
-- [x] Bloquear IPs privados.
-- [x] Bloquear hostnames privados.
-- [x] Bloquear tokens e env assignments.
-- [x] Gerar trace summary publico.
-- [x] Criar rehearsal script/runbook de 5 minutos.
-- [x] Rodar comandos do video em ordem.
-- [x] Medir duracao estimada do video.
-- [x] Validar audio/tela/terminal como checklist.
-- [x] Atualizar `submission/final-checklist.md`.
+- [x] Map sensitive fields in logs and traces.
+- [x] Redact long prompts above a configurable limit.
+- [x] Redact long candidates above a configurable limit.
+- [x] Mask absolute local paths.
+- [x] Block private IPs.
+- [x] Block private hostnames.
+- [x] Block tokens and env assignments.
+- [x] Generate public trace summary.
+- [x] Create a 5-minute rehearsal script/runbook.
+- [x] Run video commands in order.
+- [x] Measure estimated video duration.
+- [x] Validate audio/screen/terminal as a checklist.
+- [x] Update `submission/final-checklist.md`.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- Logs publicaveis passam secret scan e redaction check.
-- Ensaio de submissao gera relatorio.
-- O roteiro de video cabe em 5 minutos.
-- O time sabe exatamente o que abrir, rodar e mostrar no dia final.
+- Logs publishable pass secret scan and redaction check.
+- Submission rehearsal generates a report.
+- Video script fits in 5 minutes.
+- The team knows exactly what to open, run, and show on the final day.
 
-## Metricas
+## Metrics
 
-- Numero de campos redigidos.
-- Tamanho de trace publico.
-- Tempo total do ensaio.
-- Itens de checklist pendentes.
-- Achados de secret scan.
+- Number of redacted fields.
+- Public trace size.
+- Total rehearsal time.
+- Pending checklist items.
+- Secret scan findings.
 
-## Comandos esperados
+## Expected Commands
 
 ```bash
 python3 scripts/redact_logs.py --check --report reports/generated/redaction-report.md
 python3 scripts/submission_rehearsal.py --check --report reports/generated/submission-rehearsal.md
 ```
 
-## Riscos
+## Risks
 
-- Redigir tanto que o report deixa de explicar a decisao.
-- Manter logs internos publicaveis por acidente.
-- Fazer ensaio de video tarde demais.
+- Redacting so much that the report fails to explain the decision.
+- Keeping internal logs publishable by accident.
+- Doing the video rehearsal too late.
 
-## Decisao
+## Decision
 
-O artefato publico deve explicar decisoes sem expor dados brutos sensiveis. Interno e publico precisam ser caminhos separados.
+The public artifact must explain decisions without exposing sensitive raw data. Internal and public need to be separate paths.
 
 ## Definition of Done
 
-- Redaction de logs existe.
-- Ensaio de submissao existe.
-- Public trace/report e seguro.
-- Checklist final fica acionavel para gravacao e envio.
+- Log redaction exists.
+- Submission rehearsal exists.
+- Public trace/report is secure.
+- Final checklist becomes actionable for recording and submission.

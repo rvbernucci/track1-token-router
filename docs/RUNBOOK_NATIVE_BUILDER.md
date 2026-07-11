@@ -1,47 +1,47 @@
 # Runbook Native.Builder
 
-## Objetivo
+## Objective
 
-Usar Native.Builder/NativelyAI como ferramenta auxiliar de demo, documentacao ou apresentacao, nao como runtime competitivo do Track 1.
+Use Native.Builder/NativelyAI as an auxiliary tool for demo, documentation, or presentation, not as a Track 1 competitive runtime.
 
-## Papel correto
+## Correct Role
 
-- Criar demo visual do fluxo do router.
-- Gerar documentacao navegavel para jurados.
-- Ajudar pitch/video.
-- Nao substituir CLI, eval harness ou scoring path.
+- Create a visual demo of the router flow.
+- Generate navigable documentation for judges.
+- Help with pitch/video.
+- Do not replace CLI, eval harness, or scoring path.
 
-## Entradas seguras
+## Safe Inputs
 
-- Descricao publica da arquitetura.
-- Screenshots sem segredo.
-- Reports gerados sem prompts sensiveis.
-- Diagramas Mermaid ou Markdown.
+- Public description of the architecture.
+- Screenshots without secrets.
+- Reports generated without sensitive prompts.
+- Mermaid or Markdown diagrams.
 
-## Entradas proibidas
+## Prohibited Inputs
 
 - API keys.
-- IP privado da VM.
-- Logs com prompts sensiveis.
-- Dados de avaliacao oficial se houver regra de confidencialidade.
+- Private VM IP.
+- Logs with sensitive prompts.
+- Official evaluation data if confidentiality rules apply.
 
-## Fluxo sugerido
+## Suggested Flow
 
-1. Exportar `SUBMISSION.md`, `docs/DETERMINISTIC_SOLVERS.md` e report do battle drill.
-2. Criar demo auxiliar explicando:
+1. Export `SUBMISSION.md`, `docs/DETERMINISTIC_SOLVERS.md` and the battle drill report.
+2. Create an auxiliary demo explaining:
    - FunctionGemma assessment;
    - regression and minimax decision engine;
    - deterministic solver route;
    - Gemma 4 E2B text-only route;
    - Fireworks Pareto fallback.
-3. Usar a demo apenas como material de apresentacao.
-4. Manter a execucao real no CLI.
+3. Use the demo only as presentation material.
+4. Keep the actual execution on the CLI.
 
-## Health check de posicionamento
+## Positioning Health Check
 
-Se uma mudanca em Native.Builder for necessaria para o score tecnico, estamos no caminho errado.
+If a change in Native.Builder is required for the technical score, we are on the wrong track.
 
-O core competitivo deve continuar reproduzivel por:
+The competitive core must remain reproducible by:
 
 ```bash
 scripts/offline_release_check.sh

@@ -1,63 +1,63 @@
 # Sprint 24 - Deterministic Solver Pack
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Expandir os guardrails para um pacote de solvers deterministicos seguros, focados em tarefas mecanicas que nao precisam de LLM local nem Fireworks.
+Expand guardrails to a pack of secure deterministic solvers, focused on mechanical tasks that do not need local LLM nor Fireworks.
 
-## Por que importa
+## Why It Matters
 
-Se codigo resolve com certeza, usar LLM e desperdicio de latencia e risco. O solver pack aumenta accuracy em tarefas mecanicas e reduz pressao sobre a cascata.
+If code resolves it with certainty, using an LLM is a waste of latency and risk. The solver pack increases accuracy in mechanical tasks and reduces pressure on the cascade.
 
-## Entregaveis
+## Deliverables
 
-- Modulo `router/orchestration/solvers.py`.
-- Registro de solvers com nome, confidence e reason.
-- Solvers seguros para matematica e transformacao simples.
-- Testes de falso positivo.
-- Metricas de economia no battle drill.
-- Registro reutilizado como engine candidato quando `sub_intent` e a regressao indicarem alto `deterministic_fit`.
+- Module `router/orchestration/solvers.py`.
+- Registry of solvers with name, confidence, and reason.
+- Secure solvers for simple math and transformations.
+- False-positive tests.
+- Savings metrics in the battle drill.
+- Registry reused as candidate engine when `sub_intent` and regression indicate high `deterministic_fit`.
 
 ## Checklist
 
-- [x] Criar contrato `SolverResult`.
-- [x] Criar registry de solvers.
-- [x] Resolver soma, subtracao, multiplicacao e divisao inteira segura.
-- [x] Resolver comparacao numerica simples.
-- [x] Resolver contagem de caracteres.
-- [x] Resolver contagem de palavras.
-- [x] Resolver uppercase/lowercase/titlecase.
-- [x] Resolver trim/normalize whitespace.
-- [x] Resolver JSON compact quando payload for valido.
-- [x] Resolver JSON pretty quando payload for valido.
-- [x] Resolver extracao de primeiro/ultimo item de lista simples.
-- [x] Bloquear algebra, datas ambiguas e word problems.
-- [x] Adicionar testes de falso positivo.
-- [x] Adicionar testes de formato final.
-- [x] Medir rotas economizadas no battle drill.
-- [x] Documentar limites dos solvers.
+- [x] Create `SolverResult` contract.
+- [x] Create registry of solvers.
+- [x] Resolve safe addition, subtraction, multiplication, and integer division.
+- [x] Resolve simple numerical comparison.
+- [x] Resolve character count.
+- [x] Resolve word count.
+- [x] Resolve uppercase/lowercase/titlecase.
+- [x] Resolve trim/normalize whitespace.
+- [x] Resolve JSON compact when payload is valid.
+- [x] Resolve JSON pretty when payload is valid.
+- [x] Resolve extraction of first/last item from a simple list.
+- [x] Block algebra, ambiguous dates, and word problems.
+- [x] Add false-positive tests.
+- [x] Add final format tests.
+- [x] Measure routes saved in the battle drill.
+- [x] Document limits of solvers.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- Solvers so respondem quando confidence for alta.
-- Casos complexos passam para o runner normal.
-- O solver pack reduz chamadas da cascata em tarefas mecanicas.
-- O CI prova que nao estamos usando regex como raciocinio geral.
+- Solvers only respond when confidence is high.
+- Complex cases pass to the normal runner.
+- The solver pack reduces cascade calls in mechanical tasks.
+- The CI proves that we are not using regex as general reasoning.
 
-## Saida esperada
+## Expected Output
 
-Um ganho real de eficiencia sem depender de modelo, credito ou heuristica fragil.
+A real efficiency gain without depending on models, credit, or fragile heuristics.
 
-## Decisao
+## Decision
 
-Cada solver deve ser pequeno, explicito e testado. Se a regra precisa de interpretacao semantica, ela nao pertence ao solver deterministico.
+Each solver must be small, explicit, and tested. If the rule requires semantic interpretation, it does not belong to the deterministic solver.
 
-## Evidencia de fechamento
+## Evidence of Closure
 
-- `python3 -m unittest tests.test_solvers tests.test_competition_mode tests.test_state_machine tests.test_battle_drill`: 25 testes focados passando.
-- `ROUTER_MODE=competition COMPETITION_DRY_RUN=1 python3 -m router ask "What is 6 * 7? Return only the number." --json`: rota `solver_arithmetic`, resposta `42`, zero tokens remotos.
+- `python3 -m unittest tests.test_solvers tests.test_competition_mode tests.test_state_machine tests.test_battle_drill`: 25 focused tests passing.
+- `ROUTER_MODE=competition COMPETITION_DRY_RUN=1 python3 -m router ask "What is 6 * 7? Return only the number." --json`: `solver_arithmetic` route, response `42`, zero remote tokens.
 - `python3 scripts/battle_drill.py`: `solver_pack_ready=true`.
-- Limites documentados em `docs/DETERMINISTIC_SOLVERS.md`.
+- Limits documented in `docs/DETERMINISTIC_SOLVERS.md`.

@@ -1,18 +1,18 @@
 # Sprint 40 - Pareto Spec Operationalization
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credits.
 
-## Objetivo
+## Objective
 
-Transformar Pareto e teoria dos jogos em especificacoes executaveis: todo comportamento central do roteador precisa ter spec, plano, tasks, testes e criterio de aceite.
+Transform Pareto and game theory into executable specifications: every core behavior of the router must have a spec, plan, tasks, tests, and acceptance criteria.
 
-## Tese
+## Thesis
 
-Uma estrategia so vira vantagem competitiva quando ela e rastreavel. Se nao conseguimos explicar por spec por que um modelo foi chamado, nao conseguimos calibrar nem defender a decisao.
+A strategy only becomes a competitive advantage when it is traceable. If we cannot explain via spec why a model was invoked, we cannot calibrate or defend the decision.
 
-## Entregaveis
+## Deliverables
 
 - `specs/000-constitution/constitution.md`.
 - `specs/001-fireworks-pareto-router/spec.md`.
@@ -25,32 +25,32 @@ Uma estrategia so vira vantagem competitiva quando ela e rastreavel. Se nao cons
 
 ## Checklist
 
-- [ ] Criar constituicao operacional com principios nao negociaveis.
-- [ ] Especificar requisitos do Pareto Router.
-- [ ] Especificar requisitos da matriz de correlacao e Nash welfare.
-- [ ] Vincular cada requisito a pelo menos um teste existente ou planejado.
-- [ ] Documentar criterios de aceite por dominio de tarefa.
-- [ ] Criar checklist de convergencia spec -> code -> tests -> docs.
-- [ ] Atualizar `docs/TEST_MATRIX.md` com referencias a specs.
-- [ ] Rodar `python3 -m unittest tests.test_fireworks_model_router`.
-- [ ] Rodar `python3 scripts/secret_scan.py`.
+- [ ] Create an operational constitution with non-negotiable principles.
+- [ ] Specify Pareto Router requirements.
+- [ ] Specify correlation matrix and Nash welfare requirements.
+- [ ] Link each requirement to at least one existing or planned test.
+- [ ] Document acceptance criteria per task domain.
+- [ ] Create a spec -> code -> tests -> docs convergence checklist.
+- [ ] Update `docs/TEST_MATRIX.md` with references to specs.
+- [ ] Run `python3 -m unittest tests.test_fireworks_model_router`.
+- [ ] Run `python3 scripts/secret_scan.py`.
 
-## Metricas
+## Metrics
 
-- requisitos com teste vinculado;
-- decisoes de roteamento com criterio de aceite;
-- specs sem `[NEEDS CLARIFICATION]`;
-- divergencias encontradas entre docs e codigo.
+- requirements with linked tests;
+- routing decisions with acceptance criteria;
+- specs without `[NEEDS CLARIFICATION]`;
+- divergences found between docs and code.
 
 ## Definition Of Done
 
-- As duas features centrais tem `spec.md`, `plan.md` e `tasks.md`.
-- Toda regra critica do roteador aparece em uma spec.
-- A matriz de teste aponta para as specs.
-- Checks locais passam.
+- The two core features have `spec.md`, `plan.md`, and `tasks.md`.
+- Every critical router rule appears in a spec.
+- The test matrix points to the specs.
+- Local checks pass.
 
-## Anti-Escopo
+## Out of Scope
 
-- Nao instalar `specify-cli` ainda.
-- Nao mudar heuristica sem teste.
-- Nao criar especificacao generica sem criterio de aceite.
+- Do not install `specify-cli` yet.
+- Do not change heuristics without tests.
+- Do not create generic specifications without acceptance criteria.

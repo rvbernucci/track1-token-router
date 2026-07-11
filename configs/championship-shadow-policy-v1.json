@@ -45,7 +45,7 @@
   "artifacts": {
     "local_adjudication_policy": {
       "path": "configs/local-adjudication-policy-v1.json",
-      "sha256": "a401b1252108ac2cf1e6774a4c9bc73cd8278a7af5451d88f4d662fd8558b58d"
+      "sha256": "06adeee3cbdec9b2fa14e539c188d3c566a4220160eb870f3261bb4cec39ddb5"
     },
     "shadow_runtime": {
       "path": "router/evals/shadow_runtime.py",
@@ -53,7 +53,7 @@
     },
     "proof_policy": {
       "path": "configs/proof-verifier-policy-v1.json",
-      "sha256": "071772c25a4b2a331a1286ddb932185166431d460f121ea28f15da6a5812a7f0"
+      "sha256": "7f15b93b93ef6dd1b407852114e8634ee585fa6b5f9067630589fcb81e02ebca"
     },
     "code_policy": {
       "path": "configs/code-verifier-policy-v1.json",

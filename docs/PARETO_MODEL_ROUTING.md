@@ -1,31 +1,31 @@
 # Pareto Model Routing
 
-## Tese
+## Thesis
 
-Track 1 nao e uma disputa de modelo mais forte. E uma disputa de escolha eficiente: para cada input, selecionar o modelo que entrega qualidade suficiente com o menor custo de tokens possivel.
+Track 1 is not a contest of the strongest model. It is a contest of efficient choice: for each input, select the model that delivers sufficient quality at the lowest possible token cost.
 
-Pesquisa de capacidades, treinamento e benchmarks por familia de modelo: [MODEL_CAPABILITY_RESEARCH.md](MODEL_CAPABILITY_RESEARCH.md).
+Capability research, training, and benchmarks by model family: [MODEL_CAPABILITY_RESEARCH.md](MODEL_CAPABILITY_RESEARCH.md).
 
-Camada de matriz de correlacao, equilibrio de Nash e dilema do prisioneiro: [GAME_THEORY_MODEL_SELECTION.md](GAME_THEORY_MODEL_SELECTION.md).
+Correlation matrix layer, Nash equilibrium, and prisoner's dilemma: [GAME_THEORY_MODEL_SELECTION.md](GAME_THEORY_MODEL_SELECTION.md).
 
-Camada experimental de regressao matricial para calibrar pesos com microbench real: [MATRIX_REGRESSION_SELECTION.md](MATRIX_REGRESSION_SELECTION.md).
+Experimental matrix regression layer to calibrate weights with real microbenchmarks: [MATRIX_REGRESSION_SELECTION.md](MATRIX_REGRESSION_SELECTION.md).
 
-Isso cria uma fronteira de Pareto por tarefa. Um modelo e dominado quando outro modelo e ao mesmo tempo:
+This creates a Pareto frontier per task. A model is dominated when another model is simultaneously:
 
-- mais barato ou igual;
-- mais rapido ou igual;
-- tao capaz ou mais capaz para aquele dominio;
-- tao confiavel ou mais confiavel.
+- cheaper or equal;
+- faster or equal;
+- as capable or more capable for that domain;
+- as reliable or more reliable.
 
-Modelos dominados nao deveriam receber trafego naquele perfil de tarefa.
+Dominated models should not receive traffic in that task profile.
 
-## Sinais Do Input
+## Input Signals
 
-O router extrai sinais leves do prompt:
+The router extracts lightweight signals from the prompt:
 
-- `classification`: sentimento, positivo/negativo/neutro, label simples.
-- `formatting`: JSON, uppercase, lowercase, return only, formato estrito.
-- `summarization`: resumir, sintetizar, reduzir texto.
+- `classification`: sentiment, positive/negative/neutral, simple label.
+- `formatting`: JSON, uppercase, lowercase, return only, strict format.
+- `summarization`: summarize, synthesize, reduce text.
 - `extraction`: named entity, extract, entities.
 - `logic`: puzzle, deductive, constraints, proof.
 - `math_reasoning`: multi-step, percentage, rate, average, word problem.
@@ -34,33 +34,33 @@ O router extrai sinais leves do prompt:
 - `current_factual`: latest, today, current, price, CEO, version.
 - `general`: fallback.
 
-Esses sinais viram tres tiers:
+These signals become three tiers:
 
-- `cheap`: tarefa curta, classificacao ou formato.
-- `medium`: linguagem geral, resumo, extracao, factual estavel.
-- `strong`: codigo, raciocinio, matematica multi-step, informacao temporal.
+- `cheap`: short task, classification, or formatting.
+- `medium`: general language, summarization, extraction, stable factual.
+- `strong`: code, reasoning, multi-step math, temporal information.
 
-## Metricas Do Modelo
+## Model Metrics
 
-Cada candidato recebe um perfil estimado:
+Each candidate receives an estimated profile:
 
-- preco de input por 1M tokens;
-- preco de output por 1M tokens;
-- latencia observada ou estimada;
-- tokens observados em tarefa simples;
-- fortalezas por dominio;
-- confiabilidade observada.
-- caminho de servico: `standard`, `priority` ou `fast`.
-- tipo do modelo: `chat`, `embedding` ou `reranker`.
-- capacidade de responder pelo caminho de chat/completions.
+- input price per 1M tokens;
+- output price per 1M tokens;
+- observed or estimated latency;
+- observed tokens in a simple task;
+- strengths by domain;
+- observed reliability.
+- service path: `standard`, `priority`, or `fast`.
+- model type: `chat`, `embedding`, or `reranker`.
+- ability to respond via the chat/completions path.
 
-O preco veio da documentacao de Serverless Pricing da Fireworks. A latencia e tokens simples vieram do microbench real do projeto.
+The price comes from the Fireworks Serverless Pricing documentation. The latency and simple tokens come from the project's real microbenchmarks.
 
-## Catalogo Fireworks Mapeado
+## Mapped Fireworks Catalog
 
-Modelos de resposta final, todos via `accounts/fireworks/models/...`:
+Final response models, all via `accounts/fireworks/models/...`:
 
-Nota de 2026-07-08: o Track 1 ACT II passou a ter Pareto restrito oficial. No caminho final, considerar apenas:
+Note of 2026-07-08: Track 1 ACT II now has an official restricted Pareto. In the final path, consider only:
 
 - `minimax-m3`;
 - `kimi-k2p7-code`;
@@ -68,117 +68,117 @@ Nota de 2026-07-08: o Track 1 ACT II passou a ter Pareto restrito oficial. No ca
 - `gemma-4-26b-a4b-it`;
 - `gemma-4-31b-it-nvfp4`.
 
-Os modelos abaixo que nao pertencem a essa lista ficam como pesquisa/calibracao historica, nao como rota final de submissao.
+The models below that do not belong to this list are for historical research/calibration, not as the final submission route.
 
-| Modelo | Papel no Pareto | Uso preferencial |
+| Model | Role in Pareto | Preferred Use |
 | --- | --- | --- |
-| `gpt-oss-20b` | menor custo de entrada para chat | classificacao, formato simples, resposta curta |
-| `deepseek-v4-flash` | modelo barato e mais forte que o basico | resumo, linguagem geral, fallback barato |
-| `gpt-oss-120b` | raciocinio barato com controle de `reasoning_effort` | logica e tarefas fortes quando codigo especializado nao e necessario |
-| `minimax-m3` | melhor custo/capacidade atual para codigo e agente | primeiro candidato para `code_generation` e `code_debug` no catalogo completo |
-| `minimax-m2p7` | alternativa barata para agente/produtividade | fallback se M3 nao estiver em `ALLOWED_MODELS` |
-| `qwen3p7-plus` | meio termo multimodal com function calling | matematica, codigo e tarefas multimodais quando permitido |
-| `nemotron-3-ultra-nvfp4` | raciocinio/codigo/matematica com preco medio | fallback forte antes de modelos mais caros |
-| `kimi-k2p7-code` | modelo especializado em codigo long-horizon | codigo complexo quando a confianca importa mais que custo minimo |
-| `kimi-k2p6` | modelo agentico/coding anterior | fallback de Kimi se K2.7 Code nao estiver liberado |
-| `glm-5p1` | modelo amplo para linguagem/estrutura | general, resumo, formato, logica |
-| `glm-5p2` | GLM mais novo com contexto longo | general, resumo, formato, logica, prompts longos |
-| `deepseek-v4-pro` | modelo forte para raciocinio/codigo | fallback de alta confiabilidade, caro e lento |
+| `gpt-oss-20b` | lowest entry cost for chat | classification, simple formatting, short response |
+| `deepseek-v4-flash` | cheap model and stronger than the basic one | summarization, general language, cheap fallback |
+| `gpt-oss-120b` | cheap reasoning with `reasoning_effort` control | logic and strong tasks when specialized code is not needed |
+| `minimax-m3` | best current cost/capability for code and agent | first candidate for `code_generation` and `code_debug` in the complete catalog |
+| `minimax-m2p7` | cheap alternative for agent/productivity | fallback if M3 is not in `ALLOWED_MODELS` |
+| `qwen3p7-plus` | multimodal middle ground with function calling | math, code, and multimodal tasks when allowed |
+| `nemotron-3-ultra-nvfp4` | reasoning/code/math with average price | strong fallback before more expensive models |
+| `kimi-k2p7-code` | specialized model for long-horizon code | complex code when confidence matters more than minimum cost |
+| `kimi-k2p6` | previous agentic/coding model | Kimi fallback if K2.7 Code is not released |
+| `glm-5p1` | broad model for language/structure | general, summarization, formatting, logic |
+| `glm-5p2` | newer GLM with long context | general, summarization, formatting, logic, long prompts |
+| `deepseek-v4-pro` | strong model for reasoning/code | high reliability fallback, expensive and slow |
 
-Modelos auxiliares, nao usados para resposta final:
+Auxiliary models, not used for final response:
 
-| Modelo | Tipo | Regra |
+| Model | Type | Rule |
 | --- | --- | --- |
-| `qwen3-embedding-8b` | `embedding` | pode apoiar RAG/eval futura, mas nunca vence a rota de chat |
-| `qwen3-reranker-8b` | `reranker` | pode apoiar ranking futuro, mas nunca vence a rota de chat |
+| `qwen3-embedding-8b` | `embedding` | can support future RAG/eval, but never wins the chat route |
+| `qwen3-reranker-8b` | `reranker` | can support future ranking, but never wins the chat route |
 
-Regra critica: se `ALLOWED_MODELS` vier apenas com embedding/reranker, o router falha cedo com erro claro. Isso e melhor do que gastar chamada Fireworks em endpoint que nao produz a resposta exigida pelo Track 1.
+Critical rule: if `ALLOWED_MODELS` comes with only embedding/reranker, the router fails early with a clear error. This is better than wasting a Fireworks call on an endpoint that does not produce the response required by Track 1.
 
-## Caminhos De Servico
+## Service Paths
 
-Fireworks Serverless tem tres caminhos:
+Fireworks Serverless has three paths:
 
-- `standard`: default, sem parametro extra. E o caminho feliz do Track 1.
-- `priority`: ativado por `service_tier=priority`, mais confiavel em pico e mais caro. Deve ser fallback manual, nao padrao.
-- `fast`: selecionado por outro model ID, por exemplo `accounts/fireworks/routers/glm-5p2-fast`. Entra no Pareto somente se o ID aparecer em `ALLOWED_MODELS`.
+- `standard`: default, no extra parameter. It is the happy path for Track 1.
+- `priority`: activated by `service_tier=priority`, more reliable under peak load and more expensive. Should be a manual fallback, not the default.
+- `fast`: selected by another model ID, for example `accounts/fireworks/routers/glm-5p2-fast`. Enters the Pareto only if the ID appears in `ALLOWED_MODELS`.
 
-Fast pode estar na fronteira por latencia, mas nao deve vencer quando Standard ja tem capacidade suficiente e menor custo.
+Fast may be on the frontier for latency, but it should not win when Standard already has sufficient capability and lower cost.
 
 ## Prompt Cache
 
-Prompt caching e default na Fireworks e funciona por prefixo exato. Para aumentar cache hit:
+Prompt caching is default in Fireworks and works by exact prefix. To increase cache hit:
 
-- manter system prompt estatico;
-- colocar input variavel no final;
-- nao inserir timestamp no system prompt;
-- enviar `user=track1-token-router-v1` como pista de afinidade de sessao.
+- keep system prompt static;
+- place variable input at the end;
+- do not insert timestamp in the system prompt;
+- send `user=track1-token-router-v1` as a session affinity hint.
 
-## Regra De Decisao
+## Decision Rule
 
-1. Ler `ALLOWED_MODELS`.
-2. Classificar o input em dominio e tier.
-3. Montar candidatos com custo estimado.
-4. Separar modelos de chat de modelos auxiliares.
-5. Remover modelos dominados.
-6. Filtrar modelos com capacidade minima para o tier.
-7. Escolher o menor custo dentro da fronteira elegivel.
-8. Aplicar `reasoning_effort` economico quando suportado.
-9. Se o modelo rejeitar o parametro extra, refazer uma vez sem ele.
+1. Read `ALLOWED_MODELS`.
+2. Classify input into domain and tier.
+3. Assemble candidates with estimated cost.
+4. Separate chat models from auxiliary models.
+5. Remove dominated models.
+6. Filter models with minimum capability for the tier.
+7. Choose the lowest cost within the eligible frontier.
+8. Apply economical `reasoning_effort` when supported.
+9. If the model rejects the extra parameter, retry once without it.
 
-## Descoberta De Campo
+## Field Findings
 
-Em microbench real, `reasoning_effort=none` reduziu tarefas triviais para 13-18 tokens totais em GLM, DeepSeek e Kimi. Sem controle de reasoning, alguns modelos gastaram 68-95 tokens e, em GLM, chegaram a retornar raciocinio no `content`.
+In real microbenchmarks, `reasoning_effort=none` reduced trivial tasks to 13-18 total tokens in GLM, DeepSeek, and Kimi. Without reasoning control, some models spent 68-95 tokens, and GLM even returned reasoning within the `content`.
 
-`gpt-oss-120b` rejeitou `reasoning_effort=none`, mas aceitou `low`.
+`gpt-oss-120b` rejected `reasoning_effort=none`, but accepted `low`.
 
-Em microbench Pareto real de 2026-07-07, com 36 chamadas e custo estimado total de `0.00275120` USD:
+In the real Pareto microbenchmark from 2026-07-07, with 36 calls and total estimated cost of `0.00275120` USD:
 
-- `deepseek-v4-flash`, `minimax-m3` e `kimi-k2p7-code` fizeram 6/6 tarefas mecanicas validas;
-- `deepseek-v4-flash` foi o melhor custo/validade no dataset pequeno;
-- `gpt-oss-120b` caiu de 4/6 em `auto` para 6/6 quando forcado para `reasoning_effort=low`;
-- `gpt-oss-20b` subiu para 5/6 com `low`, mas ainda falhou em logica por content vazio;
-- `qwen3p7-plus` falhou em tarefas estritas por devolver raciocinio junto com a resposta.
+- `deepseek-v4-flash`, `minimax-m3`, and `kimi-k2p7-code` completed 6/6 valid mechanical tasks;
+- `deepseek-v4-flash` was the best cost/validity on the small dataset;
+- `gpt-oss-120b` went from 4/6 in `auto` to 6/6 when forced to `reasoning_effort=low`;
+- `gpt-oss-20b` went up to 5/6 with `low`, but still failed in logic due to empty content;
+- `qwen3p7-plus` failed in strict tasks by returning reasoning along with the response.
 
-Em nova rodada de 2026-07-08, com `select_reasoning_effort()` usando `low` para `gpt-oss`, o mesmo microbench produziu:
+In a new round on 2026-07-08, with `select_reasoning_effort()` using `low` for `gpt-oss`, the same microbenchmark produced:
 
-- 36 chamadas, 33 validas, custo estimado `0.00281451` USD;
-- `deepseek-v4-flash`, `gpt-oss-20b`, `gpt-oss-120b`, `minimax-m3` e `kimi-k2p7-code` fizeram 6/6;
-- `qwen3p7-plus` repetiu 3/6 e segue fora do caminho estrito ate controlarmos thinking/output;
-- por custo, `deepseek-v4-flash` venceu `formatting`, `classification` e `logic`;
-- por custo, `gpt-oss-20b` venceu `math_reasoning` e `code_generation`;
-- por latencia, `gpt-oss-120b` ficou surpreendentemente forte em tarefas curtas, apesar do custo maior que `gpt-oss-20b` e `deepseek-v4-flash`.
+- 36 calls, 33 valid, estimated cost of `0.00281451` USD;
+- `deepseek-v4-flash`, `gpt-oss-20b`, `gpt-oss-120b`, `minimax-m3`, and `kimi-k2p7-code` completed 6/6;
+- `qwen3p7-plus` repeated 3/6 and remains out of the strict path until we control thinking/output;
+- by cost, `deepseek-v4-flash` won in `formatting`, `classification`, and `logic`;
+- by cost, `gpt-oss-20b` won in `math_reasoning` and `code_generation`;
+- by latency, `gpt-oss-120b` was surprisingly strong in short tasks, despite the higher cost than `gpt-oss-20b` and `deepseek-v4-flash`.
 
-Rodada restrita aos modelos oficiais acessiveis na chave local em 2026-07-08:
+Round restricted to official models accessible on the local key on 2026-07-08:
 
 - dataset: `evals/fireworks-pareto/track1-category-microbench.jsonl`;
-- categorias: factual Q&A, math reasoning, sentiment, summarization, NER, code debugging, logic puzzles e code generation;
-- modelos testados: `minimax-m3`, `kimi-k2p7-code`;
-- chamadas: `32`;
-- validas: `29/32`;
-- custo estimado: `0.00517850` USD;
-- `minimax-m3`: `15/16`, custo `0.00141390`, latencia media `1330ms`;
-- `kimi-k2p7-code`: `14/16`, custo `0.00376460`, latencia media `2008ms`;
-- conclusao operacional: `minimax-m3` e o default acessivel mais forte; `kimi-k2p7-code` deve ser fallback/candidato, nao default.
+- categories: factual Q&A, math reasoning, sentiment, summarization, NER, code debugging, logic puzzles, and code generation;
+- tested models: `minimax-m3`, `kimi-k2p7-code`;
+- calls: `32`;
+- valid: `29/32`;
+- estimated cost: `0.00517850` USD;
+- `minimax-m3`: `15/16`, cost `0.00141390`, average latency `1330ms`;
+- `kimi-k2p7-code`: `14/16`, cost `0.00376460`, average latency `2008ms`;
+- operational conclusion: `minimax-m3` is the strongest accessible default; `kimi-k2p7-code` should be a fallback/candidate, not the default.
 
-Gemma no estado atual:
+Gemma in the current state:
 
-- os tres Gemma oficiais retornam `HTTP 404` com a chave local atual;
-- o router esta preparado para escolher Gemma em tarefas cheap/medium se o harness liberar;
-- se Gemma falhar, o runner tenta o proximo modelo permitido antes de devolver erro.
+- the three official Gemmas return `HTTP 404` with the current local key;
+- the router is prepared to choose Gemma in cheap/medium tasks if the harness permits;
+- if Gemma fails, the runner tries the next allowed model before returning an error.
 
-## Implicacao Competitiva
+## Competitive Implication
 
-O router nao deve ser:
+The router should not:
 
-- sempre usar o menor modelo;
-- sempre usar o maior modelo;
-- sempre usar Gemma;
-- sempre usar o primeiro de `ALLOWED_MODELS`.
+- always use the smallest model;
+- always use the largest model;
+- always use Gemma;
+- always use the first from `ALLOWED_MODELS`.
 
-O router deve ser:
+The router should be:
 
-- Gemma-first apenas em cheap/medium linguagem, se Gemma estiver acessivel;
-- Minimax-first para strong math, logic, code debugging e code generation;
-- custo-first quando a tarefa for simples;
-- capacidade-first quando a tarefa for forte;
-- sempre `ALLOWED_MODELS`-first no caminho oficial.
+- Gemma-first only in cheap/medium language, if Gemma is accessible;
+- Minimax-first for strong math, logic, code debugging, and code generation;
+- cost-first when the task is simple;
+- capability-first when the task is strong;
+- always `ALLOWED_MODELS`-first in the official path.

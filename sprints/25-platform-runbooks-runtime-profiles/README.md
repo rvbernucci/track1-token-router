@@ -1,65 +1,65 @@
 # Sprint 25 - Platform Runbooks & Runtime Profiles
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Transformar a documentacao oficial de AMD Developer Cloud, DigitalOcean, Gemma, Fireworks e Native.Builder em runbooks executaveis e perfis de runtime prontos para ativacao.
+Transform the official documentation of AMD Developer Cloud, DigitalOcean, Gemma, Fireworks, and Native.Builder into executable runbooks and runtime profiles ready for activation.
 
-## Por que importa
+## Why it matters
 
-Quando os creditos chegarem, nao podemos gastar as primeiras horas decidindo comandos, portas, env vars e health checks. Tudo que pode ser preparado offline deve estar pronto.
+When credits arrive, we cannot spend the first few hours deciding on commands, ports, env vars, and health checks. Everything that can be prepared offline should be ready.
 
-## Entregaveis
+## Deliverables
 
 - `runtime-profiles/`.
-- Perfis `.env.example` por plataforma/modelo.
-- Runbook AMD/DigitalOcean MI300X.
-- Runbook FunctionGemma training.
-- Runbook Gemma E2B text-only.
-- Runbook Fireworks serverless.
-- Runbook Native.Builder como demo auxiliar.
-- Health check offline para perfis.
-- Checklist de custo e destruicao de VM.
+- `.env.example` profiles per platform/model.
+- AMD/DigitalOcean MI300X runbook.
+- FunctionGemma training runbook.
+- Gemma E2B text-only runbook.
+- Fireworks serverless runbook.
+- Native.Builder runbook as an auxiliary demo.
+- Offline health check for profiles.
+- Cost and VM destruction checklist.
 
 ## Checklist
 
-- [x] Os perfis de serving grande foram aposentados do caminho ativo.
-- [x] O perfil Gemma generico foi aposentado; os perfis ativos agora separam FunctionGemma, E2B e `three_route`.
-- [x] Criar `runtime-profiles/fireworks-serverless.env.example`.
-- [x] Criar `docs/RUNBOOK_AMD_DIGITALOCEAN.md`.
-- [x] Criar `docs/RUNBOOK_GEMMA.md`.
-- [x] Criar `docs/RUNBOOK_FIREWORKS.md`.
-- [x] Criar `docs/RUNBOOK_NATIVE_BUILDER.md`.
-- [x] Documentar portas, comandos e health checks.
-- [x] Documentar variaveis obrigatorias e opcionais.
-- [x] Documentar estrategia de scratch disk.
-- [x] Documentar regra de destruir VM para parar custo.
-- [x] Criar script `scripts/check_runtime_profiles.py`.
-- [x] Validar que nenhum perfil contem segredo real.
-- [x] Integrar profile check ao release check.
-- [x] Atualizar `CREDIT_ACTIVATION.md`.
+- [x] Large serving profiles have been retired from the active path.
+- [x] The generic Gemma profile has been retired; active profiles now separate FunctionGemma, E2B, and `three_route`.
+- [x] Create `runtime-profiles/fireworks-serverless.env.example`.
+- [x] Create `docs/RUNBOOK_AMD_DIGITALOCEAN.md`.
+- [x] Create `docs/RUNBOOK_GEMMA.md`.
+- [x] Create `docs/RUNBOOK_FIREWORKS.md`.
+- [x] Create `docs/RUNBOOK_NATIVE_BUILDER.md`.
+- [x] Document ports, commands, and health checks.
+- [x] Document required and optional variables.
+- [x] Document scratch disk strategy.
+- [x] Document VM destruction rule to stop costs.
+- [x] Create `scripts/check_runtime_profiles.py` script.
+- [x] Validate that no profile contains real secrets.
+- [x] Integrate profile check with the release check.
+- [x] Update `CREDIT_ACTIVATION.md`.
 
-## Criterios de aceite
+## Acceptance criteria
 
-- Cada plataforma oficial tem um runbook claro.
-- Cada perfil pode ser validado sem credenciais.
-- O time consegue ativar AMD/Fireworks sem redesenhar arquitetura.
-- Nenhum segredo real aparece em docs, envs ou CI.
+- Each official platform has a clear runbook.
+- Each profile can be validated without credentials.
+- The team can activate AMD/Fireworks without redesigning the architecture.
+- No real secrets appear in docs, envs, or CI.
 
-## Saida esperada
+## Expected output
 
-Creditos deixam de ser bloqueio operacional e viram apenas troca de env vars.
+Credits stop being an operational blocker and become just a swap of env vars.
 
-## Decisao
+## Decision
 
-Runbooks devem ser comandos reproduziveis, nao anotacoes soltas. O objetivo e reduzir tempo de ativacao no kickoff.
+Runbooks must be reproducible commands, not loose notes. The goal is to reduce activation time at kickoff.
 
-## Evidencia de fechamento
+## Closing evidence
 
-- `python3 scripts/check_runtime_profiles.py`: perfis validos e sem segredo real.
-- `python3 -m unittest tests.test_runtime_profiles`: validador CLI e deteccao de segredo sintetico testados.
-- `python3 scripts/secret_scan.py`: scanner global sem achados.
-- `scripts/offline_release_check.sh`: profile check integrado a porteira pesada.
+- `python3 scripts/check_runtime_profiles.py`: valid profiles without real secrets.
+- `python3 -m unittest tests.test_runtime_profiles`: CLI validator and synthetic secret detection tested.
+- `python3 scripts/secret_scan.py`: global scanner with no findings.
+- `scripts/offline_release_check.sh`: profile check integrated into the heavy release check.

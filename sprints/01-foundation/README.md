@@ -1,63 +1,63 @@
-# Sprint 01 - Fundacao e contratos
+# Sprint 01 - Foundation and contracts
 
-## Objetivo
+## Objective
 
-Criar a espinha dorsal do projeto: CLI minimo, contratos de entrada/saida, logs estruturados e esqueleto testavel.
+Create the project's backbone: minimal CLI, input/output contracts, structured logs, and a testable skeleton.
 
-Esta sprint nao tenta ganhar o hackathon ainda. Ela impede que a gente se perca quando o kickoff revelar o formato real das tasks.
+This sprint does not attempt to win the hackathon yet. It prevents us from getting lost when kickoff reveals the actual format of the tasks.
 
-## Entregaveis
+## Deliverables
 
-- Pacote Python instalavel localmente.
-- CLI com comandos vazios ou semi-funcionais: `ask`, `solve`, `run`, `eval`.
-- Contratos `TaskEnvelope`, `AnswerResult`, `RouteDecision`, `TokenUsage`.
-- Logger JSONL por task.
-- Config por env vars.
-- Testes unitarios dos contratos e parsers.
+- Locally installable Python package.
+- CLI with empty or semi-functional commands: `ask`, `solve`, `run`, `eval`.
+- `TaskEnvelope`, `AnswerResult`, `RouteDecision`, and `TokenUsage` contracts.
+- JSONL logger per task.
+- Config via env vars.
+- Unit tests for contracts and parsers.
 
 ## Checklist
 
-- [x] Criar `pyproject.toml`.
-- [x] Criar pacote `router`.
-- [x] Criar modulo `router.core.contracts`.
-- [x] Criar modulo `router.cli.main`.
-- [x] Definir schema de entrada para texto simples.
-- [x] Definir schema de entrada para JSON.
-- [x] Definir schema de entrada para JSONL.
-- [x] Garantir que `stdout` so imprime resposta final.
-- [x] Garantir que logs humanos vao para `stderr`.
-- [x] Criar logger JSONL em `logs/run.jsonl`.
-- [x] Criar testes de serializacao e desserializacao.
-- [x] Documentar env vars minimas.
+- [x] Create `pyproject.toml`.
+- [x] Create `router` package.
+- [x] Create `router.core.contracts` module.
+- [x] Create `router.cli.main` module.
+- [x] Define input schema for plain text.
+- [x] Define input schema for JSON.
+- [x] Define input schema for JSONL.
+- [x] Ensure that `stdout` only prints the final response.
+- [x] Ensure that human logs go to `stderr`.
+- [x] Create JSONL logger in `logs/run.jsonl`.
+- [x] Create serialization and deserialization tests.
+- [x] Document minimal env vars.
 
-## Criterios de aceite
+## Acceptance criteria
 
-- [x] `router ask "What is 2+2?"` retorna uma resposta mockada no `stdout`.
-- [x] `router solve --json < task.json` parseia o envelope e retorna JSON final.
-- [x] `router run --jsonl tasks.jsonl --out output.jsonl` processa multiplas tasks.
-- [x] Nenhum log de debug contamina `stdout`.
-- [x] Testes passam localmente.
+- [x] `router ask "What is 2+2?"` returns a mocked response on `stdout`.
+- [x] `router solve --json < task.json` parses the envelope and returns final JSON.
+- [x] `router run --jsonl tasks.jsonl --out output.jsonl` processes multiple tasks.
+- [x] No debug log contaminates `stdout`.
+- [x] Tests pass locally.
 
-## Evidencias
+## Evidence
 
 - `python3 -m unittest discover -s tests`
 - `python3 -m router ask "What is 2+2?"`
 - `python3 -m router solve --json`
 - `python3 -m router run --jsonl tasks.jsonl --out output.jsonl`
 
-## Decisoes tecnicas
+## Technical decisions
 
-- Python sera o core competitivo.
-- CLI-first, sem servidor web nesta fase.
-- Estrutura orientada a contratos, nao a framework.
-- Tudo que puder variar no kickoff deve entrar por adapter.
+- Python will be the competitive core.
+- CLI-first, no web server at this stage.
+- Structure oriented around contracts, not a framework.
+- Everything that can vary at kickoff should come via adapter.
 
-## Riscos
+## Risks
 
-- Overengineering antes de conhecer o evaluator.
-- Misturar formato interno com formato final.
-- Criar CLI bonita, mas dificil de rodar no container.
+- Overengineering before knowing the evaluator.
+- Mixing internal format with final format.
+- Creating a pretty CLI, but difficult to run in the container.
 
-## Saida esperada da sprint
+## Expected sprint output
 
-Um runner ainda burro, mas confiavel. A partir daqui, qualquer inteligencia entra por tras de contratos estaveis.
+A runner that is still basic, but reliable. From here on, any intelligence goes behind stable contracts.

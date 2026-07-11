@@ -9,7 +9,7 @@ The runner handles factual Q&A, math reasoning, sentiment, summarization, NER, c
 ```text
 task
 -> strip official JSON envelope; retain task_id only in the engine
--> registered deterministic solver (accept or refuse)
+-> proof-carrying deterministic solver (release only a unique, recomputable result)
 -> Kimi K2.7 Code when present in ALLOWED_MODELS
 -> strict output validation and allowed-model fallback
 -> Answer Contract Engine normalization and validation
@@ -17,13 +17,14 @@ task
 -> final answer
 ```
 
-The disabled three-route challenger inserts `FunctionGemma five-parameter assessment -> routing equation -> E2B or Fireworks` after envelope removal. It is promoted only if the fresh holdout passes the frozen Kimi baseline.
+The local challenger inserts `FunctionGemma five-parameter assessment -> intent-specific matrix regression -> E2B or Fireworks` after envelope removal. Its runtime remains optional because the 2.59 GB LiteRT artifact must be bundled at image-build time; the submitted image never downloads models during evaluation.
 
 - Deterministic solvers must independently accept the original input or refuse it.
 - Kimi is a validation-selected preference and is never called unless the harness includes it in `ALLOWED_MODELS`.
 - Strict-format failures can retry another ranked allowed model; model unavailability is cached per batch.
 - The Answer Contract Engine performs only unambiguous mechanical transformations before the official JSON serializer.
-- FunctionGemma 270M and Gemma 4 E2B were trained and evaluated as the local challenger, but E2B failed its frozen accuracy gate and neither model is bundled in the submitted image.
+- FunctionGemma 270M and Gemma 4 E2B were evaluated on 2,000 post-contract answers. E2B produced 828 correct answers; 823 had valid 270M parameters. The intent-specific regression selected 252 of 1,991 evaluable tasks at 84.52% out-of-fold precision and 12.66% coverage.
+- The proof engine recovered both known correct deterministic ordering answers while refusing all five incorrect deterministic candidates. Its independent 260-case gate still reports 180 releases, 100% precision and zero false positives.
 
 The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
@@ -41,7 +42,7 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-Sprints 45-49 are complete. The frozen 571-task ablation selected deterministic-then-Kimi over matrix, per-intent, Minimax and local-E2B challengers. The public championship image passed the exact `linux/amd64`, 4 GB, 2 vCPU, no-network and official-contract gates.
+The public championship image passed the exact `linux/amd64`, 4 GB, 2 vCPU, no-network and official-contract gates. The proof-carrying deterministic route is promoted. The calibrated E2B artifact is reproducible and documented, but is not silently enabled in an image that does not contain its pinned model artifact.
 
 ## Quickstart
 
@@ -83,6 +84,7 @@ python3 -m router submit-track1 \
 | [AMD training tutorial](./docs/FUNCTIONGEMMA_270M_AMD_TRAINING_TUTORIAL.md) | Full SFT and LoRA workflow on ROCm |
 | [Gemma E2B token ladder](./docs/E2B_TOKEN_LADDER.md) | Adaptive 96/192/384 experiment, quantization and CPU runtime audit |
 | [Public E2B evidence](./reports/public/e2b-token-ladder.md) | Aggregate recovery, feature and latency results |
+| [E2B 270M matrix regression](./reports/public/e2b-270m-matrix-regression.md) | Post-contract correctness, model comparison and operating frontier |
 | [Raw-prompt ablation](./reports/public/raw-prompt-answer-contract-ablation.md) | Byte-identical Kimi answers with 51.9% fewer Fireworks tokens |
 | [Sprints 45-49 completion audit](./reports/public/sprints-45-49-completion-audit.md) | Requirement-to-evidence map and final release proof |
 | [E2B runtime](./docs/GEMMA_E2B_TEXT_ONLY_RUNTIME.md) | Text-only LiteRT-LM packaging and 4 GB gates |
@@ -108,7 +110,7 @@ python3 -m router submit-track1 \
 
 ## Runtime Modes
 
-`fireworks` is the promoted Docker mode. `three_route` remains available for reproducing the rejected local-model research path.
+`fireworks` is the zero-download Docker mode. `three_route` is available when the pinned FunctionGemma and E2B endpoints are supplied.
 
 ```text
 ROUTER_MODE=fireworks
@@ -120,10 +122,10 @@ ROUTER_MODE=three_route
 The audited championship image is:
 
 ```text
-ghcr.io/rvbernucci/track1-token-router:v1.0.0-championship
+ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router
 ```
 
-Its immutable platform-manifest digest is `sha256:b88778e89291dc7a21f638a4347e0c4ba0ef8d156a43a45ae248215d40f4bb5e`.
+The release workflow verifies the public `linux/amd64` manifest, immutable revision label, anonymous pull and exact-image resource gate.
 
 ## Fireworks
 
@@ -151,4 +153,4 @@ Use the preinstalled ROCm/PyTorch stack. Training instructions are in the AMD Fu
 
 ## Promotion Rule
 
-The final runtime was promoted because it had the highest eligible validation accuracy, preserved that result on the locked test, and used fewer tokens than every remote-routing challenger. See [the public ablation](./reports/public/championship-ablation.md).
+The release policy is accuracy-first: deterministic answers require a recomputable proof; unsupported tasks use an allowed Fireworks model. The E2B matrix is an optional token-saving challenger whose measured operating point is documented rather than overstated. See [the public ablation](./reports/public/championship-ablation.md) and [the E2B regression report](./reports/public/e2b-270m-matrix-regression.md).

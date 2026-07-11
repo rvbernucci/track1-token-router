@@ -150,6 +150,33 @@ class ProofEngineTests(unittest.TestCase):
                 self.assertEqual(solved.answer, answer)
                 self.assertEqual(solved.proof.proof_type, proof_type)
 
+    def test_ordering_proof_accepts_descriptor_and_identify_queries_only_for_unique_extremes(self) -> None:
+        cases = {
+            (
+                "Four brothers (Liam, Mason, Noah, Oliver) have different ages. "
+                "Liam is older than Mason. Mason is older than Noah. Noah is older than Oliver. "
+                "Who is the youngest brother? Output only the name in all capital letters."
+            ): "Oliver",
+            (
+                "Five people (A, B, C, D, and E) have different heights. "
+                "A is taller than B. B is taller than C. C is taller than D. D is taller than E. "
+                "Identify the shortest person? Return only the uppercase letter."
+            ): "E",
+        }
+        for prompt, expected in cases.items():
+            with self.subTest(prompt=prompt):
+                solved = solve_with_proof(TaskEnvelope(input_text=prompt))
+                self.assertIsNotNone(solved)
+                self.assertEqual(solved.answer, expected)
+                self.assertEqual(solved.proof.proof_type, ProofType.ORDERING)
+                self.assertTrue(solved.proof.unique)
+
+        second_tallest = (
+            "Alice is taller than Bob. David is taller than Alice but shorter than Charlie. "
+            "Who is the second tallest sibling?"
+        )
+        self.assertIsNone(solve_with_proof(TaskEnvelope(input_text=second_tallest)))
+
     def test_rejects_inconsistent_or_underdetermined_logic(self) -> None:
         blocked = [
             "Mia is older than Noah. Noah is older than Mia. Who is the oldest? Return only the name.",

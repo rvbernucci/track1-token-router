@@ -1,78 +1,78 @@
 # Spec Kit Adoption For Track 1 Token Router
 
-## Por Que Isso Importa
+## Why This Matters
 
-O `github/spec-kit` formaliza Spec-Driven Development: especificacoes deixam de ser documentacao auxiliar e viram a fonte de verdade que guia plano, tarefas, testes e implementacao.
+The `github/spec-kit` formalizes Spec-Driven Development: specifications stop being auxiliary documentation and become the source of truth that guides the plan, tasks, tests, and implementation.
 
-Para o hackathon, isso e especialmente forte porque nosso risco principal nao e apenas escrever codigo. Nosso risco e perder alinhamento entre:
+For the hackathon, this is especially strong because our main risk is not just writing code. Our risk is losing alignment between:
 
-- regra oficial do Track 1;
-- estrategia de Pareto;
-- matriz de capacidades dos modelos;
-- restricoes de token/custo;
-- testes offline;
-- entrega Docker/CLI.
+- official Track 1 rules;
+- Pareto strategy;
+- model capability matrix;
+- token/cost constraints;
+- offline tests;
+- Docker/CLI delivery.
 
-Spec Kit encaixa como governanca: antes de alterar o roteador, precisamos conseguir responder "qual requisito esta sendo atendido, qual teste prova isso, e qual decisao de scoring justifica a mudanca?".
+Spec Kit fits in as governance: before changing the router, we need to be able to answer "which requirement is being met, which test proves this, and which scoring decision justifies the change?".
 
-## Principios A Adotar
+## Principles To Adopt
 
 ### 1. Specification First
 
-Toda mudanca competitiva relevante deve nascer de uma especificacao curta:
+Every relevant competitive change must stem from a short specification:
 
-- problema;
-- regra oficial impactada;
-- decisao estrategica;
-- comportamento esperado;
-- criterio de aceite;
-- teste ou evidencia.
+- problem;
+- official rule impacted;
+- strategic decision;
+- expected behavior;
+- acceptance criteria;
+- test or evidence.
 
 ### 2. Constitution Before Code
 
-O projeto precisa de uma constituicao operacional. Para este Track 1:
+The project needs an operational constitution. For this Track 1:
 
-- scoring manda;
-- tokens Fireworks sao recurso escasso;
-- accuracy abaixo do gate invalida economia;
-- modelos auxiliares nao podem produzir resposta final;
-- todo comportamento de rota precisa ser auditavel;
-- nada depende de credito para evoluir offline;
-- segredo nunca aparece em log, README, fixture ou CI.
+- scoring governs;
+- Fireworks tokens are a scarce resource;
+- accuracy below the gate invalidates savings;
+- auxiliary models cannot produce the final response;
+- every routing behavior must be auditable;
+- nothing depends on credits to evolve offline;
+- secrets never appear in logs, READMEs, fixtures, or CI.
 
 ### 3. Plan Then Tasks
 
-Cada feature competitiva deve ter:
+Each competitive feature must have:
 
-- `spec.md`: o que e por que;
-- `plan.md`: como sera implementado;
-- `tasks.md`: checklist executavel;
-- testes vinculados;
-- documentacao atualizada.
+- `spec.md`: what and why;
+- `plan.md`: how it will be implemented;
+- `tasks.md`: executable checklist;
+- linked tests;
+- updated documentation.
 
 ### 4. Test-First Where It Matters
 
-Para logica de roteamento, primeiro definimos o comportamento em teste:
+For routing logic, we first define the behavior in a test:
 
-- tarefa cheap escolhe modelo barato suficiente;
-- tarefa strong nao escolhe modelo underqualified;
-- embedding/reranker nunca vencem chat;
-- modelo caro so vence se houver ganho estrategico justificavel;
-- metadata explica a decisao.
+- cheap task chooses a sufficiently cheap model;
+- strong task does not choose an underqualified model;
+- embedding/reranker never beats chat;
+- expensive model only wins if there is a justifiable strategic gain;
+- metadata explains the decision.
 
 ### 5. Converge After Implementation
 
-Depois da implementacao, rodamos convergencia:
+After implementation, we run convergence:
 
-- especificacao ainda descreve o codigo?
-- testes cobrem o comportamento prometido?
-- docs explicam a decisao?
-- o runbook permite reproduzir?
-- a mudanca melhora scoring ou reduz risco?
+- does the specification still describe the code?
+- do tests cover the promised behavior?
+- do docs explain the decision?
+- does the runbook allow reproduction?
+- does the change improve scoring or reduce risk?
 
-## Fluxo Proposto Sem Instalar Nada Ainda
+## Proposed Flow Without Installing Anything Yet
 
-Enquanto nao decidirmos instalar o CLI oficial, adotamos a estrutura manual:
+Until we decide to install the official CLI, we adopt the manual structure:
 
 ```text
 specs/
@@ -88,66 +88,66 @@ specs/
     tasks.md
 ```
 
-Esse fluxo preserva compatibilidade mental com Spec Kit sem introduzir dependencia nova.
+This flow preserves mental compatibility with Spec Kit without introducing new dependencies.
 
-## Fluxo Proposto Com Spec Kit
+## Proposed Flow With Spec Kit
 
-Se decidirmos instalar:
+If we decide to install:
 
 ```bash
 uv tool install specify-cli --from git+https://github.com/github/spec-kit.git@vX.Y.Z
 specify init . --integration codex
 ```
 
-Antes disso, precisamos validar:
+Before that, we need to validate:
 
-- se a integracao `codex` esta disponivel na versao instalada;
-- se o comando nao sobrescreve arquivos existentes;
-- quais arquivos seriam criados em `.specify/`, `specs/` ou diretorios de agente;
-- se o projeto deve usar slash commands, skills mode ou apenas templates.
+- whether the `codex` integration is available in the installed version;
+- whether the command does not overwrite existing files;
+- which files would be created in `.specify/`, `specs/`, or agent directories;
+- whether the project should use slash commands, skills mode, or just templates.
 
-Comandos conceituais do Spec Kit:
+Conceptual commands of the Spec Kit:
 
-- `constitution`: cria principios;
-- `specify`: cria especificacao de feature;
-- `plan`: traduz spec em plano tecnico;
-- `tasks`: gera tarefas executaveis;
-- `analyze`: verifica consistencia entre artefatos;
-- `implement`: executa tarefas conforme plano.
+- `constitution`: creates principles;
+- `specify`: creates feature specification;
+- `plan`: translates spec into a technical plan;
+- `tasks`: generates executable tasks;
+- `analyze`: verifies consistency between artifacts;
+- `implement`: executes tasks according to the plan.
 
-## Como Isso Melhora Nosso Pareto
+## How This Improves Our Pareto
 
-Sem Spec-Driven Development, cada heuristica pode virar opiniao.
+Without Spec-Driven Development, every heuristic can become just an opinion.
 
-Com Spec-Driven Development, cada heuristica precisa rastrear:
+With Spec-Driven Development, every heuristic needs to track:
 
-- fonte: regra oficial, model card, benchmark, smoke test ou eval offline;
-- decisao: por que esse modelo entra ou sai;
-- teste: como provar que a decisao nao regrediu;
-- metrica: token, custo, latencia, accuracy, pass/fail mecanico;
-- risco: onde a heuristica pode quebrar.
+- source: official rule, model card, benchmark, smoke test, or offline eval;
+- decision: why that model enters or leaves;
+- test: how to prove that the decision did not regress;
+- metric: token, cost, latency, accuracy, mechanical pass/fail;
+- risk: where the heuristic can break.
 
-Exemplo:
+Example:
 
 ```text
-Spec: escolher menor modelo Fireworks suficiente.
-Plan: calcular Pareto + Nash welfare por dominio.
-Tasks: implementar matriz, metadata, testes e docs.
-Tests: gpt-oss-20b vence cheap; MiniMax M3 vence code quando Kimi tem ganho marginal menor que custo; embedding nao vence chat.
+Spec: choose the smallest sufficient Fireworks model.
+Plan: calculate Pareto + Nash welfare by domain.
+Tasks: implement matrix, metadata, tests, and docs.
+Tests: gpt-oss-20b wins cheap; MiniMax M3 wins code when Kimi has marginal gain smaller than cost; embedding does not win chat.
 ```
 
-## Regra De Adocao
+## Adoption Rule
 
-Nao instalar Spec Kit ainda como dependencia do projeto principal.
+Do not install Spec Kit as a dependency of the main project yet.
 
-Primeiro passo seguro:
+First safe step:
 
-- criar Sprint 39;
-- criar constituicao manual;
-- aplicar o fluxo a uma feature real;
-- depois decidir se vale rodar `specify init`.
+- create Sprint 39;
+- create manual constitution;
+- apply the flow to a real feature;
+- then decide if it is worth running `specify init`.
 
-## Fontes
+## Sources
 
 - GitHub Spec Kit repository: https://github.com/github/spec-kit
 - Spec-Driven Development guide: https://raw.githubusercontent.com/github/spec-kit/main/spec-driven.md

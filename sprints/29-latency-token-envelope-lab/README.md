@@ -1,67 +1,67 @@
 # Sprint 29 - Latency And Token Envelope Lab
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Criar laboratorios offline para medir latencia, timeout, cold start, throughput JSONL e exposicao conservadora de tokens remotos.
+Create offline laboratories to measure latency, timeout, cold start, JSONL throughput, and conservative remote token exposure.
 
-## Por que importa
+## Why It Matters
 
-Uma resposta correta pode perder se for lenta, instavel ou cara. Antes de ter AMD/Fireworks reais, ainda podemos medir o envelope operacional do runner, simular atrasos e detectar rotas que tendem a estourar budget.
+A correct answer can still lose if it is slow, unstable, or expensive. Before we have real AMD/Fireworks, we can still measure the runner's operational envelope, simulate delays, and detect routes that tend to exceed the budget.
 
-## Tese
+## Thesis
 
-O battle drill deve evoluir de "esta pronto?" para "esta pronto dentro de um envelope de tempo e token?".
+The battle drill must evolve from "is it ready?" to "is it ready within a time and token envelope?".
 
-## Entregaveis
+## Deliverables
 
 - `scripts/latency_drill.py`.
 - `scripts/token_envelope.py`.
 - `reports/generated/latency-report.md`.
 - `reports/generated/token-envelope.md`.
-- Integracao de readiness no battle drill.
-- Testes de p95, timeout simulado e ranking de prompts caros.
+- Readiness integration in the battle drill.
+- p95 tests, simulated timeout, and ranking of expensive prompts.
 
 ## Checklist
 
-- [x] Medir cold start do CLI `ask`.
-- [x] Medir tempo por task em `ROUTER_MODE=competition`.
-- [x] Medir tempo por lote JSONL.
-- [x] Medir p50, p95 e p99.
-- [x] Simular provider local lento.
-- [x] Simular Fireworks lento.
-- [x] Simular timeout local.
-- [x] Simular timeout remoto.
-- [x] Criar thresholds configuraveis por env.
-- [x] Falhar em `--check` quando p95 exceder limite.
-- [x] Calcular tokens estimados por packet remoto.
-- [x] Calcular pior caso por rota.
-- [x] Gerar top 20 tarefas mais caras.
-- [x] Mostrar exposicao remota por policy.
-- [x] Integrar `latency_ready` ao battle drill.
-- [x] Integrar `token_envelope_ready` ao battle drill.
+- [x] Measure CLI `ask` cold start.
+- [x] Measure time per task in `ROUTER_MODE=competition`.
+- [x] Measure time per JSONL batch.
+- [x] Measure p50, p95, and p99.
+- [x] Simulate slow local provider.
+- [x] Simulate slow Fireworks.
+- [x] Simulate local timeout.
+- [x] Simulate remote timeout.
+- [x] Create configurable thresholds per env.
+- [x] Fail in `--check` when p95 exceeds limit.
+- [x] Calculate estimated tokens per remote packet.
+- [x] Calculate worst case per route.
+- [x] Generate top 20 most expensive tasks.
+- [x] Show remote exposure per policy.
+- [x] Integrate `latency_ready` into the battle drill.
+- [x] Integrate `token_envelope_ready` into the battle drill.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- `latency_drill.py --check` passa no ambiente local.
-- `token_envelope.py --check` passa sem Fireworks.
-- Relatorios mostram limites, resultados e riscos.
-- Battle drill inclui readiness de latencia e token envelope.
-- Nenhuma medicao depende de credito real.
+- `latency_drill.py --check` passes in the local environment.
+- `token_envelope.py --check` passes without Fireworks.
+- Reports show limits, results, and risks.
+- Battle drill includes latency and token envelope readiness.
+- No measurement depends on real credit.
 
-## Metricas
+## Metrics
 
 - CLI cold start.
-- p50/p95/p99 por task.
-- throughput de JSONL tasks por segundo.
-- packet tokens medio e maximo.
-- remote token exposure por policy.
-- numero de tasks acima do budget por task.
+- p50/p95/p99 per task.
+- JSONL tasks throughput per second.
+- average and maximum packet tokens.
+- remote token exposure per policy.
+- number of tasks above budget per task.
 
-## Comandos esperados
+## Expected Commands
 
 ```bash
 python3 scripts/latency_drill.py --check --report reports/generated/latency-report.md
@@ -69,29 +69,29 @@ python3 scripts/token_envelope.py --check --report reports/generated/token-envel
 python3 scripts/battle_drill.py
 ```
 
-## Riscos
+## Risks
 
-- Confundir latencia offline com latencia real de GPU.
-- Criar thresholds impossiveis para CI.
-- Otimizar cold start local e esquecer batch/evaluator.
+- Confusing offline latency with real GPU latency.
+- Creating impossible thresholds for CI.
+- Optimizing local cold start and forgetting batch/evaluator.
 
-## Decisao
+## Decision
 
-O sprint mede envelopes e tendencias. Benchmarks reais de AMD/Fireworks continuam na trilha dependente de credito.
+The sprint measures envelopes and trends. Real AMD/Fireworks benchmarks continue on the credit-dependent track.
 
 ## Definition of Done
 
-- Latency drill existe e tem `--check`.
-- Token envelope existe e tem `--check`.
-- Reports sao gerados.
-- Battle drill consome os sinais.
-- CI continua estavel.
+- Latency drill exists and has `--check`.
+- Token envelope exists and has `--check`.
+- Reports are generated.
+- Battle drill consumes the signals.
+- CI remains stable.
 
-## Evidencias
+## Evidence
 
-- `scripts/latency_drill.py --check` mede cold start, tarefas individuais, lote JSONL, p50/p95/p99 e probes de timeout.
-- `scripts/token_envelope.py --check` calcula exposicao remota por policy, pior caso por rota e top 20 tarefas mais caras.
-- `router/evals/operational_envelope.py` centraliza thresholds e calculos para scripts e battle drill.
-- `tests/test_operational_envelope.py` cobre percentis, falha por p95 e thresholds de token.
-- `tests/test_battle_drill.py` valida `latency_ready` e `token_envelope_ready`.
-- `scripts/offline_release_check.sh` executa os dois labs antes do battle drill.
+- `scripts/latency_drill.py --check` measures cold start, individual tasks, JSONL batch, p50/p95/p99, and timeout probes.
+- `scripts/token_envelope.py --check` calculates remote exposure per policy, worst case per route, and top 20 most expensive tasks.
+- `router/evals/operational_envelope.py` centralizes thresholds and calculations for scripts and battle drill.
+- `tests/test_operational_envelope.py` covers percentiles, failure by p95, and token thresholds.
+- `tests/test_battle_drill.py` validates `latency_ready` and `token_envelope_ready`.
+- `scripts/offline_release_check.sh` executes both labs before the battle drill.

@@ -1,54 +1,54 @@
 # Sprint 41 - Domain Correlation Eval Pack
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Criar um pacote de avaliacao offline para testar se a matriz de correlacao tarefa-modelo esta classificando os dominios certos e excluindo estrategias ruins.
+Create an offline evaluation pack to test if the task-model correlation matrix is classifying the right domains and excluding bad strategies.
 
-## Tese
+## Thesis
 
-A matriz de correlacao so tem valor se for falsificavel. Precisamos de prompts por dominio com expectativa clara de roteamento, nao apenas exemplos soltos.
+The correlation matrix only has value if it is falsifiable. We need prompts by domain with a clear routing expectation, not just loose examples.
 
-## Entregaveis
+## Deliverables
 
 - `evals/fireworks-pareto/domain-correlation.jsonl`.
-- Fixture com `input`, `expected_domain`, `expected_tier`, `expected_allowed_pool`, `forbidden_models`.
+- Fixture with `input`, `expected_domain`, `expected_tier`, `expected_allowed_pool`, `forbidden_models`.
 - Script `scripts/eval_fireworks_pareto.py`.
-- Relatorio `reports/generated/fireworks-pareto-correlation-report.md`.
-- Testes unitarios para cobertura minima do dataset.
+- Report `reports/generated/fireworks-pareto-correlation-report.md`.
+- Unit tests for minimum dataset coverage.
 
 ## Checklist
 
-- [ ] Criar 10 prompts por dominio: cheap, medium, strong-code, strong-math, long-context, factual/current, formatting, extraction.
-- [ ] Definir `expected_domain` e `expected_tier` para cada prompt.
-- [ ] Definir modelos proibidos: embedding, reranker, underqualified, over-expensive quando aplicavel.
-- [ ] Implementar script de replay offline usando `select_fireworks_model`.
-- [ ] Gerar matriz de confusao dominio esperado vs dominio roteado.
-- [ ] Gerar ranking de modelos escolhidos por categoria.
-- [ ] Adicionar teste garantindo que o dataset e parseavel.
-- [ ] Adicionar teste com taxa minima de match por dominio.
+- [ ] Create 10 prompts per domain: cheap, medium, strong-code, strong-math, long-context, factual/current, formatting, extraction.
+- [ ] Define `expected_domain` and `expected_tier` for each prompt.
+- [ ] Define forbidden models: embedding, reranker, underqualified, over-expensive when applicable.
+- [ ] Implement offline replay script using `select_fireworks_model`.
+- [ ] Generate confusion matrix of expected domain vs. routed domain.
+- [ ] Generate ranking of selected models by category.
+- [ ] Add test ensuring that the dataset is parseable.
+- [ ] Add test with minimum match rate per domain.
 
-## Metricas
+## Metrics
 
 - domain match rate;
 - tier match rate;
 - forbidden model violations;
-- distribuicao de modelos por dominio;
-- taxa de underqualification;
-- taxa de over-escalation.
+- model distribution by domain;
+- underqualification rate;
+- over-escalation rate.
 
-## Definition Of Done
+## Definition of Done
 
-- O eval roda sem Fireworks.
-- O relatorio mostra onde a matriz esta acertando e errando.
-- Nenhum modelo auxiliar vence resposta final.
-- Falhas viram tasks concretas de tuning.
+- The eval runs without Fireworks.
+- The report shows where the matrix is succeeding and failing.
+- No auxiliary model wins the final response.
+- Failures become concrete tuning tasks.
 
-## Anti-Escopo
+## Anti-Scope
 
-- Nao chamar API real.
-- Nao usar LLM como juiz nesta sprint.
-- Nao otimizar pesos antes de ter baseline.
+- Do not call real API.
+- Do not use LLM as judge in this sprint.
+- Do not optimize weights before having a baseline.

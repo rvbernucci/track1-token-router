@@ -1,14 +1,14 @@
 # Runbook Fireworks Serverless
 
-## Objetivo
+## Objective
 
-Ativar Fireworks como o caminho oficial seguro para o Track 1, usando o menor modelo permitido suficiente para cada tarefa e mantendo qualquer inferencia local dentro do envelope final.
+Activate Fireworks as the official secure path for Track 1, using the smallest sufficient allowed model for each task and keeping any local inference within the final envelope.
 
-Perfil recomendado: `runtime-profiles/fireworks-serverless.env.example`.
+Recommended profile: `runtime-profiles/fireworks-serverless.env.example`.
 
-## Politica Promovida
+## Promoted Policy
 
-O baseline congelado de 571 tarefas selecionou `kimi-k2p7-code` globalmente. No teste bloqueado, Kimi obteve `59.58%` de acuracia conservadora, `75.0%` entre julgamentos binarios e `73,870` tokens. Minimax, regressao matricial e politica por intencao perderam acuracia e usaram mais tokens. O E2B economizou tokens, mas perdeu acuracia de forma estatisticamente significativa.
+The frozen baseline of 571 tasks selected `kimi-k2p7-code` globally. In the held-out test, Kimi obtained `59.58%` conservative accuracy, `75.0%` among binary judgments, and `73,870` tokens. Minimax, matrix regression, and intent policy lost accuracy and used more tokens. E2B saved tokens but lost accuracy in a statistically significant way.
 
 Configure:
 
@@ -16,22 +16,22 @@ Configure:
 FIREWORKS_CHAMPION_MODEL=accounts/fireworks/models/kimi-k2p7-code
 ```
 
-Esse valor e apenas preferencia. O runtime chama Kimi somente se o ID estiver em `ALLOWED_MODELS`; caso contrario, usa o seletor de fallback entre os modelos oficialmente permitidos.
+This value is only a preference. The runtime calls Kimi only if the ID is in `ALLOWED_MODELS`; otherwise, it uses the fallback selector among the officially allowed models.
 
-Nota Track 1 atual: local models sao uma estrategia valida de scoring. Respostas locais contam para accuracy e usam zero Fireworks tokens. Porem o guia atual tambem define o ambiente final como `4 GB` RAM e `2 vCPU`; logo, Fireworks continua sendo o caminho oficial mais seguro quando nao ha um modelo local compacto provado dentro desse limite.
+Current Track 1 note: local models are a valid scoring strategy. Local responses count toward accuracy and use zero Fireworks tokens. However, the current guide also defines the final environment as `4 GB` RAM and `2 vCPU`; therefore, Fireworks remains the safest official path when there is no proven compact local model within this limit.
 
-Nota LoRA/model fine-tuning: fine-tunar a decisao do roteador e permitido; usar um LoRA/deployment Fireworks como modelo respondedor nao entra no caminho principal sem confirmacao explicita do avaliador. A decisao operacional esta em [`docs/FIREWORKS_LORA_FINE_TUNING_STRATEGY.md`](./FIREWORKS_LORA_FINE_TUNING_STRATEGY.md).
+LoRA/model fine-tuning note: fine-tuning the router decision is permitted; using a Fireworks LoRA/deployment as a responding model does not enter the main path without explicit confirmation from the evaluator. The operational decision is in [`docs/FIREWORKS_LORA_FINE_TUNING_STRATEGY.md`](./FIREWORKS_LORA_FINE_TUNING_STRATEGY.md).
 
-## Variaveis obrigatorias
+## Required Variables
 
-- `FIREWORKS_API_KEY`: nunca commitar.
-- `ALLOWED_MODELS`: lista oficial injetada pelo harness; o runtime usa o primeiro modelo quando `FIREWORKS_MODEL` nao esta definido.
-- `FIREWORKS_MODEL`: override local para desenvolvimento.
+- `FIREWORKS_API_KEY`: never commit.
+- `ALLOWED_MODELS`: official list injected by the harness; the runtime uses the first model when `FIREWORKS_MODEL` is not defined.
+- `FIREWORKS_MODEL`: local override for development.
 - `FIREWORKS_BASE_URL`: `https://api.fireworks.ai/inference/v1`.
-- `FIREWORKS_SERVICE_TIER`: opcional; vazio usa Standard, `priority` so para fallback manual.
-- `FIREWORKS_CHAMPION_MODEL`: primeira opcao validada, condicionada a `ALLOWED_MODELS`.
+- `FIREWORKS_SERVICE_TIER`: optional; empty uses Standard, `priority` only for manual fallback.
+- `FIREWORKS_CHAMPION_MODEL`: first validated option, conditioned on `ALLOWED_MODELS`.
 
-## Ativacao
+## Activation
 
 ```bash
 cp runtime-profiles/fireworks-serverless.env.example .env.fireworks
@@ -39,7 +39,7 @@ printf "FIREWORKS_API_KEY=<set locally, not in git>\n" >> .env.fireworks.local
 chmod 600 .env.fireworks.local
 ```
 
-Carregar em shell local:
+Load in local shell:
 
 ```bash
 set -a
@@ -48,15 +48,15 @@ set -a
 set +a
 ```
 
-## Smoke real seguro
+## Secure Real Smoke
 
-O smoke usa o mesmo cliente OpenAI-compatible do router, nunca imprime `FIREWORKS_API_KEY` e carrega `.env.fireworks` + `.env.fireworks.local` automaticamente se existirem.
+The smoke test uses the same OpenAI-compatible client as the router, never prints `FIREWORKS_API_KEY`, and automatically loads `.env.fireworks` + `.env.fireworks.local` if they exist.
 
 ```bash
 python3 scripts/fireworks_smoke.py --json
 ```
 
-Com modelo explicito:
+With explicit model:
 
 ```bash
 python3 scripts/fireworks_smoke.py \
@@ -66,80 +66,80 @@ python3 scripts/fireworks_smoke.py \
   --json
 ```
 
-Esperado:
+Expected:
 
 - `ok=true`;
-- `model` igual ao modelo testado;
-- `usage.total` preenchido;
-- nenhuma chave impressa no terminal.
+- `model` equal to the tested model;
+- `usage.total` populated;
+- no keys printed in the terminal.
 
-Se Gemma retornar `HTTP 404` com `Model not found, inaccessible, and/or not deployed`, a chave Fireworks pode estar valida, mas o modelo Gemma ainda nao esta liberado para a conta/chave atual. Nesse caso, listar os modelos acessiveis pelo endpoint `/models` e usar temporariamente um modelo retornado por essa lista ate a liberacao do parceiro/hackathon.
+If Gemma returns `HTTP 404` with `Model not found, inaccessible, and/or not deployed`, the Fireworks key may be valid, but the Gemma model is not yet released for the current account/key. In this case, list the models accessible via the `/models` endpoint and temporarily use a model returned by that list until released by the partner/hackathon.
 
-Modelos com reasoning podem consumir poucos tokens apenas em `reasoning_content`. Para smoke real, evitar `--max-tokens 8`; usar `--max-tokens 64` ou maior para permitir uma resposta final em `message.content`.
+Models with reasoning may consume few tokens only in `reasoning_content`. For a real smoke test, avoid `--max-tokens 8`; use `--max-tokens 64` or greater to allow a final response in `message.content`.
 
-Resultado de 2026-07-08:
+Result of 2026-07-08:
 
-- `accounts/fireworks/models/gemma-4-31b-it` retornou `HTTP 404 Not Found`;
-- `accounts/fireworks/models/gemma-4-26b-a4b-it` retornou `HTTP 404 Not Found`;
-- `accounts/fireworks/models/gemma-4-31b-it-nvfp4` retornou `HTTP 404 Not Found`;
-- endpoint `/models` retornou `HTTP 403 Forbidden` para a chave atual;
-- `accounts/fireworks/models/gpt-oss-20b` no smoke simples retornou resposta sem `message.content`, entao nao usar smoke simples para `gpt-oss`;
-- `accounts/fireworks/models/deepseek-v4-flash` validou conectividade com `usage.total=59`, mas nao seguiu formato estrito no smoke; qualidade deve ser medida pelo microbench com validadores.
-- `accounts/fireworks/models/minimax-m3` e `accounts/fireworks/models/kimi-k2p7-code` funcionaram com a chave atual e tambem funcionam quando chamados por alias curto via scripts do projeto.
+- `accounts/fireworks/models/gemma-4-31b-it` returned `HTTP 404 Not Found`;
+- `accounts/fireworks/models/gemma-4-26b-a4b-it` returned `HTTP 404 Not Found`;
+- `accounts/fireworks/models/gemma-4-31b-it-nvfp4` returned `HTTP 404 Not Found`;
+- `/models` endpoint returned `HTTP 403 Forbidden` for the current key;
+- `accounts/fireworks/models/gpt-oss-20b` in simple smoke returned a response without `message.content`, so do not use simple smoke for `gpt-oss`;
+- `accounts/fireworks/models/deepseek-v4-flash` validated connectivity with `usage.total=59`, but did not follow the strict format in the smoke test; quality should be measured by the microbench with validators.
+- `accounts/fireworks/models/minimax-m3` and `accounts/fireworks/models/kimi-k2p7-code` worked with the current key and also work when called by short alias via project scripts.
 
-## Microbench de reasoning
+### Reasoning Microbench
 
-Em 2026-07-07, um microteste real com a chave Fireworks do projeto mostrou:
+On 2026-07-07, a real microtest with the project's Fireworks key showed:
 
 - prompt: `Answer with exactly one word: ready`;
-- sem controle de reasoning, `glm-5p1` e `glm-5p2` gastaram 88-95 tokens e devolveram raciocinio no `content`;
-- com `reasoning_effort=none`, `glm-5p1`, `deepseek-v4-pro`, `kimi-k2p6` e `glm-5p2` responderam em 13-18 tokens totais;
-- `gpt-oss-120b` rejeitou `reasoning_effort=none`, mas aceitou `reasoning_effort=low`;
-- o campo `reasoning=disabled` foi rejeitado pelo endpoint atual como input extra.
+- without reasoning control, `glm-5p1` and `glm-5p2` consumed 88-95 tokens and returned reasoning in `content`;
+- with `reasoning_effort=none`, `glm-5p1`, `deepseek-v4-pro`, `kimi-k2p6`, and `glm-5p2` responded in 13-18 total tokens;
+- `gpt-oss-120b` rejected `reasoning_effort=none` but accepted `reasoning_effort=low`;
+- the `reasoning=disabled` field was rejected by the current endpoint as extra input.
 
-Implementacao atual:
+Current implementation:
 
-- tarefas `cheap` e `medium` usam `reasoning_effort=none` quando o modelo nao e `gpt-oss`;
-- `gpt-oss` usa `low` tambem em tarefas fortes, porque microbench com `medium` gerou content vazio/truncado com budget curto;
-- se o modelo rejeitar o parametro, o runner refaz a chamada uma vez sem extra body.
+- `cheap` and `medium` tasks use `reasoning_effort=none` when the model is not `gpt-oss`;
+- `gpt-oss` uses `low` also in strong tasks, because the microbench with `medium` generated empty/truncated content with a short budget;
+- if the model rejects the parameter, the runner retries the call once without the extra body.
 
-## Microbench de Pareto
+## Pareto Microbench
 
-Em 2026-07-07, `scripts/fireworks_microbench.py` rodou 36 chamadas reais com 6 modelos e 6 tarefas mecanicamente validadas:
+On 2026-07-07, `scripts/fireworks_microbench.py` ran 36 real calls with 6 models and 6 mechanically validated tasks:
 
-- custo estimado total: `0.00275120` USD;
-- `deepseek-v4-flash`: 6/6 validas, custo `0.00011788`, media `1775ms`;
-- `minimax-m3`: 6/6 validas, custo `0.00055590`, media `1508ms`;
-- `kimi-k2p7-code`: 6/6 validas, custo `0.00112655`, media `1193ms`;
-- `gpt-oss-20b`: 4/6 em auto, com falhas de content vazio em strong;
-- `gpt-oss-120b`: 4/6 em auto, com falhas de content vazio/truncado em strong;
-- `qwen3p7-plus`: 3/6, falhando por devolver raciocinio junto quando a tarefa exigia resposta estrita.
+- total estimated cost: `0.00275120` USD;
+- `deepseek-v4-flash`: 6/6 valid, cost `0.00011788`, average `1775ms`;
+- `minimax-m3`: 6/6 valid, cost `0.00055590`, average `1508ms`;
+- `kimi-k2p7-code`: 6/6 valid, cost `0.00112655`, average `1193ms`;
+- `gpt-oss-20b`: 4/6 automatically, with empty content failures in strong;
+- `gpt-oss-120b`: 4/6 automatically, with empty/truncated content failures in strong;
+- `qwen3p7-plus`: 3/6, failing by returning reasoning along with the response when the task required a strict response.
 
-Teste complementar com `--reasoning-effort-override low` para `gpt-oss`:
+Complementary test with `--reasoning-effort-override low` for `gpt-oss`:
 
-- `gpt-oss-120b`: 6/6 validas, custo `0.00026265`, media `1805ms`;
-- `gpt-oss-20b`: 5/6 validas, custo `0.00008870`, media `2436ms`;
-- conclusao: `low` e o default seguro atual para `gpt-oss` com `max_tokens` curto.
+- `gpt-oss-120b`: 6/6 valid, cost `0.00026265`, average `1805ms`;
+- `gpt-oss-20b`: 5/6 valid, cost `0.00008870`, average `2436ms`;
+- conclusion: `low` is the current safe default for `gpt-oss` with a short `max_tokens`.
 
-Relatorios gerados:
+Generated reports:
 
 - `reports/generated/fireworks-microbench-report.md`;
 - `reports/generated/fireworks-microbench-gpt-low-report.md`.
 
-Em 2026-07-08, apos receber creditos Fireworks, o microbench Pareto completo foi repetido com `--max-calls 36 --budget-usd 0.10`:
+On 2026-07-08, after receiving Fireworks credits, the full Pareto microbench was repeated with `--max-calls 36 --budget-usd 0.10`:
 
-- chamadas: `36`;
-- validas: `33/36`;
-- tokens totais: `4835`;
-- custo estimado: `0.00281451` USD;
-- `deepseek-v4-flash`: 6/6, custo `0.00011788`, media `1699ms`;
-- `gpt-oss-20b`: 6/6, custo `0.00012393`, media `1934ms`;
-- `gpt-oss-120b`: 6/6, custo `0.00024825`, media `788ms`;
-- `minimax-m3`: 6/6, custo `0.00055590`, media `1234ms`;
-- `kimi-k2p7-code`: 6/6, custo `0.00112255`, media `1648ms`;
-- `qwen3p7-plus`: 3/6, falhando por retornar raciocinio junto em tarefas estritas.
+- calls: `36`;
+- valid: `33/36`;
+- total tokens: `4835`;
+- estimated cost: `0.00281451` USD;
+- `deepseek-v4-flash`: 6/6, cost `0.00011788`, average `1699ms`;
+- `gpt-oss-20b`: 6/6, cost `0.00012393`, average `1934ms`;
+- `gpt-oss-120b`: 6/6, cost `0.00024825`, average `788ms`;
+- `minimax-m3`: 6/6, cost `0.00055590`, average `1234ms`;
+- `kimi-k2p7-code`: 6/6, cost `0.00112255`, average `1648ms`;
+- `qwen3p7-plus`: 3/6, failing by returning reasoning along with the response in strict tasks.
 
-Vencedores por custo no dataset minimo de 2026-07-08:
+Winners by cost in the minimal dataset of 2026-07-08:
 
 - `formatting`: `deepseek-v4-flash`;
 - `classification`: `deepseek-v4-flash`;
@@ -147,13 +147,13 @@ Vencedores por custo no dataset minimo de 2026-07-08:
 - `math_reasoning`: `gpt-oss-20b`;
 - `code_generation`: `gpt-oss-20b`.
 
-Vencedores por latencia no mesmo dataset:
+Winners by latency in the same dataset:
 
-- `format_json`, `math_reasoning` e `logic`: `gpt-oss-120b`;
+- `format_json`, `math_reasoning`, and `logic`: `gpt-oss-120b`;
 - `code_generation`: `minimax-m3`;
-- `cheap_exact_ack` e `cheap_sentiment`: `kimi-k2p7-code`, mas com custo maior que `deepseek-v4-flash`.
+- `cheap_exact_ack` and `cheap_sentiment`: `kimi-k2p7-code`, but with higher cost than `deepseek-v4-flash`.
 
-Smoke do contrato oficial em 2026-07-08:
+Smoke test of the official contract on 2026-07-08:
 
 ```bash
 ROUTER_MODE=fireworks \
@@ -163,16 +163,16 @@ python3 -m router submit-track1 \
   --output reports/generated/fireworks-official-smoke-results.json
 ```
 
-Resultado:
+Result:
 
-- `/output/results.json` valido;
+- `/output/results.json` valid;
 - tarefa de resumo usou Fireworks com `173` tokens remotos;
 - tarefa aritmetica `6 * 7` saiu por solver deterministico com `0` tokens remotos;
-- resposta final: `42`.
+- final answer: `42`.
 
-## Track 1 ACT II - Pareto Restrito Oficial
+## Track 1 ACT II - Official Restricted Pareto
 
-O guia Track 1 compartilhado em 2026-07-08 restringe os modelos a:
+The Track 1 guide shared on 2026-07-08 restricts models to:
 
 - `minimax-m3`;
 - `kimi-k2p7-code`;
@@ -180,7 +180,7 @@ O guia Track 1 compartilhado em 2026-07-08 restringe os modelos a:
 - `gemma-4-26b-a4b-it`;
 - `gemma-4-31b-it-nvfp4`.
 
-O runtime normaliza aliases curtos para IDs Fireworks completos:
+The runtime normalizes short aliases to full Fireworks IDs:
 
 - `minimax-m3` -> `accounts/fireworks/models/minimax-m3`;
 - `kimi-k2p7-code` -> `accounts/fireworks/models/kimi-k2p7-code`;
@@ -188,153 +188,153 @@ O runtime normaliza aliases curtos para IDs Fireworks completos:
 - `gemma-4-26b-a4b-it` -> `accounts/fireworks/models/gemma-4-26b-a4b-it`;
 - `gemma-4-31b-it-nvfp4` -> `accounts/fireworks/models/gemma-4-31b-it-nvfp4`.
 
-Smoke permitido em 2026-07-08:
+Allowed smoke on 2026-07-08:
 
-- `minimax-m3`: OK, `162` tokens totais no smoke curto;
-- `kimi-k2p7-code`: OK, `57` tokens totais no smoke curto;
-- os tres Gemma: `HTTP 404 Not Found` na chave local atual.
+- `minimax-m3`: OK, `162` total tokens in the short smoke;
+- `kimi-k2p7-code`: OK, `57` total tokens in the short smoke;
+- the three Gemma: `HTTP 404 Not Found` on the current local key.
 
-Benchmark `evals/fireworks-pareto/track1-category-microbench.jsonl`, cobrindo as 8 categorias oficiais, com `minimax-m3` e `kimi-k2p7-code`:
+Benchmark `evals/fireworks-pareto/track1-category-microbench.jsonl`, covering the 8 official categories, with `minimax-m3` and `kimi-k2p7-code`:
 
-- chamadas: `32`;
-- validas mecanicas: `29/32`;
-- custo estimado: `0.00517850` USD;
-- `minimax-m3`: `15/16`, custo `0.00141390`, latencia media `1330ms`;
-- `kimi-k2p7-code`: `14/16`, custo `0.00376460`, latencia media `2008ms`.
+- calls: `32`;
+- mechanically valid: `29/32`;
+- estimated cost: `0.00517850` USD;
+- `minimax-m3`: `15/16`, cost `0.00141390`, average latency `1330ms`;
+- `kimi-k2p7-code`: `14/16`, cost `0.00376460`, average latency `2008ms`.
 
-Falhas observadas:
+Observed failures:
 
-- NER de data/dinheiro normalizou `July 8, 2026` para `2026-07-08` e `$450` para `450`; mecanicamente falhou, mas semanticamente provavelmente aceitavel;
-- `kimi-k2p7-code` falhou em `debug_first_even` por devolver explicacao junto e codigo truncado;
-- `reasoning_effort=none` global reduziu custo para `0.00282810` USD, mas piorou validade para `28/32`; portanto nao forcar `none` em tarefas fortes.
+- date/money NER normalized `July 8, 2026` to `2026-07-08` and `$450` to `450`; mechanically failed, but semantically probably acceptable;
+- `kimi-k2p7-code` failed in `debug_first_even` by returning explanation along with the response and truncated code;
+- global `reasoning_effort=none` reduced cost to `0.00282810` USD, but degraded validity to `28/32`; therefore, do not force `none` on strong tasks.
 
-Politica historica anterior ao baseline congelado:
+Historical policy before the frozen baseline:
 
-- os experimentos iniciais testaram Gemma-first e Minimax-first por dominio;
-- fallback entre modelos permitidos se o modelo escolhido retornar erro rapido de API, 404 ou resposta sem `message.content`;
-- timeout nao cascata para outro modelo no mesmo request, porque o envelope oficial exige resposta abaixo de 30s;
-- o baseline maior de Sprint 49 substituiu essa heuristica e promoveu Kimi globalmente;
-- `ROUTER_MODE=three_route` permanece apenas para reproduzir o challenger FunctionGemma/E2B rejeitado.
+- initial experiments tested Gemma-first and Minimax-first by domain;
+- fallback among allowed models if the chosen model returns a quick API error, 404, or response without `message.content`;
+- timeout does not cascade to another model in the same request, because the official envelope requires a response under 30s;
+- the larger baseline of Sprint 49 replaced this heuristic and promoted Kimi globally;
+- `ROUTER_MODE=three_route` remains only to reproduce the rejected challenger FunctionGemma/E2B.
 
-Calibracao complementar de 2026-07-09 com todos os modelos permitidos esta em [`docs/FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md`](./FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md).
+Complementary calibration of 2026-07-09 with all allowed models is in [`docs/FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md`](./FIREWORKS_TRACK1_ALLOWED_CALIBRATION.md).
 
-LoRA/model fine-tuning como respondedor fica fora do caminho principal por risco regulatorio, a menos que o harness exponha explicitamente o deployment em `ALLOWED_MODELS`: [`docs/FIREWORKS_LORA_FINE_TUNING_STRATEGY.md`](./FIREWORKS_LORA_FINE_TUNING_STRATEGY.md).
+LoRA/model fine-tuning as responder remains out of the main path due to regulatory risk, unless the harness explicitly exposes the deployment in `ALLOWED_MODELS`: [`docs/FIREWORKS_LORA_FINE_TUNING_STRATEGY.md`](./FIREWORKS_LORA_FINE_TUNING_STRATEGY.md).
 
 ## Serverless vs Batch vs Deployments
 
-Fireworks tem tres caminhos diferentes, e eles nao significam a mesma coisa para o Track 1.
+Fireworks has three different paths, and they do not mean the same thing for Track 1.
 
-O texto oficial do hackathon diz que Gemma pode ser acessado por Fireworks AI e AMD Developer Cloud, sem sign-up separado, e que existe premio de Track 1 para Best Use of Gemma via Fireworks. O mesmo texto tambem diz para checar as restricoes de cada track antes de escolher modelo.
+The official hackathon text says that Gemma can be accessed via Fireworks AI and AMD Developer Cloud, without separate sign-up, and that there is a Track 1 prize for Best Use of Gemma via Fireworks. The same text also says to check the restrictions of each track before choosing a model.
 
 ### Serverless
 
-Serverless e o caminho mais proximo do scoring do Track 1: chamada OpenAI-compatible em `FIREWORKS_BASE_URL` com modelo permitido em `ALLOWED_MODELS`.
+Serverless is the path closest to Track 1 scoring: OpenAI-compatible call at `FIREWORKS_BASE_URL` with an allowed model in `ALLOWED_MODELS`.
 
-Uso no projeto:
+Use in the project:
 
 - `ROUTER_MODE=fireworks`;
 - `python3 -m router submit-track1`;
-- selecionar o menor modelo suficiente dentro de `ALLOWED_MODELS`.
+- select the smallest sufficient model within `ALLOWED_MODELS`.
 
 Serving paths:
 
-- Standard: default, sem `service_tier`.
-- Priority: `service_tier=priority`; mais confiavel em pico, mas mais caro. Nao usar no caminho feliz de economia de creditos.
-- Fast: nao e parametro; e outro model ID, como `accounts/fireworks/routers/glm-5p2-fast`. So usar se esse ID vier em `ALLOWED_MODELS` ou em teste local explicito.
+- Standard: default, without `service_tier`.
+- Priority: `service_tier=priority`; more reliable at peak, but more expensive. Do not use in the happy path of credit savings.
+- Fast: not a parameter; it is another model ID, such as `accounts/fireworks/routers/glm-5p2-fast`. Only use if this ID comes in `ALLOWED_MODELS` or in explicit local testing.
 
 Prompt cache:
 
-- Fireworks ativa prompt caching por default.
-- O router mantem o system prompt estatico no inicio e o input variavel no final.
-- O runner envia `user=track1-token-router-v1` para dar uma pista de afinidade de sessao e aumentar chance de cache em prompts com prefixo comum.
-- Nao colocar timestamp ou dados dinamicos no system prompt.
+- Fireworks enables prompt caching by default.
+- The router keeps the system prompt static at the beginning and the variable input at the end.
+- The runner sends `user=track1-token-router-v1` to provide a hint of session affinity and increase the chance of caching on prompts with a common prefix.
+- Do not place timestamps or dynamic data in the system prompt.
 
 ### Batch Inference Jobs
 
-Batch e para inferencia assincrona em dataset JSONL. Ele pode mostrar modelos elegiveis para batch/on-demand, mas nao e o caminho natural do contrato oficial `/input/tasks.json` -> `/output/results.json`.
+Batch is for asynchronous inference on a JSONL dataset. It may show models eligible for batch/on-demand, but it is not the natural path of the official contract `/input/tasks.json` -> `/output/results.json`.
 
-Riscos:
+Risks:
 
-- pode ficar em `pending` se o modelo nao for compativel;
-- depende de quota de batch;
-- nao deve ser assumido como permitido no scoring final;
-- pode consumir creditos sem melhorar a submissao oficial.
+- can remain in `pending` if the model is not compatible;
+- depends on batch quota;
+- should not be assumed as allowed in the final scoring;
+- can consume credits without improving the official submission.
 
-Uso aceitavel:
+Acceptable use:
 
-- avaliacao offline;
-- gerar dataset de calibracao;
-- testar prompt/router fora do harness.
+- offline evaluation;
+- generate calibration dataset;
+- test prompt/router outside the harness.
 
 ### On-demand Deployments
 
-Deployments criam GPUs dedicadas e permitem acessar modelos que nao existem em serverless. A Model Library pode mostrar Gemma como `Ready` e `Deploy on Demand`, mas isso nao significa que `accounts/fireworks/models/<gemma>` funcione diretamente no endpoint serverless.
+Deployments create dedicated GPUs and allow access to models that do not exist in serverless. The Model Library may show Gemma as `Ready` and `Deploy on Demand`, but this does not mean that `accounts/fireworks/models/<gemma>` works directly on the serverless endpoint.
 
-Exemplo: em 2026-07-07, `accounts/fireworks/models/gemma-4-31b-it` aparece na Model Library como on-demand, mas `Serverless: Not supported`. Chamada direta em `/chat/completions` retorna `Model not found, inaccessible, and/or not deployed` enquanto nao houver deployment proprio ou liberacao especifica.
+Example: on 2026-07-07, `accounts/fireworks/models/gemma-4-31b-it` appears in the Model Library as on-demand, but `Serverless: Not supported`. A direct call in `/chat/completions` returns `Model not found, inaccessible, and/or not deployed` as long as there is no custom deployment or specific release.
 
-A documentacao oficial de On-Demand Deployments descreve esse caminho como deploy de um modelo em recurso dedicado, com consulta posterior via API OpenAI-compatible usando o deployment criado. Isso resolve acesso tecnico ao modelo, mas muda a natureza do risco: deixa de ser apenas escolha de modelo serverless e passa a envolver ciclo de vida de deployment.
+The official documentation for On-Demand Deployments describes this path as deploying a model on a dedicated resource, with subsequent querying via OpenAI-compatible API using the created deployment. This resolves technical access to the model, but changes the nature of the risk: it shifts from just choosing a serverless model to involving the deployment lifecycle.
 
-Uso aceitavel:
+Acceptable use:
 
-- demonstrar Best Use of Gemma se o hackathon permitir esse caminho;
-- calibrar Gemma fora do scoring;
-- prototipar agente Gemma-first.
+- demonstrate Best Use of Gemma if the hackathon permits this path;
+- calibrate Gemma outside of scoring;
+- prototype Gemma-first agent.
 
-Risco para Track 1:
+Risk for Track 1:
 
-- deployment e cobrado por GPU-second;
-- deployment pode continuar gerando custo se ficar ativo;
-- deployment ID pode ser diferente do model ID listado em `ALLOWED_MODELS`;
-- modelo de deployment pode nao estar em `ALLOWED_MODELS`;
-- se nao passar por `FIREWORKS_BASE_URL` do harness, pode nao contar corretamente para o score.
-- criar deployment dentro do container pode violar a ideia de ambiente padronizado e aumentar tempo de startup.
+- deployment is charged per GPU-second;
+- deployment can continue to generate cost if it remains active;
+- deployment ID can be different from the model ID listed in `ALLOWED_MODELS`;
+- deployment model may not be in `ALLOWED_MODELS`;
+- if it does not pass through the harness's `FIREWORKS_BASE_URL`, it may not count correctly toward the score.
+- creating a deployment inside the container may violate the idea of a standardized environment and increase startup time.
 
-Perguntas que precisam de confirmacao antes de usar Gemma On-Demand no scoring:
+Questions that need confirmation before using Gemma On-Demand in scoring:
 
-- o harness vai injetar IDs serverless ou IDs de deployment em `ALLOWED_MODELS`?
-- chamadas para deployment proprio contam para token efficiency?
-- custo por GPU-second entra no score ou apenas tokens Fireworks?
-- o deployment precisa existir antes da submissao ou pode ser criado pelo container?
-- usar deployment proprio viola alguma restricao do Track 1?
+- will the harness inject serverless IDs or deployment IDs in `ALLOWED_MODELS`?
+- do calls to custom deployments count toward token efficiency?
+- does cost per GPU-second enter the score, or only Fireworks tokens?
+- does the deployment need to exist before submission, or can it be created by the container?
+- does using a custom deployment violate any Track 1 restriction?
 
-Decisao operacional:
+Operational decision:
 
-- final Track 1: `ALLOWED_MODELS` serverless-first, com fallback entre modelos permitidos;
-- Gemma serverless liberado no harness: ativar Gemma-first em cheap/medium linguagem;
-- Gemma apenas via On-Demand: usar como trilha de pesquisa/demo ate confirmacao explicita;
-- Gemma local 26B/31B no AMD pod: usar para desenvolvimento/calibracao/demo, nao assumir como final-container runtime;
-- nunca criar deployment automaticamente em script de teste sem aprovacao humana, porque pode abrir custo recorrente.
+- final Track 1: `ALLOWED_MODELS` serverless-first, with fallback among allowed models;
+- Gemma serverless released in the harness: activate Gemma-first in cheap/medium language;
+- Gemma only via On-Demand: use as research/demo path until explicit confirmation;
+- local Gemma 26B/31B in the AMD pod: use for development/calibration/demo, do not assume as final-container runtime;
+- never create a deployment automatically in a test script without human approval, as it can incur recurring costs.
 
 ## Smoke three-route
 
-Este comando passa a ser operacional na Sprint 48, com os dois modelos locais empacotados.
+This command becomes operational in Sprint 48, with the two local models packaged.
 
 ```bash
 ROUTER_MODE=three_route \
 python3 -m router ask "What is 2+2?" --json
 ```
 
-Esperado para tarefa facil:
+Expected for easy task:
 
-- rota local;
+- local route;
 - `remote_tokens.total=0`.
 
-Teste de escalacao controlada:
+Controlled escalation test:
 
 ```bash
 ROUTER_MODE=three_route \
 python3 -m router ask "Who is the CEO of AMD today?" --json
 ```
 
-Esperado:
+Expected:
 
-- chamada remota quando o decisor matricial escolhe Fireworks ou uma rota local falha;
-- resposta Fireworks final no formato solicitado pela tarefa;
-- `remote_tokens` registrado.
+- remote call when the matrix decision-maker chooses Fireworks or a local route fails;
+- final Fireworks response in the format requested by the task;
+- `remote_tokens` registered.
 
-## Modo oficial sem endpoint local
+## Official Mode Without Local Endpoint
 
-O Participant Guide injeta Fireworks, nao um endpoint local. Com o ambiente final de `4 GB` RAM e `2 vCPU`, este e o caminho oficial seguro:
+The Participant Guide injects Fireworks, not a local endpoint. With the final environment of `4 GB` RAM and `2 vCPU`, this is the official secure path:
 
 ```bash
 ROUTER_MODE=fireworks \
@@ -344,20 +344,20 @@ ALLOWED_MODELS=<comma-separated-models> \
 python3 -m router submit-track1 --input /input/tasks.json --output /output/results.json
 ```
 
-Nesse modo, validadores mecanicos conservadores rodam antes da chamada remota e o primeiro modelo de `ALLOWED_MODELS` e usado quando `FIREWORKS_MODEL` estiver vazio.
+In this mode, conservative mechanical validators run before the remote call, and the first model in `ALLOWED_MODELS` is used when `FIREWORKS_MODEL` is empty.
 
-## Budget guard
+## Budget Guard
 
-Antes de benchmark real:
+Before real benchmark:
 
 ```bash
 export MAX_REMOTE_TOKENS_PER_TASK=300
 export MAX_REMOTE_TOKENS_PER_RUN=6000
 ```
 
-## Nao fazer
+## What Not To Do
 
-- Nao mandar todas as tasks direto para Fireworks sem medir.
-- Nao aumentar `FIREWORKS_MAX_TOKENS` sem justificativa.
-- Nao commitar `.env.fireworks.local`.
-- Nao armazenar API key em logs ou screenshots.
+- Do not send all tasks directly to Fireworks without measuring.
+- Do not increase `FIREWORKS_MAX_TOKENS` without justification.
+- Do not commit `.env.fireworks.local`.
+- Do not store the API key in logs or screenshots.

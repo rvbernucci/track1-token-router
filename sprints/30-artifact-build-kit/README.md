@@ -1,94 +1,94 @@
 # Sprint 30 - Artifact Build Kit
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Transformar os textos de submissao em artefatos finais ou semi-finais: slides PDF, cover PNG/JPG, roteiro de gravacao, checklist de video e modo estrito de readiness.
+Transform submission texts into final or semi-final artifacts: PDF slides, PNG/JPG cover, recording script, video checklist, and strict readiness mode.
 
-## Por que importa
+## Why it matters
 
-A lablab avalia tambem apresentacao. Um projeto tecnicamente forte pode perder clareza se o video, slide deck, cover e demo URL forem improvisados na ultima hora.
+Lablab also evaluates presentation. A technically strong project can lose clarity if the video, slide deck, cover, and demo URL are improvised at the last minute.
 
-## Tese
+## Thesis
 
-Artefatos finais devem ser buildaveis como codigo. O que puder ser validado por script nao deve depender de memoria humana no dia da submissao.
+Final artifacts must be buildable as code. Anything that can be validated by a script should not rely on human memory on submission day.
 
-## Entregaveis
+## Deliverables
 
 - `submission/final/`.
-- `submission/final/slides.pdf` ou pipeline documentado para gerar.
-- `submission/final/cover.png` ou `cover.jpg`.
+- `submission/final/slides.pdf` or a documented pipeline to generate it.
+- `submission/final/cover.png` or `cover.jpg`.
 - `submission/recording-shotlist.md`.
 - `submission/final-checklist.md`.
 - `scripts/build_submission_artifacts.py`.
 - `scripts/submission_readiness_check.py --strict`.
-- Testes para modo estrito.
+- Tests for strict mode.
 
 ## Checklist
 
-- [x] Criar shotlist de video por cena.
-- [x] Criar comandos exatos que aparecem no video.
-- [x] Criar speaker notes curtas por slide.
-- [x] Gerar ou preparar `slides.pdf`.
-- [x] Gerar ou preparar cover PNG/JPG.
-- [x] Criar checklist de audio, tela, terminal e tempo.
-- [x] Criar pasta `submission/final/`.
-- [x] Criar script de build/validacao de artefatos.
-- [x] Adicionar `--strict` ao readiness check.
-- [x] Em `--strict`, exigir repo URL.
-- [x] Em `--strict`, exigir demo URL.
-- [x] Em `--strict`, exigir video MP4 ou placeholder aprovado.
-- [x] Em `--strict`, exigir slides PDF.
-- [x] Em `--strict`, exigir cover PNG/JPG.
-- [x] Em `--strict`, exigir CI verde informado.
-- [x] Documentar pendencias que so fecham no kickoff.
+- [x] Create video shotlist per scene.
+- [x] Create exact commands that appear in the video.
+- [x] Create short speaker notes per slide.
+- [x] Generate or prepare `slides.pdf`.
+- [x] Generate or prepare PNG/JPG cover.
+- [x] Create checklist for audio, screen, terminal, and timing.
+- [x] Create `submission/final/` folder.
+- [x] Create artifact build/validation script.
+- [x] Add `--strict` to the readiness check.
+- [x] In `--strict`, require repo URL.
+- [x] In `--strict`, require demo URL.
+- [x] In `--strict`, require MP4 video or approved placeholder.
+- [x] In `--strict`, require PDF slides.
+- [x] In `--strict`, require PNG/JPG cover.
+- [x] In `--strict`, require reported green CI.
+- [x] Document pending tasks that are only closed at kickoff.
 
-## Criterios de aceite
+## Acceptance criteria
 
-- O modo normal continua passando sem artefatos finais pesados.
-- O modo estrito falha enquanto URLs e arquivos finais nao existirem.
-- O time sabe exatamente o que gravar em ate 5 minutos.
-- Slides e cover seguem a narrativa do Track 1.
+- Normal mode still passes without heavy final artifacts.
+- Strict mode fails as long as final URLs and files do not exist.
+- The team knows exactly what to record in up to 5 minutes.
+- Slides and cover follow the Track 1 narrative.
 
-## Metricas
+## Metrics
 
-- Duracao estimada do video.
-- Numero de slides.
-- Tamanho dos arquivos finais.
-- Numero de pendencias restantes no modo estrito.
+- Estimated video duration.
+- Number of slides.
+- Final files size.
+- Number of remaining pending items in strict mode.
 
-## Comandos esperados
+## Expected commands
 
 ```bash
 python3 scripts/build_submission_artifacts.py --check
 python3 scripts/submission_readiness_check.py --strict
 ```
 
-## Riscos
+## Risks
 
-- Gastar tempo em design e esquecer reproducibilidade.
-- Criar arquivos binarios grandes sem necessidade.
-- Fazer promessas no pitch que o runner ainda nao cumpre.
+- Spending time on design and forgetting reproducibility.
+- Creating large binary files unnecessarily.
+- Making promises in the pitch that the runner does not yet fulfill.
 
-## Decisao
+## Decision
 
-O artifact kit deve ser pragmatico. Se um artefato ainda nao puder ser finalizado sem credito, o sprint deve deixar placeholder validado e lista exata do que falta.
+The artifact kit must be pragmatic. If an artifact cannot yet be finalized without credit, the sprint should leave a validated placeholder and an exact list of what is missing.
 
 ## Definition of Done
 
-- Shotlist existe.
-- Modo `--strict` existe.
-- Artefatos finais ou placeholders controlados existem.
-- Checklist final cobre lablab, repo, video, slides, cover, demo URL e CI.
+- Shotlist exists.
+- `--strict` mode exists.
+- Final artifacts or controlled placeholders exist.
+- Final checklist covers lablab, repo, video, slides, cover, demo URL, and CI.
 
-## Evidencias
+## Evidence
 
-- `submission/recording-shotlist.md` define cenas, tempo e comandos do video.
-- `submission/final-checklist.md` cobre lablab, repo, demo, video, artefatos e kickoff.
-- `scripts/build_submission_artifacts.py --check` gera `submission/final/slides.pdf`, `cover.png`, `speaker-notes.md`, `artifact-manifest.json`, `README.md` e placeholder de video.
-- `scripts/submission_readiness_check.py --strict` exige repo URL, demo URL, CI verde, slides PDF, cover PNG/JPG e video ou placeholder aprovado.
-- `tests/test_submission_readiness.py` cobre builder, strict pendente e strict aprovado em fixture temporaria.
-- Estado atual esperado do strict: falha somente por `demo_url` ausente e `ci_status` ainda nao marcado como `green`.
+- `submission/recording-shotlist.md` defines video scenes, timing, and commands.
+- `submission/final-checklist.md` covers lablab, repo, demo, video, artifacts, and kickoff.
+- `scripts/build_submission_artifacts.py --check` generates `submission/final/slides.pdf`, `cover.png`, `speaker-notes.md`, `artifact-manifest.json`, `README.md`, and video placeholder.
+- `scripts/submission_readiness_check.py --strict` requires repo URL, demo URL, green CI, PDF slides, PNG/JPG cover, and video or approved placeholder.
+- `tests/test_submission_readiness.py` covers builder, pending strict, and approved strict in a temporary fixture.
+- Expected current state of strict: fails only due to missing `demo_url` and `ci_status` not yet marked as `green`.

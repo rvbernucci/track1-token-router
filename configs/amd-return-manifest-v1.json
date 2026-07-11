@@ -3,7 +3,7 @@
   "source_bundle": [
     {
       "path": "configs/championship-shadow-policy-v1.json",
-      "sha256": "2b8897e004a43efeb41820cbfa01b5ef04b899392a959359aea3ed81a2cebbaf"
+      "sha256": "87c701fc53beaa9097c9f1bfa7c710fb418854cfbca4301490225e03186b7ebd"
     },
     {
       "path": "configs/functiongemma-scale789-q8-runtime.json",

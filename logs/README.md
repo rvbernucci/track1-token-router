@@ -1,14 +1,14 @@
 # Logs
 
-Pasta para logs locais de execucao.
+Folder for local execution logs.
 
-## Objetivo
+## Objective
 
-Guardar rastros suficientes para aprender a politica de roteamento sem contaminar stdout.
+Keep enough traces to learn the routing policy without contaminating stdout.
 
-## Formato recomendado
+## Recommended format
 
-JSONL, uma linha por task:
+JSONL, one line per task:
 
 ```json
 {
@@ -25,18 +25,18 @@ JSONL, uma linha por task:
 }
 ```
 
-## Relatorio local
+## Local report
 
 ```bash
 python3 scripts/analyze_traces.py --logs "logs/*.jsonl" --report reports/generated/trace-summary.md
 ```
 
-O relatorio agrega rotas, tokens remotos, latencia por etapa, erros e falhas de parsing.
+The report aggregates routes, remote tokens, latency per step, errors, and parsing failures.
 
-## Nao colocar aqui
+## Do not put here
 
 - API keys.
 - secrets.
-- arquivos grandes.
-- pesos de modelo.
-- dados que o evaluator nao permite persistir.
+- large files.
+- model weights.
+- data that the evaluator does not allow to be persisted.

@@ -1,47 +1,47 @@
 # Sprint 06 - Offline Evaluation Arena
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Criar uma arena de avaliacao offline forte o suficiente para calibrar o roteador antes de ter acesso real a AMD Developer Cloud ou Fireworks.
+Create an offline evaluation arena strong enough to calibrate the router before having real access to AMD Developer Cloud or Fireworks.
 
-Sem credito, o ativo mais importante e dataset. Ele nos diz onde a cascata erra, onde escala demais e onde gasta token remoto simulado sem necessidade.
+Without credit, the most important asset is the dataset. It tells us where the cascade fails, where it escalates too much, and where it spends simulated remote tokens unnecessarily.
 
-## Entregaveis
+## Deliverables
 
-- Dataset offline com 100-300 tarefas.
-- Categorias: facil, media, dificil, formato, matematica, instrucao, adversarial, conhecimento instavel.
-- Expected answers quando houver resposta objetiva.
-- Metadados de dificuldade e risco.
-- Relatorio por categoria.
-- Comando de geracao/validacao do dataset.
+- Offline dataset with 100-300 tasks.
+- Categories: easy, medium, difficult, format, mathematics, instruction, adversarial, unstable knowledge.
+- Expected answers when there is an objective response.
+- Difficulty and risk metadata.
+- Report by category.
+- Command for dataset generation/validation.
 
 ## Checklist
 
-- [x] Criar `evals/offline/tasks.jsonl`.
-- [x] Criar `evals/offline/expected.jsonl`.
-- [x] Adicionar campo `metadata.category`.
-- [x] Adicionar campo `metadata.difficulty`.
-- [x] Adicionar campo `metadata.expected_route`.
-- [x] Criar tarefas triviais que devem sair localmente.
-- [x] Criar tarefas de formato estrito.
-- [x] Criar tarefas matematicas multi-etapa.
-- [x] Criar tarefas adversariais de prompt injection.
-- [x] Criar tarefas de conhecimento possivelmente desatualizado.
-- [x] Criar relatorio por categoria.
-- [x] Garantir que o dataset nao usa dados sensiveis.
+- [x] Create `evals/offline/tasks.jsonl`.
+- [x] Create `evals/offline/expected.jsonl`.
+- [x] Add `metadata.category` field.
+- [x] Add `metadata.difficulty` field.
+- [x] Add `metadata.expected_route` field.
+- [x] Create trivial tasks that should resolve locally.
+- [x] Create strict format tasks.
+- [x] Create multi-step mathematical tasks.
+- [x] Create adversarial prompt injection tasks.
+- [x] Create potentially outdated knowledge tasks.
+- [x] Create report by category.
+- [x] Ensure the dataset does not use sensitive data.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- [x] `python3 -m router eval --jsonl evals/offline/tasks.jsonl --expected evals/offline/expected.jsonl` roda sem provedores reais.
-- [x] O relatorio mostra rotas, exact match, escalations e tokens remotos simulados.
-- [x] O dataset tem cobertura minima por categoria.
-- [x] O README explica como adicionar novas tarefas.
+- [x] `python3 -m router eval --jsonl evals/offline/tasks.jsonl --expected evals/offline/expected.jsonl` runs without real providers.
+- [x] The report shows routes, exact match, escalations, and simulated remote tokens.
+- [x] The dataset has minimum coverage per category.
+- [x] The README explains how to add new tasks.
 
-## Evidencias
+## Evidence
 
 - `python3 scripts/generate_offline_eval.py`
 - `python3 scripts/generate_offline_eval.py --check`
@@ -49,19 +49,19 @@ Sem credito, o ativo mais importante e dataset. Ele nos diz onde a cascata erra,
 - `python3 -m router eval --jsonl evals/offline/tasks.jsonl --expected evals/offline/expected.jsonl --report reports/generated/offline-report.md`
 - `python3 -m unittest discover -s tests`
 
-## Resultado
+## Result
 
-- 160 tarefas offline.
-- 8 categorias com 20 tarefas cada.
-- Metadados por tarefa: `category`, `difficulty`, `expected_route`, `risk`.
-- Relatorio do `router eval` inclui `categories`, `difficulties` e `expected_route`.
+- 160 offline tasks.
+- 8 categories with 20 tasks each.
+- Metadata per task: `category`, `difficulty`, `expected_route`, `risk`.
+- `router eval` report includes `categories`, `difficulties`, and `expected_route`.
 
-## Riscos
+## Risks
 
-- Dataset artificial demais.
-- Exact match punir respostas semanticamente corretas.
-- Medir so accuracy e esquecer custo/latencia.
+- Dataset too artificial.
+- Exact match punishing semantically correct responses.
+- Measuring only accuracy and forgetting cost/latency.
 
-## Saida esperada
+## Expected Output
 
-Uma arena offline que permite continuar calibrando sem depender de creditos.
+An offline arena that allows continued calibration without depending on credits.

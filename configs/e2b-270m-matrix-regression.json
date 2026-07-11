@@ -1,0 +1,40 @@
+{
+  "coefficients": [
+    0.21229811824010014,
+    0.5001244296202647,
+    -0.9408504565265986,
+    1.1971756112917211,
+    0.5113321589439564,
+    0.21453277220798253,
+    -0.03900455692544146,
+    -0.6530479364195515,
+    -0.5800568609339857,
+    0.11189722119273059,
+    -0.26201695028825595,
+    -0.038633518384267825,
+    -1.3777422171111218,
+    -0.10373132346342503
+  ],
+  "decision_threshold": 0.7,
+  "default_enabled": false,
+  "feature_names": [
+    "intent.factual_qa",
+    "intent.math_reasoning",
+    "intent.sentiment",
+    "intent.summarization",
+    "intent.ner",
+    "intent.code_debugging",
+    "intent.logic_puzzle",
+    "intent.code_generation",
+    "score.deterministic_fit",
+    "score.reasoning_demand",
+    "score.knowledge_uncertainty",
+    "score.generation_demand",
+    "score.format_complexity"
+  ],
+  "fit_positive": 1551,
+  "fit_rows": 3982,
+  "invalid_270m_route": "fireworks",
+  "schema_version": "e2b-270m-matrix-regression-v1",
+  "training_scope": "all_available_3982_after_grouped_oof_evaluation"
+}

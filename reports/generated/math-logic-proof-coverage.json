@@ -113,10 +113,10 @@
     "passed": true
   },
   "summary": {
-    "logic_latency_p50_ms": 0.03962499613407999,
-    "logic_latency_p95_ms": 0.32041700615081936,
-    "math_latency_p50_ms": 0.042041996493935585,
-    "math_latency_p95_ms": 0.3705830022227019,
+    "logic_latency_p50_ms": 0.03629199636634439,
+    "logic_latency_p95_ms": 0.11183400056324899,
+    "math_latency_p50_ms": 0.03479099541436881,
+    "math_latency_p95_ms": 0.053333002142608166,
     "refused": 80,
     "released": 180,
     "released_precision": 1.0,

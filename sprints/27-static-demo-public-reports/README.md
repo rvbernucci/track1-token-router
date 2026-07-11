@@ -1,79 +1,79 @@
 # Sprint 27 - Static Demo And Public Reports
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credits.
 
-## Objetivo
+## Objective
 
-Criar uma demo estatica publicavel e um fluxo de exportacao de reports publicos para explicar o projeto rapidamente sem depender de AMD Developer Cloud, Fireworks, Native.Builder ou servidor proprio.
+Create a publishable static demo and a public report export workflow to explain the project quickly without depending on AMD Developer Cloud, Fireworks, Native.Builder, or our own server.
 
-## Por que importa
+## Why it matters
 
-A documentacao da lablab exige prototipo acessivel por URL. Mesmo que o core seja CLI-first, a submissao precisa ser entendida por jurados, mentores e avaliadores humanos em poucos minutos.
+Lablab documentation requires a prototype accessible via URL. Even though the core is CLI-first, the submission needs to be understood by judges, mentors, and human evaluators in a few minutes.
 
-O objetivo nao e construir uma UI complexa. E criar uma vitrine estatica, segura e fiel ao runner competitivo.
+The objective is not to build a complex UI, but to create a static, secure showroom that is faithful to the competitive runner.
 
-## Tese
+## Thesis
 
-O demo site deve responder quatro perguntas:
+The demo site must answer four questions:
 
-- o que o router faz;
-- por que isso economiza tokens remotos;
-- como reproduzir localmente;
-- quais evidencias offline provam readiness.
+- what the router does;
+- why this saves remote tokens;
+- how to reproduce locally;
+- what offline evidence proves readiness.
 
-## Entregaveis
+## Deliverables
 
 - `demo-site/`.
 - `demo-site/index.html`.
-- `demo-site/assets/` quando necessario.
+- `demo-site/assets/` when necessary.
 - `scripts/export_public_report.py`.
 - `reports/public/`.
 - `reports/public/battle-report.md`.
 - `reports/public/fuzz-report.md`.
 - `reports/public/submission-readiness.md`.
 - `docs/PUBLIC_DEMO_RUNBOOK.md`.
-- Atualizacao em `submission/demo-plan.md`.
-- Testes para exportacao sem segredos.
+- Update in `submission/demo-plan.md`.
+- Tests for export without secrets.
 
 ## Checklist
 
-- [x] Criar estrutura `demo-site/`.
-- [x] Criar HTML estatico sem dependencia de build tool.
-- [x] Incluir pitch em 90 segundos.
-- [x] Incluir diagrama do fluxo competitivo.
-- [x] Incluir exemplo `solver_arithmetic` com zero tokens remotos.
-- [x] Incluir exemplo de remote audit dry-run.
-- [x] Incluir links para README, SUBMISSION e reports publicos.
-- [x] Criar `scripts/export_public_report.py`.
-- [x] Exportar battle report publico.
-- [x] Exportar fuzz report publico.
-- [x] Exportar submission readiness publico.
-- [x] Redigir prompts longos antes de publicar.
-- [x] Mascarar paths locais absolutos.
-- [x] Bloquear IPs privados, hostnames privados e tokens.
-- [x] Criar teste que injeta segredo sintetico e espera bloqueio.
-- [x] Criar comando local para servir demo com `python3 -m http.server`.
-- [x] Criar checklist de GitHub Pages.
-- [x] Integrar export publico ao release check ou a um check dedicado.
+- [x] Create `demo-site/` structure.
+- [x] Create static HTML without build tool dependencies.
+- [x] Include 90-second pitch.
+- [x] Include diagram of the competitive flow.
+- [x] Include `solver_arithmetic` example with zero remote tokens.
+- [x] Include remote audit dry-run example.
+- [x] Include links to README, SUBMISSION, and public reports.
+- [x] Create `scripts/export_public_report.py`.
+- [x] Export public battle report.
+- [x] Export public fuzz report.
+- [x] Export public submission readiness.
+- [x] Redact long prompts before publishing.
+- [x] Mask absolute local paths.
+- [x] Block private IPs, private hostnames, and tokens.
+- [x] Create test that injects a synthetic secret and expects blockage.
+- [x] Create local command to serve demo with `python3 -m http.server`.
+- [x] Create GitHub Pages checklist.
+- [x] Integrate public export into the release check or a dedicated check.
 
-## Criterios de aceite
+## Acceptance criteria
 
-- `demo-site/index.html` abre localmente sem instalar dependencias.
-- `python3 scripts/export_public_report.py --check` passa sem segredos.
-- `reports/public/` contem apenas artefatos seguros para compartilhar.
-- O demo site explica a arquitetura sem exigir leitura do codigo.
-- O demo nao vira dependencia do evaluator tecnico.
+- `demo-site/index.html` opens locally without installing dependencies.
+- `python3 scripts/export_public_report.py --check` passes without secrets.
+- `reports/public/` contains only safe artifacts to share.
+- The demo site explains the architecture without requiring code reading.
+- The demo does not become a dependency of the technical evaluator.
 
-## Metricas
+## Metrics
 
-- Tempo para entender a tese: alvo menor que 90 segundos.
-- Numero de reports publicos exportados: minimo 3.
-- Secret scan em reports publicos: zero achados.
-- Comando de reproducao local visivel no primeiro scroll.
+- Time to understand the thesis: target less than 90 seconds.
+- Number of public reports exported: minimum 3.
+- Secret scan in public reports: zero findings.
+- Local reproduction command visible on first scroll.
 
-## Comandos esperados
+## Expected commands
 
 ```bash
 python3 scripts/export_public_report.py --check
@@ -81,28 +81,28 @@ cd demo-site
 python3 -m http.server 8080
 ```
 
-## Riscos
+## Risks
 
-- Criar uma landing page bonita mas desconectada do runner real.
-- Publicar logs ou prompts que nao deveriam sair do repo.
-- Gastar tempo demais em visual antes de fechar o conteudo tecnico.
+- Creating a beautiful landing page that is disconnected from the actual runner.
+- Publishing logs or prompts that should not leave the repo.
+- Spending too much time on visuals before finalizing technical content.
 
-## Decisao
+## Decision
 
-O demo deve ser estatico, pequeno e auditavel. Se uma melhoria exigir backend, auth, banco de dados ou deploy complexo, ela fica fora deste sprint.
+The demo must be static, small, and auditable. If an improvement requires a backend, auth, database, or complex deployment, it is out of scope for this sprint.
 
 ## Definition of Done
 
-- Demo estatica existe.
-- Reports publicos sao exportados por script.
-- Secret scan cobre os artefatos compartilhaveis.
-- Submission demo checklist aponta para o novo fluxo.
-- Documentacao explica como publicar no GitHub Pages ou equivalente.
+- Static demo exists.
+- Public reports are exported by script.
+- Secret scan covers shareable artifacts.
+- Submission demo checklist points to the new flow.
+- Documentation explains how to publish on GitHub Pages or equivalent.
 
-## Evidencias
+## Evidence
 
-- `demo-site/index.html` criado como pagina estatica sem build.
-- `docs/PUBLIC_DEMO_RUNBOOK.md` criado com fluxo local, roteiro de 90 segundos e checklist de GitHub Pages.
-- `scripts/export_public_report.py --check` exporta reports sanitizados para `reports/public/` e `demo-site/public-reports/`.
-- `tests/test_public_reports.py` cobre export real, redacao de paths/IPs, bloqueio de segredo sintetico e links do demo.
-- `scripts/offline_release_check.sh` executa o export publico antes do secret scan.
+- `demo-site/index.html` created as a static page without build.
+- `docs/PUBLIC_DEMO_RUNBOOK.md` created with local flow, 90-second script, and GitHub Pages checklist.
+- `scripts/export_public_report.py --check` exports sanitized reports to `reports/public/` and `demo-site/public-reports/`.
+- `tests/test_public_reports.py` covers actual export, redaction of paths/IPs, synthetic secret blocking, and demo links.
+- `scripts/offline_release_check.sh` executes the public export before the secret scan.

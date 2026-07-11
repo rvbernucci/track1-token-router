@@ -1,55 +1,55 @@
 # Sprint 21 - Calibration Loop & Battle Drill
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Criar um loop de calibracao que rode datasets, compare politicas, ajuste thresholds e produza um battle report antes do kickoff/scoring real.
+Create a calibration loop that runs datasets, compares policies, adjusts thresholds, and produces a battle report before the actual kickoff/scoring.
 
-## Por que importa
+## Why it matters
 
-Depois que a orquestracao existir, a vantagem vem de iterar rapido. Precisamos de um ritual de competicao: rodar, medir, ajustar e repetir.
+Once orchestration exists, the advantage comes from iterating fast. We need a competition ritual: run, measure, adjust, and repeat.
 
-## Entregaveis
+## Deliverables
 
-- Script `scripts/battle_drill.py`.
-- Relatorio `reports/generated/battle-report.md`.
-- JSON `reports/generated/battle-report.json`.
-- Comparacao de configuracoes.
-- Ranking por score offline.
-- Checklist de readiness.
-- Testes do pipeline de calibracao.
+- `scripts/battle_drill.py` script.
+- `reports/generated/battle-report.md` report.
+- `reports/generated/battle-report.json` JSON.
+- Configuration comparison.
+- Ranking by offline score.
+- Readiness checklist.
+- Tests for the calibration pipeline.
 
 ## Checklist
 
-- [x] Rodar offline dataset completo.
-- [x] Rodar policy comparison.
-- [x] Rodar offline scoreboard.
-- [x] Rodar prompt ablation.
-- [x] Rodar trace analytics.
-- [x] Rodar guardrail probes.
-- [x] Comparar pelo menos 3 configuracoes.
-- [x] Eleger configuracao candidata.
-- [x] Registrar tradeoff accuracy vs token remoto.
-- [x] Registrar riscos restantes.
-- [x] Gerar battle report Markdown.
-- [x] Gerar battle report JSON.
-- [x] Integrar ao release check ou comando dedicado.
+- [x] Run full dataset offline.
+- [x] Run policy comparison.
+- [x] Run offline scoreboard.
+- [x] Run prompt ablation.
+- [x] Run trace analytics.
+- [x] Run guardrail probes.
+- [x] Compare at least 3 configurations.
+- [x] Elect a candidate configuration.
+- [x] Record the accuracy vs. remote token tradeoff.
+- [x] Record remaining risks.
+- [x] Generate Markdown battle report.
+- [x] Generate JSON battle report.
+- [x] Integrate with the release check or a dedicated command.
 
-## Criterios de aceite
+## Acceptance criteria
 
-- Um unico comando gera o diagnostico competitivo.
-- O relatorio mostra a melhor configuracao candidata.
-- O relatorio mostra por que as alternativas perderam.
-- O processo funciona sem AMD e sem Fireworks.
+- A single command generates the competitive diagnosis.
+- The report shows the best candidate configuration.
+- The report shows why the alternatives lost.
+- The process works without AMD and without Fireworks.
 
-## Saida esperada
+## Expected output
 
-Um ritual de calibracao para transformar arquitetura em vantagem operacional.
+A calibration ritual to turn architecture into operational advantage.
 
-## Evidencia local
+## Local evidence
 
 ```bash
 python3 scripts/battle_drill.py
@@ -57,6 +57,6 @@ python3 -m unittest tests.test_battle_drill
 scripts/offline_release_check.sh
 ```
 
-## Decisao
+## Decision
 
-O battle drill escolhe a configuracao candidata pelo scoreboard offline e coloca lado a lado policy comparison, policy ablation, prompt ablation, trace analytics e guardrail probes. Ele nao substitui o scoring oficial, mas cria um ritual repetivel para chegar no kickoff com uma hipotese forte.
+The battle drill chooses the candidate configuration via the offline scoreboard and places policy comparison, policy ablation, prompt ablation, trace analytics, and guardrail probes side by side. It does not replace official scoring, but creates a repeatable ritual to arrive at kickoff with a strong hypothesis.

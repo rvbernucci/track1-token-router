@@ -5,7 +5,7 @@
     "dataset_path": "evals/proof-carrying/math-logic-holdout.jsonl",
     "dataset_sha256": "b4410091c7c3d9348df7412ac664ae6d83a5b9d33a955c56ee87a879a23c6e3f",
     "engine_path": "router/orchestration/proof_engine.py",
-    "engine_sha256": "f0893c49ddbf6f00bff53597cb7875db46fcf39b241640f374e7780f5b0b3a13",
+    "engine_sha256": "21a4a7846fcaac0197a8c0d1c0f30f230ace280a80150304ee81d3f2c61abc10",
     "evaluation_path": "reports/generated/math-logic-proof-coverage.json",
     "evaluation_gate": {
       "minimum_released": 180,

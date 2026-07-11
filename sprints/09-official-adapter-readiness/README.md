@@ -1,41 +1,41 @@
 # Sprint 09 - Official Adapter Readiness
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Preparar o projeto para adaptar rapidamente o formato oficial de input/output revelado no kickoff, sem refatorar o core.
+Prepare the project to quickly adapt to the official input/output format revealed in the kickoff, without refactoring the core.
 
-## Entregaveis
+## Deliverables
 
-- Pasta `router/adapters/official`.
-- Interface de adapter oficial.
-- Templates para texto, JSON, JSONL e arquivo.
-- Testes de contrato.
-- Checklist de kickoff.
+- `router/adapters/official` folder.
+- Official adapter interface.
+- Templates for text, JSON, JSONL, and file.
+- Contract tests.
+- Kickoff checklist.
 
 ## Checklist
 
-- [x] Criar interface `OfficialAdapter`.
-- [x] Criar adapter `plain_text`.
-- [x] Criar adapter `json_task`.
-- [x] Criar adapter `jsonl_batch`.
-- [x] Criar adapter `file_payload`.
-- [x] Criar fixture de exemplo por formato.
-- [x] Criar testes de round-trip.
-- [x] Documentar como adaptar em 30 minutos.
-- [x] Criar `KICKOFF_CHECKLIST.md`.
-- [x] Garantir que o core nao conhece detalhes oficiais.
+- [x] Create `OfficialAdapter` interface.
+- [x] Create `plain_text` adapter.
+- [x] Create `json_task` adapter.
+- [x] Create `jsonl_batch` adapter.
+- [x] Create `file_payload` adapter.
+- [x] Create example fixture per format.
+- [x] Create round-trip tests.
+- [x] Document how to adapt in 30 minutes.
+- [x] Create `KICKOFF_CHECKLIST.md`.
+- [x] Ensure the core does not know official details.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- [x] Um novo formato pode ser adicionado sem mexer na cascata.
-- [x] Testes provam entrada -> `TaskEnvelope` -> saida final.
-- [x] O checklist de kickoff explica exatamente onde editar.
+- [x] A new format can be added without modifying the cascade.
+- [x] Tests prove input -> `TaskEnvelope` -> final output.
+- [x] The kickoff checklist explains exactly where to edit.
 
-## Evidencias
+## Evidence
 
 - `router/adapters/official/README.md`
 - `fixtures/official/`
@@ -43,22 +43,22 @@ Preparar o projeto para adaptar rapidamente o formato oficial de input/output re
 - `tests/test_official_adapters.py`
 - `python3 -m unittest discover -s tests`
 
-## Resultado
+## Result
 
-Adapters prontos:
+Ready adapters:
 
 - `plain_text`
 - `json_task`
 - `jsonl_batch`
 - `file_payload`
 
-O core permanece isolado: `router/core` nao importa `router.adapters.official`.
+The core remains isolated: `router/core` does not import `router.adapters.official`.
 
-## Riscos
+## Risks
 
-- Tentar prever demais o formato oficial.
-- Acoplar adapter ao evaluator antes de conhecer o contrato real.
+- Trying to predict the official format too much.
+- Coupling the adapter to the evaluator before knowing the real contract.
 
-## Saida esperada
+## Expected Output
 
-Um ponto de encaixe claro para o kickoff, sem interromper a rota offline.
+A clear integration point for the kickoff, without disrupting the offline path.

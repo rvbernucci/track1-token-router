@@ -1,92 +1,92 @@
 # Fireworks LoRA & Fine-Tuning Strategy
 
-Atualizado em: 2026-07-09
+Updated on: 2026-07-09
 
-## Decisao de campeonato
+## Strategic Decision
 
-LoRA nao deve entrar no caminho principal de submissao do Track 1 sem confirmacao explicita do avaliador.
+LoRA should not enter the main submission path of Track 1 without explicit confirmation from the evaluator.
 
-Motivo: o Track 1 restringe a selecao a `ALLOWED_MODELS`, enquanto a documentacao Fireworks diz que modelos LoRA fine-tuned so podem ser implantados em on-demand dedicated deployments, nao em Serverless. Um LoRA em live merge ou multi-LoRA muda o `model` para um ID fine-tuned/deployment, potencialmente fora da lista permitida e fora da comparabilidade do scoring.
+Reason: Track 1 restricts the selection to `ALLOWED_MODELS`, while the Fireworks documentation states that fine-tuned LoRA models can only be deployed in on-demand dedicated deployments, not in Serverless. A LoRA in live merge or multi-LoRA changes the `model` to a fine-tuned/deployment ID, potentially outside the allowed list and outside the comparability of the scoring.
 
-Portanto:
+Therefore:
 
-- caminho principal: solvers locais + matriz/Nash + modelos Fireworks permitidos;
-- fine-tuning do roteador: permitido e compativel com o scoring, desde que a saida final continue respeitando accuracy e Fireworks token count;
-- caminho LoRA como modelo de resposta: pesquisa/calibracao opcional, atras de feature flag, nunca default;
-- uso competitivo: somente se o guia oficial ou harness expuser um LoRA/fine-tuned model em `ALLOWED_MODELS`.
+- main path: local solvers + matrix/Nash + allowed Fireworks models;
+- router fine-tuning: allowed and compatible with scoring, as long as the final output continues to respect accuracy and Fireworks token count;
+- LoRA path as a response model: optional research/calibration, behind a feature flag, never default;
+- competitive use: only if the official guide or harness exposes a LoRA/fine-tuned model in `ALLOWED_MODELS`.
 
-## Distincao importante
+## Important Distinction
 
-O texto oficial permite fine-tunar o roteador. Isso e diferente de trocar o modelo de resposta por um LoRA Fireworks fora do conjunto permitido.
+The official text allows fine-tuning the router. This is different from replacing the response model with a Fireworks LoRA outside the allowed set.
 
-Seguro e alinhado:
+Safe and aligned:
 
-- treinar uma regressao/matriz local para escolher o menor modelo suficiente;
-- fine-tunar um classificador local que decide `local_solver`, `cheap_fireworks`, `strong_fireworks` ou `abstain`;
-- calibrar thresholds de risco com dados de microbench;
-- usar o fine-tuned router para reduzir chamadas Fireworks sem mudar os modelos finais permitidos.
+- train a local regression/matrix to choose the smallest sufficient model;
+- fine-tune a local classifier that decides `local_solver`, `cheap_fireworks`, `strong_fireworks`, or `abstain`;
+- calibrate risk thresholds with microbench data;
+- use the fine-tuned router to reduce Fireworks calls without changing the final allowed models.
 
-Condicionado ao harness:
+Conditioned on the harness:
 
-- chamar um fine-tuned Fireworks model como resposta final;
-- usar multi-LoRA com `model="<fine_tuned_model>#<deployment>"`;
-- substituir `minimax-m3`, `kimi-k2p7-code` ou Gemma permitido por um deployment proprio.
+- call a fine-tuned Fireworks model as a final response;
+- use multi-LoRA with `model="<fine_tuned_model>#<deployment>"`;
+- replace `minimax-m3`, `kimi-k2p7-code`, or allowed Gemma with an own deployment.
 
-Regra pratica: fine-tunar a decisao de roteamento e bom; fine-tunar o modelo respondedor so entra se o avaliador aceitar esse endpoint/model ID.
+Rule of thumb: fine-tuning the routing decision is good; fine-tuning the responding model is only included if the evaluator accepts that endpoint/model ID.
 
-## O que a documentacao oficial diz
+## What the Official Documentation Says
 
-Fontes:
+Sources:
 
 - Fireworks Managed Fine-Tuning Overview: https://docs.fireworks.ai/fine-tuning/managed-finetuning-intro
 - Fireworks Deploying Fine Tuned Models: https://docs.fireworks.ai/fine-tuning/deploying-loras
 - Fireworks Understanding LoRA Performance: https://docs.fireworks.ai/guides/understanding_lora_performance
 - Fireworks Model Library: https://app.fireworks.ai/models
 
-Pontos relevantes:
+Relevant points:
 
-- Managed fine-tuning suporta familias abertas importantes, incluindo Gemma, Kimi, DeepSeek, Qwen, GLM e Llama, quando o base model tem training shape compativel.
-- Gemma `gemma-4-26b-a4b-it` e `gemma-4-31b-it` aparecem na tabela de fine-tuning com contexto maximo de `256K`.
-- LoRA e recomendado quando queremos adapter training eficiente e flexibilidade para servir multiplos adapters.
-- Full-parameter tuning e indicado quando a tarefa exige alterar todos os pesos para raciocinio, alinhamento ou adaptacao de dominio dificil.
-- LoRA fine-tuned models so podem ser deployed em on-demand dedicated deployments; Fireworks afirma que Serverless nao suporta LoRA.
-- Fireworks oferece dois modos de deploy LoRA: live merge e multi-LoRA.
-- Live merge funde os pesos LoRA no deploy, removendo overhead de inferencia e igualando comportamento de um fine-tune nativo.
-- Multi-LoRA permite varios adapters em um unico deployment, mas adiciona overhead por request.
-- Para multi-LoRA, o request deve usar `model="<fine_tuned_model>#<deployment>"`; a chave antiga `deployedModel` esta depreciada.
-- FP8/FP4 quantized shapes nao suportam `--enable-addons`; LoRA addon requer BF16 ou merge.
-- LoRA unmerged pode aumentar TTFT em torno de `10-30%` e reduzir throughput sob concorrencia.
+- Managed fine-tuning supports major open families, including Gemma, Kimi, DeepSeek, Qwen, GLM, and Llama, when the base model has a compatible training shape.
+- Gemma `gemma-4-26b-a4b-it` and `gemma-4-31b-it` appear in the fine-tuning table with a maximum context of `256K`.
+- LoRA is recommended when we want efficient adapter training and flexibility to serve multiple adapters.
+- Full-parameter tuning is suitable when the task requires altering all weights for reasoning, alignment, or difficult domain adaptation.
+- Fine-tuned LoRA models can only be deployed in on-demand dedicated deployments; Fireworks states that Serverless does not support LoRA.
+- Fireworks offers two LoRA deployment modes: live merge and multi-LoRA.
+- Live merge fuses the LoRA weights at deployment, removing inference overhead and matching the behavior of a native fine-tune.
+- Multi-LoRA allows multiple adapters on a single deployment, but adds per-request overhead.
+- For multi-LoRA, the request must use `model="<fine_tuned_model>#<deployment>"`; the old `deployedModel` key is deprecated.
+- FP8/FP4 quantized shapes do not support `--enable-addons`; LoRA addon requires BF16 or merge.
+- Unmerged LoRA can increase TTFT by around `10-30%` and reduce throughput under concurrency.
 
-## Fit com Track 1
+## Fit with Track 1
 
-Track 1 premia menor token count depois do accuracy gate. Fine-tuning do roteador pode reduzir tokens se ele evita chamadas ou escolhe modelos menores com seguranca. Fine-tuning do modelo respondedor pode melhorar accuracy de um modelo pequeno, mas nao reduz tokens automaticamente:
+Track 1 rewards a lower token count after the accuracy gate. Fine-tuning the router can reduce tokens if it avoids calls or safely chooses smaller models. Fine-tuning the responding model can improve the accuracy of a small model, but does not automatically reduce tokens:
 
-- os tokens Fireworks continuam contando se a inferencia passa por `FIREWORKS_BASE_URL`;
-- se o LoRA exigir deployment proprio, ele pode sair do conjunto oficial de modelos permitidos;
-- se a resposta local ja cobre subcasos mecanicos com zero token, LoRA compete contra uma opcao melhor: nao chamar Fireworks;
-- se o problema e roteamento, um modelo fine-tuned ainda precisa receber prompt e produzir resposta, entao pode gastar mais token do que uma regra/solver local.
+- Fireworks tokens still count if inference goes through `FIREWORKS_BASE_URL`;
+- if the LoRA requires its own deployment, it may fall outside the official set of allowed models;
+- if the local response already covers mechanical subcases with zero tokens, LoRA competes against a better option: not calling Fireworks;
+- if the problem is routing, a fine-tuned model still needs to receive a prompt and produce a response, so it may use more tokens than a local rule/solver.
 
-Conclusao: LoRA so faria sentido para a faixa residual de tarefas que:
+Conclusion: LoRA would only make sense for the residual range of tasks that:
 
-- nao sao mecanicamente resolviveis;
-- aparecem com padrao repetido no avaliador;
-- hoje exigem modelo caro para passar accuracy;
-- podem ser respondidas por um modelo menor/fine-tuned com menos tokens;
-- e sao aceitas pelo harness como modelo permitido.
+- are not mechanically solvable;
+- appear with a repeated pattern in the evaluator;
+- currently require an expensive model to pass accuracy;
+- can be answered by a smaller/fine-tuned model with fewer tokens;
+- and are accepted by the harness as an allowed model.
 
-## Usos seguros agora
+## Safe Uses Now
 
-Sem depender de aceitacao oficial:
+Without depending on official acceptance:
 
-- estudar a Model Library para ver quais modelos permitidos sao tunable/deployable;
-- preparar um dataset SFT de roteamento/format-following a partir dos microbenches locais;
-- usar LoRA apenas como laboratorio para medir se Gemma/Minimax/Kimi melhora em formato estrito;
-- nao publicar imagem final apontando para LoRA;
-- nao alterar `ALLOWED_MODELS` para ID fine-tuned no caminho de submissao.
+- study the Model Library to see which allowed models are tunable/deployable;
+- prepare a routing/format-following SFT dataset from local microbenches;
+- use LoRA only as a lab sandbox to measure if Gemma/Minimax/Kimi improves in strict formatting;
+- do not publish a final image pointing to LoRA;
+- do not change `ALLOWED_MODELS` to a fine-tuned ID in the submission path.
 
-## Feature flag proposta
+## Proposed Feature Flag
 
-Se o regulamento liberar fine-tuned deployments, implementar atras destas variaveis:
+If the regulations release fine-tuned deployments, implement behind these variables:
 
 ```bash
 ENABLE_FIREWORKS_LORA=0
@@ -95,34 +95,34 @@ FIREWORKS_LORA_DEPLOYMENT=
 FIREWORKS_LORA_MODE=disabled  # disabled|live_merge|multi_lora
 ```
 
-Regras:
+Rules:
 
-- default sempre `disabled`;
-- falhar fechado se `FIREWORKS_LORA_MODEL` nao estiver em `ALLOWED_MODELS` ou se `ALLOW_UNLISTED_LORA=1` nao estiver explicitamente definido para laboratorio;
-- registrar em metadata quando LoRA for usado;
-- separar custo/latencia/validade de LoRA nos relatórios para nao contaminar matriz oficial.
+- default always `disabled`;
+- fail closed if `FIREWORKS_LORA_MODEL` is not in `ALLOWED_MODELS` or if `ALLOW_UNLISTED_LORA=1` is not explicitly defined for lab testing;
+- record in metadata when LoRA is used;
+- separate LoRA cost/latency/validacy in reports so as not to contaminate the official matrix.
 
-## Experimento minimo se liberarem
+## Minimal Experiment if Released
 
-1. Criar dataset de SFT com entradas do tipo `prompt -> answer` apenas para formato estrito e categorias onde Fireworks falha por wrappers/extraneous prose.
-2. Treinar LoRA curto em um base permitido, preferencialmente Gemma se o bonus Gemma continuar relevante.
-3. Deploy live merge, nao multi-LoRA, se houver apenas um adapter; isso evita overhead.
-4. Rodar `scripts/fireworks_microbench.py` no mesmo dataset dos modelos permitidos.
-5. Aceitar LoRA apenas se passar estes gates:
+1. Create an SFT dataset with inputs of type `prompt -> answer` only for strict format and categories where Fireworks fails due to wrappers/extraneous prose.
+2. Train a short LoRA on an allowed base, preferably Gemma if the Gemma bonus remains relevant.
+3. Deploy live merge, not multi-LoRA, if there is only one adapter; this avoids overhead.
+4. Run `scripts/fireworks_microbench.py` on the same dataset as the allowed models.
+5. Accept LoRA only if it passes these gates:
 
-- validade mecanica maior ou igual ao melhor modelo permitido;
-- tokens totais menores que o melhor modelo permitido na mesma categoria;
-- latencia dentro do budget oficial;
-- ID aceito pelo harness ou explicitamente listado em `ALLOWED_MODELS`;
-- auditoria de submissao documenta o risco regulatorio.
+- mechanical validity greater than or equal to the best allowed model;
+- total tokens fewer than the best allowed model in the same category;
+- latency within the official budget;
+- ID accepted by the harness or explicitly listed in `ALLOWED_MODELS`;
+- submission audit documents the regulatory risk.
 
-## Decisao atual
+## Current Decision
 
-Nao implementar LoRA no runtime principal agora.
+Do not implement LoRA in the main runtime for now.
 
-Melhor retorno competitivo imediato:
+Best immediate competitive return:
 
-- ampliar gates adversariais zero-token;
-- manter Gemma no projeto via modelos permitidos/local AMD quando acessivel;
-- usar Fireworks allowed models como fallback controlado por matriz/regressao/Nash;
-- gastar credito apenas em microbench que melhora pesos de roteamento ou revela falhas de solvers/formatos.
+- expand zero-token adversarial gates;
+- keep Gemma in the project via allowed models/local AMD when accessible;
+- use Fireworks allowed models as a fallback controlled by matrix/regression/Nash;
+- spend credit only on microbenches that improve routing weights or reveal solver/format failures..

@@ -1,81 +1,81 @@
 # Sprint 32 - Public Demo Deploy And Strict Readiness
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credits.
 
-## Objetivo
+## Objective
 
-Publicar a demo estatica em uma URL real, fechar os campos publicos de submissao que nao dependem de AMD/Fireworks e transformar o modo `--strict` em um gate confiavel de pre-submissao.
+Publish the static demo to a real URL, close the public submission fields that do not depend on AMD/Fireworks, and turn the `--strict` mode into a reliable pre-submission gate.
 
-## Por que importa
+## Why It Matters
 
-O projeto ja tem `demo-site/`, reports publicos, CI verde e artefatos finais. Ainda assim, a submissao lablab pede uma experiencia acessivel por URL. Sem uma URL publica testada, a demonstracao continua local demais para jurados e mentores.
+The project already has `demo-site/`, public reports, green CI, and final artifacts. Still, the lablab submission asks for an experience accessible by URL. Without a tested public URL, the demo remains too local for judges and mentors.
 
-## Tese
+## Thesis
 
-O runner competitivo continua CLI-first. A demo publica e apenas a camada de explicacao, reproducao e evidencia.
+The competitive runner remains CLI-first. The public demo is just the layer of explanation, reproduction, and evidence.
 
-## Entregaveis
+## Deliverables
 
-- Workflow ou runbook de GitHub Pages para publicar `demo-site/`.
+- Workflow or runbook of GitHub Pages to publish `demo-site/`.
 - `docs/DEMO_DEPLOYMENT.md`.
-- Atualizacao de `submission/final/submission-status.json`.
-- Atualizacao de `submission/final-checklist.md`.
-- Teste/check que valida links internos da demo.
+- Update of `submission/final/submission-status.json`.
+- Update of `submission/final-checklist.md`.
+- Test/check that validates internal links of the demo.
 - `scripts/check_demo_site.py`.
-- Relatorio `reports/generated/demo-site-check.md`.
+- Report `reports/generated/demo-site-check.md`.
 
 ## Checklist
 
-- [x] Decidir caminho de deploy: GitHub Pages via Actions ou Pages manual.
-- [x] Criar `docs/DEMO_DEPLOYMENT.md`.
-- [x] Criar `scripts/check_demo_site.py`.
-- [x] Validar que `demo-site/index.html` referencia apenas assets publicaveis.
-- [x] Validar links para `public-reports/*.md`.
-- [x] Validar links para README e SUBMISSION no GitHub.
-- [x] Validar ausencia de secrets, IPs privados e paths locais na demo.
-- [x] Publicar URL HTTPS da demo.
-- [x] Atualizar `submission/final/submission-status.json` com `demo_url`.
-- [x] Atualizar `ci_status` automaticamente ou por comando documentado.
-- [x] Fazer `python3 scripts/submission_readiness_check.py --strict` falhar apenas por video real, se o placeholder continuar aprovado.
-- [x] Integrar check da demo ao `offline_release_check.sh` sem depender da URL externa.
+- [x] Decide deployment path: GitHub Pages via Actions or manual Pages.
+- [x] Create `docs/DEMO_DEPLOYMENT.md`.
+- [x] Create `scripts/check_demo_site.py`.
+- [x] Validate that `demo-site/index.html` references only publishable assets.
+- [x] Validate links to `public-reports/*.md`.
+- [x] Validate links to README and SUBMISSION on GitHub.
+- [x] Validate absence of secrets, private IPs, and local paths in the demo.
+- [x] Publish HTTPS URL of the demo.
+- [x] Update `submission/final/submission-status.json` with `demo_url`.
+- [x] Update `ci_status` automatically or by documented command.
+- [x] Make `python3 scripts/submission_readiness_check.py --strict` fail only for real video, if the placeholder remains approved.
+- [x] Integrate demo check into `offline_release_check.sh` without depending on the external URL.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- Existe uma URL HTTPS para a demo.
-- A demo abre sem backend, login ou creditos.
-- Links internos e public reports passam em check local.
-- O strict readiness nao falha mais por `demo_url`.
-- O deploy nao vira dependencia do evaluator tecnico.
+- There is an HTTPS URL for the demo.
+- The demo opens without backend, login, or credits.
+- Internal links and public reports pass local check.
+- Strict readiness no longer fails for `demo_url`.
+- Deployment does not become a dependency of the technical evaluator.
 
-## Metricas
+## Metrics
 
-- Links internos validos.
-- Tamanho total publicavel de `demo-site/`.
-- Numero de problemas de sanitizacao.
-- Status strict antes/depois.
+- Valid internal links.
+- Total publishable size of `demo-site/`.
+- Number of sanitization issues.
+- Strict status before/after.
 
-## Comandos esperados
+## Expected Commands
 
 ```bash
 python3 scripts/check_demo_site.py --check --report reports/generated/demo-site-check.md
 python3 scripts/submission_readiness_check.py --strict
 ```
 
-## Riscos
+## Risks
 
-- Publicar a demo com links quebrados.
-- Confundir demo visual com runtime competitivo.
-- Marcar `ci_status=green` manualmente e esquecer de validar o commit atual.
+- Publishing the demo with broken links.
+- Confusing visual demo with competitive runtime.
+- Marking `ci_status=green` manually and forgetting to validate the current commit.
 
-## Decisao
+## Decision
 
-O deploy deve ser estatico, barato e reversivel. Se exigir backend, auth, banco de dados ou segredo, sai do escopo.
+The deploy must be static, cheap, and reversible. If it requires backend, auth, database, or secrets, it is out of scope.
 
 ## Definition of Done
 
-- Demo publicada em URL HTTPS.
-- Strict readiness atualizado.
-- Check local da demo existe.
-- Checklist final reflete estado real de submissao.
+- Demo published to HTTPS URL.
+- Strict readiness updated.
+- Local demo check exists.
+- Final checklist reflects real submission state.

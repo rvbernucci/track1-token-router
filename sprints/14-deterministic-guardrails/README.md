@@ -1,47 +1,47 @@
 # Sprint 14 - Deterministic Guardrails
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credits.
 
-## Objetivo
+## Objective
 
-Adicionar uma camada deterministica opcional antes da cascata para resolver ou bloquear casos obvios sem chamar LLM local ou remota.
+Add an optional deterministic layer before the cascade to resolve or block obvious cases without calling local or remote LLMs.
 
-## Entregaveis
+## Deliverables
 
-- Modulo `router/core/guardrails.py`.
-- Regras deterministicas seguras.
-- Wrapper de runner com guardrails.
+- Module `router/core/guardrails.py`.
+- Safe deterministic rules.
+- Runner wrapper with guardrails.
 - Config `ENABLE_GUARDRAILS`.
-- Testes de cada regra.
-- Logs indicando rota deterministica.
+- Tests for each rule.
+- Logs indicating deterministic routing.
 
 ## Checklist
 
-- [x] Detectar input vazio.
-- [x] Detectar saudacoes simples.
-- [x] Detectar contas triviais de soma/subtracao seguras.
-- [x] Detectar pedido de eco literal.
-- [x] Nao resolver matematica complexa.
-- [x] Criar `GuardedRunner`.
-- [x] Adicionar config `ENABLE_GUARDRAILS`.
-- [x] Integrar sem quebrar modos existentes.
-- [x] Adicionar testes.
-- [x] Documentar limites.
+- [x] Detect empty input.
+- [x] Detect simple greetings.
+- [x] Detect simple, safe addition/subtraction calculations.
+- [x] Detect literal echo requests.
+- [x] Do not solve complex mathematics.
+- [x] Create `GuardedRunner`.
+- [x] Add config `ENABLE_GUARDRAILS`.
+- [x] Integrate without breaking existing modes.
+- [x] Add tests.
+- [x] Document limitations.
 
-## Criterios de aceite
+## Acceptance criteria
 
-- Guardrails podem ser ligados/desligados por env var.
-- Casos deterministiscos saem sem chamada de modelo.
-- Casos complexos passam para o runner normal.
-- Testes provam que a camada e conservadora.
+- Guardrails can be turned on/off via environment variables.
+- Deterministic cases resolve without model calls.
+- Complex cases fall back to the normal runner.
+- Tests prove that the layer is conservative.
 
-## Saida esperada
+## Expected output
 
-Economia local/remota em tarefas triviais, sem transformar regex em motor de raciocinio.
+Local/remote savings on trivial tasks, without turning regex into a reasoning engine.
 
-## Evidencia local
+## Local evidence
 
 ```bash
 python3 -m unittest tests.test_guardrails
@@ -49,8 +49,8 @@ ENABLE_GUARDRAILS=1 python3 -m router ask "What is 12 - 5? Return only the numbe
 scripts/offline_release_check.sh
 ```
 
-## Limites
+## Limitations
 
-- Nao resolve multiplicacao, divisao, porcentagem, algebra, datas ou problemas de palavras.
-- Nao tenta julgar dificuldade ampla.
-- Na arquitetura atual, `sub_intent`, `deterministic_fit` e a regressao tornam o solver candidato; ele ainda precisa aceitar o input original.
+- Does not solve multiplication, division, percentage, algebra, dates, or word problems.
+- Does not attempt to judge broad difficulty.
+- In the current architecture, `sub_intent`, `deterministic_fit`, and regression make the solver a candidate; it must still accept the original input.

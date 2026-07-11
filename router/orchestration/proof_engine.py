@@ -457,7 +457,12 @@ def _solve_ordering(task: TaskEnvelope) -> ProofSolveResult | None:
         r"\b([A-Z][A-Za-z-]*)\s+is\s+(older|younger|taller|shorter|heavier|lighter)\s+than\s+([A-Z][A-Za-z-]*)\b",
         text,
     )
-    query = re.search(r"(?i)who is (?:the )?(oldest|youngest|tallest|shortest|heaviest|lightest)\?", text)
+    query = re.search(
+        r"(?i)(?:who\s+is|identify)\s+(?:the\s+)?"
+        r"(oldest|youngest|tallest|shortest|heaviest|lightest)"
+        r"(?:\s+(?:person|brother|sister|sibling|participant|individual|one))?\s*[?.]",
+        text,
+    )
     if not comparisons or query is None:
         return None
     entities = sorted({item for left, _, right in comparisons for item in (left, right)})

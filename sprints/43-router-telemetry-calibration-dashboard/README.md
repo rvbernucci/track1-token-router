@@ -1,37 +1,37 @@
 # Sprint 43 - Router Telemetry Calibration Dashboard
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credits.
 
-## Objetivo
+## Objective
 
-Expor telemetria operacional do Pareto/Game Theory em relatorios e JSONL para calibracao: cada decisao deve revelar custo estimado, correlacao, payoff, label estrategico e motivo de escolha.
+Expose operational telemetry of Pareto/Game Theory in reports and JSONL for calibration: each decision must reveal estimated cost, correlation, payoff, strategic label, and reason for choice.
 
-## Tese
+## Thesis
 
-Sem telemetria, nao existe calibracao. O roteador precisa deixar rastros compactos, seguros e comparaveis entre runs.
+Without telemetry, there is no calibration. The router needs to leave compact, secure, and comparable traces between runs.
 
-## Entregaveis
+## Deliverables
 
-- Trace JSONL com campos de `game_theory`.
-- Extensao de `router/analytics/traces.py` para decisao Fireworks.
-- Relatorio `reports/generated/router-game-theory-dashboard.md`.
-- Redaction de payloads sensiveis.
-- Testes de schema de telemetria.
+- JSONL trace with `game_theory` fields.
+- Extension of `router/analytics/traces.py` for Fireworks decisions.
+- Report `reports/generated/router-game-theory-dashboard.md`.
+- Redaction of sensitive payloads.
+- Telemetry schema tests.
 
 ## Checklist
 
-- [ ] Definir schema minimo de telemetria por task.
-- [ ] Registrar `selected_model`, `domain`, `tier`, `nash_product`, `prisoner_payoff`, `game_label`.
-- [ ] Registrar top 3 candidatos por score sem expor input completo.
-- [ ] Agregar metricas por dominio/tier/modelo.
-- [ ] Agregar contagem de labels: cooperate, defect, dominated, auxiliary.
-- [ ] Gerar dashboard Markdown offline.
-- [ ] Adicionar teste contra vazamento de segredo.
-- [ ] Adicionar teste de compatibilidade com logs existentes.
+- [ ] Define minimal telemetry schema per task.
+- [ ] Record `selected_model`, `domain`, `tier`, `nash_product`, `prisoner_payoff`, `game_label`.
+- [ ] Record top 3 candidates by score without exposing complete input.
+- [ ] Aggregate metrics by domain/tier/model.
+- [ ] Aggregate label counts: cooperate, defect, dominated, auxiliary.
+- [ ] Generate offline Markdown dashboard.
+- [ ] Add test against secret leaking.
+- [ ] Add test of compatibility with existing logs.
 
-## Metricas
+## Metrics
 
 - selected model distribution;
 - average estimated cost;
@@ -44,13 +44,13 @@ Sem telemetria, nao existe calibracao. O roteador precisa deixar rastros compact
 
 ## Definition Of Done
 
-- Qualquer run offline gera dashboard auditavel.
-- O dashboard explica por que os modelos foram chamados.
-- Logs nao vazam segredo nem payload longo.
-- `scripts/offline_release_check.sh` continua passando.
+- Any offline run generates an auditable dashboard.
+- The dashboard explains why models were called.
+- Logs do not leak secrets or long payloads.
+- `scripts/offline_release_check.sh` continues passing.
 
-## Anti-Escopo
+## Out of Scope
 
-- Nao criar UI web.
-- Nao logar respostas completas por padrao.
-- Nao adicionar dependencia pesada de dashboard.
+- Do not create web UI.
+- Do not log full responses by default.
+- Do not add heavy dashboard dependencies.

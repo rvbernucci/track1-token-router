@@ -1,98 +1,99 @@
-# Sprint 31 - Policy Pareto And Decision Replay
+# Sprint 31 - Policy Pareto & Decision Replay
 
-## Tipo
+## Type
 
-Nao depende de credito.
+Does not depend on credit.
 
-## Objetivo
+## Objective
 
-Criar ferramentas offline para explorar a fronteira de Pareto das politicas de roteamento e gerar replays legiveis de decisoes individuais.
+Create offline tools to explore the Pareto frontier of routing policies and generate readable replays of individual decisions.
 
-## Por que importa
+## Why It Matters
 
-O projeto precisa justificar por que a politica default e boa. Alem disso, a demo e o pitch ficam muito mais fortes quando conseguimos mostrar uma decisao real passo a passo.
+The project needs to justify why the default policy is good. Moreover, the demo and the pitch become much stronger when we can show a real decision step-by-step.
 
-## Tese
+## Thesis
 
-O melhor argumento tecnico nao e "temos uma cascata". E "esta decisao economizou tokens sem sacrificar formato, budget ou confianca".
+The best technical argument is not "we have a cascade". It is "this decision saved tokens without sacrificing format, budget, or confidence".
 
-## Entregaveis
+## Deliverables
 
 - `scripts/optimize_policy.py`.
 - `scripts/replay_decision.py`.
 - `reports/generated/policy-pareto.md`.
 - `reports/generated/decision-replay.md`.
-- Perfil default recomendado e justificativa.
-- Atualizacao do video script com exemplos reais.
-- Testes de replay e optimizer.
+- Recommended default profile and justification.
+- Update of the video script with real examples.
+- Replay and optimizer tests.
 
 ## Checklist
 
-- [x] Varrer `repair_threshold`.
-- [x] Varrer `remote_threshold`.
-- [x] Varrer `low_budget_deny_threshold`.
-- [x] Comparar exact-match proxy.
-- [x] Comparar packet tokens estimados.
-- [x] Comparar taxa de escalacao.
-- [x] Comparar budget violations.
-- [x] Gerar tabela Pareto.
-- [x] Marcar politicas dominadas.
-- [x] Sugerir perfil default.
-- [x] Criar `replay_decision.py --text`.
-- [x] Replay mostra guardrail/solver.
-- [x] Replay mostra risk signals.
-- [x] Replay mostra budget decision.
-- [x] Replay mostra policy decision.
-- [x] Replay mostra final validator.
-- [x] Replay mostra resposta final.
-- [x] Atualizar `submission/video-script.md` com exemplos reais.
+- [x] Sweep `repair_threshold`.
+- [x] Sweep `remote_threshold`.
+- [x] Sweep `low_budget_deny_threshold`.
+- [x] Compare exact-match proxy.
+- [x] Compare estimated packet tokens.
+- [x] Compare escalation rate.
+- [x] Compare budget violations.
+- [x] Generate Pareto table.
+- [x] Mark dominated policies.
+- [x] Suggest default profile.
+- [x] Create `replay_decision.py --text`.
+- [x] Replay shows guardrail/solver.
+- [x] Replay shows risk signals.
+- [x] Replay shows budget decision.
+- [x] Replay shows policy decision.
+- [x] Replay shows final validator.
+- [x] Replay shows final response.
+- [x] Update `submission/video-script.md` with real examples.
 
-## Criterios de aceite
+## Acceptance Criteria
 
-- `optimize_policy.py` roda sem modelo real.
-- Relatorio Pareto diferencia politicas dominadas e candidatas.
-- `replay_decision.py` gera Markdown util para demo.
-- O perfil default continua documentado como decisao, nao chute.
-- O video script ganha pelo menos dois exemplos concretos.
+- `optimize_policy.py` runs without a real model.
+- Pareto report differentiates dominated and candidate policies.
+- `replay_decision.py` generates Markdown useful for a demo.
+- The default profile remains documented as a decision, not a guess.
+- The video script gains at least two concrete examples.
 
-## Metricas
+## Metrics
 
-- Exact match proxy por perfil.
-- Remote packet tokens por perfil.
-- Escalation rate por perfil.
-- Budget violations por perfil.
-- Numero de politicas dominadas.
+- Exact match proxy per profile.
+- Remote packet tokens per profile.
+- Escalation rate per profile.
+- Budget violations per profile.
+- Number of dominated policies.
 
-## Comandos esperados
+## Expected Commands
 
 ```bash
 python3 scripts/optimize_policy.py --report reports/generated/policy-pareto.md
 python3 scripts/replay_decision.py --text "What is 6 * 7? Return only the number." --report reports/generated/decision-replay.md
 ```
 
-## Riscos
+## Risks
 
-- Superotimizar para o dataset offline.
-- Confundir proxy de exact match com scoring oficial.
-- Escolher perfil agressivo demais por economia aparente.
+- Over-optimizing for the offline dataset.
+- Confusing the exact match proxy with official scoring.
+- Choosing a profile that is too aggressive for apparent savings.
 
-## Decisao
+## Decision
 
-O optimizer informa, mas nao substitui julgamento humano. A politica final deve considerar accuracy, token exposure, latencia e robustez contra formato desconhecido.
+The optimizer informs, but does not replace human judgment. The final policy must consider accuracy, token exposure, latency, and robustness against unknown formats.
 
 ## Definition of Done
 
-- Pareto report existe.
-- Decision replay existe.
-- Perfil default tem justificativa.
-- Video script referencia replays reais.
-- Battle drill continua sendo a porteira principal.
+- Pareto report exists.
+- Decision replay exists.
+- Default profile has a justification.
+- Video script references real replays.
+- Battle drill remains the main gatekeeper.
 
-## Evidencias
+## Evidence
 
-- `scripts/optimize_policy.py --check` varre thresholds e gera `reports/generated/policy-pareto.md`.
-- Optimizer recomenda `repair=3;remote=5;low_budget=0.05`, preservando o default atual quando ele empata na melhor superficie Pareto.
-- `scripts/replay_decision.py --text "What is 6 * 7? Return only the number."` gera replay Markdown com solver, risk signals, budget, policy e final validator.
-- `tests/test_policy_optimizer_replay.py` cobre recomendacao Pareto e replay de decisao.
-- `submission/video-script.md` referencia replays concretos para solver zero-token e pergunta de conhecimento atual.
-- `scripts/offline_release_check.sh` executa optimizer e replay antes do battle drill.
+- `docs/EVALUATOR_ASSUMPTIONS.md` documents hypotheses, impact, mitigation, tests, and kickoff questions.
+- `docs/KICKOFF_ADAPTER_DRILL.md` defines the adaptation procedure in under 30 minutes.
+- `fixtures/adapter-drill/` contains `scoring_text_batch`, `scoring_json_envelope`, and `scoring_file_bundle`.
+- `router/adapters/official/` contains experimental adapters for the three formats.
+- `scripts/adapter_drill.py --check` generates `reports/generated/adapter-drill-report.md`.
+- `tests/test_official_adapters.py` covers parse and format of the three formats.
+- `scripts/offline_release_check.sh` runs the drill before the battle drill.
