@@ -1,0 +1,57 @@
+{
+  "schema_version": "full-local-exact-image-smoke-v1",
+  "passed": true,
+  "image": "ghcr.io/rvbernucci/track1-token-router:v3.2.0-full-hybrid",
+  "platform": "linux/amd64",
+  "workflow_run": {
+    "id": 29157770736,
+    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29157770736",
+    "conclusion": "success",
+    "head_sha": "1068ebd3e789d4f68bbdda61ed7ea267a5a82994"
+  },
+  "limits": {
+    "memory": "4g",
+    "cpus": "2",
+    "network": "none"
+  },
+  "metrics": {
+    "cold_seconds": 12.56,
+    "warm_seconds": 2.627,
+    "wall_seconds": 15.641,
+    "sampled_peak_memory_mib": 728.1
+  },
+  "model_sha256": {
+    "functiongemma": "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77",
+    "e2b": "181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c"
+  },
+  "probes": [
+    {
+      "task_id": "sprint60-cold",
+      "answer": "positive",
+      "route": "e2b_local",
+      "fireworks_prompt_tokens": 0,
+      "fireworks_completion_tokens": 0
+    },
+    {
+      "task_id": "sprint60-warm",
+      "answer": "negative",
+      "route": "e2b_local",
+      "fireworks_prompt_tokens": 0,
+      "fireworks_completion_tokens": 0
+    }
+  ],
+  "checks": {
+    "container_exit_zero": true,
+    "model_hashes": true,
+    "network_disabled": true,
+    "not_oom_killed": true,
+    "official_output_contract": true,
+    "peak_memory_at_most_3584_mib": true,
+    "platform_linux_amd64": true,
+    "two_local_routes": true,
+    "cold_at_most_120_seconds": true,
+    "warm_at_most_30_seconds": true,
+    "zero_fireworks_tokens": true
+  },
+  "source_artifact_sha256": "f3e8d34d0fee604ada0da87ea620708c5a4237fbb51e17b627acf5804ddde7ab"
+}
