@@ -75,13 +75,17 @@ class PublicReportExportTests(unittest.TestCase):
     def test_static_demo_links_to_public_reports_and_reproduction_commands(self) -> None:
         content = Path("demo-site/index.html").read_text(encoding="utf-8")
 
-        self.assertIn("public-reports/battle-report.md", content)
+        self.assertIn("reports/public/final-hybrid-scorecard.md", content)
+        self.assertIn("reports/public/final-pareto-calibration.md", content)
         self.assertIn("public-reports/fuzz-report.md", content)
-        self.assertIn("public-reports/submission-readiness.md", content)
+        self.assertIn("submission/final/final-release-decision.json", content)
         self.assertIn("README.md", content)
         self.assertIn("SUBMISSION.md", content)
         self.assertIn("FunctionGemma", content)
-        self.assertIn("python3 -m http.server 8080", content)
+        self.assertIn("docker pull --platform linux/amd64", content)
+        self.assertIn("docker run --rm --platform linux/amd64", content)
+        self.assertIn("v3.3.0-full-hybrid", content)
+        self.assertIn("cat output/results.json", content)
         self.assertIn("solver_arithmetic", content)
 
 

@@ -1,0 +1,40 @@
+name: Sprint 65 E2B Boundary Audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  boundary-audit:
+    runs-on: [self-hosted, Linux, X64, track1-builder-stable]
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate and test corpus
+        run: |
+          python3 scripts/generate_e2b_boundary_corpus.py
+          python3 -m unittest tests.test_generate_e2b_boundary_corpus tests.test_run_e2b_boundary_audit
+      - name: Pull exact final image
+        run: docker pull --platform linux/amd64 ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid
+      - name: Run real local boundary audit
+        run: |
+          docker run --rm --platform linux/amd64 --memory=4g --cpus=2 --network=none \
+            --entrypoint python -v "$PWD:/workspace" -w /workspace \
+            ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid \
+            scripts/run_e2b_boundary_audit.py --start-local --threshold 0.75 --check --json
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sprint65-e2b-boundary-evidence
+          path: |
+            evals/e2b-boundary-v1
+            reports/generated/e2b-boundary-v1
+            reports/public/e2b-boundary-audit.md
+          if-no-files-found: error

@@ -1,0 +1,25 @@
+{
+  "category_counts": {
+    "code_debugging": 60,
+    "code_generation": 60,
+    "factual_qa": 60,
+    "logic_puzzle": 60,
+    "math_reasoning": 60,
+    "ner": 60,
+    "sentiment": 60,
+    "summarization": 60
+  },
+  "generator": "template combinatorics with gold fixed before inference",
+  "per_category": 60,
+  "policy": "sealed audit only; no fitting or threshold selection",
+  "rows": 480,
+  "schema_version": "e2b-boundary-corpus-v1",
+  "seed": 65065,
+  "split_counts": {
+    "calibration": 0,
+    "sealed": 480,
+    "train": 0
+  },
+  "tasks_sha256": "e0e4a2e92a9c7111ad3ac5b901ea585278af52b092770e97fad542e1157b5add",
+  "unique_prompt_hashes": true
+}
