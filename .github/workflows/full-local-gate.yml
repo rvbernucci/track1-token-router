@@ -1,0 +1,45 @@
+name: Full Local Exact-Image Gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Public linux/amd64 image to verify
+        required: true
+        default: ghcr.io/rvbernucci/track1-token-router:v3.0.0-full-local
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  exact-image-local-inference:
+    runs-on: [self-hosted, Linux, X64, track1-builder-stable]
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run gate unit tests
+        run: python -m unittest tests.test_full_local_image_gate tests.test_e2b_matrix_gate
+
+      - name: Prove real local inference in the exact public image
+        run: |
+          python scripts/full_local_image_gate.py \
+            --image "${{ inputs.image }}" \
+            --memory 4g \
+            --cpus 2 \
+            --network none \
+            --json
+
+      - name: Upload exact-image evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sprint60-exact-image-evidence
+          path: reports/generated/full-local
+          if-no-files-found: error
