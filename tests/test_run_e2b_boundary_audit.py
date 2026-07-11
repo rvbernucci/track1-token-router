@@ -14,5 +14,11 @@ class E2BBoundaryAuditTests(unittest.TestCase):
         self.assertGreater(_wilson(90,100),.80)
         self.assertLess(_wilson(90,100),.90)
 
+    def test_code_evaluator_ignores_formatting_and_docstrings_not_behavior(self):
+        spec = {"type": "exact_code", "expected": "def add(value):\n    return value + 2"}
+        with_docstring = 'def add(value):\n    """Add two."""\n    return value + 2'
+        self.assertTrue(_evaluate(spec, with_docstring))
+        self.assertFalse(_evaluate(spec, "def add(value):\n    return value - 2"))
+
 
 if __name__ == "__main__": unittest.main()

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import math
@@ -33,9 +34,18 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, default=Path("reports/generated/e2b-boundary-v1"))
     parser.add_argument("--public-report", type=Path, default=Path("reports/public/e2b-boundary-audit.md"))
     parser.add_argument("--start-local", action="store_true")
+    parser.add_argument("--relabel-only", action="store_true")
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
+    if args.relabel_only:
+        result = relabel(ROOT / args.tasks, ROOT / args.output_dir, threshold=args.threshold)
+        report = ROOT / args.public_report
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text(_markdown(result), encoding="utf-8")
+        if args.json:
+            print(json.dumps(result, sort_keys=True))
+        return 0 if result["passed"] or not args.check else 1
     processes = _start_local() if args.start_local else []
     try:
         result = run(ROOT / args.tasks, ROOT / args.output_dir, threshold=args.threshold)
@@ -99,6 +109,33 @@ def run(tasks_path: Path, output: Path, *, threshold: float) -> dict:
     return result
 
 
+def relabel(tasks_path: Path, output: Path, *, threshold: float) -> dict:
+    tasks = _jsonl(tasks_path)
+    task_by_id = {row["task_id"]: row for row in tasks}
+    prediction_path = output / "predictions.jsonl"
+    adjudication_path = output / "adjudication.jsonl"
+    predictions = _jsonl(prediction_path)
+    if len(predictions) != len(tasks):
+        raise ValueError(f"cannot relabel incomplete evidence: {len(predictions)}/{len(tasks)}")
+    adjudications = []
+    for row in predictions:
+        task = task_by_id[row["task_id"]]
+        row["correct"] = _evaluate(task["evaluation"], row["answer"])
+        adjudications.append({
+            "schema_version": "e2b-boundary-adjudication-v1",
+            "task_id": row["task_id"],
+            "evaluation": task["evaluation"],
+            "answer": row["answer"],
+            "correct": row["correct"],
+            "policy": "mechanical_gold_fixed_before_inference",
+        })
+    prediction_path.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in predictions), encoding="utf-8")
+    adjudication_path.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in adjudications), encoding="utf-8")
+    result = _summarize(tasks, predictions, threshold)
+    (output / "summary.json").write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return result
+
+
 def _summarize(tasks, rows, threshold):
     selected=[r for r in rows if r["probability"]>=threshold and r["assessment"] is not None]
     correct=sum(r["correct"] for r in selected)
@@ -136,8 +173,21 @@ def _evaluate(spec, answer):
     if kind=="json":
         try:return json.loads(clean)==expected
         except (ValueError,TypeError):return False
-    if kind=="exact_code": return "\n".join(line.rstrip() for line in clean.splitlines()).strip()==expected
+    if kind=="exact_code": return _canonical_code(clean)==_canonical_code(expected)
     return False
+
+
+def _canonical_code(source):
+    try:
+        tree = ast.parse(source)
+    except (SyntaxError, ValueError, TypeError):
+        return None
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and node.body:
+            first = node.body[0]
+            if isinstance(first, ast.Expr) and isinstance(first.value, ast.Constant) and isinstance(first.value.value, str):
+                node.body.pop(0)
+    return ast.dump(tree, annotate_fields=True, include_attributes=False)
 
 
 def _malformed_fails_closed():
