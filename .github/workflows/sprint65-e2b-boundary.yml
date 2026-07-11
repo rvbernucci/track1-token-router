@@ -28,6 +28,10 @@ jobs:
             --entrypoint python -v "$PWD:/workspace" -w /workspace \
             ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid \
             scripts/run_e2b_boundary_audit.py --start-local --threshold 0.75 --check --json
+      - name: Analyze sealed evidence
+        if: always()
+        run: |
+          python3 scripts/analyze_e2b_boundary_evidence.py --threshold 0.75 --check
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
