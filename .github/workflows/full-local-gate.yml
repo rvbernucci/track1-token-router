@@ -7,6 +7,11 @@ on:
         description: Public linux/amd64 image to verify
         required: true
         default: ghcr.io/rvbernucci/track1-token-router:v3.0.0-full-local
+      clean_pull:
+        description: Remove local image state and pull the public image again
+        required: true
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -29,11 +34,14 @@ jobs:
 
       - name: Prove real local inference in the exact public image
         run: |
+          pull_flag=""
+          if [[ "${{ inputs.clean_pull }}" != "true" ]]; then pull_flag="--skip-clean-pull"; fi
           python scripts/full_local_image_gate.py \
             --image "${{ inputs.image }}" \
             --memory 4g \
             --cpus 2 \
             --network none \
+            $pull_flag \
             --json
 
       - name: Upload exact-image evidence

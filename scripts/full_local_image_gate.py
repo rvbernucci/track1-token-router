@@ -105,6 +105,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             raise SystemExit(f"container failed with exit {process.returncode}: {stderr[-2000:]}")
         results = json.loads((output_dir / "results.json").read_text(encoding="utf-8"))
         logs = [json.loads(line) for line in (output_dir / "run.jsonl").read_text(encoding="utf-8").splitlines() if line]
+        (args.output_dir / "run.jsonl").write_text(
+            "".join(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in logs),
+            encoding="utf-8",
+        )
         report = _report(args, platform, hashes, started, finished, inspect, results, logs, samples)
         (args.output_dir / "exact-image-smoke.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         (args.output_dir / "process-memory.jsonl").write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in samples), encoding="utf-8")
@@ -156,6 +160,7 @@ def _report(args, platform, hashes, started, finished, inspect, results, logs, s
     warm_seconds = timestamps[1] - timestamps[0] if len(timestamps) > 1 else None
     routes = [row.get("route", "") for row in logs]
     remote = [row.get("remote_tokens", {}) for row in logs]
+    traces = [row.get("extra", {}).get("routing_trace", {}) for row in logs]
     result_contract = (
         isinstance(results, list) and len(results) == len(PROBES)
         and all(isinstance(row, dict) and set(row) == {"task_id", "answer"} and all(isinstance(value, str) and value for value in row.values()) for row in results)
@@ -182,6 +187,7 @@ def _report(args, platform, hashes, started, finished, inspect, results, logs, s
         "limits": {"memory": args.memory, "cpus": str(args.cpus), "network": args.network},
         "model_sha256": hashes,
         "routes": routes,
+        "routing_traces": traces,
         "remote_tokens": remote,
         "results": results,
         "metrics": {
