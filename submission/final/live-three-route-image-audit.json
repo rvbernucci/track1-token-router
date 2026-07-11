@@ -1,0 +1,55 @@
+{
+  "accuracy": 0.96875,
+  "always_fireworks_tokens": 7234,
+  "checks": {
+    "all_three_routes_have_witnesses": true,
+    "answer_contract_valid_100pct": true,
+    "authorized_fireworks_only": true,
+    "batch_within_570_seconds": true,
+    "e2b_failure_falls_through": true,
+    "output_order_and_ids_match": true,
+    "peak_memory_at_most_3584_mib": true,
+    "raw_prompt_envelope_separation": true,
+    "remote_tokens_below_always_fireworks": true,
+    "runtime_failures_at_most_2pct": true,
+    "terminal_remote_failure_nonzero_no_output": true
+  },
+  "correct": 93,
+  "e2b_failure_probe": {
+    "exit_code": 0,
+    "results_exists": true,
+    "route_class": "fireworks",
+    "wall_seconds": 5.421454136259854
+  },
+  "execution": {
+    "exit_code": 0,
+    "oom_killed": false,
+    "peak_memory_mib": 1140.736,
+    "stderr_tail": "{\"tasks\": 96, \"out\": \"/output/results.json\"}\n",
+    "wall_seconds": 242.3646718300879
+  },
+  "image": {
+    "compressed_bytes": 2666205890,
+    "digest_reference": "ghcr.io/rvbernucci/track1-token-router@sha256:6bdf4fcfe5e99181b033a5926208c4e8627fd36e24225c920ae278918ba2ff58",
+    "platform": "linux/amd64",
+    "revision": "71303be255bfe45c5d502e463aea9b899cc41c8d",
+    "tag": "ghcr.io/rvbernucci/track1-token-router:v3.4.2-full-hybrid",
+    "uncompressed_bytes": 2666221906,
+    "version": "v3.4.2-full-hybrid"
+  },
+  "passed": true,
+  "remote_tokens": 3559,
+  "routes": {
+    "deterministic": 12,
+    "e2b": 12,
+    "fireworks": 72
+  },
+  "schema_version": "live-three-route-arena-v1",
+  "tasks": 96,
+  "terminal_failure_probe": {
+    "exit_code": 1,
+    "results_exists": false,
+    "route_class": "fireworks",
+    "wall_seconds": 3.9395007714629173
+  }
+}
