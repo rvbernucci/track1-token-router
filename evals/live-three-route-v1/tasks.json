@@ -1,0 +1,1634 @@
+[
+  {
+    "category": "factual_qa",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "number",
+    "prompt": "Registry P2-300: Archive A is 92100. Return only Archive A's integer code.",
+    "prompt_sha256": "1a5a4096c9a0b6c3f47f3f811e5c7067bfc81b2dec10bf58539ce348a140e36b",
+    "task_id": "live_factual_qa_00",
+    "validator": {
+      "expected": "92100",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "factual_qa",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "number",
+    "prompt": "Registry P2-301: Archive A is 92137. Archive B is 92148. Archive C is 92128. Return only Archive A's integer code.",
+    "prompt_sha256": "1eeb3389cf86bb745f542fd615b3dfd6db2c1cd587fae1ed21e487f640e46ae5",
+    "task_id": "live_factual_qa_01",
+    "validator": {
+      "expected": "92137",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "factual_qa",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "number",
+    "prompt": "Registry P2-302: Archive A is 92174. Archive B is 92185. Archive C is 92165. Return only Archive A's integer code.",
+    "prompt_sha256": "a786c337fad2524c66f926389d5a1bf8fe8ab4eb092f9294404d2367d35824c5",
+    "task_id": "live_factual_qa_02",
+    "validator": {
+      "expected": "92174",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "factual_qa",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "number",
+    "prompt": "Registry P2-303: Archive A is 92211. Return only Archive A's integer code.",
+    "prompt_sha256": "889803015b2da91ea207e72ff1cafa54f0f742b6d3cdcf01f88ec14483c97d85",
+    "task_id": "live_factual_qa_03",
+    "validator": {
+      "expected": "92211",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "factual_qa",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "number",
+    "prompt": "Registry P2-304: Archive A is 92248. Archive B is 92259. Archive C is 92239. Return only Archive A's integer code.",
+    "prompt_sha256": "64d37cf7aa71b0f57660d61d8326119e0b845aac5dd6dc4f612d6a603f239e43",
+    "task_id": "live_factual_qa_04",
+    "validator": {
+      "expected": "92248",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "factual_qa",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "number",
+    "prompt": "Registry P2-305: Archive A is 92285. Archive B is 92296. Archive C is 92276. Return only Archive A's integer code.",
+    "prompt_sha256": "85e7994127d2c85b91f66761e18e9185adb30eb4deaefb2a54c25bd3bb8b194f",
+    "task_id": "live_factual_qa_05",
+    "validator": {
+      "expected": "92285",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "factual_qa",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "number",
+    "prompt": "Registry P2-306: Archive A is 92322. Return only Archive A's integer code.",
+    "prompt_sha256": "f047c46eb99519d5c9b11e1d4664f0d49746aa731aff880ada4872e761589273",
+    "task_id": "live_factual_qa_06",
+    "validator": {
+      "expected": "92322",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "factual_qa",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "number",
+    "prompt": "Registry P2-307: Archive A is 92359. Archive B is 92370. Archive C is 92350. Return only Archive A's integer code.",
+    "prompt_sha256": "6296d5cd6836fd68bd3f8878b6a8fb693fdb7ae387dfad7f97e4e6a3e354791a",
+    "task_id": "live_factual_qa_07",
+    "validator": {
+      "expected": "92359",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "factual_qa",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "number",
+    "prompt": "Registry P2-308: Archive A is 92396. Archive B is 92407. Archive C is 92387. Return only Archive A's integer code.",
+    "prompt_sha256": "98eaee8dfa53badab3c812b8d6832dd88a649eb59d3be8209acc095a3b5f2fce",
+    "task_id": "live_factual_qa_08",
+    "validator": {
+      "expected": "92396",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "factual_qa",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "number",
+    "prompt": "Registry P2-309: Archive A is 92433. Return only Archive A's integer code.",
+    "prompt_sha256": "8a78c72777d9923611e21fc9ba7df46c83c52d7d7e62830f7dc92849892eab24",
+    "task_id": "live_factual_qa_09",
+    "validator": {
+      "expected": "92433",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "factual_qa",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "number",
+    "prompt": "Registry P2-310: Archive A is 92470. Archive B is 92481. Archive C is 92461. Return only Archive A's integer code.",
+    "prompt_sha256": "8935d53ecc100e7cf84a70ec822e80792cc50cc394743092f601eb46b40a3048",
+    "task_id": "live_factual_qa_10",
+    "validator": {
+      "expected": "92470",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "factual_qa",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "number",
+    "prompt": "Registry P2-311: Archive A is 92507. Archive B is 92518. Archive C is 92498. Return only Archive A's integer code.",
+    "prompt_sha256": "264e19c0d6b104fd16a0c6eb56839ec761e3094c0ab9d2a7816e9cbe0cf32816",
+    "task_id": "live_factual_qa_11",
+    "validator": {
+      "expected": "92507",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "math_reasoning",
+    "difficulty": "easy",
+    "expected_route": "deterministic",
+    "output_shape": "number",
+    "prompt": "Compute 700 + 30. Return only the number.",
+    "prompt_sha256": "c278b04d8e7b4e6f6b6b0f6b217e25d6682fe9a4f4188e5df69838f5490b5a6e",
+    "task_id": "live_math_reasoning_00",
+    "validator": {
+      "expected": 730,
+      "type": "number_exact"
+    }
+  },
+  {
+    "category": "math_reasoning",
+    "difficulty": "medium",
+    "expected_route": "deterministic",
+    "output_shape": "number",
+    "prompt": "Compute 701 + 31. Return only the number.",
+    "prompt_sha256": "d8996ac9078298fc058878632ec0dcb3ee409ac3b7936a2cb993866032dbdb9b",
+    "task_id": "live_math_reasoning_01",
+    "validator": {
+      "expected": 732,
+      "type": "number_exact"
+    }
+  },
+  {
+    "category": "math_reasoning",
+    "difficulty": "hard",
+    "expected_route": "deterministic",
+    "output_shape": "number",
+    "prompt": "Compute 702 + 32. Return only the number.",
+    "prompt_sha256": "e0e63b1601d31d9b9ee8cbbcfa76d9b87cd06865b9aafd84245fe51888fd491c",
+    "task_id": "live_math_reasoning_02",
+    "validator": {
+      "expected": 734,
+      "type": "number_exact"
+    }
+  },
+  {
+    "category": "math_reasoning",
+    "difficulty": "easy",
+    "expected_route": "deterministic",
+    "output_shape": "number",
+    "prompt": "Compute 703 + 33. Return only the number.",
+    "prompt_sha256": "8a1390d48d49049041990c67932024166667b3a2fded4a05cbe6d42a9c983ee8",
+    "task_id": "live_math_reasoning_03",
+    "validator": {
+      "expected": 736,
+      "type": "number_exact"
+    }
+  },
+  {
+    "category": "math_reasoning",
+    "difficulty": "medium",
+    "expected_route": "deterministic",
+    "output_shape": "number",
+    "prompt": "Compute 704 + 34. Return only the number.",
+    "prompt_sha256": "28bbbfee11d08e9e1e5718a9169ae9c49fe7a38072c5273263dae257c4f90d92",
+    "task_id": "live_math_reasoning_04",
+    "validator": {
+      "expected": 738,
+      "type": "number_exact"
+    }
+  },
+  {
+    "category": "math_reasoning",
+    "difficulty": "hard",
+    "expected_route": "deterministic",
+    "output_shape": "number",
+    "prompt": "Compute 705 + 35. Return only the number.",
+    "prompt_sha256": "4848bac3fa577abdd29a8cf737b01492def7f0165b2ca9aafe0a410014d6abe4",
+    "task_id": "live_math_reasoning_05",
+    "validator": {
+      "expected": 740,
+      "type": "number_exact"
+    }
+  },
+  {
+    "category": "math_reasoning",
+    "difficulty": "easy",
+    "expected_route": "deterministic",
+    "output_shape": "number",
+    "prompt": "Compute 706 + 36. Return only the number.",
+    "prompt_sha256": "3b0573e815cfc58663aa86510133fd328dedca32e4a028a3731361d2f6e1b663",
+    "task_id": "live_math_reasoning_06",
+    "validator": {
+      "expected": 742,
+      "type": "number_exact"
+    }
+  },
+  {
+    "category": "math_reasoning",
+    "difficulty": "medium",
+    "expected_route": "deterministic",
+    "output_shape": "number",
+    "prompt": "Compute 707 + 37. Return only the number.",
+    "prompt_sha256": "c18b22d9b1da78cc93bf1d772e6d97a5c57c099e33d6a56a280778a850aaf48f",
+    "task_id": "live_math_reasoning_07",
+    "validator": {
+      "expected": 744,
+      "type": "number_exact"
+    }
+  },
+  {
+    "category": "math_reasoning",
+    "difficulty": "hard",
+    "expected_route": "deterministic",
+    "output_shape": "number",
+    "prompt": "Compute 708 + 38. Return only the number.",
+    "prompt_sha256": "b488b994bc2ea4aa1ea9ad3b2195f6a6993c2c6bb8c21e68bc410ed87b706b90",
+    "task_id": "live_math_reasoning_08",
+    "validator": {
+      "expected": 746,
+      "type": "number_exact"
+    }
+  },
+  {
+    "category": "math_reasoning",
+    "difficulty": "easy",
+    "expected_route": "deterministic",
+    "output_shape": "number",
+    "prompt": "Compute 709 + 39. Return only the number.",
+    "prompt_sha256": "fd8d1bd93bfe46dc9abffd458900e14e972db74dec1b054c494a62e2df4532b9",
+    "task_id": "live_math_reasoning_09",
+    "validator": {
+      "expected": 748,
+      "type": "number_exact"
+    }
+  },
+  {
+    "category": "math_reasoning",
+    "difficulty": "medium",
+    "expected_route": "deterministic",
+    "output_shape": "number",
+    "prompt": "Compute 710 + 40. Return only the number.",
+    "prompt_sha256": "8799a3f869db6876360ffc0d18e08f6fdb9873d24496d12a9e60a7d9a9b45220",
+    "task_id": "live_math_reasoning_10",
+    "validator": {
+      "expected": 750,
+      "type": "number_exact"
+    }
+  },
+  {
+    "category": "math_reasoning",
+    "difficulty": "hard",
+    "expected_route": "deterministic",
+    "output_shape": "number",
+    "prompt": "Compute 711 + 41. Return only the number.",
+    "prompt_sha256": "9e5d05ce614e86d34ff0a92b510062c0bb17ed9a3921f96c62fe45b8bf3151f9",
+    "task_id": "live_math_reasoning_11",
+    "validator": {
+      "expected": 752,
+      "type": "number_exact"
+    }
+  },
+  {
+    "category": "sentiment",
+    "difficulty": "easy",
+    "expected_route": "e2b",
+    "output_shape": "label",
+    "prompt": "Review P2-300: The target component is dependable and excellent. Return exactly positive, negative, or neutral for the target component.",
+    "prompt_sha256": "537f2b12623261b457005b00e3e7c1069d24497c6650a04422e6d0ed9a155b28",
+    "task_id": "live_sentiment_00",
+    "validator": {
+      "expected": "positive",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "sentiment",
+    "difficulty": "medium",
+    "expected_route": "e2b",
+    "output_shape": "label",
+    "prompt": "Review P2-301: The packaging was unremarkable. The target component is broken and frustrating. Return exactly positive, negative, or neutral for the target component.",
+    "prompt_sha256": "872852548d6046dcaf400fdfbac9ac38fffd70a58a16e0867b2be3d760d7fb3d",
+    "task_id": "live_sentiment_01",
+    "validator": {
+      "expected": "negative",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "sentiment",
+    "difficulty": "hard",
+    "expected_route": "e2b",
+    "output_shape": "label",
+    "prompt": "Review P2-302: The packaging was unremarkable. The target component is available as specified. Return exactly positive, negative, or neutral for the target component.",
+    "prompt_sha256": "b7871f4a71540570b76fbe49db34373e65d391248cb783d479d008acfdb6a3fa",
+    "task_id": "live_sentiment_02",
+    "validator": {
+      "expected": "neutral",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "sentiment",
+    "difficulty": "easy",
+    "expected_route": "e2b",
+    "output_shape": "label",
+    "prompt": "Review P2-303: The target component is dependable and excellent. Return exactly positive, negative, or neutral for the target component.",
+    "prompt_sha256": "6aa9e8041936b07596c3243730ded5166457ca20043187bf7d8da5289714581b",
+    "task_id": "live_sentiment_03",
+    "validator": {
+      "expected": "positive",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "sentiment",
+    "difficulty": "medium",
+    "expected_route": "e2b",
+    "output_shape": "label",
+    "prompt": "Review P2-304: The packaging was unremarkable. The target component is broken and frustrating. Return exactly positive, negative, or neutral for the target component.",
+    "prompt_sha256": "1a982d0357a2da979f02066f19950dfa62b67bb984d8f93439c8f639722ff3f3",
+    "task_id": "live_sentiment_04",
+    "validator": {
+      "expected": "negative",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "sentiment",
+    "difficulty": "hard",
+    "expected_route": "e2b",
+    "output_shape": "label",
+    "prompt": "Review P2-305: The packaging was unremarkable. The target component is available as specified. Return exactly positive, negative, or neutral for the target component.",
+    "prompt_sha256": "658a70eda07cb635e1fb5fa7e6dbe651cc921ee38ba474805c5bcf69cc4668f4",
+    "task_id": "live_sentiment_05",
+    "validator": {
+      "expected": "neutral",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "sentiment",
+    "difficulty": "easy",
+    "expected_route": "e2b",
+    "output_shape": "label",
+    "prompt": "Review P2-306: The target component is dependable and excellent. Return exactly positive, negative, or neutral for the target component.",
+    "prompt_sha256": "4f29fc8418480b04274d7c480c53fa83c3698cbdcff3b68690f63f23ab42e99b",
+    "task_id": "live_sentiment_06",
+    "validator": {
+      "expected": "positive",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "sentiment",
+    "difficulty": "medium",
+    "expected_route": "e2b",
+    "output_shape": "label",
+    "prompt": "Review P2-307: The packaging was unremarkable. The target component is broken and frustrating. Return exactly positive, negative, or neutral for the target component.",
+    "prompt_sha256": "b1cd13d14d0f31b792e8cb9cf1b632d385bd8c0d50d73f2902194985a06c3911",
+    "task_id": "live_sentiment_07",
+    "validator": {
+      "expected": "negative",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "sentiment",
+    "difficulty": "hard",
+    "expected_route": "e2b",
+    "output_shape": "label",
+    "prompt": "Review P2-308: The packaging was unremarkable. The target component is available as specified. Return exactly positive, negative, or neutral for the target component.",
+    "prompt_sha256": "fdbf345d3cf48cffbe77ad60ecdce12f6dc41ae6c091471448d5de752a51f64e",
+    "task_id": "live_sentiment_08",
+    "validator": {
+      "expected": "neutral",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "sentiment",
+    "difficulty": "easy",
+    "expected_route": "e2b",
+    "output_shape": "label",
+    "prompt": "Review P2-309: The target component is dependable and excellent. Return exactly positive, negative, or neutral for the target component.",
+    "prompt_sha256": "b29aca73729a6ab4c20758965d8c7992e78a1b48c7dcebbdd9bc3cc7e140b439",
+    "task_id": "live_sentiment_09",
+    "validator": {
+      "expected": "positive",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "sentiment",
+    "difficulty": "medium",
+    "expected_route": "e2b",
+    "output_shape": "label",
+    "prompt": "Review P2-310: The packaging was unremarkable. The target component is broken and frustrating. Return exactly positive, negative, or neutral for the target component.",
+    "prompt_sha256": "86cb063e3f3657a3ab2bff3c1bc7677c2b0de9f12ced3bd185173ccd3ee8517e",
+    "task_id": "live_sentiment_10",
+    "validator": {
+      "expected": "negative",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "sentiment",
+    "difficulty": "hard",
+    "expected_route": "e2b",
+    "output_shape": "label",
+    "prompt": "Review P2-311: The packaging was unremarkable. The target component is available as specified. Return exactly positive, negative, or neutral for the target component.",
+    "prompt_sha256": "9b2c09fe5348f194af91586628a9127235c9930c60bb65446797cc8e54db3092",
+    "task_id": "live_sentiment_11",
+    "validator": {
+      "expected": "neutral",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "summarization",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "short_text",
+    "prompt": "Notes: Attendance was recorded. The committee approved Project P2-300 on Friday. Catering was deferred. Return exactly the approval sentence.",
+    "prompt_sha256": "dbbbaa7df22cee0d45889000710f8e1eab7e39b796a30b29655a834c5b8242cb",
+    "task_id": "live_summarization_00",
+    "validator": {
+      "expected": "The committee approved Project P2-300 on Friday.",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "summarization",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "short_text",
+    "prompt": "Notes: Attendance was recorded. The committee approved Project P2-301 on Friday. Catering was deferred. Return exactly the approval sentence.",
+    "prompt_sha256": "b3fecc0cda1ca3bdadc3876783bfa41e6c33a5042b1d7ca7ae9d88df7fe2f67d",
+    "task_id": "live_summarization_01",
+    "validator": {
+      "expected": "The committee approved Project P2-301 on Friday.",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "summarization",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "short_text",
+    "prompt": "Minutes P2-302: Budget discussion continued. Catering was deferred. The committee approved Project P2-302 on Friday. Return only the sentence that records the decision.",
+    "prompt_sha256": "a062ff1e5fea3d0c6ad025bd0bde24634c89b91466f136b3919cdf37f049ae6c",
+    "task_id": "live_summarization_02",
+    "validator": {
+      "expected": "The committee approved Project P2-302 on Friday.",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "summarization",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "short_text",
+    "prompt": "Notes: Attendance was recorded. The committee approved Project P2-303 on Friday. Catering was deferred. Return exactly the approval sentence.",
+    "prompt_sha256": "2a8b0f04b81965265dad10339f677e495636bc414d4a67ba2db8a3cba2ed54de",
+    "task_id": "live_summarization_03",
+    "validator": {
+      "expected": "The committee approved Project P2-303 on Friday.",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "summarization",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "short_text",
+    "prompt": "Notes: Attendance was recorded. The committee approved Project P2-304 on Friday. Catering was deferred. Return exactly the approval sentence.",
+    "prompt_sha256": "754c711ec060f75e0385ab6ff7cfd5030b36b82ba86c816ed3afd7a915a00b57",
+    "task_id": "live_summarization_04",
+    "validator": {
+      "expected": "The committee approved Project P2-304 on Friday.",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "summarization",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "short_text",
+    "prompt": "Minutes P2-305: Budget discussion continued. Catering was deferred. The committee approved Project P2-305 on Friday. Return only the sentence that records the decision.",
+    "prompt_sha256": "91f150c0fbee90518da6f7ccdcb3645de9d0b483c6b900faaa3970d7b322e3ef",
+    "task_id": "live_summarization_05",
+    "validator": {
+      "expected": "The committee approved Project P2-305 on Friday.",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "summarization",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "short_text",
+    "prompt": "Notes: Attendance was recorded. The committee approved Project P2-306 on Friday. Catering was deferred. Return exactly the approval sentence.",
+    "prompt_sha256": "cde87a5b071d696f89540be17dad54a8b4136e6c409681ecd54ce76475d5f21a",
+    "task_id": "live_summarization_06",
+    "validator": {
+      "expected": "The committee approved Project P2-306 on Friday.",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "summarization",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "short_text",
+    "prompt": "Notes: Attendance was recorded. The committee approved Project P2-307 on Friday. Catering was deferred. Return exactly the approval sentence.",
+    "prompt_sha256": "805b28bd41be758283dccc569365bdc1fce8d92e63c22ef71a3ff61c0d42ba0c",
+    "task_id": "live_summarization_07",
+    "validator": {
+      "expected": "The committee approved Project P2-307 on Friday.",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "summarization",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "short_text",
+    "prompt": "Minutes P2-308: Budget discussion continued. Catering was deferred. The committee approved Project P2-308 on Friday. Return only the sentence that records the decision.",
+    "prompt_sha256": "930d550100c9897ac7703683ef5474f53e1dcf63ed16baab46d0158ec87504ff",
+    "task_id": "live_summarization_08",
+    "validator": {
+      "expected": "The committee approved Project P2-308 on Friday.",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "summarization",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "short_text",
+    "prompt": "Notes: Attendance was recorded. The committee approved Project P2-309 on Friday. Catering was deferred. Return exactly the approval sentence.",
+    "prompt_sha256": "826b5bfa2f590f23a8fd3bc773ac29c946b85bdf7e61e3887a4ebe85fd957260",
+    "task_id": "live_summarization_09",
+    "validator": {
+      "expected": "The committee approved Project P2-309 on Friday.",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "summarization",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "short_text",
+    "prompt": "Notes: Attendance was recorded. The committee approved Project P2-310 on Friday. Catering was deferred. Return exactly the approval sentence.",
+    "prompt_sha256": "45ecd0139a509f50be3f8ba7bfe6cb51f68133c505ff1c19c98cbc228759afaf",
+    "task_id": "live_summarization_10",
+    "validator": {
+      "expected": "The committee approved Project P2-310 on Friday.",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "summarization",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "short_text",
+    "prompt": "Minutes P2-311: Budget discussion continued. Catering was deferred. The committee approved Project P2-311 on Friday. Return only the sentence that records the decision.",
+    "prompt_sha256": "dad2cc249905bd49ef952a407b9a50a0dfb476e463594ee12b8fac0efd87ed78",
+    "task_id": "live_summarization_11",
+    "validator": {
+      "expected": "The committee approved Project P2-311 on Friday.",
+      "type": "exact"
+    }
+  },
+  {
+    "category": "ner",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "json",
+    "prompt": "Extract entities from: Mira Vale 300 joined Helix 300 Labs in Nova City 300. Return only minified JSON with keys person, organization, location.",
+    "prompt_sha256": "d9933b4f27a3f65571b4ccec80689ef13ba037e48ba406f4e13d695ad763cb51",
+    "task_id": "live_ner_00",
+    "validator": {
+      "expected": {
+        "location": "Nova City 300",
+        "organization": "Helix 300 Labs",
+        "person": "Mira Vale 300"
+      },
+      "type": "json_contains"
+    }
+  },
+  {
+    "category": "ner",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "json",
+    "prompt": "Extract entities from: Mira Vale 301 joined Helix 301 Labs in Nova City 301. Return only minified JSON with keys person, organization, location.",
+    "prompt_sha256": "3e18c505054c8cfb327e4526bd5075d911f482acfa1d86616e3e8545bb36e4fc",
+    "task_id": "live_ner_01",
+    "validator": {
+      "expected": {
+        "location": "Nova City 301",
+        "organization": "Helix 301 Labs",
+        "person": "Mira Vale 301"
+      },
+      "type": "json_contains"
+    }
+  },
+  {
+    "category": "ner",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "json",
+    "prompt": "Extract entities from: Mira Vale 302 joined Helix 302 Labs in Nova City 302. Return only minified JSON with keys person, organization, location.",
+    "prompt_sha256": "37ef70ddbb02eb96955b2f418c7a4481712c93a39f88f6a2f774290a5c89c3ce",
+    "task_id": "live_ner_02",
+    "validator": {
+      "expected": {
+        "location": "Nova City 302",
+        "organization": "Helix 302 Labs",
+        "person": "Mira Vale 302"
+      },
+      "type": "json_contains"
+    }
+  },
+  {
+    "category": "ner",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "json",
+    "prompt": "Extract entities from: Mira Vale 303 joined Helix 303 Labs in Nova City 303. Return only minified JSON with keys person, organization, location.",
+    "prompt_sha256": "d8c3b94285d2d93acedc619841094c1758ee7e9005fbe3f40138d982d0c1c9d8",
+    "task_id": "live_ner_03",
+    "validator": {
+      "expected": {
+        "location": "Nova City 303",
+        "organization": "Helix 303 Labs",
+        "person": "Mira Vale 303"
+      },
+      "type": "json_contains"
+    }
+  },
+  {
+    "category": "ner",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "json",
+    "prompt": "Extract entities from: Mira Vale 304 joined Helix 304 Labs in Nova City 304. Return only minified JSON with keys person, organization, location.",
+    "prompt_sha256": "8f684d6074a8b2187c55276fcea27850a6322e81bce2d34b0df3fcad764504ff",
+    "task_id": "live_ner_04",
+    "validator": {
+      "expected": {
+        "location": "Nova City 304",
+        "organization": "Helix 304 Labs",
+        "person": "Mira Vale 304"
+      },
+      "type": "json_contains"
+    }
+  },
+  {
+    "category": "ner",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "json",
+    "prompt": "Extract entities from: Mira Vale 305 joined Helix 305 Labs in Nova City 305. Return only minified JSON with keys person, organization, location.",
+    "prompt_sha256": "5924dff29da3735b6d40adc3cf4db7fecc003e86a47a52c41c0b1e51c693a613",
+    "task_id": "live_ner_05",
+    "validator": {
+      "expected": {
+        "location": "Nova City 305",
+        "organization": "Helix 305 Labs",
+        "person": "Mira Vale 305"
+      },
+      "type": "json_contains"
+    }
+  },
+  {
+    "category": "ner",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "json",
+    "prompt": "Extract entities from: Mira Vale 306 joined Helix 306 Labs in Nova City 306. Return only minified JSON with keys person, organization, location.",
+    "prompt_sha256": "f3903c147b6b407ff158404543618f5962ffa73818d76d373bc07ae72158b306",
+    "task_id": "live_ner_06",
+    "validator": {
+      "expected": {
+        "location": "Nova City 306",
+        "organization": "Helix 306 Labs",
+        "person": "Mira Vale 306"
+      },
+      "type": "json_contains"
+    }
+  },
+  {
+    "category": "ner",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "json",
+    "prompt": "Extract entities from: Mira Vale 307 joined Helix 307 Labs in Nova City 307. Return only minified JSON with keys person, organization, location.",
+    "prompt_sha256": "2cbf2d08f23025893356ea84b5282c629d6f03d46b23d0105f72db06a5b643f8",
+    "task_id": "live_ner_07",
+    "validator": {
+      "expected": {
+        "location": "Nova City 307",
+        "organization": "Helix 307 Labs",
+        "person": "Mira Vale 307"
+      },
+      "type": "json_contains"
+    }
+  },
+  {
+    "category": "ner",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "json",
+    "prompt": "Extract entities from: Mira Vale 308 joined Helix 308 Labs in Nova City 308. Return only minified JSON with keys person, organization, location.",
+    "prompt_sha256": "ac966f34dec3a34a875479acd08aae5f56083cebf57fe3cf15778d8958890b94",
+    "task_id": "live_ner_08",
+    "validator": {
+      "expected": {
+        "location": "Nova City 308",
+        "organization": "Helix 308 Labs",
+        "person": "Mira Vale 308"
+      },
+      "type": "json_contains"
+    }
+  },
+  {
+    "category": "ner",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "json",
+    "prompt": "Extract entities from: Mira Vale 309 joined Helix 309 Labs in Nova City 309. Return only minified JSON with keys person, organization, location.",
+    "prompt_sha256": "8573d1eae0aa295be6881841ec8de5ff489b147ab8781bb9ac4544b0e83a5f7b",
+    "task_id": "live_ner_09",
+    "validator": {
+      "expected": {
+        "location": "Nova City 309",
+        "organization": "Helix 309 Labs",
+        "person": "Mira Vale 309"
+      },
+      "type": "json_contains"
+    }
+  },
+  {
+    "category": "ner",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "json",
+    "prompt": "Extract entities from: Mira Vale 310 joined Helix 310 Labs in Nova City 310. Return only minified JSON with keys person, organization, location.",
+    "prompt_sha256": "b744619d14c44abc5dbfe6c1986c44c2ed9035aee430886db6e19d284217af66",
+    "task_id": "live_ner_10",
+    "validator": {
+      "expected": {
+        "location": "Nova City 310",
+        "organization": "Helix 310 Labs",
+        "person": "Mira Vale 310"
+      },
+      "type": "json_contains"
+    }
+  },
+  {
+    "category": "ner",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "json",
+    "prompt": "Extract entities from: Mira Vale 311 joined Helix 311 Labs in Nova City 311. Return only minified JSON with keys person, organization, location.",
+    "prompt_sha256": "33ba952cfc5f7729623040a27d3b3c4fdcd55f0db9e70a6dcdd011bb99e87ffc",
+    "task_id": "live_ner_11",
+    "validator": {
+      "expected": {
+        "location": "Nova City 311",
+        "organization": "Helix 311 Labs",
+        "person": "Mira Vale 311"
+      },
+      "type": "json_contains"
+    }
+  },
+  {
+    "category": "code_debugging",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Fix this Python function and return only code:\ndef repair_300(value):\n    return value - 5",
+    "prompt_sha256": "3d21c1e758764ee9c57f6f2848ec61b8b68f922ecdc353190e73aa867de8f16a",
+    "task_id": "live_code_debugging_00",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            1
+          ],
+          "expected": 6
+        },
+        {
+          "args": [
+            10
+          ],
+          "expected": 15
+        }
+      ],
+      "function_name": "repair_300",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_debugging",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Fix this Python function and return only code:\ndef repair_301(value):\n    return value - 6",
+    "prompt_sha256": "f27495f6035996a4b181d31a9329c3528e5c286996afe07d54520dff4d4718a0",
+    "task_id": "live_code_debugging_01",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            1
+          ],
+          "expected": 7
+        },
+        {
+          "args": [
+            10
+          ],
+          "expected": 16
+        }
+      ],
+      "function_name": "repair_301",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_debugging",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Fix this Python function and return only code:\ndef repair_302(value):\n    return value - 7",
+    "prompt_sha256": "ed315ea4834f8407ec679772aebd63917c1d993cd889ae1dafad47a396f71a48",
+    "task_id": "live_code_debugging_02",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            1
+          ],
+          "expected": 8
+        },
+        {
+          "args": [
+            10
+          ],
+          "expected": 17
+        }
+      ],
+      "function_name": "repair_302",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_debugging",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Fix this Python function and return only code:\ndef repair_303(value):\n    return value - 8",
+    "prompt_sha256": "722338afb963a4172669b188e7238a02806875ba5c75beaaf400a816e58a80cf",
+    "task_id": "live_code_debugging_03",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            1
+          ],
+          "expected": 9
+        },
+        {
+          "args": [
+            10
+          ],
+          "expected": 18
+        }
+      ],
+      "function_name": "repair_303",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_debugging",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Fix this Python function and return only code:\ndef repair_304(value):\n    return value - 9",
+    "prompt_sha256": "7044f3e25e30c151bb21c091731203cc4a214c96df3a0d2becaaa8bcfb49b709",
+    "task_id": "live_code_debugging_04",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            1
+          ],
+          "expected": 10
+        },
+        {
+          "args": [
+            10
+          ],
+          "expected": 19
+        }
+      ],
+      "function_name": "repair_304",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_debugging",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Fix this Python function and return only code:\ndef repair_305(value):\n    return value - 10",
+    "prompt_sha256": "2b564307501bbfc6aa6c57ece5d825216d062d98011893e5cc432ff8e2dc374a",
+    "task_id": "live_code_debugging_05",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            1
+          ],
+          "expected": 11
+        },
+        {
+          "args": [
+            10
+          ],
+          "expected": 20
+        }
+      ],
+      "function_name": "repair_305",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_debugging",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Fix this Python function and return only code:\ndef repair_306(value):\n    return value - 2",
+    "prompt_sha256": "fa5f149a758d827aac4acdacb51c2587640a8edc9f764441213eeb4aa72e56bc",
+    "task_id": "live_code_debugging_06",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            1
+          ],
+          "expected": 3
+        },
+        {
+          "args": [
+            10
+          ],
+          "expected": 12
+        }
+      ],
+      "function_name": "repair_306",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_debugging",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Fix this Python function and return only code:\ndef repair_307(value):\n    return value - 3",
+    "prompt_sha256": "1cbc95262ad885bfa88c8ac88375a1cad399c74a5ff3c39c69698278fe8ffaa3",
+    "task_id": "live_code_debugging_07",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            1
+          ],
+          "expected": 4
+        },
+        {
+          "args": [
+            10
+          ],
+          "expected": 13
+        }
+      ],
+      "function_name": "repair_307",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_debugging",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Fix this Python function and return only code:\ndef repair_308(value):\n    return value - 4",
+    "prompt_sha256": "337d866baa4e10bb34446e56d751cd0c23397687940d8d8ee0be6db616493b48",
+    "task_id": "live_code_debugging_08",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            1
+          ],
+          "expected": 5
+        },
+        {
+          "args": [
+            10
+          ],
+          "expected": 14
+        }
+      ],
+      "function_name": "repair_308",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_debugging",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Fix this Python function and return only code:\ndef repair_309(value):\n    return value - 5",
+    "prompt_sha256": "ba2b6f0e1b70e353d15d3a39cf62003542e54055292efd56b52ead08f4628cfd",
+    "task_id": "live_code_debugging_09",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            1
+          ],
+          "expected": 6
+        },
+        {
+          "args": [
+            10
+          ],
+          "expected": 15
+        }
+      ],
+      "function_name": "repair_309",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_debugging",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Fix this Python function and return only code:\ndef repair_310(value):\n    return value - 6",
+    "prompt_sha256": "11e5b0318d0b92ee0bed6ac160f1fa73b608fa6f5024847c4e5f0b999cd26c70",
+    "task_id": "live_code_debugging_10",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            1
+          ],
+          "expected": 7
+        },
+        {
+          "args": [
+            10
+          ],
+          "expected": 16
+        }
+      ],
+      "function_name": "repair_310",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_debugging",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Fix this Python function and return only code:\ndef repair_311(value):\n    return value - 7",
+    "prompt_sha256": "7e8ea1e1857b31f529c786a457ee4bf01a13ff1dfdc249e65bb436c544d6e40a",
+    "task_id": "live_code_debugging_11",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            1
+          ],
+          "expected": 8
+        },
+        {
+          "args": [
+            10
+          ],
+          "expected": 17
+        }
+      ],
+      "function_name": "repair_311",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "logic_puzzle",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "label",
+    "prompt": "All rax300 are tor300. Object q300 is a rax300. Is q300 a tor300? Return exactly yes or no.",
+    "prompt_sha256": "45ff5e7ae509cc21c3941ddc9d734df2547350294c5d89e2e78e284b8fa300fe",
+    "task_id": "live_logic_puzzle_00",
+    "validator": {
+      "expected": "yes",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "logic_puzzle",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "label",
+    "prompt": "All rax301 are tor301. Object q301 is a tor301. Must q301 be a rax301? Return exactly yes or no.",
+    "prompt_sha256": "02fe67064371c11725b8074546fa68119023c699c66140b8b100ded8bf97af4d",
+    "task_id": "live_logic_puzzle_01",
+    "validator": {
+      "expected": "no",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "logic_puzzle",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "label",
+    "prompt": "All rax302 are tor302. Object q302 is a rax302. Is q302 a tor302? Return exactly yes or no.",
+    "prompt_sha256": "c4c48262c7af03f1cabf2ba8e5c43e396c14f8ca83881ac0d59a38155516b2f5",
+    "task_id": "live_logic_puzzle_02",
+    "validator": {
+      "expected": "yes",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "logic_puzzle",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "label",
+    "prompt": "All rax303 are tor303. Object q303 is a tor303. Must q303 be a rax303? Return exactly yes or no.",
+    "prompt_sha256": "ab17e7c2b3bc6ac441bfa7173500f734e37b0e5cfbf6520312af7eb53b85d831",
+    "task_id": "live_logic_puzzle_03",
+    "validator": {
+      "expected": "no",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "logic_puzzle",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "label",
+    "prompt": "All rax304 are tor304. Object q304 is a rax304. Is q304 a tor304? Return exactly yes or no.",
+    "prompt_sha256": "e0bde99e9f349a1ba1cbd0d70c533e3647458cde6e08e37dc331a6c6bd6a7d93",
+    "task_id": "live_logic_puzzle_04",
+    "validator": {
+      "expected": "yes",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "logic_puzzle",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "label",
+    "prompt": "All rax305 are tor305. Object q305 is a tor305. Must q305 be a rax305? Return exactly yes or no.",
+    "prompt_sha256": "128455c2f7ac969ee5829dfbf769f3622fc3ae40f63556c0338d030bb6d960eb",
+    "task_id": "live_logic_puzzle_05",
+    "validator": {
+      "expected": "no",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "logic_puzzle",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "label",
+    "prompt": "All rax306 are tor306. Object q306 is a rax306. Is q306 a tor306? Return exactly yes or no.",
+    "prompt_sha256": "b11c2e610b8607e9e001378e1feaf2e53205665795fc6121923ffafe08ce4bde",
+    "task_id": "live_logic_puzzle_06",
+    "validator": {
+      "expected": "yes",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "logic_puzzle",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "label",
+    "prompt": "All rax307 are tor307. Object q307 is a tor307. Must q307 be a rax307? Return exactly yes or no.",
+    "prompt_sha256": "bb4a8f38133699cf31300eb5878fbb343b56160653abd7a2e3f2bb53dafdecca",
+    "task_id": "live_logic_puzzle_07",
+    "validator": {
+      "expected": "no",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "logic_puzzle",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "label",
+    "prompt": "All rax308 are tor308. Object q308 is a rax308. Is q308 a tor308? Return exactly yes or no.",
+    "prompt_sha256": "ccb8a52bafbaf1ea846c8818bcd21159afaea295c4edd746a182636aa35de3c2",
+    "task_id": "live_logic_puzzle_08",
+    "validator": {
+      "expected": "yes",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "logic_puzzle",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "label",
+    "prompt": "All rax309 are tor309. Object q309 is a tor309. Must q309 be a rax309? Return exactly yes or no.",
+    "prompt_sha256": "95c3492568d4b10e840bfecb053e6e4821f057cb48062a4e5e9cb4e1e6d5707e",
+    "task_id": "live_logic_puzzle_09",
+    "validator": {
+      "expected": "no",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "logic_puzzle",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "label",
+    "prompt": "All rax310 are tor310. Object q310 is a rax310. Is q310 a tor310? Return exactly yes or no.",
+    "prompt_sha256": "aafc66198fec7abec93b82cd110ec41b5967ff65f90088be3aaf64440ef26d4a",
+    "task_id": "live_logic_puzzle_10",
+    "validator": {
+      "expected": "yes",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "logic_puzzle",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "label",
+    "prompt": "All rax311 are tor311. Object q311 is a tor311. Must q311 be a rax311? Return exactly yes or no.",
+    "prompt_sha256": "1f9574d63aece0230ecbbc5d0e6d407a189cfe74fcad591d28d084bfbddc7c43",
+    "task_id": "live_logic_puzzle_11",
+    "validator": {
+      "expected": "no",
+      "type": "exact_lower"
+    }
+  },
+  {
+    "category": "code_generation",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Return only Python code defining shift_p2_300(value), which returns value plus 4.",
+    "prompt_sha256": "a8b6223f8d2cc4b0efe0b34ae63a544ec1fd1e97a4052e9619ef2af784946368",
+    "task_id": "live_code_generation_00",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            0
+          ],
+          "expected": 4
+        },
+        {
+          "args": [
+            7
+          ],
+          "expected": 11
+        }
+      ],
+      "function_name": "shift_p2_300",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_generation",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Return only Python code defining shift_p2_301(value), which returns value plus 5.",
+    "prompt_sha256": "8a9371df32964537971a058a76745003c481d438acfadf002e3241a4ac2f7ece",
+    "task_id": "live_code_generation_01",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            0
+          ],
+          "expected": 5
+        },
+        {
+          "args": [
+            7
+          ],
+          "expected": 12
+        }
+      ],
+      "function_name": "shift_p2_301",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_generation",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Return only Python code defining shift_p2_302(value), which returns value plus 6.",
+    "prompt_sha256": "b574bd43763a9c6f5676bb072b514ddf95002eb75ce3e4704d704588bbe901bd",
+    "task_id": "live_code_generation_02",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            0
+          ],
+          "expected": 6
+        },
+        {
+          "args": [
+            7
+          ],
+          "expected": 13
+        }
+      ],
+      "function_name": "shift_p2_302",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_generation",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Return only Python code defining shift_p2_303(value), which returns value plus 7.",
+    "prompt_sha256": "47643ab4b66728d26296fad6c3a20fdaaca3140c3be2fa020b10aec28746b8b7",
+    "task_id": "live_code_generation_03",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            0
+          ],
+          "expected": 7
+        },
+        {
+          "args": [
+            7
+          ],
+          "expected": 14
+        }
+      ],
+      "function_name": "shift_p2_303",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_generation",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Return only Python code defining shift_p2_304(value), which returns value plus 8.",
+    "prompt_sha256": "f76a9d5416f1b3fdefb4fdf3ffa9182b89cb105a6bfa5fb757272afaefd5bfe4",
+    "task_id": "live_code_generation_04",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            0
+          ],
+          "expected": 8
+        },
+        {
+          "args": [
+            7
+          ],
+          "expected": 15
+        }
+      ],
+      "function_name": "shift_p2_304",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_generation",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Return only Python code defining shift_p2_305(value), which returns value plus 9.",
+    "prompt_sha256": "70b5489a14b0cbdafffd62c2503c2b1e3bd1b77c4de250201c85a84c44f521e3",
+    "task_id": "live_code_generation_05",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            0
+          ],
+          "expected": 9
+        },
+        {
+          "args": [
+            7
+          ],
+          "expected": 16
+        }
+      ],
+      "function_name": "shift_p2_305",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_generation",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Return only Python code defining shift_p2_306(value), which returns value plus 10.",
+    "prompt_sha256": "69acd298ce8ff8915ab443d903dceb7da370f7c6f45125b4e669808bc47d445d",
+    "task_id": "live_code_generation_06",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            0
+          ],
+          "expected": 10
+        },
+        {
+          "args": [
+            7
+          ],
+          "expected": 17
+        }
+      ],
+      "function_name": "shift_p2_306",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_generation",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Return only Python code defining shift_p2_307(value), which returns value plus 11.",
+    "prompt_sha256": "c65334ecfd881f4410b84f1aa3ad47a0345aeeb2a383d7bc3a74ed08113b3a10",
+    "task_id": "live_code_generation_07",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            0
+          ],
+          "expected": 11
+        },
+        {
+          "args": [
+            7
+          ],
+          "expected": 18
+        }
+      ],
+      "function_name": "shift_p2_307",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_generation",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Return only Python code defining shift_p2_308(value), which returns value plus 1.",
+    "prompt_sha256": "c45d6502cd861148aab23c5ce854df9e97258e17b9f25926183ff626c6f709b6",
+    "task_id": "live_code_generation_08",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            0
+          ],
+          "expected": 1
+        },
+        {
+          "args": [
+            7
+          ],
+          "expected": 8
+        }
+      ],
+      "function_name": "shift_p2_308",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_generation",
+    "difficulty": "easy",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Return only Python code defining shift_p2_309(value), which returns value plus 2.",
+    "prompt_sha256": "1ba51aca9120c2bf9c7e4055297be250e4e14c92bbcf323ec2a55019ad751f2c",
+    "task_id": "live_code_generation_09",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            0
+          ],
+          "expected": 2
+        },
+        {
+          "args": [
+            7
+          ],
+          "expected": 9
+        }
+      ],
+      "function_name": "shift_p2_309",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_generation",
+    "difficulty": "medium",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Return only Python code defining shift_p2_310(value), which returns value plus 3.",
+    "prompt_sha256": "1c7763e24bb0fdc9634cef6c98a8889f075d7182acc2f9aef76311644e6fae90",
+    "task_id": "live_code_generation_10",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            0
+          ],
+          "expected": 3
+        },
+        {
+          "args": [
+            7
+          ],
+          "expected": 10
+        }
+      ],
+      "function_name": "shift_p2_310",
+      "type": "python_function_cases"
+    }
+  },
+  {
+    "category": "code_generation",
+    "difficulty": "hard",
+    "expected_route": "fireworks",
+    "output_shape": "code",
+    "prompt": "Return only Python code defining shift_p2_311(value), which returns value plus 4.",
+    "prompt_sha256": "7a69a75f7296f82600b17ca445c9bf7f87fe51ec929327e941c34fb9365dfba5",
+    "task_id": "live_code_generation_11",
+    "validator": {
+      "cases": [
+        {
+          "args": [
+            0
+          ],
+          "expected": 4
+        },
+        {
+          "args": [
+            7
+          ],
+          "expected": 11
+        }
+      ],
+      "function_name": "shift_p2_311",
+      "type": "python_function_cases"
+    }
+  }
+]

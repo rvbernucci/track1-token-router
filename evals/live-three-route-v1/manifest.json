@@ -1,0 +1,21 @@
+{
+  "category_counts": {
+    "code_debugging": 12,
+    "code_generation": 12,
+    "factual_qa": 12,
+    "logic_puzzle": 12,
+    "math_reasoning": 12,
+    "ner": 12,
+    "sentiment": 12,
+    "summarization": 12
+  },
+  "expected_route_counts": {
+    "deterministic": 12,
+    "e2b": 12,
+    "fireworks": 72
+  },
+  "labels_frozen_before_inference": true,
+  "rows": 96,
+  "schema_version": "live-three-route-v1-manifest",
+  "tasks_sha256": "7f9ed5766e06881d6edcbf2ab601a0d5a64a0c3e06f9a253f6349a3d91bb3180"
+}
