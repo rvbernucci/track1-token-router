@@ -4,19 +4,21 @@ Use this as the copy-paste source of truth for the final hackathon form.
 
 ## Project Title
 
-Track 1 Token Router
+ProofRoute: Token-Efficient AI Agent
 
 ## Short Description
 
-Accuracy-first token router: fail-closed local solvers, validation-selected Kimi, strict outputs, and evidence-backed rejection of unsafe local-model routes.
+An accuracy-first agent that proves deterministic answers locally and routes unsupported tasks to the best permitted Fireworks model, protecting quality while reducing scored tokens.
 
 ## Long Description
 
-Track 1 Token Router is a CLI-first competitive agent for AMD Developer Hackathon Track 1. It offers each untouched task to a fail-closed deterministic solver, then calls validation-selected Kimi K2.7 Code only when the model is authorized by the evaluator's `ALLOWED_MODELS`. Dynamic completion ceilings, strict output validation, safe mechanical repairs and ranked fallback protect accuracy while limiting scored Fireworks tokens.
+ProofRoute is a general-purpose, token-efficient AI agent built for AMD Developer Hackathon ACT II Track 1. It handles factual Q&A, mathematics, sentiment analysis, summarization, named-entity recognition, code debugging, logic puzzles and code generation. The business idea is simple: not every query should pay for the most expensive intelligence.
 
-The team also trained FunctionGemma 270M on AMD and tested a quantized, text-only Gemma 4 E2B route on 2,000 tasks. That challenger fit the memory envelope but failed the frozen accuracy gate, so it was excluded from the final image. The same holdout rejected per-intent, matrix and Minimax-only policies. The promoted deterministic-plus-Kimi runtime produced the strongest eligible accuracy with fewer tokens and the smallest operational surface.
+Each untouched task first reaches a proof-carrying deterministic layer. A zero-Fireworks-token answer is released only when the system can derive a unique, independently recomputable result. Unsupported or uncertain work is routed through the evaluator-provided `FIREWORKS_BASE_URL`, using only models authorized through `ALLOWED_MODELS`. The Answer Contract Engine performs safe mechanical formatting repairs and reconstructs the official `results.json` response.
 
-The system is headless and evaluator-friendly: stdout stays clean, logs are structured JSONL, adapters isolate official formats, and the final public Linux `amd64` image requires no startup model download.
+We also trained FunctionGemma 270M on AMD and evaluated Gemma 4 E2B as a zero-token local responder. Across 2,000 post-contract answers, E2B produced 828 correct responses. An intent-specific matrix regression identified a selective cohort with 84.52% out-of-fold precision and 12.66% coverage. This research is documented reproducibly without pretending the local model is bundled in the zero-download release.
+
+The public Linux `amd64` image is only 45.7 MB compressed and passed the 4 GB RAM, 2 vCPU, no-network, public-pull and official-output gates. It contains no credentials, cached answers or startup downloads.
 
 ## Tags
 
@@ -47,29 +49,29 @@ https://rvbernucci.github.io/track1-token-router/
 
 ## Video URL
 
-Local MP4 included in repository: submission/final/demo.mp4
+Local MP4 included in repository: submission/final/proofroute-retro-cli.mp4
 
 ## Public Docker Image
 
-ghcr.io/rvbernucci/track1-token-router:v1.0.0-championship
+ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router
 
 ## Release Evidence
 
-- release_tag: `v1.0.0-championship`
-- commit_sha: `8cbe0c58333486278f467d27ea9f27093eb68e99`
+- release_tag: `v2.1.0-proof-router`
+- commit_sha: `869dbfc8fe31098ca1425f1b02ff3043d1068ca4`
 - ci_status: `green`
 - release_status: `green`
 - image_audit_status: `green`
 - image_platform: `linux/amd64`
-- image_compressed_size_bytes: `45522326`
+- image_compressed_size_bytes: `45737139`
 
 ## Image Audit Command
 
 ```bash
 python3 scripts/competition_submission_audit.py \
-  --image ghcr.io/rvbernucci/track1-token-router:v1.0.0-championship \
-  --expected-revision 8cbe0c58333486278f467d27ea9f27093eb68e99 \
-  --expected-version v1.0.0-championship
+  --image ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router \
+  --expected-revision 869dbfc8fe31098ca1425f1b02ff3043d1068ca4 \
+  --expected-version v2.1.0-proof-router
 ```
 
 ## Notes
