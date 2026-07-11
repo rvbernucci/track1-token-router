@@ -215,7 +215,7 @@ class OfficialAdapterTests(unittest.TestCase):
         self.assertEqual(resources["tasks"], 2)
         self.assertGreater(resources["max_rss_mib"], 0)
 
-    def test_lablab_track1_cli_writes_fallbacks_when_runtime_budget_is_exhausted(self) -> None:
+    def test_lablab_track1_cli_fails_without_output_when_runtime_budget_is_exhausted(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             input_path = root / "tasks.json"
@@ -248,16 +248,16 @@ class OfficialAdapterTests(unittest.TestCase):
                     "--output",
                     str(output_path),
                 ],
-                check=True,
+                check=False,
                 capture_output=True,
                 text=True,
                 env=env,
             )
-            payload = json.loads(output_path.read_text(encoding="utf-8"))
+            output_exists = output_path.exists()
 
-        self.assertEqual(completed.stdout, "")
-        self.assertEqual([row["task_id"] for row in payload], ["late-1", "late-2"])
-        self.assertTrue(all(row["answer"].startswith("Unable to complete") for row in payload))
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertFalse(output_exists)
+        self.assertIn("refusing to publish synthetic or incomplete results", completed.stderr)
 
     def test_file_payload_round_trip(self) -> None:
         adapter = get_adapter("file_payload")

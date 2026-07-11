@@ -136,15 +136,16 @@ def _handle_submit_track1(args: argparse.Namespace, runner: TaskRunner) -> int:
     tasks = adapter.parse(raw)
     started_at = perf_counter()
     max_runtime_s = _float_env("TRACK1_MAX_RUNTIME_S", 570.0)
-    reserve_s = _float_env("TRACK1_RUNTIME_RESERVE_S", 5.0)
+    reserve_s = _float_env("TRACK1_RUNTIME_RESERVE_S", 50.0)
     set_run_deadline = getattr(runner, "set_run_deadline", None)
     if callable(set_run_deadline):
         set_run_deadline(started_at + max(0.0, max_runtime_s - reserve_s))
     results = []
     for task in tasks:
         if _runtime_budget_exhausted(started_at, max_runtime_s, reserve_s):
-            results.append(finalize_answer_result(task, _track1_timeout_result(task, started_at, max_runtime_s, reserve_s)))
-            continue
+            raise RuntimeError(
+                "Track 1 runtime budget exhausted; refusing to publish synthetic or incomplete results."
+            )
         result = finalize_answer_result(task, runner.run(task))
         if result.route == "fireworks_error":
             raise RuntimeError(f"Fireworks failed for task_id={task.id}; refusing to publish a synthetic answer.")
@@ -180,26 +181,6 @@ def _validate_track1_alignment(tasks: list[TaskEnvelope], results: list[AnswerRe
         raise ValueError("Track 1 input contains duplicate task_id values.")
     if result_ids != task_ids:
         raise ValueError("Track 1 results must preserve the exact input task_id order and cardinality.")
-
-
-def _track1_timeout_result(
-    task: TaskEnvelope,
-    started_at: float,
-    max_runtime_s: float,
-    reserve_s: float,
-) -> AnswerResult:
-    return AnswerResult(
-        id=task.id,
-        answer="Unable to complete the task within the available time budget.",
-        route="track1_time_budget_exhausted",
-        metadata={
-            "runner": "submit_track1",
-            "reason": "track1_total_runtime_budget_exhausted",
-            "elapsed_run_ms": round((perf_counter() - started_at) * 1000),
-            "max_runtime_s": max_runtime_s,
-            "reserve_s": reserve_s,
-        },
-    )
 
 
 def _float_env(name: str, default: float) -> float:

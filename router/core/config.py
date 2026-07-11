@@ -124,7 +124,7 @@ class RouterConfig:
             three_route_accuracy_gate=float(os.getenv("THREE_ROUTE_ACCURACY_GATE", "0.60")),
             three_route_max_failure=float(os.getenv("THREE_ROUTE_MAX_FAILURE", "0.15")),
             three_route_max_memory_mb=float(os.getenv("THREE_ROUTE_MAX_MEMORY_MB", "3584")),
-            three_route_deadline_reserve_ms=float(os.getenv("THREE_ROUTE_DEADLINE_RESERVE_MS", "500")),
+            three_route_deadline_reserve_ms=float(os.getenv("THREE_ROUTE_DEADLINE_RESERVE_MS", "50000")),
             enable_guardrails=_env_flag("ENABLE_GUARDRAILS"),
             enable_orchestrator=_env_flag("ENABLE_ORCHESTRATOR"),
             competition_dry_run=_env_flag("COMPETITION_DRY_RUN", default=True),
