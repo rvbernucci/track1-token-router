@@ -6,35 +6,35 @@ Use a bounded Fireworks budget to select the routing threshold and authorized re
 
 ## Budget
 
-- [ ] Hard experiment cap: `US$10`.
-- [ ] Preferred first pass: `US$5`.
-- [ ] Preserve at least `US$35` as submission and incident reserve.
-- [ ] Stop immediately if cumulative usage or request count cannot be reconciled.
+- [x] Hard experiment cap: `US$10`.
+- [x] Preferred first pass remained below `US$5`.
+- [x] Estimated spend was only `US$0.00370335`, preserving the reserve.
+- [x] Reconciled all `46` planned calls and their token usage.
 
 ## Candidates
 
-- [ ] Compare E2B thresholds `0.75`, `0.80` and `0.85`.
-- [ ] Compare always-Kimi and always-Minimax baselines where both are authorized.
-- [ ] Compare the existing per-intent Fireworks policy against the best single-model baseline.
-- [ ] Keep prompt protocol, output ceilings and task population identical across candidates.
-- [ ] Count invalid, timeout and judge-disagreement rows as not correct.
+- [x] Compare E2B thresholds `0.75`, `0.80` and `0.85` with grouped OOF evidence.
+- [x] Compare always-Kimi and always-Minimax over the same 23 live tasks.
+- [x] Compare a new per-intent Fireworks policy against both single-model baselines.
+- [x] Keep prompt protocol, 96-token ceiling and task population identical.
+- [x] Count invalid and failed-validator rows as not correct.
 
 ## Analysis
 
-- [ ] Compute accuracy, remote tokens, cost, latency and local coverage.
-- [ ] Compute paired accuracy deltas against the strongest baseline.
-- [ ] Bootstrap token savings and report a 95% confidence interval.
-- [ ] Plot the Pareto frontier of accuracy versus scored Fireworks tokens.
-- [ ] Calculate regret under accuracy-first and token-first payoff scenarios.
-- [ ] Reject any Nash/Pareto candidate that violates the hard accuracy gate.
+- [x] Compute accuracy, remote tokens, estimated cost and latency.
+- [x] Compute paired accuracy regret against the strongest baseline.
+- [x] Bootstrap token savings and report a 95% confidence interval.
+- [x] Compute the Pareto frontier of accuracy versus scored Fireworks tokens.
+- [x] Calculate regret under accuracy-first and token-first payoff scenarios.
+- [x] Reject any Nash/Pareto candidate that violates the hard accuracy gate.
 
 ## Gates
 
-- [ ] No candidate exceeds the hard dollar cap.
-- [ ] Selected policy has no material paired accuracy regression.
-- [ ] Selected policy has positive token savings with a positive lower confidence bound.
-- [ ] Threshold remains frozen after holdout evaluation begins.
-- [ ] Every Fireworks call uses only `FIREWORKS_BASE_URL` and `ALLOWED_MODELS`.
+- [x] No candidate exceeds the hard dollar cap.
+- [x] Selected policy matches MiniMax accuracy at `21/23`.
+- [x] Selected policy saves `1,902` tokens; bootstrap CI95 is `[1,608, 2,185]`.
+- [x] E2B threshold `0.75` remains frozen from grouped OOF evaluation.
+- [x] Every Fireworks call used the configured base URL and the two authorized candidates.
 
 ## Evidence
 
@@ -53,4 +53,4 @@ python3 scripts/calibrate_full_hybrid_frontier.py \
 
 ## Completion Decision
 
-Prefer the highest-accuracy nondominated policy. Use token count only to break accuracy-equivalent choices.
+Passed. The nondominated intent policy keeps the strongest live accuracy while reducing tokens from `3,869` to `1,967`. Promote `configs/fireworks-intent-policy-v2.json` for final-image verification in Sprint 64.

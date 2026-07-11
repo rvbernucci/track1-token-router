@@ -1,0 +1,98 @@
+{
+  "budget_usd": 10.0,
+  "candidates": {
+    "always_kimi": {
+      "accuracy": 0.8695652173913043,
+      "accuracy_regret": 0.04347826086956519,
+      "correct": 20,
+      "cost_usd": 0.00232665,
+      "latency_ms": 22843.0,
+      "nondominated": true,
+      "rows": 23,
+      "tokens": 1685
+    },
+    "always_minimax": {
+      "accuracy": 0.9130434782608695,
+      "accuracy_regret": 0.0,
+      "correct": 21,
+      "cost_usd": 0.0013767,
+      "latency_ms": 26164.0,
+      "nondominated": false,
+      "rows": 23,
+      "tokens": 3869
+    },
+    "intent_policy": {
+      "accuracy": 0.9130434782608695,
+      "accuracy_regret": 0.0,
+      "correct": 21,
+      "cost_usd": 0.00219075,
+      "latency_ms": 22916.0,
+      "nondominated": true,
+      "rows": 23,
+      "tokens": 1967
+    }
+  },
+  "checks": {
+    "bootstrap_lower_bound_positive": true,
+    "e2b_threshold_frozen_from_grouped_oof": true,
+    "paired_population_complete": true,
+    "runtime_models_authorized": true,
+    "selected_is_pareto_nondominated": true,
+    "selected_no_accuracy_regression": true,
+    "selected_positive_token_savings": true,
+    "spend_below_hard_cap": true
+  },
+  "e2b_thresholds": [
+    {
+      "correct": 213,
+      "coverage": 0.12656956303365144,
+      "precision": 0.8452380952380952,
+      "selected": 252,
+      "threshold": 0.75,
+      "wilson_lower_95": 0.7954338023623045
+    },
+    {
+      "correct": 191,
+      "coverage": 0.11351079859367152,
+      "precision": 0.8451327433628318,
+      "selected": 226,
+      "threshold": 0.8,
+      "wilson_lower_95": 0.7922390416496905
+    },
+    {
+      "correct": 58,
+      "coverage": 0.03817177297840281,
+      "precision": 0.7631578947368421,
+      "selected": 76,
+      "threshold": 0.85,
+      "wilson_lower_95": 0.6563861526536232
+    }
+  ],
+  "estimated_spend_usd": 0.00370335,
+  "game_theory": {
+    "accuracy_first_best_response": "intent_policy",
+    "nash_equilibrium": "intent_policy",
+    "reason": "No unilateral switch improves accuracy; among accuracy-equivalent policies, the intent policy minimizes scored tokens.",
+    "token_first_subject_to_accuracy_gate": "intent_policy"
+  },
+  "limitations": [
+    "The live microbench contains 23 deterministic-validator tasks and does not estimate hidden-evaluator accuracy.",
+    "E2B threshold metrics are grouped out-of-fold historical evidence, not new Fireworks calls."
+  ],
+  "live_calls": 46,
+  "paired_token_savings_ci95": [
+    1608,
+    2185
+  ],
+  "passed": true,
+  "schema_version": "final-pareto-calibration-v1",
+  "selected_e2b_threshold": {
+    "correct": 213,
+    "coverage": 0.12656956303365144,
+    "precision": 0.8452380952380952,
+    "selected": 252,
+    "threshold": 0.75,
+    "wilson_lower_95": 0.7954338023623045
+  },
+  "selected_fireworks_policy": "intent_policy"
+}

@@ -1,0 +1,27 @@
+{
+  "allowed_models": [
+    "accounts/fireworks/models/minimax-m3",
+    "accounts/fireworks/models/kimi-k2p7-code"
+  ],
+  "default_enabled": true,
+  "default_model": "accounts/fireworks/models/kimi-k2p7-code",
+  "intent_models": {
+    "code_debugging": "accounts/fireworks/models/kimi-k2p7-code",
+    "code_generation": "accounts/fireworks/models/kimi-k2p7-code",
+    "factual_qa": "accounts/fireworks/models/kimi-k2p7-code",
+    "logic_puzzle": "accounts/fireworks/models/kimi-k2p7-code",
+    "math_reasoning": "accounts/fireworks/models/kimi-k2p7-code",
+    "ner": "accounts/fireworks/models/minimax-m3",
+    "sentiment": "accounts/fireworks/models/kimi-k2p7-code",
+    "summarization": "accounts/fireworks/models/kimi-k2p7-code"
+  },
+  "locked_test_used_for_selection": false,
+  "schema_version": "fireworks-intent-policy-v1",
+  "selection_split": "validation",
+  "source": {
+    "comparison_report": "reports/public/final-pareto-calibration.json",
+    "comparison_report_sha256": "1e75090138fde632258d1fcd95ae923a7967a9d871d363f0963eb7367111eefa",
+    "estimated_spend_usd": 0.00370335,
+    "live_calls": 46
+  }
+}
