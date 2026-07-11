@@ -12,6 +12,7 @@ class LiveThreeRouteArenaTests(unittest.TestCase):
     def test_memory_units(self):
         self.assertEqual(_memory_mib("1 GiB"), 1024)
         self.assertEqual(_memory_mib("512 MiB"), 512)
+        self.assertEqual(_memory_mib("0B"), 0)
 
 
 if __name__ == "__main__":

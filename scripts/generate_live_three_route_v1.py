@@ -48,9 +48,15 @@ def generate() -> list[dict]:
                 left, right = 700 + offset, 30 + offset
                 prompt = f"Compute {left} + {right}. Return only the number."
                 validator, shape, expected_route = {"type": "number_exact", "expected": left + right}, "number", "deterministic"
+            elif category == "sentiment":
+                label = ("positive", "negative", "neutral")[offset % 3]
+                phrase = {"positive": "excellent and reliable", "negative": "awful and unreliable", "neutral": "ordinary and adequate"}[label]
+                prompt = (f"Ticket L67-{offset}: The packaging was ordinary, but module-live-{offset} was {phrase}. "
+                          f"Classify sentiment toward module-live-{offset} only. Return exactly positive, negative, or neutral.")
+                validator, shape, expected_route = {"type": "exact_lower", "expected": label}, "label", "e2b"
             else:
                 prompt, validator, _, shape = factories[category](index, difficulty)
-                expected_route = "e2b" if category == "sentiment" else "fireworks"
+                expected_route = "fireworks"
             task_id = f"live_{category}_{offset:02d}"
             rows.append({
                 "task_id": task_id, "prompt": prompt, "category": category,

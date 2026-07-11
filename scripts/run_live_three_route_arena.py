@@ -154,19 +154,31 @@ def _image_audit(image):
     inspect=json.loads(_capture(["docker","image","inspect",image]))[0]
     repo_digest=inspect.get("RepoDigests",[])[0]
     labels=inspect.get("Config",{}).get("Labels",{}) or {}
-    return {"tag":image,"digest_reference":repo_digest,"platform":f"{inspect['Os']}/{inspect['Architecture']}","revision":labels.get("org.opencontainers.image.revision"),"version":labels.get("org.opencontainers.image.version"),"uncompressed_bytes":inspect.get("Size",0)}
+    return {"tag":image,"digest_reference":repo_digest,"platform":f"{inspect['Os']}/{inspect['Architecture']}","revision":labels.get("org.opencontainers.image.revision"),"version":labels.get("org.opencontainers.image.version"),"uncompressed_bytes":inspect.get("Size",0),"compressed_bytes":_compressed_size(repo_digest)}
 
 
 def _sample(name,samples,stop):
     while not stop.wait(.25):
         result=subprocess.run(["docker","stats","--no-stream","--format","{{.MemUsage}}",name],capture_output=True,text=True)
         if result.returncode==0 and result.stdout.strip():
-            value=result.stdout.split("/",1)[0].strip();samples.append(_memory_mib(value))
+            value=result.stdout.split("/",1)[0].strip()
+            try: samples.append(_memory_mib(value))
+            except ValueError: continue
 
 
 def _memory_mib(value):
-    number=float(value.split()[0].replace("GiB","").replace("MiB","").replace("KiB",""));
-    return number*1024 if "GiB" in value else number/1024 if "KiB" in value else number
+    compact=value.replace(" ","")
+    for suffix,factor in (("GiB",1024),("MiB",1),("KiB",1/1024),("GB",953.674316),("MB",1/1.048576),("kB",1/1024/1.024),("B",1/1024/1024)):
+        if compact.endswith(suffix): return float(compact[:-len(suffix)])*factor
+    raise ValueError(f"unsupported memory value: {value}")
+
+
+def _compressed_size(reference):
+    payload=json.loads(_capture(["docker","buildx","imagetools","inspect","--raw",reference]))
+    if "manifests" in payload:
+        amd=next(item for item in payload["manifests"] if item.get("platform",{}).get("architecture")=="amd64")
+        payload=json.loads(_capture(["docker","buildx","imagetools","inspect","--raw",reference.split("@",1)[0]+"@"+amd["digest"]]))
+    return sum(int(layer.get("size",0)) for layer in payload.get("layers",[]))
 
 
 def _allowed_models(): return ["accounts/fireworks/models/minimax-m3","accounts/fireworks/models/kimi-k2p7-code"]
