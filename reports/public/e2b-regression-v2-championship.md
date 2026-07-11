@@ -18,14 +18,17 @@ The paired lineage bootstrap placed the lower 95% bound for token savings at zer
 ## Runtime Evidence
 
 - Image platform: `linux/amd64`.
-- Compressed image size: `51,565,149` bytes.
-- Uncompressed image size: `130,801,668` bytes.
+- Public image: `ghcr.io/rvbernucci/track1-token-router:v2.0.1-e2b-v2`.
+- Public digest: `sha256:c9b66097e6a9aa2aa061a35d328ba529fbf732d71dea01751e53be9dfab27553`.
+- Compressed image size: `50,481,245` bytes.
+- Uncompressed image size: `124,593,854` bytes.
 - Runtime limits: 4 GiB, 2 vCPU and network disabled.
 - Observed runtime: 1 second.
-- Process peak RSS: 28.484 MiB.
+- Process peak RSS: 28.758 MiB.
 - Official output contract: 2/2 ordered rows, exit code zero.
 - Image scan: no sealed evaluation directory, final task identifier or credential pattern.
 - Test suite: 594 tests passed after adding explicit 429/503/malformed-response chaos coverage; one environment-dependent test was skipped.
+- Release run `29143012652` and anonymous public-image audit run `29143144891` both passed.
 
 ## Safety Contract
 

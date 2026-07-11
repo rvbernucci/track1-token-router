@@ -1,6 +1,6 @@
 # Sprint 59 - Championship Runtime Promotion
 
-Status: **In progress - all local gates passed; public registry authorization pending**
+Status: **Completed - V2 rejected, deterministic plus Fireworks image published**
 
 ## Objective
 
@@ -63,7 +63,7 @@ This proves the worker and gate script, not the future local-model image. Functi
 
 ### Docker Runtime
 
-- [ ] Publish and inspect a public `linux/amd64` image.
+- [x] Publish and inspect a public `linux/amd64` image.
 - [x] Exclude rejected FunctionGemma and E2B artifacts from the promoted fallback image.
 - [x] Prove the image starts with network disabled.
 - [x] Run with `--memory=4g --cpus=2 --network=none`.
@@ -140,11 +140,14 @@ This proves the worker and gate script, not the future local-model image. Functi
 - Judgment: 271 mechanical outcomes and 129 semantic rows judged independently by Antigravity and Codex; disagreement counted as incorrect.
 - V2 outcome: three local releases, 100% point precision, 43.85% Wilson lower 95% and token-savings bootstrap lower bound zero.
 - Decision: `configs/e2b-local-adjudication-v2.json` remains disabled and pins `retain_deterministic_fireworks`.
-- Docker: `linux/amd64`, 51,565,149 compressed bytes, 28.484 MiB peak RSS, one-second wall time, network disabled and valid ordered output.
+- Docker: public `linux/amd64`, 50,481,245 compressed bytes, 28.758 MiB peak RSS, one-second wall time, network disabled and valid ordered output.
 - Leakage: `evals` is absent from the image; sealed directories are ignored from Git; image layers contain no credential or sampled final-task identifier.
 - Tests: the complete suite passed 594 tests after the explicit Fireworks 429/503/malformed chaos case; one environment-dependent test was skipped.
+- Public image: `ghcr.io/rvbernucci/track1-token-router:v2.0.1-e2b-v2`, digest `sha256:c9b66097e6a9aa2aa061a35d328ba529fbf732d71dea01751e53be9dfab27553`.
+- Release workflow: GitHub Actions run `29143012652` passed clean-clone tests, resource gate, publish, pull and immutable OCI audit.
+- Anonymous audit: GitHub Actions run `29143144891` independently pulled and gated the exact public image.
 - Public report: `reports/public/e2b-regression-v2-championship.md` contains aggregate evidence only.
 
 ## Final Decision
 
-Reject E2B V2 for the submission image. Retain proof-carrying deterministic solvers followed by the allowed Fireworks router. The only remaining operational step is granting GitHub CLI `write:packages`, pushing `ghcr.io/rvbernucci/track1-token-router:e2b-v2`, setting it public and verifying an anonymous pull.
+Reject E2B V2 for the submission image. Retain proof-carrying deterministic solvers followed by the allowed Fireworks router. The exact public image was anonymously pulled, resource-gated and audited against revision `5562ace0f412eb39e0475cec83498d2fb5185fb0` and version `v2.0.1-e2b-v2`.
