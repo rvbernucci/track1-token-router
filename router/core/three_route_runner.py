@@ -211,7 +211,20 @@ class ThreeRouteRunner:
 
     def _log(self, task: TaskEnvelope, result: AnswerResult, trace: RoutingTrace) -> None:
         if self.logger:
-            self.logger.log_result(task, result, extra={"stage": "three_route", "routing_trace": trace.to_dict()})
+            metadata = result.metadata
+            self.logger.log_result(
+                task,
+                result,
+                extra={
+                    "stage": "three_route",
+                    "routing_trace": trace.to_dict(),
+                    "fireworks_model": metadata.get("fireworks_model"),
+                    "latency_fireworks_ms": int(metadata.get("latency_fireworks_ms") or 0),
+                    "fireworks_request_options": metadata.get("fireworks_request_options") or {},
+                    "e2b_matrix": metadata.get("e2b_matrix"),
+                    "selective_e2b": metadata.get("selective_e2b"),
+                },
+            )
 
 
 def _solver_result(task: TaskEnvelope, solver: SolverResult) -> AnswerResult:

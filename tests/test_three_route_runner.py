@@ -94,14 +94,23 @@ class Predictor:
 
 
 class Runner:
-    def __init__(self, answer, route):
+    def __init__(self, answer, route, metadata=None):
         self.answer = answer
         self.route = route
+        self.metadata = metadata or {}
         self.calls = 0
 
     def run(self, task):
         self.calls += 1
-        return AnswerResult(id=task.id, answer=self.answer, route=self.route)
+        return AnswerResult(id=task.id, answer=self.answer, route=self.route, metadata=self.metadata)
+
+
+class CaptureLogger:
+    def __init__(self):
+        self.extra = None
+
+    def log_result(self, _task, _result, extra=None):
+        self.extra = extra
 
 
 class BrokenRunner:
@@ -128,6 +137,23 @@ class SelectivePolicy:
 
 
 class ThreeRouteRunnerTests(unittest.TestCase):
+    def test_safe_runtime_telemetry_is_logged_without_prompt(self):
+        logger = CaptureLogger()
+        remote = Runner(
+            "remote",
+            "fireworks_direct",
+            metadata={"fireworks_model": "accounts/fireworks/models/kimi-k2p7-code", "latency_fireworks_ms": 17},
+        )
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(), predictor=Predictor(),
+            selector=MinimaxRegretSelector(e2b_enabled=False),
+            e2b_runner=Runner("local", "e2b_local"), fireworks_runner=remote, logger=logger,
+        )
+        runner.run(TaskEnvelope(id="telemetry", input_text="Explain why the sky is blue."))
+        self.assertEqual(logger.extra["fireworks_model"], "accounts/fireworks/models/kimi-k2p7-code")
+        self.assertEqual(logger.extra["latency_fireworks_ms"], 17)
+        self.assertNotIn("prompt", logger.extra)
+
     def test_matrix_gate_uses_raw_not_calibrated_assessment(self):
         matrix = RecordingMatrixGate()
         remote = Runner("remote", "fireworks_direct")
