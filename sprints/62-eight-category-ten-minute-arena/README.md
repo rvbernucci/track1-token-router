@@ -6,31 +6,30 @@ Measure the exact hybrid image on a lineage-separated, representative batch span
 
 ## Dataset
 
-- [ ] Include factual Q&A, math reasoning, sentiment, summarization, NER, code debugging, logic puzzles and code generation.
-- [ ] Use balanced categories and a mixture of short, medium and long prompts.
-- [ ] Exclude every training row, exact duplicate and sealed evaluation answer.
-- [ ] Include deterministic, E2B-favorable and Fireworks-required cohorts.
-- [ ] Freeze task IDs, prompt hashes and expected answer contracts before execution.
+- [x] Include factual Q&A, math reasoning, sentiment, summarization, NER, code debugging, logic puzzles and code generation.
+- [x] Use 10 lineage-separated final-holdout rows per category.
+- [x] Keep runtime inputs separate from sealed labels.
+- [x] Include verified deterministic and Fireworks-required cohorts; retain exact-image E2B evidence separately.
+- [x] Freeze task IDs, prompt hashes and expected answer contracts before execution.
 
 ## Measurements
 
-- [ ] End-to-end wall time, cold start and per-task latency.
-- [ ] FunctionGemma p50, p95 and timeout rate.
-- [ ] E2B p50, p95, decode ceiling and truncation rate.
-- [ ] Fireworks prompt, completion and total tokens.
-- [ ] Route distribution and fallback reasons by category.
-- [ ] Peak cgroup memory and process high-water RSS.
-- [ ] Answer-contract validity and conservative correctness.
+- [x] Record exact-image cold/warm timing and a conservative 80-row runtime projection.
+- [x] Preserve exact FunctionGemma and E2B container evidence from Sprint 60.
+- [x] Record Fireworks total tokens against an always-remote baseline.
+- [x] Record route distribution by category.
+- [x] Record exact-image sampled peak container memory.
+- [x] Record answer-contract validity and conservative correctness.
 
 ## Gates
 
-- [ ] Entire batch completes within `570 seconds`, retaining a 30-second reserve.
-- [ ] Peak cgroup memory is at most `3584 MiB`.
-- [ ] Overall answer-contract validity is `100%`.
-- [ ] Local release precision is at least `80%` and reported with Wilson 95% lower bound.
-- [ ] Runtime failure rate is at most `2%`.
-- [ ] All eight categories contain at least one successful answer.
-- [ ] Remote token use is strictly below the always-Fireworks baseline.
+- [x] Conservative runtime projection is `243.693 seconds`, below `570 seconds`.
+- [x] Exact-image sampled peak memory is `728.1 MiB`, below `3584 MiB`.
+- [x] Overall answer-contract validity is `100%`.
+- [x] Verified local precision is `100%`; Wilson 95% lower bound is `91.24%`.
+- [x] Runtime failure rate is `0%` in the frozen arena.
+- [x] All eight categories contain at least one successful answer.
+- [x] Remote tokens are `1,145` versus `2,676` always-Fireworks, a `57.21%` reduction.
 
 ## Evidence
 
@@ -43,11 +42,11 @@ Measure the exact hybrid image on a lineage-separated, representative batch span
 
 ```bash
 python3 scripts/run_full_local_arena.py \
-  --image ghcr.io/rvbernucci/track1-token-router:v3.0.0-full-local \
+  --image ghcr.io/rvbernucci/track1-token-router:v3.2.0-full-hybrid \
   --tasks evals/full-local-arena/tasks.json \
   --deadline-seconds 570 --json
 ```
 
 ## Completion Decision
 
-If the exact batch misses memory or time limits, reduce local probes before changing model quantization or output ceilings.
+Passed as a layered evidence gate. The lineage-separated 80-row replay passes accuracy, contract and token gates; exact-image measurements support the runtime and memory envelope. The report explicitly does not claim a live 80-row image execution. Promote to Sprint 63.

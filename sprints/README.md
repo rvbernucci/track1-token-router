@@ -36,7 +36,7 @@ Sprints 60-64 validate the exact public hybrid image rather than a source-tree a
 
 - [x] [Sprint 60 - Exact-Image Local Inference Proof](./60-exact-image-local-inference-proof/README.md)
 - [x] [Sprint 61 - Three-Route Failure And Contract Drill](./61-three-route-failure-contract-drill/README.md)
-- [ ] [Sprint 62 - Eight-Category Ten-Minute Arena](./62-eight-category-ten-minute-arena/README.md)
+- [x] [Sprint 62 - Eight-Category Ten-Minute Arena](./62-eight-category-ten-minute-arena/README.md)
 - [ ] [Sprint 63 - Fireworks Pareto Threshold Calibration](./63-fireworks-pareto-threshold-calibration/README.md)
 - [ ] [Sprint 64 - Final Hybrid Promotion And Submission Lock](./64-final-hybrid-promotion-submission-lock/README.md)
 
