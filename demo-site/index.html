@@ -226,26 +226,25 @@
         <p class="eyebrow">AMD Developer Hackathon ACT II / Track 1</p>
         <h1>Accuracy first. Remote tokens only when needed.</h1>
         <p class="lead">
-          Track 1 Token Router is a CLI-first agent that uses fail-closed deterministic solvers,
-          then validation-selected Kimi when authorized by the evaluator, with strict output
-          validation and allowed-model fallback.
+          ProofRoute combines embedded FunctionGemma assessment, proof-carrying deterministic
+          solvers, selective Gemma E2B inference and evaluator-authorized Fireworks fallback.
         </p>
         <div class="actions">
-          <a class="button" href="public-reports/battle-report.md">Battle report</a>
-          <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/reports/public/championship-ablation.md">Championship ablation</a>
+          <a class="button" href="https://github.com/rvbernucci/track1-token-router/blob/main/reports/public/final-hybrid-scorecard.md">Final scorecard</a>
+          <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/reports/public/final-pareto-calibration.md">Pareto calibration</a>
           <a class="button secondary" href="public-reports/fuzz-report.md">Fuzz report</a>
-          <a class="button secondary" href="public-reports/submission-readiness.md">Submission readiness</a>
+          <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/submission/final/final-release-decision.json">Release decision</a>
           <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/README.md">README</a>
           <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/SUBMISSION.md">SUBMISSION</a>
         </div>
       </div>
 
       <aside class="panel router-card" aria-label="Router flow">
-        <div class="node"><strong>1. Local proof</strong> A registered solver accepts only an exact mechanical contract.</div>
+        <div class="node"><strong>1. Local assessment</strong> FunctionGemma 270M emits an intent and five routing scores.</div>
         <div class="arrow">↓</div>
-        <div class="node"><strong>2. Accuracy route</strong> Kimi is preferred only when it appears in <code>ALLOWED_MODELS</code>.</div>
+        <div class="node"><strong>2. Zero-token routes</strong> Proven deterministic tasks or selected Gemma E2B tasks stay local.</div>
         <div class="arrow">↓</div>
-        <div class="node"><strong>3. Contract guard</strong> Strict validation, safe repair and ranked fallback produce the answer.</div>
+        <div class="node"><strong>3. Safe fallback</strong> Kimi or MiniMax is called only when present in <code>ALLOWED_MODELS</code>.</div>
       </aside>
     </section>
 
@@ -253,25 +252,25 @@
       <article class="card">
         <h2>Why this wins</h2>
         <p>The hard part is not calling the strongest model. The hard part is knowing when not to call it.</p>
-        <span class="metric">75% binary</span>
+        <span class="metric">3 routes</span>
       </article>
 
       <article class="card">
         <h2>Evidence</h2>
-        <p>A 571-task frozen ablation rejected the FunctionGemma/E2B, per-intent, matrix and Minimax challengers without post-test tuning.</p>
-        <span class="metric">571 tasks</span>
+        <p>The exact public image produced two real E2B answers under 4 GB and 2 vCPU with zero Fireworks tokens.</p>
+        <span class="metric">727.5 MiB</span>
       </article>
 
       <article class="card">
         <h2>Submission shape</h2>
-        <p>Public GitHub repo, Docker, CLI reproduction, static demo and no-credit release path.</p>
-        <span class="metric">linux/amd64</span>
+        <p>Public, immutable, no-download image with audited OCI labels and a compact rollback tag.</p>
+        <span class="metric">2.67 GB</span>
       </article>
 
       <article class="card wide">
-        <h2>Demo command</h2>
-        <pre><code>ROUTER_MODE=fireworks \
-python3 -m router ask "What is 6 * 7? Return only the number." --json</code></pre>
+        <h2>Pull the submitted image</h2>
+        <pre><code>docker pull --platform linux/amd64 \
+  ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid</code></pre>
       </article>
 
       <article class="card">
@@ -290,21 +289,31 @@ python3 -m router ask "What is 6 * 7? Return only the number." --json</code></pr
       </article>
 
       <article class="card wide">
-        <h2>Reproduce locally</h2>
-        <pre><code>python3 -m pip install -e .
-scripts/offline_release_check.sh
-python3 scripts/export_public_report.py --check
-cd demo-site && python3 -m http.server 8080</code></pre>
+        <h2>Run the submitted container</h2>
+        <p>Create the official input file, then pass the three evaluator variables from your shell.</p>
+        <pre><code>mkdir -p input output
+printf '%s\n' '[{"task_id":"t1","prompt":"What is 6 * 7? Return only the number."}]' &gt; input/tasks.json
+
+docker run --rm --platform linux/amd64 \
+  --memory=4g --cpus=2 \
+  -e FIREWORKS_API_KEY \
+  -e FIREWORKS_BASE_URL \
+  -e ALLOWED_MODELS \
+  -v "$PWD/input:/input:ro" \
+  -v "$PWD/output:/output" \
+  ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid
+
+cat output/results.json</code></pre>
       </article>
 
       <article class="card wide">
-        <h2>Remote audit dry-run</h2>
+        <h2>Run source checks</h2>
         <p>
-          In no-credit mode, risky tasks exercise the same routing boundary without calling
-          Fireworks. The real remote provider is activated only after credentials and credits exist.
+          These commands validate the repository; they are separate from running the submitted image.
         </p>
-        <pre><code>ROUTER_MODE=competition COMPETITION_DRY_RUN=1 \
-python3 -m router ask "Summarize the tradeoff between token cost and answer quality in one sentence." --json</code></pre>
+        <pre><code>python3 -m pip install -e .
+scripts/offline_release_check.sh
+python3 scripts/export_public_report.py --check</code></pre>
       </article>
     </section>
 
