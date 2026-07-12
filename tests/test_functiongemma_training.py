@@ -15,7 +15,15 @@ from router.functiongemma.tooling import (
     training_conversation,
     validate_training_row,
 )
-from scripts.functiongemma_experiment import _chunks, boundary_report, load_config, parser, prepare, select
+from scripts.functiongemma_experiment import (
+    _chunks,
+    _trim_trailing_token,
+    boundary_report,
+    load_config,
+    parser,
+    prepare,
+    select,
+)
 
 
 def assessment(*, deterministic_fit: int = 9) -> TaskAssessment:
@@ -62,6 +70,8 @@ class FunctionGemmaToolingTests(unittest.TestCase):
             [{"id": "2"}, {"id": "3"}],
             [{"id": "4"}],
         ])
+        self.assertEqual(_trim_trailing_token([4, 5, 0, 0], 0), [4, 5])
+        self.assertEqual(_trim_trailing_token([4, 5], 0), [4, 5])
 
     def test_tool_schema_matches_runtime_contract(self) -> None:
         properties = ASSESS_TASK_TOOL["function"]["parameters"]["properties"]

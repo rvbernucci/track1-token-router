@@ -407,7 +407,10 @@ def evaluate(
         latencies.extend([latency] * len(task_batch))
         prompt_length = encoded["input_ids"].shape[-1]
         for index, (example_id, _) in enumerate(examples):
-            raw = tokenizer.decode(generated[index][prompt_length:], skip_special_tokens=False)
+            output_token_ids = _trim_trailing_token(
+                generated[index][prompt_length:].tolist(), tokenizer.pad_token_id
+            )
+            raw = tokenizer.decode(output_token_ids, skip_special_tokens=False)
             prediction = None
             error = None
             try:
@@ -423,7 +426,7 @@ def evaluate(
                     "parse_error": error,
                     "latency_ms": latency,
                     "input_tokens": int(encoded["attention_mask"][index].sum().item()),
-                    "output_tokens": int(generated.shape[-1] - prompt_length),
+                    "output_tokens": len(output_token_ids),
                 }
             )
     write_jsonl(output, predictions)
@@ -595,6 +598,13 @@ def _task(row: Mapping[str, Any]) -> tuple[str, str]:
 
 def _chunks(rows: Sequence[dict[str, Any]], size: int) -> Sequence[Sequence[dict[str, Any]]]:
     return [rows[index : index + size] for index in range(0, len(rows), size)]
+
+
+def _trim_trailing_token(token_ids: Sequence[int], token_id: int) -> list[int]:
+    trimmed = list(token_ids)
+    while trimmed and trimmed[-1] == token_id:
+        trimmed.pop()
+    return trimmed
 
 
 def _validate_variant(name: str, value: Mapping[str, Any]) -> None:
