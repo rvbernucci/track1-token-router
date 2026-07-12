@@ -45,4 +45,4 @@ No `.env` file is required or included. The harness injects `FIREWORKS_API_KEY`,
 
 ## Current Status
 
-The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash`; `v3.6.0-category-calibrated` is the one-field rollback and `v2.1.0-proof-router` the compact rollback. Release run `29196181749` and exact local-inference run `29196742441` are green. The public image is 2,666,352,767 compressed bytes and requires no startup downloads.
+The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe`; `v3.7.0-wilson-nash` is the immediate rollback and `v2.1.0-proof-router` the compact rollback. Release run `29198014562`, exact local-inference run `29198550699` and hostile harness run `29198549870` are green. The public image is 2,666,354,372 compressed bytes and requires no startup downloads.

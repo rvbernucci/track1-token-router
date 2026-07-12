@@ -51,7 +51,7 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-`v3.7.0-wilson-nash` is the promoted championship image. It passed clean public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract and exact local-inference gates. `v3.6.0-category-calibrated` remains the one-field rollback and `v2.1.0-proof-router` the compact rollback.
+`v3.7.1-harness-safe` is the promoted championship image. It passed clean public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract, exact local-inference and hostile harness-compatibility gates. `v3.7.0-wilson-nash` remains the immediate rollback and `v2.1.0-proof-router` the compact rollback.
 
 ## Quickstart
 
@@ -73,7 +73,7 @@ python3 scripts/secret_scan.py
 git diff --check
 ```
 
-The current source suite contains `679` passing tests with one environment-dependent skip.
+The promoted release suite contains `682` passing tests with one environment-dependent skip.
 
 ## Official Offline Contract
 
@@ -154,10 +154,10 @@ ROUTER_MODE=three_route
 The final hybrid championship candidate is:
 
 ```text
-ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash
+ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe
 ```
 
-It embeds FunctionGemma 270M Q8 and text-only Gemma 4 E2B, requires no startup downloads, and falls through to evaluator-authorized Fireworks models. Release run `29196181749` proved its public manifest and resource contract. Exact-image run `29196742441` then proved two local routes with zero Fireworks tokens, a `9.48 s` cold start, `1.447 s` warm inference and `639.8 MiB` sampled peak memory.
+It embeds FunctionGemma 270M Q8 and text-only Gemma 4 E2B, requires no startup downloads, and falls through to evaluator-authorized Fireworks models. Release run `29198014562` proved its public manifest and resource contract. Exact-image run `29198550699` proved two local routes with zero Fireworks tokens, a `9.737 s` cold start, `1.596 s` warm inference and `745.7 MiB` sampled peak memory. Harness run `29198549870` also passed as a non-root user with a read-only root filesystem and verified safe local-runtime fallback.
 
 ## Fireworks
 

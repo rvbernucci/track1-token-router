@@ -1,38 +1,32 @@
 {
   "accepted_risks": [
     "The hidden evaluator distribution is unknown; all accuracy claims remain scoped to documented datasets.",
-    "Semantic-v3 Q8, cluster augmentation, and verify-or-repair failed frozen promotion gates and are excluded.",
+    "Required Fireworks variables are injected by the official harness and are not embedded.",
     "The final lablab.ai field and submission receipt require manual confirmation outside this repository."
   ],
-  "candidate": "ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash",
+  "candidate": "ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe",
   "checks": {
     "candidate_is_immutable_version_tag": true,
     "compressed_size_below_10gb": true,
     "exact_local_gate_passed": true,
-    "local_gate_run_recorded": true,
+    "harness_compatibility_gate_passed": true,
     "manifest_digest_is_sha256": true,
     "platform_digest_is_sha256": true,
     "release_run_recorded": true,
     "revision_is_sha40": true,
-    "rollback_is_distinct_version_tag": true,
-    "wilson_nash_guard_hash_pinned": true
+    "rollback_is_distinct_version_tag": true
   },
-  "compressed_size_bytes": 2666352767,
-  "decision": "promote_wilson_nash_hybrid",
-  "exact_local_gate_run": {
-    "id": 29196742441,
-    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29196742441"
-  },
-  "manifest_digest": "sha256:3b661e9abf9f491d8f63ee941b218ba8269b6cd82c09d897723167f0c6513620",
+  "compressed_size_bytes": 2666354372,
+  "decision": "promote_harness_safe_wilson_nash_hybrid",
+  "exact_local_gate_run": {"id": 29198550699, "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29198550699"},
+  "harness_compatibility_run": {"id": 29198549870, "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29198549870"},
+  "manifest_digest": "sha256:b9aa6f516a69397ae203ce725c71ac7ed16dc8b5bc40a1001be406a36ba5dc70",
   "passed": true,
-  "platform_digest": "sha256:cc53eb3cebe712073c28cc9f2f00acd466065fcf9df32a9fe9e8ff39773ae2b2",
-  "release_run": {
-    "id": 29196181749,
-    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29196181749"
-  },
-  "revision": "2b76451f885ff36e8874f212779a36c7f539e0c0",
-  "rollback": "ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated",
-  "rollback_action": "Replace only the Docker Image field with ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated",
+  "platform_digest": "sha256:d558ae1cfeee1879eaf7a669a049dc4e8564bf2c15c748f59414746e0c076293",
+  "release_run": {"id": 29198014562, "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29198014562"},
+  "revision": "9f5aef59097c56531ce553a2f87f9b9eb26ab197",
+  "rollback": "ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash",
+  "rollback_action": "Replace only the Docker Image field with ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash",
   "schema_version": "final-release-decision-v1",
-  "submission_action": "Set the Docker Image field to ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash"
+  "submission_action": "Set the Docker Image field to ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe"
 }

@@ -260,7 +260,7 @@
       <article class="card">
         <h2>Evidence</h2>
         <p>The exact public image produced two real E2B answers under 4 GB and 2 vCPU with zero Fireworks tokens.</p>
-        <span class="metric">639.8 MiB peak</span>
+        <span class="metric">745.7 MiB peak</span>
       </article>
 
       <article class="card">
@@ -272,7 +272,7 @@
       <article class="card wide">
         <h2>Pull the submitted image</h2>
         <pre><code>docker pull --platform linux/amd64 \
-  ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash</code></pre>
+  ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe</code></pre>
       </article>
 
       <article class="card">
@@ -303,7 +303,7 @@ docker run --rm --platform linux/amd64 \
   -e ALLOWED_MODELS \
   -v "$PWD/input:/input:ro" \
   -v "$PWD/output:/output" \
-  ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash
+  ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe
 
 cat output/results.json</code></pre>
       </article>
@@ -316,7 +316,7 @@ cat output/results.json</code></pre>
         <pre><code>python3 -m pip install -e .
 scripts/offline_release_check.sh
 python3 scripts/export_public_report.py --check</code></pre>
-        <p><strong>Verified:</strong> 679 automated tests passed, with one environment-dependent skip.</p>
+        <p><strong>Verified:</strong> 682 automated tests passed, with one environment-dependent skip.</p>
       </article>
     </section>
 
