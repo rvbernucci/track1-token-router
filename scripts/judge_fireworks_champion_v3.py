@@ -77,6 +77,28 @@ def wilson(successes: int, total: int, z: float = 1.96) -> float:
     return (p + z * z / (2 * total) - z * math.sqrt((p * (1 - p) + z * z / (4 * total)) / total)) / denominator
 
 
+def _mcnemar_exact(left_only: int, right_only: int) -> float:
+    discordant = left_only + right_only
+    if discordant == 0:
+        return 1.0
+    tail = sum(math.comb(discordant, index) for index in range(min(left_only, right_only) + 1)) / (2 ** discordant)
+    return min(1.0, 2 * tail)
+
+
+def _model_metrics(rows: list[dict[str, Any]], by_pair: dict[tuple[str, str], dict[str, Any]]) -> dict[str, Any]:
+    successes = sum(bool(row["correct"]) for row in rows)
+    usage_rows = [by_pair[(row["task_id"], row["model"])] for row in rows]
+    return {
+        "judged": len(rows), "correct": successes,
+        "accuracy": successes / len(rows) if rows else None,
+        "wilson_lower_95": wilson(successes, len(rows)),
+        "tokens": sum(int((item.get("usage") or {}).get("total", 0)) for item in usage_rows),
+        "prompt_tokens": sum(int((item.get("usage") or {}).get("prompt", 0)) for item in usage_rows),
+        "completion_tokens": sum(int((item.get("usage") or {}).get("completion", 0)) for item in usage_rows),
+        "median_latency_ms": statistics.median(item["latency_ms"] for item in usage_rows) if usage_rows else None,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Mechanical-first blind adjudication for champion v3")
     parser.add_argument("--tasks", type=Path, default=Path("evals/fireworks-champion-v3/tasks.jsonl"))
@@ -149,17 +171,47 @@ def main() -> int:
     groups: dict[str, Any] = {}
     for model in MODELS:
         rows = [row for row in completed if row["model"] == model]
-        successes = sum(bool(row["correct"]) for row in rows)
-        usage_rows = [by_pair[(row["task_id"], model)] for row in rows]
-        groups[model] = {
-            "judged": len(rows), "correct": successes, "accuracy": successes / len(rows) if rows else None,
-            "wilson_lower_95": wilson(successes, len(rows)),
-            "tokens": sum(int((item.get("usage") or {}).get("total", 0)) for item in usage_rows),
-            "median_latency_ms": statistics.median(item["latency_ms"] for item in usage_rows) if usage_rows else None,
-        }
+        groups[model] = _model_metrics(rows, by_pair)
     metrics["models"] = groups
+    category_metrics: dict[str, Any] = {}
+    recommendation: dict[str, Any] = {"objective": "maximize_accuracy_then_minimize_tokens", "by_category": {}, "statistically_supported_overrides": {}}
+    for category in sorted({task["category"] for task in tasks.values()}):
+        category_task_ids = {task_id for task_id, task in tasks.items() if task["category"] == category}
+        category_metrics[category] = {}
+        candidates = []
+        for model in MODELS:
+            rows = [row for row in completed if row["model"] == model and row["task_id"] in category_task_ids]
+            category_metrics[category][model] = _model_metrics(rows, by_pair)
+            model_metrics = category_metrics[category][model]
+            candidates.append((model_metrics["accuracy"], -model_metrics["tokens"], model))
+        _, _, champion = max(candidates)
+        other = next(model for model in MODELS if model != champion)
+        recommendation["by_category"][category] = {
+            "preferred_model": champion,
+            "accuracy_delta_vs_other": category_metrics[category][champion]["accuracy"] - category_metrics[category][other]["accuracy"],
+            "token_delta_vs_other": category_metrics[category][champion]["tokens"] - category_metrics[category][other]["tokens"],
+            "promotion_status": "candidate_only_requires_sealed_policy_review",
+        }
+        category_ids = sorted(category_task_ids)
+        final_lookup = {(row["task_id"], row["model"]): bool(row["correct"]) for row in completed}
+        kimi_only = sum(final_lookup[(task_id, MODELS[0])] and not final_lookup[(task_id, MODELS[1])] for task_id in category_ids)
+        minimax_only = sum(final_lookup[(task_id, MODELS[1])] and not final_lookup[(task_id, MODELS[0])] for task_id in category_ids)
+        paired_p = _mcnemar_exact(kimi_only, minimax_only)
+        recommendation["by_category"][category]["paired"] = {
+            "kimi_only_correct": kimi_only, "minimax_only_correct": minimax_only,
+            "discordant": kimi_only + minimax_only, "mcnemar_exact_p": paired_p,
+        }
+        if paired_p < 0.05 and kimi_only != minimax_only:
+            recommendation["statistically_supported_overrides"][category] = MODELS[0] if kimi_only > minimax_only else MODELS[1]
+    metrics["by_category"] = category_metrics
+    recommendation["overall"] = max(
+        MODELS,
+        key=lambda model: (groups[model]["accuracy"], -groups[model]["tokens"]),
+    )
+    metrics["recommendation"] = recommendation
     metrics["complete"] = len(final) == len(tasks) * 2 and all(row["correct"] is not None for row in final)
     (output / "summary.json").write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (output / "policy-recommendation.json").write_text(json.dumps(recommendation, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps(metrics, indent=2, sort_keys=True))
     return 0
 
