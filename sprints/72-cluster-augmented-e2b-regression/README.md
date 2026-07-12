@@ -56,3 +56,11 @@ Estimate `P(E2B correct)` per intent using FunctionGemma scores, mechanical feat
 
 - [x] The offline candidate is reproducible; no ML library or rejected geometry is added to Docker.
 - [x] No intent was promoted, and the rejection evidence is separated by intent and protected source.
+
+## Boundary-Trained ML Follow-Up
+
+- [x] Reclassify the 480-row boundary corpus as training rather than independent evidence.
+- [x] Compare per-intent ridge logistic, histogram gradient boosting and Extra Trees.
+- [x] Keep legacy and expansion protected holdouts outside training and threshold selection.
+- [x] Confirm that the strong boundary OOF cohorts do not transfer with minimum support: only sentiment survives independently.
+- [x] Keep the multicategory classifier in shadow rather than betting the accuracy gate on boundary-distribution similarity.

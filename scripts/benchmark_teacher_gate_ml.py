@@ -39,6 +39,10 @@ def main() -> int:
         "--predictions", type=Path,
         help="Use runtime FunctionGemma predictions instead of teacher semantic labels.",
     )
+    parser.add_argument(
+        "--boundary-as-fit", action="store_true",
+        help="Treat the former boundary audit as training and reserve legacy/expansion holdouts for audit.",
+    )
     args = parser.parse_args()
     try:
         import numpy as np
@@ -51,7 +55,9 @@ def main() -> int:
 
     ledger = _rows(ROOT / "reports/generated/e2b-expansion-v1/regression-ledger.jsonl")
     if args.predictions:
-        rows = _runtime_prediction_rows(ledger, _rows(_absolute(args.predictions)))
+        rows = _runtime_prediction_rows(
+            ledger, _rows(_absolute(args.predictions)), allow_subset=args.boundary_as_fit,
+        )
         semantic_features = RUNTIME_SCORE_FEATURES
         teacher_overlap = None
         primary_teacher_breakdown = None
@@ -68,6 +74,12 @@ def main() -> int:
         teacher_overlap = len(set(semantic_primary) & set(kimi))
         primary_teacher_breakdown = {"agy": len(agy), "codex_fill": len(codex_fill)}
         feature_source = "teacher_consensus"
+    if args.boundary_as_fit:
+        rows = [
+            {**row, "role": "fit", "source": "boundary_training"}
+            if row["source"] == "boundary" else row
+            for row in rows
+        ]
     mechanical_names = tuple(sorted(rows[0]["mechanical_features"]))
 
     def matrix(population: Sequence[Mapping[str, Any]]) -> Any:
@@ -135,6 +147,7 @@ def main() -> int:
         "semantic_features": list(semantic_features),
         "mechanical_features": list(mechanical_names),
         "threshold_policy": "maximize calibration coverage with precision>=0.90, Wilson>=0.75, support>=20",
+        "boundary_as_fit": args.boundary_as_fit,
         "models": evaluations,
     }
     output = _absolute(args.output)
