@@ -18,11 +18,11 @@ Updated: 2026-07-11
 FunctionGemma assessment
 -> proof-carrying deterministic solver
 -> selective Gemma 4 E2B
--> Kimi by default / MiniMax for extraction
+-> Kimi by default / MiniMax for logic, sentiment and summarization
 -> Answer Contract Engine
 ```
 
-The promoted public image is `ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash`. It embeds the SHA-pinned FunctionGemma Q8 and Gemma E2B artifacts and requires no model downloads during evaluation.
+The current recommended public image is `ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract`. It embeds the SHA-pinned FunctionGemma Q8 and Gemma E2B artifacts and requires no model downloads during evaluation. `v3.7.3-public-sample` remains the officially scored rollback.
 
 ## Evaluator Variables
 
@@ -30,11 +30,10 @@ The image contains no `.env` file. The evaluator injects `FIREWORKS_API_KEY`, `F
 
 ## Resource Proof
 
-- compressed size: 2,666,216,379 bytes;
+- compressed size: 2,666,356,424 bytes;
 - exact public-image platform: `linux/amd64`;
-- final local gate: 12.147 s cold, 1.825 s warm, 15.355 s total;
-- sampled container peak: 727.5 MiB;
-- two real E2B local answers with zero Fireworks tokens;
+- exact published-image release run: `29204166556`;
+- sampled resource-gate process peak: 28.645 MiB;
 - resource gate: 4 GB, 2 vCPU, no network, 600-second ceiling.
 
 ## Failure Strategy
@@ -43,4 +42,4 @@ Every local stage fails closed to an authorized Fireworks model. The system neve
 
 ## Rollback
 
-The known-good compact rollback is `ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router`. Rollback requires changing only the Docker Image field in the submission form.
+The officially scored rollback is `ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample`. The compact emergency rollback remains `ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router`. Rollback requires changing only the Docker Image field in the submission form.

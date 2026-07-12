@@ -14,7 +14,7 @@ We trained FunctionGemma 270M on AMD and built a `6,845`-row routing ledger. The
 
 - proof-carrying deterministic tasks are solved without remote calls;
 - the expanded ordering proof recovered both known correct candidates and rejected all five incorrect candidates;
-- a 46-call live Pareto calibration selected Kimi by default and MiniMax for extraction;
+- a paired 800-prompt arena supports MiniMax for logic and sentiment, while a constrained-summary ablation retains MiniMax for summarization;
 - the selected policy matched the strongest 21/23 result while reducing tokens from 3,869 to 1,967;
 - the optional E2B frontier identifies a measured high-value local cohort instead of routing all tasks locally;
 - every decision is traceable and evaluator-safe.
@@ -45,4 +45,4 @@ No `.env` file is required or included. The harness injects `FIREWORKS_API_KEY`,
 
 ## Current Status
 
-The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe`; `v3.7.0-wilson-nash` is the immediate rollback and `v2.1.0-proof-router` the compact rollback. Release run `29198014562`, exact local-inference run `29198550699` and hostile harness run `29198549870` are green. The public image is 2,666,354,372 compressed bytes and requires no startup downloads.
+The current recommended image is `ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract`; `v3.7.3-public-sample` is the officially scored rollback and `v2.1.0-proof-router` the compact rollback. Release run `29204166556` passed the exact published-image, 4 GB RAM, 2 vCPU, no-network, public manifest and OCI-label gates. Registry audit reports 2,666,356,424 compressed bytes. The 84.2% / 4,198-token official result belongs to `v3.7.3`; `v3.8.2` is the evidence-backed successor and has no separately published evaluator score.

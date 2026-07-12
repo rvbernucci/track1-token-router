@@ -4,7 +4,7 @@ Updated: 2026-07-12
 
 ## Final Runtime
 
-The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe` (`linux/amd64`). It embeds both local models and performs no startup download. `v3.7.0-wilson-nash` remains the immediate rollback.
+The current recommended image is `ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract` (`linux/amd64`). It embeds both local models and performs no startup download. `v3.7.3-public-sample` remains the officially scored rollback.
 
 ```text
 /input/tasks.json
@@ -49,7 +49,7 @@ The Wilson-Nash guard is scoped to the exact v2 decision surface. It cannot tran
 
 ## Fireworks Route
 
-The final validation policy is Kimi K2.7 Code by default and MiniMax M3 for NER/extraction. It is a preference, never an authorization override. If the preferred model is absent, the runtime uses only another model present in `ALLOWED_MODELS`.
+The current validation policy is Kimi K2.7 Code by default and MiniMax M3 for logic puzzles, sentiment and summarization. It is a preference, never an authorization override. If the preferred model is absent, the runtime uses only another model present in `ALLOWED_MODELS`.
 
 | Policy | Valid | Tokens |
 | --- | ---: | ---: |
@@ -74,28 +74,21 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 
 ## Delivery Proof
 
-- Promoted image: `v3.7.1-harness-safe`
-- OCI manifest digest: `sha256:b9aa6f516a69397ae203ce725c71ac7ed16dc8b5bc40a1001be406a36ba5dc70`
-- Platform digest: `sha256:d558ae1cfeee1879eaf7a669a049dc4e8564bf2c15c748f59414746e0c076293`
-- Compressed size: 2,666,354,372 bytes
-- Source revision: `9f5aef59097c56531ce553a2f87f9b9eb26ab197`
-- Release run: `29198014562`
-- Exact local-inference run: `29198550699`
-- Harness-compatibility run: `29198549870`
-- Exact local metrics: cold `9.737 s`, warm `1.596 s`, sampled peak `745.7 MiB`, two local routes and zero Fireworks tokens
-- Verified immediate rollback image: `v3.7.0-wilson-nash`
-- Verified rollback OCI manifest: `sha256:a8f2045a69518b72c7e8c5b9692e82fee8f43891b74dc64c9bdf75b0e2b17221`
-- Verified rollback platform digest: `sha256:ff4688aa1f21dacc26a01c676b1b9c4ebd866bc94aa61ac4b22a596d42c8c788`
-- Verified rollback compressed size: 2,666,207,512 bytes
-- Verified rollback source revision: `1f74aab876ec3c693516284f80bcfc9a3bf92769`
-- Verified rollback release and exact-image run: `29171230908`
+- Recommended image: `v3.8.2-e2b-contract`
+- OCI manifest digest: `sha256:7ae875639a6b13c8ef84514646b1b6e501da4ef8efd448479615f015239313d9`
+- Platform digest: `sha256:04ce0867fab0973e063c9da61363849c37c4703ef7a2a73e6121e52e949b6d63`
+- Compressed size: 2,666,356,424 bytes
+- Source revision: `f2223c56322f187c2b53797f92d9083fa0d4ca83`
+- Release and exact published-image gate: `29204166556`
+- Resource gate: 4 GB, 2 vCPU, no network, 2 seconds observed runtime, 28.645 MiB sampled process peak
+- Officially scored rollback image: `v3.7.3-public-sample` (84.2% accuracy, 4,198 Fireworks tokens)
 - Compact rollback: `v2.1.0-proof-router`
 
 ## Evidence Boundaries
 
 The 80-row balanced arena is a frozen holdout replay plus exact-image envelope projection, not a live 80-row container run. Historical rejected policies remain in the repository for reproducibility and are explicitly marked as historical. Current release truth is defined by this document, `README.md`, `SUBMISSION.md` and `submission/final/final-release-decision.json`.
 
-Sprints 71-74 are frozen championship evidence. Semantic-v3 Q8, cluster augmentation and verify-or-repair failed their promotion gates and remain outside the runtime. The Wilson-Nash fail-closed guard passed protected replay, remains hash-pinned in `v3.7.1-harness-safe`, and cannot expand the proven v2 E2B cohort.
+Sprints 71-77 are frozen championship evidence. Semantic-v3 Q8, cluster augmentation, verify-or-repair and both Router ML v3 neural challengers failed their promotion gates and remain outside the runtime. The Wilson-Nash fail-closed guard remains hash-pinned in `v3.8.2-e2b-contract` and cannot expand the proven v2 E2B cohort.
 
 ## Non-Goals
 

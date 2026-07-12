@@ -49,25 +49,25 @@ Local MP4 included in repository: submission/final/proofroute-retro-cli.mp4
 
 ## Public Docker Image
 
-ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe
+ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract
 
 ## Release Evidence
 
-- release_tag: `v3.7.1-harness-safe`
-- commit_sha: `9f5aef59097c56531ce553a2f87f9b9eb26ab197`
+- release_tag: `v3.8.2-e2b-contract`
+- commit_sha: `f2223c56322f187c2b53797f92d9083fa0d4ca83`
 - ci_status: `green`
 - release_status: `green`
 - image_audit_status: `green`
 - image_platform: `linux/amd64`
-- image_compressed_size_bytes: `2666354372`
+- image_compressed_size_bytes: `2666356424`
 
 ## Image Audit Command
 
 ```bash
 python3 scripts/competition_submission_audit.py \
-  --image ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe \
-  --expected-revision 9f5aef59097c56531ce553a2f87f9b9eb26ab197 \
-  --expected-version v3.7.1-harness-safe
+  --image ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract \
+  --expected-revision f2223c56322f187c2b53797f92d9083fa0d4ca83 \
+  --expected-version v3.8.2-e2b-contract
 ```
 
 ## Notes

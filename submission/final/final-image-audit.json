@@ -1,22 +1,19 @@
 {
   "schema_version": "final-image-audit-v2",
-  "image": "ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe",
-  "source_revision": "9f5aef59097c56531ce553a2f87f9b9eb26ab197",
-  "manifest_digest": "sha256:b9aa6f516a69397ae203ce725c71ac7ed16dc8b5bc40a1001be406a36ba5dc70",
-  "platform_digest": "sha256:d558ae1cfeee1879eaf7a669a049dc4e8564bf2c15c748f59414746e0c076293",
+  "image": "ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract",
+  "source_revision": "f2223c56322f187c2b53797f92d9083fa0d4ca83",
+  "manifest_digest": "sha256:7ae875639a6b13c8ef84514646b1b6e501da4ef8efd448479615f015239313d9",
+  "platform_digest": "sha256:04ce0867fab0973e063c9da61363849c37c4703ef7a2a73e6121e52e949b6d63",
   "platform": "linux/amd64",
-  "compressed_size_bytes": 2666354372,
-  "release_run_id": 29198014562,
-  "exact_local_gate_run_id": 29198550699,
-  "harness_compatibility_run_id": 29198549870,
+  "compressed_size_bytes": 2666356424,
+  "release_run_id": 29204166556,
+  "exact_published_image_gate_run_id": 29204166556,
   "limits": {"memory": "4g", "cpus": 2, "network": "none", "maximum_runtime_seconds": 600},
-  "exact_local_metrics": {
-    "cold_seconds": 9.737,
-    "warm_seconds": 1.596,
-    "wall_seconds": 13.279,
-    "sampled_peak_memory_mib": 745.7,
-    "routes": ["e2b_local", "e2b_local"],
-    "fireworks_tokens": 0
+  "exact_published_image_metrics": {
+    "observed_runtime_seconds": 2,
+    "process_elapsed_ms": 6,
+    "sampled_process_peak_memory_mib": 28.645,
+    "result_rows": 2
   },
   "checks": {
     "public_clean_pull": true,
@@ -24,11 +21,12 @@
     "resource_gate": true,
     "official_output_contract": true,
     "model_hashes": true,
-    "two_local_routes": true,
-    "zero_fireworks_tokens": true,
-    "no_startup_downloads": true,
-    "read_only_non_root_runtime": true,
-    "local_failure_fallback": true
+    "no_startup_downloads": true
+  },
+  "historical_harness_evidence": {
+    "image": "ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe",
+    "run_id": 29198549870,
+    "scope": "Entry-point compatibility evidence only; not attributed to v3.8.2"
   },
   "passed": true
 }

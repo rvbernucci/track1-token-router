@@ -13,7 +13,7 @@ task
 -> proof-carrying deterministic solver (release only a unique, recomputable result)
 -> per-intent matrix selects embedded Gemma 4 E2B or Fireworks
 -> Wilson 90% + Nash/minimax guard confirms or rejects the local decision
--> Kimi by default / MiniMax for extraction, only when authorized
+-> Kimi by default / MiniMax for logic, sentiment and summarization, only when authorized
 -> strict output validation and allowed-model fallback
 -> Answer Contract Engine normalization and validation
 -> atomically rebuild [{task_id, answer}, ...]
@@ -51,7 +51,7 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-`v3.7.1-harness-safe` is the promoted championship image. It passed clean public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract, exact local-inference and hostile harness-compatibility gates. `v3.7.0-wilson-nash` remains the immediate rollback and `v2.1.0-proof-router` the compact rollback.
+`v3.8.2-e2b-contract` is the current recommended championship candidate. Its release workflow passed clean public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract, exact-published-image and OCI-label gates. `v3.7.3-public-sample` remains the scored rollback with 84.2% official accuracy and 4,198 Fireworks tokens; `v2.1.0-proof-router` remains the compact rollback. The evaluator has not published a separate score for `v3.8.2`.
 
 ## Quickstart
 
@@ -73,7 +73,7 @@ python3 scripts/secret_scan.py
 git diff --check
 ```
 
-The promoted release suite contains `682` passing tests with one environment-dependent skip.
+The current repository suite contains `712` passing tests with one environment-dependent skip.
 
 ## Official Offline Contract
 
@@ -117,6 +117,8 @@ Files such as `.env.example` and `runtime-profiles/*.env.example` are developmen
 | [Verify-or-repair arena](./reports/public/fireworks-verify-repair-arena-v3.md) | One-call reviewer accuracy and token break-even decision |
 | [Expansion adjudication](./reports/public/e2b-expansion-adjudication.md) | 2,400 post-contract labels and independent agreement evidence |
 | [Expansion championship](./reports/public/e2b-expansion-championship-scorecard.md) | Previous versus promoted local precision, coverage and token avoidance |
+| [Router ML v3 contract audit](./reports/public/router-ml-v3.md) | AMD neural sweeps, protected replay and rejected runtime promotion |
+| [Fireworks Champion v3](./reports/public/fireworks-champion-v3.md) | 800-prompt paired arena and retain decision |
 | [Raw-prompt ablation](./reports/public/raw-prompt-answer-contract-ablation.md) | Byte-identical Kimi answers with 51.9% fewer Fireworks tokens |
 | [Sprints 45-49 completion audit](./reports/public/sprints-45-49-completion-audit.md) | Requirement-to-evidence map and final release proof |
 | [E2B runtime](./docs/GEMMA_E2B_TEXT_ONLY_RUNTIME.md) | Text-only LiteRT-LM packaging and 4 GB gates |
@@ -154,10 +156,10 @@ ROUTER_MODE=three_route
 The final hybrid championship candidate is:
 
 ```text
-ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe
+ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract
 ```
 
-It embeds FunctionGemma 270M Q8 and text-only Gemma 4 E2B, requires no startup downloads, and falls through to evaluator-authorized Fireworks models. Release run `29198014562` proved its public manifest and resource contract. Exact-image run `29198550699` proved two local routes with zero Fireworks tokens, a `9.737 s` cold start, `1.596 s` warm inference and `745.7 MiB` sampled peak memory. Harness run `29198549870` also passed as a non-root user with a read-only root filesystem and verified safe local-runtime fallback.
+It embeds FunctionGemma 270M Q8 and text-only Gemma 4 E2B, requires no startup downloads, and falls through only to evaluator-authorized Fireworks models. Release run `29204166556` built, publicly pulled and gated the exact published image under 4 GB RAM, 2 vCPU and disabled networking. Registry audit confirms manifest `sha256:7ae875639a6b13c8ef84514646b1b6e501da4ef8efd448479615f015239313d9`, platform digest `sha256:04ce0867fab0973e063c9da61363849c37c4703ef7a2a73e6121e52e949b6d63`, source revision `f2223c56322f187c2b53797f92d9083fa0d4ca83` and 2.67 GB compressed size.
 
 ## Fireworks
 
