@@ -1,0 +1,41 @@
+{
+  "schema_version": "wilson-nash-risk-ladder-v1",
+  "default_enabled": true,
+  "review_enabled": false,
+  "review_min_remaining_ms": 30000,
+  "wilson_confidence_level": 0.9,
+  "thresholds": {
+    "direct_local_lower": 0.9,
+    "nash_lower": 0.8,
+    "review_lower": 0.7
+  },
+  "utility": {
+    "accuracy_reward": 100.0,
+    "fireworks_token_penalty": 0.02,
+    "latency_ms_penalty": 0.001
+  },
+  "evidence_by_intent": {
+    "sentiment": {
+      "successes": 44,
+      "support": 46,
+      "source": "frozen expansion holdout under the promoted v2 decision surface",
+      "wilson_lower_90": 0.8768185086792523,
+      "wilson_lower_95": 0.8547384935785704
+    }
+  },
+  "eligibility_threshold_by_intent": {
+    "sentiment": 0.764465
+  },
+  "estimates_by_intent": {
+    "sentiment": {
+      "direct_probability": 0.9,
+      "direct_tokens": 128.0,
+      "review_probability": 0.9,
+      "review_tokens": 96.0
+    }
+  },
+  "tie_break": "safer_route",
+  "randomized_strategies": false,
+  "invalid_assessment_route": "fireworks",
+  "unknown_intent_route": "fireworks"
+}

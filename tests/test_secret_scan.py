@@ -47,6 +47,21 @@ class SecretScanTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 1)
         self.assertIn("README.md", completed.stdout)
 
+    def test_ignores_virtual_environment_dependencies(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dependency = root / ".venv" / "lib" / "package.py"
+            dependency.parent.mkdir(parents=True)
+            dependency.write_text(_fake_fireworks_key(), encoding="utf-8")
+            completed = subprocess.run(
+                [sys.executable, str(ROOT / "scripts/secret_scan.py")],
+                cwd=root,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+        self.assertEqual(completed.returncode, 0)
+
 
 def _fake_fireworks_key() -> str:
     return "fw_" + ("A" * 24)

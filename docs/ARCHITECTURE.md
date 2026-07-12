@@ -1,6 +1,6 @@
 # Championship Architecture
 
-Updated: 2026-07-11
+Updated: 2026-07-12
 
 ## Final Runtime
 
@@ -12,6 +12,7 @@ The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-ca
 -> FunctionGemma 270M Q8 assessment
 -> proof-carrying deterministic solver when uniquely supported
 -> category-specific normalized E2B matrix, calibrator and threshold
+-> Wilson 90% confidence bound plus deterministic Nash/minimax guard
 -> text-only Gemma 4 E2B candidate plus Answer Contract Engine
 -> Fireworks Kimi/MiniMax policy on refusal, uncertainty or local failure
 -> engine reconstructs atomic /output/results.json
@@ -39,6 +40,8 @@ The candidate decision surface was frozen before opening the 480-row expansion h
 
 E2B receives only the original prompt and may generate at most 96 tokens. The engine, not the model, removes safe wrappers and reconstructs the official JSON envelope.
 
+The Wilson-Nash guard is scoped to the exact v2 decision surface. It cannot transfer the `44/46` holdout evidence to a task below the frozen per-intent probability threshold. It records the 90% Wilson lower bound, utility interval, worst-case regret and reason without logging prompt contents. Review is disabled, so the guard can only preserve an eligible E2B route or fail closed to direct Fireworks.
+
 - Artifact: Gemma 4 E2B LiteRT-LM, text-only execution
 - SHA-256: `181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c`
 - Exact final-image gate: 12.147 s cold, 1.825 s warm, 727.5 MiB sampled container peak
@@ -63,6 +66,7 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 | Deterministic refusal or failed proof | Continue to E2B/Fireworks |
 | Invalid FunctionGemma assessment | Fireworks |
 | E2B below threshold | Fireworks without E2B inference |
+| Wilson-Nash guard rejects matrix probe | Fireworks without E2B inference |
 | E2B malformed, timed out or runtime failure | Fireworks with structured fallback reason |
 | Preferred remote model not allowed | Select another runtime-authorized model |
 | Terminal Fireworks failure | Exit non-zero before publishing synthetic output |
@@ -89,6 +93,8 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 ## Evidence Boundaries
 
 The 80-row balanced arena is a frozen holdout replay plus exact-image envelope projection, not a live 80-row container run. Historical rejected policies remain in the repository for reproducibility and are explicitly marked as historical. Current release truth is defined by this document, `README.md`, `SUBMISSION.md` and `submission/final/final-release-decision.json`.
+
+Sprints 71-74 are challenger evidence, not retroactive claims about `v3.6.0`. Semantic-v3 Q8, cluster augmentation and verify-or-repair all failed a frozen promotion gate and remain outside the release runtime. Only the Wilson-Nash fail-closed guard is present in the new source candidate; `v3.6.0-category-calibrated` remains the promoted image until an exact-image audit proves a successor.
 
 ## Non-Goals
 

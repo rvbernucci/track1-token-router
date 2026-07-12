@@ -12,6 +12,7 @@ from router.orchestration.e2b_selective_gate import E2BSelectivePolicy
 from router.orchestration.e2b_matrix_gate import E2BMatrixGate
 from router.orchestration.game_theory_selector import MinimaxRegretSelector, deterministic_solver_prediction
 from router.orchestration.outcome_models import OutcomeModelPredictor
+from router.orchestration.risk_ladder import RiskLadderPolicy
 from router.orchestration.solvers import SolverResult, solve_deterministic
 
 
@@ -26,6 +27,7 @@ class ThreeRouteRunner:
         fireworks_runner: TaskRunner,
         selective_policy: E2BSelectivePolicy | None = None,
         matrix_gate: E2BMatrixGate | None = None,
+        risk_ladder: RiskLadderPolicy | None = None,
         logger: JsonlRunLogger | None = None,
         task_deadline_ms: int = 10 * 60 * 1000,
         e2b_min_remaining_ms: int = 30_000,
@@ -37,6 +39,7 @@ class ThreeRouteRunner:
         self.fireworks_runner = fireworks_runner
         self.selective_policy = selective_policy
         self.matrix_gate = matrix_gate
+        self.risk_ladder = risk_ladder
         self.logger = logger
         self.task_deadline_ms = task_deadline_ms
         self.e2b_min_remaining_ms = e2b_min_remaining_ms
@@ -79,6 +82,19 @@ class ThreeRouteRunner:
                 self.matrix_gate.decide(invocation.raw_assessment, task.input_text)
                 if self.matrix_gate else None
             )
+            risk_decision = (
+                self.risk_ladder.decide(
+                    intent=invocation.raw_assessment.intent.value,
+                    probability=matrix_decision.probability,
+                    remaining_ms=remaining,
+                )
+                if self.risk_ladder is not None and matrix_decision is not None else None
+            )
+            if matrix_decision is not None and matrix_decision.probe and risk_decision is not None and risk_decision.action != "e2b":
+                matrix_decision = replace(
+                    matrix_decision, probe=False,
+                    reason=f"risk_ladder_{risk_decision.action}",
+                )
             if matrix_decision is not None and matrix_decision.probe and remaining < self.e2b_min_remaining_ms:
                 matrix_decision = replace(matrix_decision, probe=False, reason="matrix_deadline_guard")
         except (FunctionGemmaProviderError, OSError, TimeoutError, ValueError) as exc:
@@ -166,6 +182,7 @@ class ThreeRouteRunner:
                 "assessment_invocation": invocation.to_dict(),
                 "robust_selection": selection.to_dict(),
                 "e2b_matrix": matrix_decision.__dict__ if matrix_decision else None,
+                "risk_ladder": risk_decision.to_dict() if risk_decision else None,
                 "selective_probe": selective_probe.to_dict() if selective_probe else None,
                 "routing_trace": trace.to_dict(),
             }
@@ -230,6 +247,7 @@ class ThreeRouteRunner:
                     "latency_fireworks_ms": int(metadata.get("latency_fireworks_ms") or 0),
                     "fireworks_request_options": metadata.get("fireworks_request_options") or {},
                     "e2b_matrix": metadata.get("e2b_matrix"),
+                    "risk_ladder": metadata.get("risk_ladder"),
                     "selective_e2b": metadata.get("selective_e2b"),
                 },
             )

@@ -12,6 +12,9 @@ IGNORED_PARTS = {
     ".pytest_cache",
     ".mypy_cache",
     ".ruff_cache",
+    ".venv",
+    "venv",
+    "node_modules",
 }
 
 SECRET_PATTERNS = [

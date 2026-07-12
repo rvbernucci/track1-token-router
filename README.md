@@ -12,6 +12,7 @@ task
 -> embedded FunctionGemma 270M Q8 assessment
 -> proof-carrying deterministic solver (release only a unique, recomputable result)
 -> per-intent matrix selects embedded Gemma 4 E2B or Fireworks
+-> Wilson 90% + Nash/minimax guard confirms or rejects the local decision
 -> Kimi by default / MiniMax for extraction, only when authorized
 -> strict output validation and allowed-model fallback
 -> Answer Contract Engine normalization and validation
@@ -29,6 +30,10 @@ task
 - The frozen per-category challenger nominated factual QA, NER and sentiment. One-shot sealed evaluation promoted only sentiment: `44/46` selected answers were correct (`95.65%` precision, `85.47%` Wilson lower bound). Factual QA and NER remained remote because selected support was insufficient.
 - The promoted v2 policy replays at `88.41%` local precision and `8.82%` zero-Fireworks-token coverage across all `6,845` rows, versus `83.58%` and `7.74%` for the previous matrix.
 - The proof engine recovered both known correct deterministic ordering answers while refusing all five incorrect deterministic candidates. Its independent 260-case gate still reports 180 releases, 100% precision and zero false positives.
+- Sprint 71 trained a strong semantic-v3 full-SFT assessor, but its Q8 candidate missed the frozen intent non-inferiority margin by `0.034 pp` and was not promoted.
+- Sprint 72 rejected cluster augmentation because it reduced sentiment calibration coverage and worsened Brier score; no clustering dependency enters Docker.
+- Sprint 73 added a hash-pinned Wilson 90% and deterministic minimax-regret guard without expanding the proven v2 decision surface. The raw `0.70` alternative fell to `84.81%` protected precision and was rejected.
+- Sprint 74 rejected one-call verify-or-repair after it used `8.52%` more Fireworks tokens in the paired arena; direct Fireworks remains the fallback.
 
 The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
@@ -68,6 +73,8 @@ python3 scripts/secret_scan.py
 git diff --check
 ```
 
+The current source suite contains `679` passing tests with one environment-dependent skip.
+
 ## Official Offline Contract
 
 ```bash
@@ -104,6 +111,10 @@ Files such as `.env.example` and `runtime-profiles/*.env.example` are developmen
 | [Public E2B evidence](./reports/public/e2b-token-ladder.md) | Aggregate recovery, feature and latency results |
 | [E2B 270M matrix regression](./reports/public/e2b-270m-matrix-regression.md) | Post-contract correctness, model comparison and operating frontier |
 | [Category calibration V2](./reports/public/e2b-category-calibration-v2.md) | 6,845-row regression, per-category calibration and sealed promotion |
+| [Semantic-v3 Q8 decision](./reports/public/functiongemma-semantic-v3-q8-decision.md) | Full-SFT/Q8 parity evidence and rejected promotion |
+| [Cluster augmentation decision](./reports/public/scale789-cluster-augmented-e2b.md) | Production-compatible cluster and regression comparison |
+| [Wilson-Nash ladder](./reports/public/wilson-nash-risk-ladder-v1.md) | Confidence bounds, minimax regret and protected replay |
+| [Verify-or-repair arena](./reports/public/fireworks-verify-repair-arena-v3.md) | One-call reviewer accuracy and token break-even decision |
 | [Expansion adjudication](./reports/public/e2b-expansion-adjudication.md) | 2,400 post-contract labels and independent agreement evidence |
 | [Expansion championship](./reports/public/e2b-expansion-championship-scorecard.md) | Previous versus promoted local precision, coverage and token avoidance |
 | [Raw-prompt ablation](./reports/public/raw-prompt-answer-contract-ablation.md) | Byte-identical Kimi answers with 51.9% fewer Fireworks tokens |

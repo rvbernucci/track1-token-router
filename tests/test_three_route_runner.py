@@ -16,6 +16,7 @@ from router.functiongemma.provider import AssessmentInvocation, FunctionGemmaPro
 from router.orchestration.game_theory_selector import MinimaxRegretSelector
 from router.orchestration.e2b_selective_gate import E2BSelectiveDecision
 from router.orchestration.e2b_matrix_gate import E2BMatrixDecision
+from router.orchestration.risk_ladder import RiskLadderDecision
 
 
 ASSESSMENT = TaskAssessment(
@@ -74,6 +75,16 @@ class RecordingMatrixGate:
         self.assessment = assessment
         self.prompt = prompt
         return E2BMatrixDecision(True, 0.77, 0.75, "probe_e2b")
+
+
+class RiskPolicy:
+    def __init__(self, action="e2b"):
+        self.action = action
+
+    def decide(self, *, intent, probability, remaining_ms):
+        return RiskLadderDecision(
+            self.action, "test", "test_policy", probability, 0.85, 0.9, 46,
+        )
 
 
 class Predictor:
@@ -188,6 +199,21 @@ class ThreeRouteRunnerTests(unittest.TestCase):
         result = runner.run(TaskEnvelope(id="task", input_text="Explain why the sky is blue."))
         self.assertEqual(result.answer, "remote")
         self.assertEqual(e2b.calls, 0)
+
+    def test_risk_ladder_can_fail_closed_after_matrix_probe(self):
+        e2b = Runner("local", "e2b_local")
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(), predictor=Predictor(e2b=0.2, fireworks=0.9),
+            selector=MinimaxRegretSelector(e2b_enabled=False),
+            e2b_runner=e2b, fireworks_runner=remote,
+            matrix_gate=RecordingMatrixGate(), risk_ladder=RiskPolicy("fireworks"),
+        )
+        result = runner.run(TaskEnvelope(id="risk", input_text="Question"))
+        self.assertEqual(result.answer, "remote")
+        self.assertEqual(e2b.calls, 0)
+        self.assertEqual(result.metadata["e2b_matrix"]["reason"], "risk_ladder_fireworks")
+        self.assertEqual(result.metadata["risk_ladder"]["action"], "fireworks")
 
     def test_enabled_high_confidence_e2b_can_answer_locally(self):
         e2b = Runner("Rayleigh scattering.", "e2b_local")

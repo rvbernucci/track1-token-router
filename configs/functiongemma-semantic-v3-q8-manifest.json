@@ -1,0 +1,53 @@
+{
+  "schema_version": "functiongemma-q8-candidate-manifest-v1",
+  "decision": "rejected",
+  "decision_reason": "The candidate missed the frozen 0.5 percentage-point intent non-inferiority margin on calibration and the 99.9% historical schema-validity gate.",
+  "model": {
+    "base_id": "google/functiongemma-270m-it",
+    "base_revision": "39eccb091651513a5dfb56892d3714c1b5b8276c",
+    "training_method": "full_sft",
+    "quantization": "Q8_0",
+    "bytes": 291557568,
+    "sha256": "73754f537c3ea79bb3e1226a03845476c795aaa26339a8cb2a24ddb14d579275"
+  },
+  "conversion": {
+    "llama_cpp_commit": "074944998d3f25e7001ede30d152b59dff741c8c"
+  },
+  "training_data": {
+    "train_rows": 3881,
+    "calibration_rows": 1124,
+    "train_sha256": "cecb83897dc3d6a5f51b4f23f46078eba5d45976d51e5137c1064f45e8ef8ee9",
+    "calibration_sha256": "3a251ab8ed11713e9aea68ef0a292936dc8e00a5f1a16f28dc678081d5d4ceee",
+    "config_sha256": "02400d7417c9be7772045dd8fc3fc5301f48400214cc5bfa7db0ccb2126d2cb7",
+    "tool_sha256": "9b2f6852cd993c77349fc2cb50be10fa6190c4e35cef6244e2ea6fb32661f648"
+  },
+  "calibration": {
+    "rows": 1124,
+    "bf16_schema_validity": 1.0,
+    "q8_schema_validity": 1.0,
+    "bf16_intent_accuracy": 0.9750889679715302,
+    "q8_intent_accuracy": 0.9697508896797153,
+    "intent_regression_percentage_points": 0.5338078291814947,
+    "parsed_assessment_parity": 0.7144128113879004,
+    "intent_parity": 0.9928825622775801,
+    "q8_p50_latency_ms": 830.4772134870291,
+    "q8_p95_latency_ms": 881.4589064568281,
+    "q8_predictions_sha256": "25ee51e87215d12f44615618b2e28bbb60ce6d6dc1c3dc7d9235659b6bc04755"
+  },
+  "historical": {
+    "rows": 201,
+    "bf16_schema_validity": 0.9950248756218906,
+    "q8_schema_validity": 0.9950248756218906,
+    "bf16_intent_accuracy": 0.9651741293532339,
+    "q8_intent_accuracy": 0.9651741293532339,
+    "parsed_assessment_parity": 0.6965174129353234,
+    "valid_intent_parity": 1.0,
+    "q8_p50_latency_ms": 826.8052020575851,
+    "q8_p95_latency_ms": 869.8821170255542,
+    "q8_predictions_sha256": "c3efb071c60f0c3ef2acd5702147712cc54b739ee03753284c7b0372b5781158"
+  },
+  "promoted_runtime": {
+    "artifact": "artifacts/functiongemma-scale789/functiongemma-scale789-q8_0.gguf",
+    "sha256": "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77"
+  }
+}

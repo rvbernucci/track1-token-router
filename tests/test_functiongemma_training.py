@@ -15,7 +15,15 @@ from router.functiongemma.tooling import (
     training_conversation,
     validate_training_row,
 )
-from scripts.functiongemma_experiment import boundary_report, load_config, prepare, select
+from scripts.functiongemma_experiment import (
+    _chunks,
+    _trim_trailing_token,
+    boundary_report,
+    load_config,
+    parser,
+    prepare,
+    select,
+)
 
 
 def assessment(*, deterministic_fit: int = 9) -> TaskAssessment:
@@ -48,6 +56,23 @@ def native_call(value: TaskAssessment) -> str:
 
 
 class FunctionGemmaToolingTests(unittest.TestCase):
+    def test_evaluation_batching_is_explicit_and_stable(self) -> None:
+        args = parser().parse_args(
+            [
+                "evaluate", "--model", "model", "--tasks", "tasks.jsonl",
+                "--output", "predictions.jsonl", "--report", "report.json",
+                "--batch-size", "8",
+            ]
+        )
+        self.assertEqual(args.batch_size, 8)
+        self.assertEqual(_chunks([{"id": str(i)} for i in range(5)], 2), [
+            [{"id": "0"}, {"id": "1"}],
+            [{"id": "2"}, {"id": "3"}],
+            [{"id": "4"}],
+        ])
+        self.assertEqual(_trim_trailing_token([4, 5, 0, 0], 0), [4, 5])
+        self.assertEqual(_trim_trailing_token([4, 5], 0), [4, 5])
+
     def test_tool_schema_matches_runtime_contract(self) -> None:
         properties = ASSESS_TASK_TOOL["function"]["parameters"]["properties"]
         self.assertEqual(set(properties), {"intent", "scores"})

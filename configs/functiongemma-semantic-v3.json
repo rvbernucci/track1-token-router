@@ -1,0 +1,50 @@
+{
+  "schema_version": "functiongemma-experiment-v1",
+  "model": {
+    "id": "google/functiongemma-270m-it",
+    "revision": "39eccb091651513a5dfb56892d3714c1b5b8276c"
+  },
+  "environment": {
+    "python": "3.10.12",
+    "torch": "2.9.1+gitff65f5b",
+    "transformers": "4.57.6",
+    "datasets": "4.8.2",
+    "accelerate": "1.13.0",
+    "peft": "0.18.1",
+    "trl": "0.26.2"
+  },
+  "data": {
+    "max_length": 1024,
+    "seed": 72
+  },
+  "generation": {
+    "max_new_tokens": 160
+  },
+  "variants": {
+    "full_sft": {
+      "method": "full",
+      "epochs": 3,
+      "learning_rate": 0.00003,
+      "batch_size": 8,
+      "gradient_accumulation_steps": 1
+    },
+    "lora_r8": {
+      "method": "lora",
+      "rank": 8,
+      "alpha": 16,
+      "epochs": 4,
+      "learning_rate": 0.0001,
+      "batch_size": 8,
+      "gradient_accumulation_steps": 1
+    },
+    "lora_r16": {
+      "method": "lora",
+      "rank": 16,
+      "alpha": 32,
+      "epochs": 4,
+      "learning_rate": 0.0001,
+      "batch_size": 8,
+      "gradient_accumulation_steps": 1
+    }
+  }
+}
