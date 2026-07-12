@@ -44,6 +44,9 @@ evals/**/metrics/
 evals/**/quarantine/
 evals/**/*.lock
 
+# Default local ML output; only explicitly named, audited candidates are tracked.
+evals/router-ml-v3/candidate.json
+
 # OS/editor noise
 .DS_Store
 .idea/

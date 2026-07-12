@@ -1,5 +1,9 @@
 # Sprint 77 - Local Router ML Recalibration
 
+## Final Status
+
+**Closed as `retain`; both contract-recalibrated neural candidates were rejected for runtime promotion.** The best candidate achieved 95.95% protected precision at 8.41% uniform coverage, but selected only sentiment and did not dominate the shipped pre-gate end to end. See `reports/public/router-ml-v3.md`. No `configs/e2b-router-ml-v3.json` is produced because the promotion gates were not jointly satisfied.
+
 ## Parallel Contract
 
 This sprint runs concurrently with Sprint 76. It owns feature engineering, E2B correctness estimation, calibration and local-route thresholds. It may read the frozen Sprint 76 ledger as an additional teacher signal, but it must not train on the Sprint 76 sealed audit or influence its judgments.
@@ -92,4 +96,3 @@ Improve selective local routing beyond sentiment-only without sacrificing the ac
 - [ ] Promotion or rejection is decided independently for every intent.
 - [ ] The exact Docker image reproduces offline scorer decisions byte-for-byte.
 - [ ] Any rejected experiment remains documentation and does not enter runtime.
-

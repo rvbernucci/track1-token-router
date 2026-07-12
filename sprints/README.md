@@ -46,8 +46,8 @@ Sprints 60-64 validate the exact public hybrid image rather than a source-tree a
 
 Sprints 76 and 77 run concurrently against separate ownership boundaries. Sprint 76 improves the authorized Fireworks fallback with a 1,600-call paired arena over 800 balanced prompts; Sprint 77 recalibrates selective zero-token routing using the complete local evidence without reading the remote arena's sealed audit.
 
-- [ ] [Sprint 76 - Fireworks 800-Prompt Champion Arena](./76-fireworks-400-prompt-champion-arena/README.md)
-- [ ] [Sprint 77 - Local Router ML Recalibration](./77-local-router-ml-recalibration/README.md)
+- [x] [Sprint 76 - Fireworks 800-Prompt Champion Arena](./76-fireworks-400-prompt-champion-arena/README.md) - closed as retain; promotion gates failed.
+- [x] [Sprint 77 - Local Router ML Recalibration](./77-local-router-ml-recalibration/README.md) - closed as retain; neural candidates remained outside runtime.
 
 ## Post-Submission Robustness Sequence
 
