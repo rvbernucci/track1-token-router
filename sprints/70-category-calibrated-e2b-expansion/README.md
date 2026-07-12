@@ -191,9 +191,9 @@ All features must be computable from the incoming prompt before choosing a route
 - [x] Add migration tests for the current v1 policy and the new per-category policy.
 - [x] Add golden tests that prove different categories can use different thresholds.
 - [x] Add tests proving no declared difficulty, gold answer or judge field reaches runtime features.
-- [ ] Rebuild and test the exact `linux/amd64` image under `4 GB RAM`, `2 vCPU`, no network and ten-minute limits.
-- [ ] Confirm both local model artifacts remain embedded and no startup download is introduced.
-- [ ] Confirm compressed image size remains below `10 GB`.
+- [x] Rebuild and test the exact `linux/amd64` image under `4 GB RAM`, `2 vCPU`, no network and ten-minute limits; release run `29178529654` passed.
+- [x] Confirm both local model artifacts remain embedded and hash-correct with no startup download; exact-image run `29179000266` passed.
+- [x] Confirm compressed image size `2,666,318,316` bytes remains below `10 GB`.
 
 ## Workstream 11 - Championship Simulation
 
@@ -257,12 +257,12 @@ All features must be computable from the incoming prompt before choosing a route
 - [x] Eight independent category models and calibrators are evaluated, even though seven remain disabled.
 - [x] Sentiment, the only enabled category, passes support, precision, Wilson, calibration, subgroup and runtime-safety gates.
 - [x] The new router improves replay precision and zero-token coverage over the previous policy.
-- [ ] The final Docker image passes the official input/output, resource, architecture, network and size gates.
+- [x] The final Docker image passes the official input/output, resource, architecture, network, local-inference and size gates.
 - [x] Public documentation reports both gains and failed hypotheses without overstating hidden-evaluation performance.
 - [x] Promotion is reversible through one hash-pinned configuration artifact; `v3.5.0-full-hybrid` remains the image rollback.
 
 ## Completion Decision
 
-Status: **release validation in progress**.
+Status: **complete**.
 
 The sprint is complete only after a frozen candidate policy passes the sealed holdout and exact-image championship simulation. Corpus generation or a higher development-set accuracy alone is not sufficient for promotion.

@@ -51,25 +51,25 @@ Local MP4 included in repository: submission/final/proofroute-retro-cli.mp4
 
 ## Public Docker Image
 
-ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router
+ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated
 
 ## Release Evidence
 
-- release_tag: `v2.1.0-proof-router`
-- commit_sha: `869dbfc8fe31098ca1425f1b02ff3043d1068ca4`
+- release_tag: `v3.6.0-category-calibrated`
+- commit_sha: `57b59ec44a71501b69e744f1fb5c8726ec2e9b85`
 - ci_status: `green`
 - release_status: `green`
 - image_audit_status: `green`
 - image_platform: `linux/amd64`
-- image_compressed_size_bytes: `45737139`
+- image_compressed_size_bytes: `2666318316`
 
 ## Image Audit Command
 
 ```bash
 python3 scripts/competition_submission_audit.py \
-  --image ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router \
-  --expected-revision 869dbfc8fe31098ca1425f1b02ff3043d1068ca4 \
-  --expected-version v2.1.0-proof-router
+  --image ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated \
+  --expected-revision 57b59ec44a71501b69e744f1fb5c8726ec2e9b85 \
+  --expected-version v3.6.0-category-calibrated
 ```
 
 ## Notes

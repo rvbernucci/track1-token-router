@@ -4,7 +4,7 @@ Updated: 2026-07-11
 
 ## Final Runtime
 
-The Sprint 70 candidate is `ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated` (`linux/amd64`). It embeds both local models and performs no startup download. `v3.5.0-full-hybrid` remains the verified rollback until the new public-image gates pass.
+The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated` (`linux/amd64`). It embeds both local models and performs no startup download. `v3.5.0-full-hybrid` remains the verified full-hybrid rollback.
 
 ```text
 /input/tasks.json
@@ -71,7 +71,14 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 ## Delivery Proof
 
 - Verified rollback image: `v3.5.0-full-hybrid`
-- Sprint 70 candidate: `v3.6.0-category-calibrated`
+- Sprint 70 promoted image: `v3.6.0-category-calibrated`
+- OCI manifest digest: `sha256:9f4ca74dab257b83cea3ad7a43bb06ff31ac4f67d96824995de492fef5146fa7`
+- Platform digest: `sha256:dcecf1402999dd16a72b044f06fd824ee69fd1df5444757e727af1a2dc9edc13`
+- Compressed size: 2,666,318,316 bytes
+- Source revision: `57b59ec44a71501b69e744f1fb5c8726ec2e9b85`
+- Release run: `29178529654`
+- Exact local-inference run: `29179000266`
+- Exact local metrics: cold `11.334 s`, warm `2.581 s`, sampled peak `745.8 MiB`, two local routes and zero Fireworks tokens
 - Verified rollback OCI manifest: `sha256:a8f2045a69518b72c7e8c5b9692e82fee8f43891b74dc64c9bdf75b0e2b17221`
 - Verified rollback platform digest: `sha256:ff4688aa1f21dacc26a01c676b1b9c4ebd866bc94aa61ac4b22a596d42c8c788`
 - Verified rollback compressed size: 2,666,207,512 bytes

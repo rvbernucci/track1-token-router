@@ -8,7 +8,7 @@ Track 1 first gates on accuracy and then rewards low Fireworks token usage. Call
 
 Track 1 Token Router assesses the untouched task with embedded FunctionGemma 270M, releases proof-carrying deterministic answers when available, and selectively probes embedded Gemma 4 E2B. Remaining tasks use a validation-selected Kimi/MiniMax policy constrained by runtime `ALLOWED_MODELS`. Strict output validation protects the official response contract.
 
-We trained FunctionGemma 270M on AMD and evaluated a text-only Gemma 4 E2B route across 2,000 post-contract answers. E2B answered 828 correctly. Of the 1,991 tasks with valid 270M parameters, an intent-specific regression selected 252 at 84.52% out-of-fold precision and 12.66% coverage. The final image embeds both local models and requires no model download at startup.
+We trained FunctionGemma 270M on AMD and built a `6,845`-row routing ledger. The expansion adds `2,400` E2B answers processed by the production Answer Contract Engine and independently labeled; `824` were correct. The frozen category model promoted sentiment only after a once-opened holdout produced `44/46` correct selected answers (`95.65%` precision; `85.47%` Wilson lower bound). The final image embeds both local models and requires no model download at startup.
 
 ## Why It Can Win
 
@@ -45,4 +45,4 @@ No `.env` file is required or included. The harness injects `FIREWORKS_API_KEY`,
 
 ## Current Status
 
-The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.5.0-full-hybrid`; `v2.1.0-proof-router` is the compact rollback. Integrated release run `29171230908` and the 96-task live predecessor arena are green. The image is 2,666,207,512 compressed bytes and requires no startup downloads.
+The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated`; `v3.5.0-full-hybrid` is the full-hybrid rollback and `v2.1.0-proof-router` the compact rollback. Release run `29178529654` and exact local-inference run `29179000266` are green. The public image is 2,666,318,316 compressed bytes and requires no startup downloads.

@@ -46,7 +46,7 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-`v3.6.0-category-calibrated` is the Sprint 70 release candidate. It adds the sealed category-calibrated sentiment policy and deadline guard to the verified `v3.5.0-full-hybrid` image. The release workflow must still prove public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network and exact local inference before the new tag replaces `v3.5.0` as the submission image.
+`v3.6.0-category-calibrated` is the promoted Sprint 70 image. It passed clean public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract and exact local-inference gates. `v3.5.0-full-hybrid` remains the full-hybrid rollback and `v2.1.0-proof-router` the compact rollback.
 
 ## Quickstart
 
@@ -146,7 +146,7 @@ The final hybrid championship candidate is:
 ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated
 ```
 
-Once the release workflow passes, this tag embeds FunctionGemma 270M Q8 and text-only Gemma 4 E2B, requires no startup downloads, and falls through to evaluator-authorized Fireworks models. Until then, `v3.5.0-full-hybrid` remains the verified public image and `v2.1.0-proof-router` the compact rollback.
+It embeds FunctionGemma 270M Q8 and text-only Gemma 4 E2B, requires no startup downloads, and falls through to evaluator-authorized Fireworks models. Exact-image run `29179000266` proved both local routes with zero Fireworks tokens under evaluator limits.
 
 ## Fireworks
 
