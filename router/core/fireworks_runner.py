@@ -33,7 +33,7 @@ from router.orchestration.prompt_packet import extract_literal_echo
 from router.orchestration.solvers import solve_deterministic
 
 
-FIREWORKS_COMPLETION_POLICY_VERSION = "compact-contract-v3"
+FIREWORKS_COMPLETION_POLICY_VERSION = "accuracy-first-contract-v4"
 
 
 class FireworksDirectRunner:
@@ -417,14 +417,14 @@ def _completion_token_cap(task: TaskEnvelope, *, expected_format: str, tier: str
     text = task.input_text
     lowered = text.lower()
     if expected_format == "yes_no":
-        return 8
+        return 64
     if expected_format == AnswerContractKind.LABEL.value:
-        return 8
+        return 128
     if expected_format == "number":
         if domain == "math_reasoning" and tier == "strong":
-            return 48
+            return 192
         if domain == "math_reasoning":
-            return 32
+            return 128
         return 16
     if expected_format == "literal_echo":
         literal = extract_literal_echo(task)
@@ -433,30 +433,38 @@ def _completion_token_cap(task: TaskEnvelope, *, expected_format: str, tier: str
         return _bounded_token_cap(_approx_tokens_for_chars(len(text)) + 16, lower=32, upper=160)
     if expected_format == "json":
         if infer_answer_contract(task).json_keys:
-            return 96
-        return _bounded_token_cap(_approx_tokens_for_chars(len(text)) + 48, lower=96, upper=224)
+            return 256
+        return _bounded_token_cap(_approx_tokens_for_chars(len(text)) + 96, lower=256, upper=384)
     if expected_format == "code":
-        return 384
+        return 512
 
     explicit_word_cap = _explicit_word_cap(lowered)
     if explicit_word_cap is not None:
         return _bounded_token_cap(math.ceil(explicit_word_cap * 1.5) + 16, lower=32, upper=224)
     if re.search(r"\b(one|single)\s+(word|label|sentence)\b", lowered):
-        return 48
+        return 96
     if re.search(
         r"\b(?:return|provide|answer with)\s+only\s+(?:the\s+)?(?:access\s+code|code|value|name|entity|word|answer)\b",
         lowered,
     ):
-        return 24
-    if re.search(r"\b(?:explain|compare|comparison|difference between|distinguish)\b", lowered):
-        return 224
-    if domain in {"classification", "formatting"} or tier == "cheap":
         return 64
-    if domain in {"extraction", "summarization"}:
-        return 160
-    if tier == "strong" or domain in {"logic", "math_reasoning", "current_factual"}:
-        return 224
-    return 128
+    if re.search(r"\b(?:explain|compare|comparison|difference between|distinguish)\b", lowered):
+        return 256
+    if domain in {"classification", "formatting"} or tier == "cheap":
+        return 128
+    if domain == "extraction":
+        return 384
+    if domain == "summarization":
+        return 256
+    if domain == "logic":
+        return 384
+    if domain == "math_reasoning":
+        return 192
+    if tier == "strong":
+        return 384
+    if domain == "current_factual":
+        return 256
+    return 256
 
 
 def _explicit_word_cap(lowered_text: str) -> int | None:

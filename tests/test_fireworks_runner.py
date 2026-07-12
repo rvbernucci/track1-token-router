@@ -211,7 +211,7 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertEqual(result.metadata["fireworks_completion_token_policy"]["max_tokens"], 16)
         self.assertEqual(
             result.metadata["fireworks_completion_token_policy"]["policy_version"],
-            "compact-contract-v3",
+            "accuracy-first-contract-v4",
         )
 
     def test_label_and_access_code_use_small_completion_budgets(self) -> None:
@@ -233,9 +233,9 @@ class FireworksDirectRunnerTests(unittest.TestCase):
             )
 
         self.assertEqual(label.metadata["fireworks_completion_token_policy"]["expected_format"], "label")
-        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 8)
+        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 128)
         self.assertEqual(access.metadata["fireworks_completion_token_policy"]["expected_format"], "free_text")
-        self.assertEqual(server.requests[1]["payload"]["max_tokens"], 24)
+        self.assertEqual(server.requests[1]["payload"]["max_tokens"], 64)
 
     def test_strong_math_number_task_gets_reasoning_headroom(self) -> None:
         with FakeOpenAIServer(response_text="144") as server:
@@ -253,7 +253,7 @@ class FireworksDirectRunnerTests(unittest.TestCase):
             )
 
         self.assertEqual(result.route, "fireworks_direct")
-        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 48)
+        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 192)
         self.assertEqual(result.metadata["fireworks_completion_token_policy"]["domain"], "math_reasoning")
 
     def test_explanatory_comparison_gets_non_truncating_completion_budget(self) -> None:
@@ -268,7 +268,7 @@ class FireworksDirectRunnerTests(unittest.TestCase):
                 )
             )
 
-        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 224)
+        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 256)
 
     def test_code_task_keeps_larger_completion_budget(self) -> None:
         response = "def slugify_title(value):\n    return value.strip().lower().replace(' ', '-')"
@@ -287,7 +287,7 @@ class FireworksDirectRunnerTests(unittest.TestCase):
             )
 
         self.assertEqual(result.answer, response)
-        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 384)
+        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 512)
         self.assertEqual(result.metadata["fireworks_completion_token_policy"]["expected_format"], "code")
 
     def test_configured_lower_max_tokens_overrides_completion_policy(self) -> None:

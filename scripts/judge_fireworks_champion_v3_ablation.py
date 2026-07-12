@@ -39,7 +39,8 @@ def main()->int:
             else:
                 side="a" if key[blind["blind_id"]]["candidate_a"]=="challenger" else "b"; challenger=bool(judgment[f"valid_{side}"]); evidence="blind_codex"
                 current_side="b" if side=="a" else "a"; current=bool(judgment[f"valid_{current_side}"])
-        final.append({"task_id":task_id,"category":tasks[task_id]["category"],"current_frozen_correct":a.frozen_baseline_correct,"current_rejudged_correct":current,"challenger_correct":challenger,"evidence":evidence})
+        frozen_correct = bool(tasks[task_id].get("current_frozen_correct", a.frozen_baseline_correct))
+        final.append({"task_id":task_id,"category":tasks[task_id]["category"],"current_frozen_correct":frozen_correct,"current_rejudged_correct":current,"challenger_correct":challenger,"evidence":evidence})
     write(out/"final-verdicts.jsonl",final)
     complete=all(x["challenger_correct"] is not None for x in final); bycat={}
     for cat in sorted({x["category"] for x in final}):

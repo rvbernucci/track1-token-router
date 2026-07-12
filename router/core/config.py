@@ -97,7 +97,7 @@ class RouterConfig:
             fireworks_timeout_s=float(os.getenv("FIREWORKS_TIMEOUT_S", "24")),
             fireworks_max_retries=int(os.getenv("FIREWORKS_MAX_RETRIES", "0")),
             fireworks_temperature=float(os.getenv("FIREWORKS_TEMPERATURE", "0.0")),
-            fireworks_max_tokens=int(os.getenv("FIREWORKS_MAX_TOKENS", "256")),
+            fireworks_max_tokens=int(os.getenv("FIREWORKS_MAX_TOKENS", "512")),
             fireworks_service_tier=os.getenv("FIREWORKS_SERVICE_TIER") or None,
             fireworks_champion_model=_optional_model(os.getenv("FIREWORKS_CHAMPION_MODEL")),
             fireworks_matrix_weights=_optional_path(os.getenv("FIREWORKS_MATRIX_WEIGHTS")),
