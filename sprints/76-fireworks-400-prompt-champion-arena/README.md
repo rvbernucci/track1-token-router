@@ -1,4 +1,4 @@
-# Sprint 76 - Fireworks 4,400-Prompt Champion Arena
+# Sprint 76 - Fireworks 800-Prompt Champion Arena
 
 ## Parallel Contract
 
@@ -6,22 +6,23 @@ This sprint runs concurrently with Sprint 77. It owns remote-model inference, bl
 
 ## Objective
 
-Determine where Kimi K2.7 Code and MiniMax M3 are accurate, contract-compliant and token-efficient across the complete 4,400-prompt E2B expansion and regression corpora. Promote the smallest per-intent policy that maximizes accuracy before token savings.
+Determine where Kimi K2.7 Code and MiniMax M3 are accurate, contract-compliant and token-efficient on a frozen, balanced 800-prompt sample from the 4,400-prompt E2B corpora. Promote the smallest per-intent policy that maximizes accuracy before token savings.
 
 ## Scope And Budget
 
-- [ ] Freeze all 4,400 prompts: 550 from each of the eight official categories.
-- [ ] Run both models on every prompt for 8,800 paired Fireworks calls.
-- [ ] Reuse the complete E2B expansion and regression corpora; do not generate synthetic arena replacements.
-- [ ] Report every category by easy, medium and hard strata when metadata permits.
+- [ ] Freeze exactly 800 prompts: 100 from each of the eight official categories.
+- [ ] Run both models on every prompt for exactly 1,600 paired Fireworks calls.
+- [ ] Sample from both E2B expansion and regression corpora; do not generate synthetic arena replacements.
+- [ ] Stratify every category across source, lineage, easy, medium and hard metadata when available.
 - [ ] Preserve mutation lineage so near-duplicates cannot cross selection and audit splits.
 - [ ] Preserve the original train, calibration, validation and final-holdout boundaries instead of resampling rows freely.
-- [ ] Enforce a hard `$18` experiment budget and retain at least `$10` of Fireworks credit.
+- [ ] Estimate worst-case spend before the first call and refuse to start above `$5` projected spend.
+- [ ] Enforce an absolute `$7` hard stop and retain the remaining Fireworks credit as paid-account protection.
 - [ ] Stop automatically if projected spend, failure rate or remaining time violates the release reserve.
 
 ## Frozen Dataset
 
-- [ ] Build `evals/fireworks-champion-v3/tasks.jsonl` with all 4,400 task IDs, prompts, categories, difficulties, sources and lineages.
+- [ ] Build `evals/fireworks-champion-v3/tasks.jsonl` with 800 task IDs, prompts, categories, difficulties, sources and lineages.
 - [ ] Join metadata to `inputs`, `splits` and `sealed/tasks` by immutable task ID; metadata files do not contain prompt text.
 - [ ] Fail the build on missing joins, divergent prompts, duplicate task IDs or duplicate prompt hashes.
 - [ ] Exclude prompts known to be malformed, duplicate or dependent on current facts without a frozen reference.
@@ -66,14 +67,14 @@ Determine where Kimi K2.7 Code and MiniMax M3 are accurate, contract-compliant a
 
 - [ ] Development accuracy is at least `95%` globally and no category is below `90%`.
 - [ ] Sealed audit accuracy does not regress against always-Kimi.
-- [ ] A category override requires at least 300 development rows and no statistically significant accuracy loss versus the category champion.
+- [ ] A category override requires at least 80 development rows and no statistically significant accuracy loss versus the category champion.
 - [ ] Any token-saving override must preserve the accuracy winner within the paired confidence interval.
 - [ ] Missing preferred models degrade to an authorized available model.
 - [ ] The selected policy passes the official public retired sample and Answer Contract Engine tests.
 
 ## Deliverables
 
-- [ ] `scripts/build_fireworks_champion_v3.py` freezes the 4,400-prompt arena.
+- [ ] `scripts/build_fireworks_champion_v3.py` freezes the 800-prompt arena.
 - [ ] `scripts/run_fireworks_champion_v3.py` performs resumable concurrent paired calls.
 - [ ] `scripts/judge_fireworks_champion_v3.py` merges mechanical and blind judgments.
 - [ ] `reports/public/fireworks-champion-v3.md` records results and limitations.
@@ -82,7 +83,7 @@ Determine where Kimi K2.7 Code and MiniMax M3 are accurate, contract-compliant a
 
 ## Definition Of Done
 
-- [ ] All 8,800 paired calls are accounted for; every semantic-judge queue row has a completed blind decision.
+- [ ] All 1,600 paired calls are accounted for; every semantic-judge queue row has a completed blind decision.
 - [ ] The sealed split is opened once, after policy freeze.
 - [ ] One explicit `promote` or `retain` decision is committed with reproducible hashes.
 - [ ] No unverified policy change reaches the submitted image.
