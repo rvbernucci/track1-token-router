@@ -117,7 +117,14 @@ def _calibrate(raw:Sequence[float],cal:tuple[float,float])->list[float]:
     a,b=cal; return [_sigmoid(a*math.log(max(EPS,p)/max(EPS,1-p))+b) for p in raw]
 
 
-def _thresholds(rows:Sequence[Mapping[str,Any]],probabilities:Sequence[float])->dict[str,Any]:
+def _thresholds(
+    rows: Sequence[Mapping[str, Any]],
+    probabilities: Sequence[float],
+    *,
+    minimum_support: int = 15,
+    minimum_precision: float = 0.95,
+    minimum_wilson: float = 0.85,
+) -> dict[str, Any]:
     result={}
     for intent in sorted({str(row["intent"]) for row in rows}):
         pairs=[(row,p) for row,p in zip(rows,probabilities,strict=True) if row["intent"]==intent]
@@ -125,9 +132,23 @@ def _thresholds(rows:Sequence[Mapping[str,Any]],probabilities:Sequence[float])->
         for threshold in sorted({round(p,6) for _,p in pairs}):
             chosen=[row for row,p in pairs if p>=threshold]; total=len(chosen); correct=sum(int(row["targets"]["e2b"]) for row in chosen)
             candidate={"threshold":threshold,"selected":total,"correct":correct,"precision":correct/total if total else 0.0,"coverage":total/len(pairs),"wilson_lower_90":_wilson(correct,total)}
-            eligible=total>=30 and candidate["precision"]>=.95 and candidate["wilson_lower_90"]>=.85
+            eligible=(
+                total >= minimum_support
+                and candidate["precision"] >= minimum_precision
+                and candidate["wilson_lower_90"] >= minimum_wilson
+            )
             if eligible and (best is None or (total,candidate["precision"])>(best["selected"],best["precision"])): best=candidate
         result[intent]=best or {"threshold":1.0,"selected":0,"correct":0,"precision":0.0,"coverage":0.0,"wilson_lower_90":0.0}
+    return result
+
+
+def _category_coverage(rows:Sequence[Mapping[str,Any]],probabilities:Sequence[float],thresholds:Mapping[str,Mapping[str,Any]])->dict[str,Any]:
+    result={}
+    for category in sorted({str(row["category"]) for row in rows}):
+        pairs=[(row,p) for row,p in zip(rows,probabilities,strict=True) if row["category"]==category]
+        selected=[row for row,p in pairs if p>=float(thresholds[str(row["intent"])]["threshold"]) and float(thresholds[str(row["intent"])]["threshold"])<1.0]
+        correct=sum(int(row["targets"]["e2b"]) for row in selected)
+        result[category]={"population":len(pairs),"selected":len(selected),"coverage":len(selected)/len(pairs) if pairs else 0.0,"precision":correct/len(selected) if selected else None}
     return result
 
 
@@ -180,7 +201,7 @@ def _candidate(kind:str,x:list[list[float]],y:list[int],hidden:int,epochs:int,ba
 def _sweep_configs(limit:int)->list[dict[str,Any]]:
     values=[]
     for index in range(max(limit,24)):
-        values.append({"hidden":(8,16,32,64)[index%4],"activation":("tanh","relu","gelu")[(index//4)%3],"layers":(1,2)[(index//12)%2],"lr":(1e-3,3e-3,1e-2)[index%3],"weight_decay":(1e-4,1e-3,3e-3)[(index//3)%3],"dropout":(0.0,0.1,0.2)[(index//2)%3]})
+        values.append({"hidden":(8,16,32,64)[index%4],"activation":("tanh","relu","gelu")[index%3],"layers":(1,2)[index%2],"lr":(1e-3,3e-3,1e-2)[(index//2)%3],"weight_decay":(1e-4,1e-3,3e-3)[(index//3)%3],"dropout":(0.0,0.1,0.2)[(index//4)%3]})
     unique=[]
     for item in values:
         if item not in unique: unique.append(item)
@@ -225,6 +246,37 @@ def _torch_sweep(x:list[list[float]],y:list[int],rows:Sequence[Mapping[str,Any]]
     return {"kind":"ensemble","members":exports}, {"completed":completed,"best":best}
 
 
+def _torch_intent_sweep(x:list[list[float]],y:list[int],rows:Sequence[Mapping[str,Any]],folds:int,epochs:int,device:str,configs:int,seeds:int,checkpoint:Path)->tuple[dict[str,Any],dict[str,Any],list[float]]:
+    state={"intents":{}}
+    if checkpoint.exists():
+        try: state=json.loads(checkpoint.read_text())
+        except (ValueError,OSError): state={"intents":{}}
+    all_oof=[0.0]*len(rows); exports={}; diagnostics={}
+    for intent in sorted({str(row["intent"]) for row in rows}):
+        indexes=[i for i,row in enumerate(rows) if row["intent"]==intent]; local_rows=[rows[i] for i in indexes]; local_x=[x[i] for i in indexes]; local_y=[y[i] for i in indexes]
+        completed=state.setdefault("intents",{}).setdefault(intent,[]); seen={json.dumps(item["config"],sort_keys=True) for item in completed}
+        for config in _sweep_configs(configs):
+            key=json.dumps(config,sort_keys=True)
+            if key in seen: continue
+            predictions=[]
+            for seed in range(177,177+seeds):
+                oof=[0.0]*len(local_rows)
+                for fold in range(folds):
+                    train_idx=[i for i,row in enumerate(local_rows) if _hash_fold(row["lineage"],folds)!=fold]; test_idx=[i for i,row in enumerate(local_rows) if _hash_fold(row["lineage"],folds)==fold]
+                    if len(set(local_y[i] for i in train_idx))<2: continue
+                    model=TorchMLP(len(x[0]),config["hidden"],device,activation=config["activation"],layers=config["layers"],dropout=config["dropout"],seed=seed).fit([local_x[i] for i in train_idx],[local_y[i] for i in train_idx],epochs=epochs,lr=config["lr"],l2=config["weight_decay"])
+                    for i,p in zip(test_idx,model.predict([local_x[i] for i in test_idx]),strict=True):oof[i]=p
+                predictions.append(oof)
+            ensemble=[sum(run[i] for run in predictions)/len(predictions) for i in range(len(local_rows))]
+            completed.append({"config":config,"seeds":seeds,"grouped_oof":_metrics(local_y,ensemble),"oof":ensemble}); checkpoint.parent.mkdir(parents=True,exist_ok=True); checkpoint.write_text(json.dumps(state,indent=2,sort_keys=True)+"\n")
+        best=min(completed,key=lambda item:(item["grouped_oof"]["brier"],item["grouped_oof"]["log_loss"])); config=best["config"]
+        for local_index,global_index in enumerate(indexes): all_oof[global_index]=best["oof"][local_index]
+        members=[]
+        for seed in range(177,177+seeds): members.append(TorchMLP(len(x[0]),config["hidden"],device,activation=config["activation"],layers=config["layers"],dropout=config["dropout"],seed=seed).fit(local_x,local_y,epochs=epochs,lr=config["lr"],l2=config["weight_decay"]).export())
+        exports[intent]={"kind":"ensemble","members":members}; diagnostics[intent]={"rows":len(indexes),"best_config":config,"grouped_oof":best["grouped_oof"]}
+    return {"kind":"intent_ensembles","models":exports},{"by_intent":diagnostics,"grouped_oof":_metrics(y,all_oof)},all_oof
+
+
 def main()->int:
     parser=argparse.ArgumentParser()
     parser.add_argument("--ledger",type=Path,default=ROOT/"evals/router-ml-v3/ledger.jsonl")
@@ -232,7 +284,8 @@ def main()->int:
     parser.add_argument("--report",type=Path,default=ROOT/"reports/generated/router-ml-v3/fit-report.json")
     parser.add_argument("--hidden",type=int,default=16); parser.add_argument("--epochs",type=int,default=500); parser.add_argument("--folds",type=int,default=5)
     parser.add_argument("--backend",choices=("auto","stdlib","torch"),default="auto"); parser.add_argument("--device",default="cuda")
-    parser.add_argument("--sweep",action="store_true"); parser.add_argument("--sweep-configs",type=int,default=24); parser.add_argument("--seeds",type=int,default=5); parser.add_argument("--checkpoint",type=Path,default=ROOT/"reports/generated/router-ml-v3/sweep-checkpoint.json")
+    parser.add_argument("--sweep",action="store_true"); parser.add_argument("--intent-challenger",action="store_true"); parser.add_argument("--sweep-configs",type=int,default=24); parser.add_argument("--intent-configs",type=int,default=8); parser.add_argument("--seeds",type=int,default=5); parser.add_argument("--checkpoint",type=Path,default=ROOT/"reports/generated/router-ml-v3/sweep-checkpoint.json"); parser.add_argument("--intent-checkpoint",type=Path,default=ROOT/"reports/generated/router-ml-v3/intent-sweep-checkpoint.json")
+    parser.add_argument("--minimum-support",type=int,default=15); parser.add_argument("--minimum-precision",type=float,default=.95); parser.add_argument("--minimum-wilson",type=float,default=.85)
     args=parser.parse_args(); rows=_rows(args.ledger)
     if any(row["targets"]["e2b"] is not None for row in rows if row["role"]=="protected_holdout"): raise ValueError("protected labels leaked into training ledger")
     fit=[row for row in rows if row["role"]=="fit" and row["assessment_valid"]]; calibration=[row for row in rows if row["role"]=="calibration" and row["assessment_valid"]]
@@ -273,16 +326,25 @@ def main()->int:
         if backend!="torch": raise ValueError("--sweep requires the torch backend")
         export,sweep=_torch_sweep(xfit,yfit,fit,args.folds,args.epochs,args.device,args.sweep_configs,args.seeds,args.checkpoint)
         comparisons["neural_sweep"]={"grouped_oof":sweep["best"]["grouped_oof"],"best_config":sweep["best"]["config"],"configs":len(sweep["completed"]),"seeds":args.seeds}
-    champion=min(("logistic","mlp","neural_sweep") if sweep else ("logistic","mlp"),key=lambda name:(comparisons[name]["grouped_oof"]["brier"],comparisons[name]["grouped_oof"]["log_loss"]))
+    intent_sweep=None
+    if args.intent_challenger:
+        if backend!="torch": raise ValueError("--intent-challenger requires the torch backend")
+        intent_export,intent_sweep,_=_torch_intent_sweep(xfit,yfit,fit,args.folds,args.epochs,args.device,args.intent_configs,args.seeds,args.intent_checkpoint)
+        comparisons["intent_ensembles"]={**intent_sweep,"configs_per_intent":args.intent_configs,"seeds":args.seeds}
+    choices=["logistic","mlp"]+(["neural_sweep"] if sweep else [])+(["intent_ensembles"] if intent_sweep else [])
+    champion=min(choices,key=lambda name:(comparisons[name]["grouped_oof"]["brier"],comparisons[name]["grouped_oof"]["log_loss"]))
     model=models["logistic" if champion=="logistic" else "mlp"]
-    runtime_model=export if champion=="neural_sweep" else model.export()
-    def predict(population:list[list[float]])->list[float]:
+    runtime_model=intent_export if champion=="intent_ensembles" else (export if champion=="neural_sweep" else model.export())
+    def predict(population:list[list[float]],population_rows:Sequence[Mapping[str,Any]])->list[float]:
         if champion!="neural_sweep": return model.predict(population)
         return [sum(_score_export(member,row) for member in runtime_model["members"])/len(runtime_model["members"]) for row in population]
-    raw_cal=predict(scaler.transform(_matrix(cal_fit,names))); ycal=[int(row["targets"]["e2b"]) for row in cal_fit]; calibration_params=_platt(raw_cal,ycal)
-    threshold_probs=_calibrate(predict(scaler.transform(_matrix(threshold_rows,names))),calibration_params); thresholds=_thresholds(threshold_rows,threshold_probs)
+    def predict_runtime(population:list[list[float]],population_rows:Sequence[Mapping[str,Any]])->list[float]:
+        if champion=="intent_ensembles": return [sum(_score_export(member,row) for member in runtime_model["models"][str(meta["intent"])]["members"])/len(runtime_model["models"][str(meta["intent"])]["members"]) for row,meta in zip(population,population_rows,strict=True)]
+        return predict(population,population_rows)
+    raw_cal=predict_runtime(scaler.transform(_matrix(cal_fit,names)),cal_fit); ycal=[int(row["targets"]["e2b"]) for row in cal_fit]; calibration_params=_platt(raw_cal,ycal)
+    threshold_probs=_calibrate(predict_runtime(scaler.transform(_matrix(threshold_rows,names)),threshold_rows),calibration_params); thresholds=_thresholds(threshold_rows,threshold_probs,minimum_support=args.minimum_support,minimum_precision=args.minimum_precision,minimum_wilson=args.minimum_wilson)
     artifact={"schema_version":"router-ml-v3-runtime-v1","champion":champion,"feature_names":names,"normalization":{"mean":scaler.mean,"scale":scaler.scale},"model":runtime_model,"calibration":{"slope":calibration_params[0],"intercept":calibration_params[1]},"thresholds":thresholds,"fail_closed":{"missing_assessment":True,"non_finite":True,"unknown_intent":True},"fit":{"rows":len(fit),"calibration_rows":len(cal_fit),"threshold_rows":len(threshold_rows),"protected_rows_accessed":0}}
-    report={"schema_version":"router-ml-v3-fit-report-v1","backend":backend,"device":args.device if backend=="torch" else "cpu","rows":{"fit":len(fit),"calibration_fit":len(cal_fit),"threshold_selection":len(threshold_rows),"protected_unopened":sum(row["role"]=="protected_holdout" for row in rows)},"group_split":{"folds":args.folds,"key":"lineage","calibration_partition":"lineage_hash"},"comparison":comparisons,"champion":champion,"thresholds":thresholds,"promotion_ready":any(value["selected"]>=30 for value in thresholds.values())}
+    report={"schema_version":"router-ml-v3-fit-report-v1","backend":backend,"device":args.device if backend=="torch" else "cpu","rows":{"fit":len(fit),"calibration_fit":len(cal_fit),"threshold_selection":len(threshold_rows),"protected_unopened":sum(row["role"]=="protected_holdout" for row in rows)},"group_split":{"folds":args.folds,"key":"lineage","calibration_partition":"lineage_hash"},"comparison":comparisons,"champion":champion,"thresholds":thresholds,"category_coverage":_category_coverage(threshold_rows,threshold_probs,thresholds),"promotion_ready":any(value["selected"]>=args.minimum_support for value in thresholds.values())}
     for path,payload in ((args.output,artifact),(args.report,report)):
         path.parent.mkdir(parents=True,exist_ok=True); path.write_text(json.dumps(payload,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     print(json.dumps({"champion":champion,"rows":report["rows"],"promoted_intents":[k for k,v in thresholds.items() if v["selected"]>=30]},sort_keys=True)); return 0

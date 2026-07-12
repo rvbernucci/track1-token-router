@@ -13,5 +13,9 @@ class RouterMlV3RuntimeTests(unittest.TestCase):
     def test_missing_feature_fails_closed(self): self.assertEqual("fireworks",MODULE.score({},"sentiment",self.artifact)["route"])
     def test_non_finite_fails_closed(self): self.assertEqual("fireworks",MODULE.score({"x":float("nan")},"sentiment",self.artifact)["route"])
     def test_unknown_intent_fails_closed(self): self.assertEqual("fireworks",MODULE.score({"x":1},"math_reasoning",self.artifact)["route"])
+    def test_intent_ensemble_uses_matching_head(self):
+        dense={"kind":"mlp_dense","activation":"relu","layers":[{"weights":[[10.0]],"bias":[0.0]}]}
+        artifact={**self.artifact,"model":{"kind":"intent_ensembles","models":{"sentiment":{"kind":"ensemble","members":[dense]}}}}
+        self.assertEqual("e2b",MODULE.score({"x":1},"sentiment",artifact)["route"])
 
 if __name__=="__main__":unittest.main()

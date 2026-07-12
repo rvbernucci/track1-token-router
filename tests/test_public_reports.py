@@ -84,7 +84,7 @@ class PublicReportExportTests(unittest.TestCase):
         self.assertIn("FunctionGemma", content)
         self.assertIn("docker pull --platform linux/amd64", content)
         self.assertIn("docker run --rm --platform linux/amd64", content)
-        self.assertIn("v3.7.1-harness-safe", content)
+        self.assertIn("v3.7.3-public-sample", content)
         self.assertIn("cat output/results.json", content)
         self.assertIn("solver_arithmetic", content)
 

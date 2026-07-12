@@ -26,6 +26,9 @@ def score(features: Mapping[str, Any], intent: str, artifact: Mapping[str, Any])
         raw=_sigmoid(float(model["b2"])+sum(float(w)*v for w,v in zip(model["w2"],hidden,strict=True)))
     elif model["kind"]=="mlp_dense": raw=_dense(model,values)
     elif model["kind"]=="ensemble": raw=sum(_dense(member,values) for member in model["members"])/len(model["members"])
+    elif model["kind"]=="intent_ensembles":
+        if intent not in model["models"]: return {"route":"fireworks","reason":"unknown_intent_head","probability":0.0}
+        ensemble=model["models"][intent]; raw=sum(_dense(member,values) for member in ensemble["members"])/len(ensemble["members"])
     else: return {"route":"fireworks","reason":"unknown_model","probability":0.0}
     raw=min(max(raw,1e-7),1-1e-7); cal=artifact["calibration"]
     probability=_sigmoid(float(cal["slope"])*math.log(raw/(1-raw))+float(cal["intercept"]))

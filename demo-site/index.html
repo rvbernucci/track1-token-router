@@ -233,6 +233,7 @@
           <a class="button" href="https://github.com/rvbernucci/track1-token-router/blob/main/reports/public/final-hybrid-scorecard.md">Final scorecard</a>
           <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/reports/public/final-pareto-calibration.md">Pareto calibration</a>
           <a class="button secondary" href="public-reports/fuzz-report.md">Fuzz report</a>
+          <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/reports/public/router-ml-v3-neural-audit.md">Neural audit</a>
           <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/submission/final/final-release-decision.json">Release decision</a>
           <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/README.md">README</a>
           <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/SUBMISSION.md">SUBMISSION</a>
@@ -312,9 +313,10 @@ cat output/results.json</code></pre>
       <article class="card wide">
         <h2>Calibration status</h2>
         <p>
-          The production image remains fail-closed. New per-intent neural calibration and a
-          1,600-call Kimi/MiniMax arena are being evaluated offline and will be promoted only
-          after protected-holdout and container regression gates pass.
+          The production image remains fail-closed. A GPU-trained neural challenger reached
+          94.87% precision on its one-time protected audit, but it was not promoted because it
+          removed a broader local cohort that remained more accurate than the remote baseline.
+          A separate 1,600-call Kimi/MiniMax arena also retained the current remote protocol.
         </p>
       </article>
 

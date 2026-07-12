@@ -18,6 +18,7 @@ from router.orchestration.e2b_mechanical_features import extract_e2b_mechanical_
 
 SCHEMA = "router-ml-v3-ledger-v1"
 SCORES = ("deterministic_fit", "reasoning_demand", "knowledge_uncertainty", "generation_demand", "format_complexity")
+INTENTS = ("factual_qa", "math_reasoning", "sentiment", "summarization", "ner", "code_debugging", "logic_puzzle", "code_generation")
 
 
 def _jsonl(path: Path) -> list[dict[str, Any]]:
@@ -86,6 +87,7 @@ def _row(source: str, metadata: Mapping[str, Any], candidate: Mapping[str, Any],
     mechanical = extract_e2b_mechanical_features(prompt).to_dict()["features"]
     protected = str(metadata.get("split")) == "final_holdout"
     features = {**semantic, **{str(k): float(v) for k, v in mechanical.items()}, **_contract_features(candidate), **_proof_features(candidate)}
+    features.update({f"intent.{name}": float(assessment_valid and intent == name) for name in INTENTS})
     features["assessment.missing"] = float(not assessment_valid)
     features["prompt.char_log"] = math.log1p(len(prompt))
     features["prompt.line_log"] = math.log1p(prompt.count("\n") + 1)
