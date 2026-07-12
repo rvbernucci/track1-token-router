@@ -1,0 +1,55 @@
+{
+  "categories": {
+    "code_debugging": 100,
+    "code_generation": 100,
+    "factual_qa": 100,
+    "logic_puzzle": 100,
+    "math_reasoning": 100,
+    "ner": 100,
+    "sentiment": 100,
+    "summarization": 100
+  },
+  "gates": {
+    "balanced_categories": true,
+    "balanced_sources": true,
+    "exact_arena": true,
+    "exact_population": true,
+    "lineage_split_isolation": true,
+    "prompt_hash_join_verified": true,
+    "selected_lineage_isolation": true,
+    "unique_prompt_hashes": true,
+    "unique_task_ids": true
+  },
+  "lineages": 800,
+  "paired_calls": 1600,
+  "population_rows": 4400,
+  "rows": 800,
+  "schema_version": "fireworks-champion-v3-manifest-v1",
+  "selection_policy": "100/category; 50/source/category; one row/lineage; expansion difficulty 17/17/16",
+  "selection_seed": "fireworks-champion-v3-800-v1",
+  "source_files": {
+    "evals/e2b-expansion-v1/metadata.jsonl": "92b61ed88f64970ff18f1a296fd901c70bd7ca6f5bcd7f762c897378da6a40ea",
+    "evals/e2b-expansion-v1/sealed/tasks/final_holdout.jsonl": "29bbc21a595d33a6fb5973373350e2afc1f331b4a3b6e677f762e947b7ebfb22",
+    "evals/e2b-expansion-v1/splits/calibration.jsonl": "2aa6ca92dc89e67898a4fb3e93cc55b6c4128cd217ce9cd2acb02c6347e744b4",
+    "evals/e2b-expansion-v1/splits/train.jsonl": "4d1a6a4fc20e15c2ddcd7f769ea46c2ab696a253d8f47891475528c9a7316e6b",
+    "evals/e2b-regression-v2/inputs/final_holdout.jsonl": "ae7a992c19731edbcced8f821148c28c7d488fa49ad2353fb80cf93a4bef4c54",
+    "evals/e2b-regression-v2/inputs/train.jsonl": "2e8ff40ea4d42df481cc3884a08d7729954a7e56094f781064436d3c8833a31e",
+    "evals/e2b-regression-v2/inputs/validation.jsonl": "9b2be25e8622c151b425f2dbccee82d4586a41a9fc00b6237d4711edbe9716b3",
+    "evals/e2b-regression-v2/metadata.jsonl": "33d1388c007c7b8b3eeda04f28e705fac6f315ef1236569c1e33490cb5c896a0"
+  },
+  "sources": {
+    "e2b-expansion-v1": 400,
+    "e2b-regression-v2": 400
+  },
+  "splits": {
+    "calibration": 83,
+    "final_holdout": 170,
+    "train": 470,
+    "validation": 77
+  },
+  "task_file": {
+    "bytes": 860071,
+    "path": "evals/fireworks-champion-v3/tasks.jsonl",
+    "sha256": "dc72cb9143405765cb99a21a3c5c0e7ad24744a1e99dc601993b95c92f95740d"
+  }
+}

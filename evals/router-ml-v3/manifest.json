@@ -1,0 +1,32 @@
+{
+  "attrition": {},
+  "ledger_sha256": "d94a0fb1f23b5e0a5f2c64c22c8d172ad4b8eda5b8d7ef471ad244ee99a51b5f",
+  "lineage_overlap": {
+    "calibration_protected_holdout": 0,
+    "fit_calibration": 0,
+    "fit_protected_holdout": 0
+  },
+  "lineages": {
+    "calibration": 680,
+    "fit": 2040,
+    "protected_holdout": 680
+  },
+  "protected_targets_redacted": true,
+  "roles": {
+    "calibration": 880,
+    "fit": 2640,
+    "protected_holdout": 880
+  },
+  "rows": 4400,
+  "schema_version": "router-ml-v3-manifest-v1",
+  "source_hashes": {
+    "evals/e2b-expansion-v1/adjudication/development/candidates.jsonl": "0d3c7c7560a64e844d4cdcd999b032d148ae4a256482999977a950bc58de32f2",
+    "evals/e2b-expansion-v1/adjudication/development/labels.jsonl": "7d80dcf4d33233e8d42574606be07f18c5e0672e19220818ce9e26e8ba9f1660",
+    "evals/e2b-expansion-v1/adjudication/sealed/candidates.jsonl": "05a57d278441717118b0ffcea370fb42662133afaf5c1e2acf6f19f782596cae",
+    "evals/e2b-expansion-v1/metadata.jsonl": "92b61ed88f64970ff18f1a296fd901c70bd7ca6f5bcd7f762c897378da6a40ea",
+    "evals/e2b-regression-v2-adjudication/development/candidates.jsonl": "09330d648b251349ddc9c123a19fd33602b5bd2aa44fbe0eb340d44395906b46",
+    "evals/e2b-regression-v2-adjudication/development/labels.jsonl": "1a4ba53bba5bf849b632f847b6bb33cb10355cecc9c80ec2159ce7ef441a4fec",
+    "evals/e2b-regression-v2-adjudication/sealed/final-holdout-candidates.jsonl": "a2014f40e1866f85193c79bedbe28405bfa9ef52cd6c58006716ab99ba2b0b24",
+    "evals/e2b-regression-v2/metadata.jsonl": "33d1388c007c7b8b3eeda04f28e705fac6f315ef1236569c1e33490cb5c896a0"
+  }
+}

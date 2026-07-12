@@ -42,7 +42,7 @@ def main() -> int:
             connection.settimeout(max(0.1, min(5.0, deadline - time.monotonic())))
             try:
                 message = json.loads(connection.recv())
-            except TimeoutError:
+            except (TimeoutError, websocket.WebSocketTimeoutException):
                 continue
             if not isinstance(message, list) or len(message) < 2 or message[0] != "stdout":
                 continue
