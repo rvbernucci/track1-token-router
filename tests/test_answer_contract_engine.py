@@ -21,6 +21,21 @@ class AnswerContractEngineTests(unittest.TestCase):
         self.assertEqual(result.answer, "positive")
         self.assertEqual(result.actions, ("extracted_unique_label",))
 
+    def test_preserves_sentiment_explanation_when_prompt_requires_a_reason(self) -> None:
+        task = TaskEnvelope(
+            input_text=(
+                "Classify the sentiment as Positive, Negative, or Neutral and give a one-sentence reason: "
+                "'The package was damaged, but support resolved the problem.'"
+            )
+        )
+        answer = "Positive, because the initial problem was resolved quickly by support."
+
+        result = apply_answer_contract(task, answer)
+
+        self.assertTrue(result.valid)
+        self.assertEqual(result.contract.kind, AnswerContractKind.FREE_TEXT)
+        self.assertEqual(result.answer, answer)
+
     def test_rejects_ambiguous_or_negated_label(self) -> None:
         task = TaskEnvelope(input_text="Classify sentiment. Answer exactly one label: positive, negative, or neutral.")
 

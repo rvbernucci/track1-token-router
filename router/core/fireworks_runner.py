@@ -33,7 +33,7 @@ from router.orchestration.prompt_packet import extract_literal_echo
 from router.orchestration.solvers import solve_deterministic
 
 
-FIREWORKS_COMPLETION_POLICY_VERSION = "compact-contract-v2"
+FIREWORKS_COMPLETION_POLICY_VERSION = "compact-contract-v3"
 
 
 class FireworksDirectRunner:
@@ -448,6 +448,8 @@ def _completion_token_cap(task: TaskEnvelope, *, expected_format: str, tier: str
         lowered,
     ):
         return 24
+    if re.search(r"\b(?:explain|compare|comparison|difference between|distinguish)\b", lowered):
+        return 224
     if domain in {"classification", "formatting"} or tier == "cheap":
         return 64
     if domain in {"extraction", "summarization"}:

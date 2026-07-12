@@ -3,12 +3,19 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
 
 from router.core.contracts import TaskAssessment
 from router.orchestration.e2b_mechanical_features import extract_e2b_mechanical_features
+
+
+_EXPLANATORY_RESPONSE = re.compile(
+    r"\b(?:explain|explanation|justify|justification|reason|rationale)\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -127,6 +134,12 @@ class E2BMatrixGate:
         threshold = self.thresholds_by_intent.get(assessment.intent.value, self.threshold)
         if not self.enabled or coefficients is None or assessment.intent.value not in self.allowed_intents:
             return E2BMatrixDecision(False, 0.0, threshold, "matrix_disabled_or_unknown_intent")
+        if (
+            assessment.intent.value == "sentiment"
+            and prompt
+            and _EXPLANATORY_RESPONSE.search(prompt)
+        ):
+            return E2BMatrixDecision(False, 0.0, threshold, "matrix_explanatory_response_required")
         scores = assessment.scores.to_dict()
         values = [float(scores[name]) / 10.0 for name in self.score_names]
         feature_schema_version = None

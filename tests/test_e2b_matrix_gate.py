@@ -32,6 +32,21 @@ class E2BMatrixGateTests(unittest.TestCase):
         self.assertLessEqual(decision.probability, 1.0)
         self.assertEqual(decision.probe, decision.probability >= decision.threshold)
 
+    def test_sentiment_explanation_is_never_sent_to_label_only_e2b_cohort(self) -> None:
+        gate = E2BMatrixGate.load(Path("configs/e2b-category-matrix-regression-v2.json"))
+        assessment = TaskAssessment(
+            intent=Intent.SENTIMENT,
+            scores=AssessmentScores(5, 3, 0, 4, 2),
+        )
+
+        decision = gate.decide(
+            assessment,
+            "Classify as Positive, Negative, or Neutral and give a one-sentence reason.",
+        )
+
+        self.assertFalse(decision.probe)
+        self.assertEqual(decision.reason, "matrix_explanatory_response_required")
+
     def test_hash_mismatch_fails_closed(self) -> None:
         with self.assertRaises(ValueError):
             E2BMatrixGate.load(

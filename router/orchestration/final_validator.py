@@ -480,7 +480,10 @@ def _extract_allowed_labels(prompt: str) -> tuple[str, ...]:
     strict_sentiment = bool(
         re.search(r"\bclassif(?:y|ique|ica)\b.*\b(?:as|como)\b", lowered)
         or re.search(r"\b(?:answer|return|respond)\b.*\b(?:only|exactly one)\b.*\blabel\b", lowered)
-    ) and not re.search(r"\b(?:explain|justify|assessment|analysis|reasoning)\b", lowered)
+    ) and not re.search(
+        r"\b(?:explain|explanation|justify|justification|assessment|analysis|reason|reasoning|rationale)\b",
+        lowered,
+    )
     if strict_sentiment and all(label in lowered for label in ("positive", "negative", "neutral")):
         labels = ["positive", "negative", "neutral"]
         if re.search(r"\bmixed\b", lowered):

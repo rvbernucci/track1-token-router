@@ -211,7 +211,7 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertEqual(result.metadata["fireworks_completion_token_policy"]["max_tokens"], 16)
         self.assertEqual(
             result.metadata["fireworks_completion_token_policy"]["policy_version"],
-            "compact-contract-v2",
+            "compact-contract-v3",
         )
 
     def test_label_and_access_code_use_small_completion_budgets(self) -> None:
@@ -255,6 +255,20 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertEqual(result.route, "fireworks_direct")
         self.assertEqual(server.requests[0]["payload"]["max_tokens"], 48)
         self.assertEqual(result.metadata["fireworks_completion_token_policy"]["domain"], "math_reasoning")
+
+    def test_explanatory_comparison_gets_non_truncating_completion_budget(self) -> None:
+        with FakeOpenAIServer(response_text="RAM is volatile working memory; ROM is non-volatile firmware storage.") as server:
+            client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
+            runner = FireworksDirectRunner(client, max_tokens=512, enable_deterministic_solvers=False)
+
+            runner.run(
+                TaskEnvelope(
+                    id="comparison",
+                    input_text="Explain the difference between RAM and ROM and what each is used for.",
+                )
+            )
+
+        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 224)
 
     def test_code_task_keeps_larger_completion_budget(self) -> None:
         response = "def slugify_title(value):\n    return value.strip().lower().replace(' ', '-')"
