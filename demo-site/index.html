@@ -258,9 +258,9 @@
       </article>
 
       <article class="card">
-        <h2>Evidence</h2>
-        <p>The exact public image produced two real E2B answers under 4 GB and 2 vCPU with zero Fireworks tokens.</p>
-        <span class="metric">745.7 MiB peak</span>
+        <h2>Live score</h2>
+        <p>The public image completed the official evaluator successfully, giving us a measured baseline for further calibration.</p>
+        <span class="metric">63.2% / 3,936 tokens</span>
       </article>
 
       <article class="card">
@@ -272,7 +272,8 @@
       <article class="card wide">
         <h2>Pull the submitted image</h2>
         <pre><code>docker pull --platform linux/amd64 \
-  ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe</code></pre>
+  ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample</code></pre>
+        <p>This exact public tag passed anonymous registry access and clean-pull harness checks.</p>
       </article>
 
       <article class="card">
@@ -303,9 +304,18 @@ docker run --rm --platform linux/amd64 \
   -e ALLOWED_MODELS \
   -v "$PWD/input:/input:ro" \
   -v "$PWD/output:/output" \
-  ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe
+  ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample
 
 cat output/results.json</code></pre>
+      </article>
+
+      <article class="card wide">
+        <h2>Calibration status</h2>
+        <p>
+          The production image remains fail-closed. New per-intent neural calibration and a
+          1,600-call Kimi/MiniMax arena are being evaluated offline and will be promoted only
+          after protected-holdout and container regression gates pass.
+        </p>
       </article>
 
       <article class="card wide">
