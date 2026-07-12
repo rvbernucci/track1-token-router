@@ -32,28 +32,43 @@ def rows(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-def population(root: Path) -> list[dict[str, Any]]:
+def population(root: Path, *, include_protected: bool = True) -> list[dict[str, Any]]:
     ledger = {row["task_id"]: row for row in rows(root / "evals/router-ml-v3/ledger.jsonl")}
     tasks: dict[str, dict[str, Any]] = {}
     refs: dict[str, dict[str, Any]] = {}
     task_paths = [
         *sorted((root / "evals/e2b-expansion-v1/splits").glob("*.jsonl")),
-        root / "evals/e2b-expansion-v1/sealed/tasks/final_holdout.jsonl",
-        *sorted((root / "evals/e2b-regression-v2/inputs").glob("*.jsonl")),
+        root / "evals/e2b-regression-v2/inputs/train.jsonl",
+        root / "evals/e2b-regression-v2/inputs/validation.jsonl",
     ]
     ref_paths = [
         *sorted((root / "evals/e2b-expansion-v1/references").glob("*.jsonl")),
-        root / "evals/e2b-expansion-v1/sealed/references/final_holdout.jsonl",
         *sorted((root / "evals/e2b-regression-v2/references").glob("*.jsonl")),
-        root / "evals/e2b-regression-v2/sealed/final_holdout.jsonl",
     ]
+    if include_protected:
+        task_paths.extend(
+            (
+                root / "evals/e2b-expansion-v1/sealed/tasks/final_holdout.jsonl",
+                root / "evals/e2b-regression-v2/inputs/final_holdout.jsonl",
+            )
+        )
+        ref_paths.extend(
+            (
+                root / "evals/e2b-expansion-v1/sealed/references/final_holdout.jsonl",
+                root / "evals/e2b-regression-v2/sealed/final_holdout.jsonl",
+            )
+        )
     for path in task_paths:
         for row in rows(path):
             tasks[str(row["task_id"])] = row
     for path in ref_paths:
         for row in rows(path):
             refs[str(row["task_id"])] = row
-    expected = set(ledger)
+    expected = {
+        task_id
+        for task_id, row in ledger.items()
+        if include_protected or row.get("role") != "protected_holdout"
+    }
     if set(tasks) != expected or set(refs) != expected:
         raise ValueError(
             f"Population join mismatch: ledger={len(ledger)} tasks={len(tasks)} refs={len(refs)}"
