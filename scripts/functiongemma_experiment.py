@@ -68,6 +68,7 @@ def parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--gold", type=Path)
     evaluate.add_argument("--output", type=Path, required=True)
     evaluate.add_argument("--report", type=Path, required=True)
+    evaluate.add_argument("--batch-size", type=int, default=1)
 
     calibrate = commands.add_parser("calibrate")
     calibrate.add_argument("--predictions", type=Path, required=True)
@@ -104,7 +105,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.command == "train":
         return emit(train(config, args.data, args.variant, args.output))
     if args.command == "evaluate":
-        return emit(evaluate(config, args.model, args.revision, args.tasks, args.gold, args.output, args.report))
+        return emit(
+            evaluate(
+                config,
+                args.model,
+                args.revision,
+                args.tasks,
+                args.gold,
+                args.output,
+                args.report,
+                batch_size=args.batch_size,
+            )
+        )
     if args.command == "calibrate":
         return emit(calibrate(args.predictions, args.output))
     if args.command == "boundary":
@@ -336,13 +348,20 @@ def evaluate(
     gold_path: Path | None,
     output: Path,
     report_path: Path,
+    *,
+    batch_size: int = 1,
 ) -> dict[str, Any]:
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
+    if batch_size < 1:
+        raise ValueError("Evaluation batch size must be positive.")
     tasks = jsonl_rows(tasks_path)
     gold_by_id = _gold(tasks, gold_path)
     tokenizer = AutoTokenizer.from_pretrained(model_path, revision=revision)
+    tokenizer.padding_side = "left"
+    if tokenizer.pad_token_id is None:
+        tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForCausalLM.from_pretrained(
         model_path,
         revision=revision,
@@ -355,18 +374,22 @@ def evaluate(
     predictions: list[dict[str, Any]] = []
     latencies: list[float] = []
     max_new_tokens = int(_mapping(config["generation"], "generation")["max_new_tokens"])
-    for row in tasks:
-        example_id, task_text = _task(row)
-        messages = [
-            {"role": "developer", "content": DEVELOPER_INSTRUCTION},
-            {"role": "user", "content": task_text},
+    for task_batch in _chunks(tasks, batch_size):
+        examples = [_task(row) for row in task_batch]
+        conversations = [
+            [
+                {"role": "developer", "content": DEVELOPER_INSTRUCTION},
+                {"role": "user", "content": task_text},
+            ]
+            for _, task_text in examples
         ]
         encoded = tokenizer.apply_chat_template(
-            messages,
+            conversations,
             tools=[ASSESS_TASK_TOOL],
             add_generation_prompt=True,
             return_dict=True,
             return_tensors="pt",
+            padding=True,
         )
         encoded = {key: value.to(model.device) for key, value in encoded.items()}
         started = time.monotonic()
@@ -379,34 +402,38 @@ def evaluate(
                 pad_token_id=tokenizer.pad_token_id,
                 eos_token_id=eos_token_ids,
             )
-        latency = (time.monotonic() - started) * 1000
-        latencies.append(latency)
+        batch_latency = (time.monotonic() - started) * 1000
+        latency = batch_latency / len(task_batch)
+        latencies.extend([latency] * len(task_batch))
         prompt_length = encoded["input_ids"].shape[-1]
-        raw = tokenizer.decode(generated[0][prompt_length:], skip_special_tokens=False)
-        prediction = None
-        error = None
-        try:
-            prediction = assessment_from_function_call(raw).to_dict()
-        except ValueError as exc:
-            error = str(exc)
-        predictions.append(
-            {
-                "id": example_id,
-                "gold": gold_by_id[example_id],
-                "prediction": prediction,
-                "raw_output": raw,
-                "parse_error": error,
-                "latency_ms": latency,
-                "input_tokens": int(prompt_length),
-                "output_tokens": int(generated.shape[-1] - prompt_length),
-            }
-        )
+        for index, (example_id, _) in enumerate(examples):
+            raw = tokenizer.decode(generated[index][prompt_length:], skip_special_tokens=False)
+            prediction = None
+            error = None
+            try:
+                prediction = assessment_from_function_call(raw).to_dict()
+            except ValueError as exc:
+                error = str(exc)
+            predictions.append(
+                {
+                    "id": example_id,
+                    "gold": gold_by_id[example_id],
+                    "prediction": prediction,
+                    "raw_output": raw,
+                    "parse_error": error,
+                    "latency_ms": latency,
+                    "input_tokens": int(encoded["attention_mask"][index].sum().item()),
+                    "output_tokens": int(generated.shape[-1] - prompt_length),
+                }
+            )
     write_jsonl(output, predictions)
     metrics = assessment_metrics(predictions)
     metrics.update(
         {
             "model": model_path,
             "revision": revision,
+            "batch_size": batch_size,
+            "throughput_tasks_per_second": 1000.0 / percentile(latencies, 0.50),
             "p50_latency_ms": percentile(latencies, 0.50),
             "p95_latency_ms": percentile(latencies, 0.95),
             "peak_rss_mb": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024,
@@ -564,6 +591,10 @@ def _task(row: Mapping[str, Any]) -> tuple[str, str]:
     if isinstance(messages, list) and len(messages) >= 2:
         return str(row["id"]), str(messages[1]["content"])
     raise ValueError("Evaluation task has no input text.")
+
+
+def _chunks(rows: Sequence[dict[str, Any]], size: int) -> Sequence[Sequence[dict[str, Any]]]:
+    return [rows[index : index + size] for index in range(0, len(rows), size)]
 
 
 def _validate_variant(name: str, value: Mapping[str, Any]) -> None:
