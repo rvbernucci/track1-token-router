@@ -6,7 +6,7 @@ Updated: 2026-07-11
 
 The `default_enabled=false` policy below is historical Sprint 49 evidence. Sprint 63 ran a new paired 46-call benchmark under the final raw-prompt protocol and 96-token ceiling. The promoted `configs/fireworks-intent-policy-v2.json` uses Kimi by default and MiniMax for NER/extraction. It matched the strongest result at 21/23 valid answers while reducing scored tokens from 3,869 to 1,967. Estimated experiment spend was `$0.00370335`; paired token-savings CI95 was `[1,608, 2,185]`.
 
-The policy SHA-256 is `b57498d17e9d560e9990b56492e5b5aa51d0ce8ac060c83a2f56a4f847b4792a`. It remains subordinate to runtime `ALLOWED_MODELS`. See `reports/public/final-pareto-calibration.md` for current evidence.
+The policy SHA-256 is `87a9d2a96453f06e49ea574f5fe0d11b4f41214560efa8281e09adb66856a124`. It keeps Kimi as the default, uses MiniMax for summarization, and adds only the statistically supported MiniMax overrides for logic and sentiment. It remains subordinate to runtime `ALLOWED_MODELS`. See `reports/generated/fireworks-champion-v3/final-summary.md` and `reports/public/fireworks-cap-only-ablation.md` for current evidence.
 
 ## Historical Sprint 49 Evidence
 

@@ -9,19 +9,20 @@
     "code_debugging": "accounts/fireworks/models/kimi-k2p7-code",
     "code_generation": "accounts/fireworks/models/kimi-k2p7-code",
     "factual_qa": "accounts/fireworks/models/kimi-k2p7-code",
-    "logic_puzzle": "accounts/fireworks/models/kimi-k2p7-code",
+    "logic_puzzle": "accounts/fireworks/models/minimax-m3",
     "math_reasoning": "accounts/fireworks/models/kimi-k2p7-code",
     "ner": "accounts/fireworks/models/kimi-k2p7-code",
-    "sentiment": "accounts/fireworks/models/kimi-k2p7-code",
+    "sentiment": "accounts/fireworks/models/minimax-m3",
     "summarization": "accounts/fireworks/models/minimax-m3"
   },
   "locked_test_used_for_selection": false,
   "schema_version": "fireworks-intent-policy-v1",
   "selection_split": "validation",
   "source": {
-    "comparison_report": "reports/public/fireworks-pareto-v2.json",
-    "comparison_report_sha256": "5c85332324325869f43a8c6fd45cc9345c71d1a0db2ccc63d0a9c7365d047b84",
-    "estimated_spend_usd": 0.0312178,
-    "live_calls": 384
+    "comparison_report": "reports/generated/fireworks-champion-v3/final-summary.md",
+    "comparison_report_sha256": "39e15cca291613ebd06bdf26d4a5a0a4810be70ec92e24250d14382e1b519a98",
+    "estimated_spend_usd": 0.0,
+    "live_calls": 1600,
+    "promotion_basis": "paired McNemar p<0.05; accuracy-first-contract-v4 cap ablation passed"
   }
 }
