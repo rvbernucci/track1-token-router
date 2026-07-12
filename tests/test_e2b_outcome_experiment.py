@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from router.core.e2b_runner import E2B_SYSTEM_PROMPT
 from scripts.e2b_outcome_experiment import _assessment_index, _candidate_id, _complete, _task, run_experiment
 
 
@@ -63,8 +64,14 @@ class E2BOutcomeExperimentTests(unittest.TestCase):
         payload = json.loads(request.data)
         self.assertEqual(payload["max_completion_tokens"], 16)
         self.assertEqual(payload["max_tokens"], 16)
-        self.assertEqual(payload["messages"], [{"role": "user", "content": "question"}])
-        self.assertEqual(row["prompt_version"], "raw-prompt-v1")
+        self.assertEqual(
+            payload["messages"],
+            [
+                {"role": "system", "content": E2B_SYSTEM_PROMPT},
+                {"role": "user", "content": "question"},
+            ],
+        )
+        self.assertEqual(row["prompt_version"], "generic-answer-contract-v1")
 
     @patch("urllib.request.urlopen")
     def test_run_is_append_only_and_resumable(self, urlopen) -> None:

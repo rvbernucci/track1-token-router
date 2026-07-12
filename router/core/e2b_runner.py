@@ -4,14 +4,19 @@ from time import perf_counter
 
 from router.core.contracts import AnswerResult, TaskEnvelope, TokenUsage
 from router.core.model_client import LocalModelClient, ModelClientError
-from router.core.prompts import ANSWER_PROMPT_VERSION
-
-
-E2B_PROMPT_VERSION = ANSWER_PROMPT_VERSION
+E2B_PROMPT_VERSION = "generic-answer-contract-v1"
+E2B_SYSTEM_PROMPT = (
+    "Answer the user's task directly and correctly. Follow every explicit output-format "
+    "constraint exactly. Return only the requested answer; do not add a preamble, explanation, "
+    "or markdown unless the user explicitly requests it."
+)
 
 
 def build_e2b_messages(input_text: str) -> list[dict[str, str]]:
-    return [{"role": "user", "content": input_text}]
+    return [
+        {"role": "system", "content": E2B_SYSTEM_PROMPT},
+        {"role": "user", "content": input_text},
+    ]
 
 
 class GemmaE2BRunner:
