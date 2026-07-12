@@ -15,6 +15,14 @@ MINIMAX = "accounts/fireworks/models/minimax-m3"
 
 
 class FireworksIntentPolicyTests(unittest.TestCase):
+    def test_championship_policy_uses_minimax_for_summarization_adherence(self) -> None:
+        policy = FireworksIntentPolicy.load(Path("configs/fireworks-intent-policy-v2.json"))
+
+        selected = policy.select(domain="summarization", runtime_allowed_models=[KIMI, MINIMAX])
+
+        self.assertEqual(selected["model"], MINIMAX)  # type: ignore[index]
+        self.assertFalse(selected["used_default"])  # type: ignore[index]
+
     def test_promotes_validation_choices_without_locked_test_input(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "comparison.json"
