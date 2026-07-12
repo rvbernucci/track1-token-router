@@ -44,9 +44,9 @@ Sprints 60-64 validate the exact public hybrid image rather than a source-tree a
 
 ## Parallel Championship Improvement Sequence
 
-Sprints 76 and 77 run concurrently against separate ownership boundaries. Sprint 76 improves the authorized Fireworks fallback with a 400-prompt blind arena; Sprint 77 recalibrates selective zero-token routing without reading the remote arena's sealed audit.
+Sprints 76 and 77 run concurrently against separate ownership boundaries. Sprint 76 improves the authorized Fireworks fallback with an 8,800-call paired arena over all 4,400 existing prompts; Sprint 77 recalibrates selective zero-token routing without reading the remote arena's sealed audit.
 
-- [ ] [Sprint 76 - Fireworks 400-Prompt Champion Arena](./76-fireworks-400-prompt-champion-arena/README.md)
+- [ ] [Sprint 76 - Fireworks 4,400-Prompt Champion Arena](./76-fireworks-400-prompt-champion-arena/README.md)
 - [ ] [Sprint 77 - Local Router ML Recalibration](./77-local-router-ml-recalibration/README.md)
 
 ## Post-Submission Robustness Sequence
