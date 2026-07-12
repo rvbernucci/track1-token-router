@@ -1,0 +1,25 @@
+name: Harness Compatibility Gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Public linux/amd64 image to verify
+        required: true
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  harness-compatibility:
+    runs-on: [self-hosted, Linux, X64, track1-builder-stable]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clean pull public image
+        run: |
+          docker image rm "${{ inputs.image }}" 2>/dev/null || true
+          docker pull --platform linux/amd64 "${{ inputs.image }}"
+      - name: Run hostile harness compatibility matrix
+        run: bash scripts/harness_compat_gate.sh "${{ inputs.image }}"

@@ -14,7 +14,7 @@ Do not route everything to the strongest model. Route only when risk signals jus
 
 ## Slide 4 - Architecture
 
-Fail-closed solvers answer only provable templates. FunctionGemma assesses the remaining prompts, a calibrated matrix and Wilson-Nash guard select safe E2B tasks, and all uncertainty falls through to an authorized Fireworks model.
+Fail-closed solvers answer only provable templates. FunctionGemma assesses the remaining prompts, a calibrated matrix and Wilson-Nash guard select safe E2B tasks, and all uncertainty falls through to an authorized Firewo...
 
 ## Slide 5 - Competition Mode
 
@@ -26,7 +26,7 @@ Fuzz pack, battle drill, scoring simulator, Docker, CI, secret scan and runtime 
 
 ## Slide 7 - AMD/Fireworks Activation
 
-The AMD pod trained FunctionGemma and benchmarked E2B. The final image embeds both quantized local models; exact-image testing proved two local answers with zero Fireworks tokens under 4 GB RAM and 2 vCPU.
+The AMD pod trained FunctionGemma and benchmarked E2B. The final image embeds both quantized local models and exact-image testing proves zero-token local inference under evaluator limits.
 
 ## Slide 8 - Demo
 

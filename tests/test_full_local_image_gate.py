@@ -1,3 +1,4 @@
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -9,6 +10,29 @@ class FullLocalImageGateTests(unittest.TestCase):
         dockerfile = Path("Dockerfile.championship").read_text(encoding="utf-8")
         self.assertIn("libvulkan1", dockerfile)
         self.assertIn("mesa-vulkan-drivers", dockerfile)
+
+    def test_championship_entrypoint_is_posix_shell_and_uses_writable_runtime_paths(self) -> None:
+        entrypoint = Path("scripts/championship_entrypoint.sh")
+        subprocess.run(["sh", "-n", str(entrypoint)], check=True)
+        content = entrypoint.read_text(encoding="utf-8")
+        dockerfile = Path("Dockerfile.championship").read_text(encoding="utf-8")
+        self.assertIn("/tmp/proofroute", content)
+        self.assertIn("ROUTER_LOG_PATH=/tmp/proofroute/run.jsonl", dockerfile)
+        self.assertNotIn(">/app/logs/", content)
+
+    def test_championship_entrypoint_falls_back_to_remote_instead_of_crashing(self) -> None:
+        content = Path("scripts/championship_entrypoint.sh").read_text(encoding="utf-8")
+        self.assertIn("export ROUTER_MODE=fireworks", content)
+        self.assertIn('remote_only "FunctionGemma startup failure"', content)
+        self.assertIn('remote_only "Gemma E2B startup failure"', content)
+        self.assertIn("exec router submit-track1", content)
+
+    def test_harness_compatibility_gate_covers_hostile_runtime_conditions(self) -> None:
+        content = Path("scripts/harness_compat_gate.sh").read_text(encoding="utf-8")
+        self.assertIn("--read-only --user 65534:65534", content)
+        self.assertIn("PROOFROUTE_DISABLE_LOCAL=1", content)
+        self.assertIn("Official Fireworks runtime requires harness variables", content)
+        self.assertIn("--network=none", content)
 
     def test_memory_units(self) -> None:
         self.assertAlmostEqual(memory_to_mib("1024KiB"), 1.0)
