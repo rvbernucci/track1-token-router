@@ -1,0 +1,56 @@
+name: E2B Prompt Ablation
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Exact public image containing Gemma E2B
+        required: true
+        default: ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample
+      per_category:
+        description: Tasks per category
+        required: true
+        default: "20"
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  ablation:
+    runs-on: [self-hosted, Linux, X64, track1-builder-stable]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run unit tests
+        run: python3 -m unittest tests.test_run_e2b_prompt_ablation
+      - name: Pull exact public image
+        run: docker pull --platform linux/amd64 "${{ inputs.image }}"
+      - name: Start embedded E2B server
+        run: |
+          docker run -d --rm --name proofroute-e2b-ablation \
+            --platform linux/amd64 --memory=4g --cpus=2 \
+            -p 127.0.0.1:19379:9379 \
+            --entrypoint python "${{ inputs.image }}" \
+            /app/scripts/litert_cpu_server.py --host 0.0.0.0 --port 9379 \
+            --cpu-threads 2 --max-context-tokens 2048
+          for attempt in $(seq 1 60); do
+            curl -fsS http://127.0.0.1:19379/v1/models >/dev/null && exit 0
+            sleep 1
+          done
+          docker logs proofroute-e2b-ablation
+          exit 1
+      - name: Run raw versus treated prompts
+        run: |
+          python3 scripts/run_e2b_prompt_ablation.py \
+            --per-category "${{ inputs.per_category }}" --workers 1
+      - name: Stop server
+        if: always()
+        run: docker stop proofroute-e2b-ablation 2>/dev/null || true
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2b-prompt-ablation
+          path: reports/generated/e2b-prompt-ablation
+          if-no-files-found: error
