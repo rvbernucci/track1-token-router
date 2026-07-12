@@ -109,11 +109,22 @@ def main() -> int:
     parser.add_argument("--timeout", type=float, default=120)
     parser.add_argument("--workers", type=int, default=16)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--shard-count", type=int, default=1)
+    parser.add_argument("--shard-indices", default="0")
     args = parser.parse_args()
     endpoints = [item.strip() for item in args.endpoints.split(",") if item.strip()]
     if not endpoints or args.workers < 1:
         raise ValueError("At least one endpoint and worker are required")
-    all_tasks = population(ROOT)
+    if args.shard_count < 1:
+        raise ValueError("shard-count must be positive")
+    shard_indices = {int(value) for value in args.shard_indices.split(",") if value.strip()}
+    if not shard_indices or min(shard_indices) < 0 or max(shard_indices) >= args.shard_count:
+        raise ValueError("shard-indices must fall inside shard-count")
+    all_tasks = [
+        task
+        for task in population(ROOT)
+        if int(hashlib.sha256(task["task_id"].encode()).hexdigest(), 16) % args.shard_count in shard_indices
+    ]
     done = {row["task_id"] for row in rows(args.output)} if args.resume else set()
     if args.output.exists() and not args.resume:
         raise ValueError("Output exists; use --resume")
@@ -169,7 +180,17 @@ def main() -> int:
             written += 1
             if written % 100 == 0:
                 print(json.dumps({"written": written, "remaining": len(pending) - written}), flush=True)
-    print(json.dumps({"population": len(all_tasks), "written": written, "resumed": len(done)}))
+    print(
+        json.dumps(
+            {
+                "population": len(all_tasks),
+                "written": written,
+                "resumed": len(done),
+                "shard_count": args.shard_count,
+                "shard_indices": sorted(shard_indices),
+            }
+        )
+    )
     return 0
 
 
