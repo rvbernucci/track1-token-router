@@ -1,38 +1,38 @@
 {
   "accepted_risks": [
-    "The 80-row arena is a frozen replay plus exact-image envelope projection, not a live 80-row image run.",
-    "The 23-task Fireworks microbench is deterministic-validator evidence, not hidden-evaluator accuracy.",
-    "The final lablab.ai form and screenshot require manual confirmation outside this repository."
+    "The hidden evaluator distribution is unknown; all accuracy claims remain scoped to documented datasets.",
+    "Semantic-v3 Q8, cluster augmentation, and verify-or-repair failed frozen promotion gates and are excluded.",
+    "The final lablab.ai field and submission receipt require manual confirmation outside this repository."
   ],
-  "candidate": "ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated",
+  "candidate": "ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash",
   "checks": {
     "candidate_is_immutable_version_tag": true,
     "compressed_size_below_10gb": true,
     "exact_local_gate_passed": true,
     "local_gate_run_recorded": true,
     "manifest_digest_is_sha256": true,
-    "pareto_gate_passed": true,
     "platform_digest_is_sha256": true,
     "release_run_recorded": true,
     "revision_is_sha40": true,
-    "rollback_is_distinct_version_tag": true
+    "rollback_is_distinct_version_tag": true,
+    "wilson_nash_guard_hash_pinned": true
   },
-  "compressed_size_bytes": 2666318316,
-  "decision": "promote_category_calibrated_hybrid",
+  "compressed_size_bytes": 2666352767,
+  "decision": "promote_wilson_nash_hybrid",
   "exact_local_gate_run": {
-    "id": 29179000266,
-    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29179000266"
+    "id": 29196742441,
+    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29196742441"
   },
-  "manifest_digest": "sha256:9f4ca74dab257b83cea3ad7a43bb06ff31ac4f67d96824995de492fef5146fa7",
+  "manifest_digest": "sha256:3b661e9abf9f491d8f63ee941b218ba8269b6cd82c09d897723167f0c6513620",
   "passed": true,
-  "platform_digest": "sha256:dcecf1402999dd16a72b044f06fd824ee69fd1df5444757e727af1a2dc9edc13",
+  "platform_digest": "sha256:cc53eb3cebe712073c28cc9f2f00acd466065fcf9df32a9fe9e8ff39773ae2b2",
   "release_run": {
-    "id": 29178529654,
-    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29178529654"
+    "id": 29196181749,
+    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29196181749"
   },
-  "revision": "57b59ec44a71501b69e744f1fb5c8726ec2e9b85",
-  "rollback": "ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router",
-  "rollback_action": "Replace only the Docker Image field with ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router",
+  "revision": "2b76451f885ff36e8874f212779a36c7f539e0c0",
+  "rollback": "ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated",
+  "rollback_action": "Replace only the Docker Image field with ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated",
   "schema_version": "final-release-decision-v1",
-  "submission_action": "Set the Docker Image field to ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated"
+  "submission_action": "Set the Docker Image field to ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash"
 }

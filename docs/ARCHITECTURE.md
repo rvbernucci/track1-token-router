@@ -4,7 +4,7 @@ Updated: 2026-07-12
 
 ## Final Runtime
 
-The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated` (`linux/amd64`). It embeds both local models and performs no startup download. `v3.5.0-full-hybrid` remains the verified full-hybrid rollback.
+The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash` (`linux/amd64`). It embeds both local models and performs no startup download. `v3.6.0-category-calibrated` remains the verified one-field rollback.
 
 ```text
 /input/tasks.json
@@ -44,7 +44,7 @@ The Wilson-Nash guard is scoped to the exact v2 decision surface. It cannot tran
 
 - Artifact: Gemma 4 E2B LiteRT-LM, text-only execution
 - SHA-256: `181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c`
-- Exact final-image gate: 12.147 s cold, 1.825 s warm, 727.5 MiB sampled container peak
+- Exact final-image gate: 9.48 s cold, 1.447 s warm, 639.8 MiB sampled container peak
 - Exact final-image probes: two `e2b_local` answers and zero Fireworks tokens
 
 ## Fireworks Route
@@ -74,15 +74,15 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 
 ## Delivery Proof
 
-- Verified rollback image: `v3.5.0-full-hybrid`
-- Sprint 70 promoted image: `v3.6.0-category-calibrated`
-- OCI manifest digest: `sha256:9f4ca74dab257b83cea3ad7a43bb06ff31ac4f67d96824995de492fef5146fa7`
-- Platform digest: `sha256:dcecf1402999dd16a72b044f06fd824ee69fd1df5444757e727af1a2dc9edc13`
-- Compressed size: 2,666,318,316 bytes
-- Source revision: `57b59ec44a71501b69e744f1fb5c8726ec2e9b85`
-- Release run: `29178529654`
-- Exact local-inference run: `29179000266`
-- Exact local metrics: cold `11.334 s`, warm `2.581 s`, sampled peak `745.8 MiB`, two local routes and zero Fireworks tokens
+- Promoted image: `v3.7.0-wilson-nash`
+- OCI manifest digest: `sha256:3b661e9abf9f491d8f63ee941b218ba8269b6cd82c09d897723167f0c6513620`
+- Platform digest: `sha256:cc53eb3cebe712073c28cc9f2f00acd466065fcf9df32a9fe9e8ff39773ae2b2`
+- Compressed size: 2,666,352,767 bytes
+- Source revision: `2b76451f885ff36e8874f212779a36c7f539e0c0`
+- Release run: `29196181749`
+- Exact local-inference run: `29196742441`
+- Exact local metrics: cold `9.48 s`, warm `1.447 s`, sampled peak `639.8 MiB`, two local routes and zero Fireworks tokens
+- Verified one-field rollback image: `v3.6.0-category-calibrated`
 - Verified rollback OCI manifest: `sha256:a8f2045a69518b72c7e8c5b9692e82fee8f43891b74dc64c9bdf75b0e2b17221`
 - Verified rollback platform digest: `sha256:ff4688aa1f21dacc26a01c676b1b9c4ebd866bc94aa61ac4b22a596d42c8c788`
 - Verified rollback compressed size: 2,666,207,512 bytes
@@ -94,7 +94,7 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 
 The 80-row balanced arena is a frozen holdout replay plus exact-image envelope projection, not a live 80-row container run. Historical rejected policies remain in the repository for reproducibility and are explicitly marked as historical. Current release truth is defined by this document, `README.md`, `SUBMISSION.md` and `submission/final/final-release-decision.json`.
 
-Sprints 71-74 are challenger evidence, not retroactive claims about `v3.6.0`. Semantic-v3 Q8, cluster augmentation and verify-or-repair all failed a frozen promotion gate and remain outside the release runtime. Only the Wilson-Nash fail-closed guard is present in the new source candidate; `v3.6.0-category-calibrated` remains the promoted image until an exact-image audit proves a successor.
+Sprints 71-74 are frozen championship evidence. Semantic-v3 Q8, cluster augmentation and verify-or-repair failed their promotion gates and remain outside the runtime. The Wilson-Nash fail-closed guard passed protected replay, is hash-pinned in `v3.7.0-wilson-nash`, and cannot expand the proven v2 E2B cohort.
 
 ## Non-Goals
 

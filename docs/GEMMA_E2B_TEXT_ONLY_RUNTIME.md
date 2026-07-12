@@ -93,7 +93,7 @@ After generation, the selective gate rejects malformed output, refusals,
 explicit constraint violations, noncanonical sentiment labels, and candidates
 below its calibrated post-response probability.
 
-The earlier post-response selector and v1 global threshold remain historical evidence. Sprint 70 promotes a normalized per-category v2 matrix for sentiment only. On the once-opened expansion holdout, it selected 46 sentiment assessments and produced 44 correct post-contract answers (`95.65%` precision; `85.47%` Wilson lower bound). Factual QA and NER stayed disabled for insufficient selected support. Exact-image run `29179000266` proved both embedded models under 4 GB/2 vCPU with network disabled, cold start `11.334 s`, warm inference `2.581 s`, sampled peak `745.8 MiB` and zero Fireworks tokens.
+The earlier post-response selector and v1 global threshold remain historical evidence. Sprint 70 promoted a normalized per-category v2 matrix for sentiment only. On the once-opened expansion holdout, it selected 46 sentiment assessments and produced 44 correct post-contract answers (`95.65%` precision; `85.47%` Wilson lower bound). Factual QA and NER stayed disabled for insufficient selected support. Championship exact-image run `29196742441` proved both embedded models under 4 GB/2 vCPU with network disabled, cold start `9.48 s`, warm inference `1.447 s`, sampled peak `639.8 MiB` and zero Fireworks tokens.
 
 ## OpenAI Adapter Compatibility
 

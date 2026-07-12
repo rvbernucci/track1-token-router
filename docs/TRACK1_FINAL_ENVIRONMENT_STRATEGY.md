@@ -22,7 +22,7 @@ FunctionGemma assessment
 -> Answer Contract Engine
 ```
 
-The promoted public image is `ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid`. It embeds the SHA-pinned FunctionGemma Q8 and Gemma E2B artifacts and requires no model downloads during evaluation.
+The promoted public image is `ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash`. It embeds the SHA-pinned FunctionGemma Q8 and Gemma E2B artifacts and requires no model downloads during evaluation.
 
 ## Evaluator Variables
 

@@ -1,1 +1,1 @@
-Accuracy-first token router: fail-closed local solvers, validation-selected Kimi, strict outputs, and evidence-backed rejection of unsafe local-model routes.
+Accuracy-first hybrid router combining proof solvers, calibrated local Gemma inference, Wilson-Nash risk control and authorized Fireworks fallback.

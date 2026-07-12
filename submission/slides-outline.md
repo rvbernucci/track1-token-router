@@ -14,11 +14,11 @@ Do not route everything to the strongest model. Route only when risk signals jus
 
 ## Slide 4 - Architecture
 
-Fail-closed solvers answer only provable templates. All other tasks use validation-selected Kimi when authorized, then strict output validation and allowed-model fallback.
+Fail-closed solvers answer only provable templates. FunctionGemma assesses the remaining prompts, a calibrated matrix and Wilson-Nash guard select safe E2B tasks, and all uncertainty falls through to an authorized Fireworks model.
 
 ## Slide 5 - Competition Mode
 
-One integrated runner with budget policy, final validation, prompt packet estimation and trace logging.
+One integrated runner with raw-prompt inference, Answer Contract validation, deterministic JSON reconstruction and trace logging.
 
 ## Slide 6 - Offline Readiness
 
@@ -26,7 +26,7 @@ Fuzz pack, battle drill, scoring simulator, Docker, CI, secret scan and runtime 
 
 ## Slide 7 - AMD/Fireworks Activation
 
-The AMD pod trained FunctionGemma and benchmarked E2B. Memory passed, accuracy did not, so the final image intentionally excludes both local models.
+The AMD pod trained FunctionGemma and benchmarked E2B. The final image embeds both quantized local models and exact-image testing proves zero-token local inference under evaluator limits.
 
 ## Slide 8 - Demo
 
@@ -38,4 +38,4 @@ The router avoids unnecessary token spend, keeps prompts compact and escalates o
 
 ## Slide 10 - Championship Decision
 
-The frozen ablation selected deterministic-then-Kimi: 75% binary locked-test accuracy, 73,870 tokens, and no post-test tuning.
+Frozen gates promoted the Wilson-Nash guard while rejecting semantic-v3 Q8, cluster augmentation and verify-or-repair. The public v3.7 image is the evidence-backed championship release.

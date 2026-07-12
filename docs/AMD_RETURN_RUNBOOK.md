@@ -1,6 +1,6 @@
 # AMD Return Runbook
 
-> Historical runbook. The return work and final Docker gates are complete. The promoted image is `v3.3.0-full-hybrid`; release run `29158458646` and exact local-inference run `29158947843` are green.
+> Historical runbook. The return work and final Docker gates are complete. Its original v3.3 evidence remains below; the current promoted image is documented in `docs/ARCHITECTURE.md`.
 
 ## Decision Boundary
 

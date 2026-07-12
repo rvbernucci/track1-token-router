@@ -51,7 +51,7 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-`v3.6.0-category-calibrated` is the promoted Sprint 70 image. It passed clean public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract and exact local-inference gates. `v3.5.0-full-hybrid` remains the full-hybrid rollback and `v2.1.0-proof-router` the compact rollback.
+`v3.7.0-wilson-nash` is the promoted championship image. It passed clean public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract and exact local-inference gates. `v3.6.0-category-calibrated` remains the one-field rollback and `v2.1.0-proof-router` the compact rollback.
 
 ## Quickstart
 
@@ -154,10 +154,10 @@ ROUTER_MODE=three_route
 The final hybrid championship candidate is:
 
 ```text
-ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated
+ghcr.io/rvbernucci/track1-token-router:v3.7.0-wilson-nash
 ```
 
-It embeds FunctionGemma 270M Q8 and text-only Gemma 4 E2B, requires no startup downloads, and falls through to evaluator-authorized Fireworks models. Exact-image run `29179000266` proved both local routes with zero Fireworks tokens under evaluator limits.
+It embeds FunctionGemma 270M Q8 and text-only Gemma 4 E2B, requires no startup downloads, and falls through to evaluator-authorized Fireworks models. Release run `29196181749` proved its public manifest and resource contract. Exact-image run `29196742441` then proved two local routes with zero Fireworks tokens, a `9.48 s` cold start, `1.447 s` warm inference and `639.8 MiB` sampled peak memory.
 
 ## Fireworks
 
