@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Track 1 Token Router</title>
+  <title>ProofRoute — Token-Efficient Hybrid AI Agent</title>
   <style>
     :root {
       --ink: #201713;
@@ -234,6 +234,7 @@
           <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/reports/public/final-pareto-calibration.md">Pareto calibration</a>
           <a class="button secondary" href="public-reports/fuzz-report.md">Fuzz report</a>
           <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/reports/public/router-ml-v3-neural-audit.md">Neural audit</a>
+          <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/reports/public/fireworks-champion-v3.md">Fireworks arena</a>
           <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/submission/final/final-release-decision.json">Release decision</a>
           <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/README.md">README</a>
           <a class="button secondary" href="https://github.com/rvbernucci/track1-token-router/blob/main/SUBMISSION.md">SUBMISSION</a>
@@ -260,8 +261,8 @@
 
       <article class="card">
         <h2>Live score</h2>
-        <p>The public image completed the official evaluator successfully, giving us a measured baseline for further calibration.</p>
-        <span class="metric">63.2% / 3,936 tokens</span>
+        <p>Our last scored evaluator baseline completed successfully and became the immutable control for every later change.</p>
+        <span class="metric">84.2% / 4,198 tokens</span>
       </article>
 
       <article class="card">
@@ -273,8 +274,8 @@
       <article class="card wide">
         <h2>Pull the submitted image</h2>
         <pre><code>docker pull --platform linux/amd64 \
-  ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample</code></pre>
-        <p>This exact public tag passed anonymous registry access and clean-pull harness checks.</p>
+  ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract</code></pre>
+        <p>This public tag exposes a <code>linux/amd64</code> manifest and passed the complete release workflow.</p>
       </article>
 
       <article class="card">
@@ -305,7 +306,7 @@ docker run --rm --platform linux/amd64 \
   -e ALLOWED_MODELS \
   -v "$PWD/input:/input:ro" \
   -v "$PWD/output:/output" \
-  ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample
+  ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract
 
 cat output/results.json</code></pre>
       </article>
@@ -313,10 +314,22 @@ cat output/results.json</code></pre>
       <article class="card wide">
         <h2>Calibration status</h2>
         <p>
-          The production image remains fail-closed. A GPU-trained neural challenger reached
-          94.87% precision on its one-time protected audit, but it was not promoted because it
-          removed a broader local cohort that remained more accurate than the remote baseline.
-          A separate 1,600-call Kimi/MiniMax arena also retained the current remote protocol.
+          The runtime remains fail-closed. The generic E2B answer contract improved accuracy
+          from 62.50% to 84.38% on a balanced 64-task ablation. We then evaluated 4,400 local
+          answers: mechanical evidence handled 2,621 rows, while GLM-5.2 and Codex/Antigravity
+          agreed on 96.7% of the 1,779 semantic cases. The resulting neural challenger reached
+          95.95% protected precision at 8.41% coverage, but remains research evidence until it
+          proves end-to-end dominance over the shipped gate.
+        </p>
+      </article>
+
+      <article class="card wide">
+        <h2>Answer Contract Engine</h2>
+        <p>
+          Models receive only the raw prompt, never the evaluator's JSON wrapper. ProofRoute
+          validates the returned content and reconstructs <code>results.json</code> deterministically.
+          A controlled ablation reduced Fireworks input tokens by 51.9% while preserving
+          byte-identical Kimi answers.
         </p>
       </article>
 
@@ -328,7 +341,7 @@ cat output/results.json</code></pre>
         <pre><code>python3 -m pip install -e .
 scripts/offline_release_check.sh
 python3 scripts/export_public_report.py --check</code></pre>
-        <p><strong>Verified:</strong> 682 automated tests passed, with one environment-dependent skip.</p>
+        <p><strong>Verified:</strong> 709 automated tests passed, with one environment-dependent skip.</p>
       </article>
     </section>
 

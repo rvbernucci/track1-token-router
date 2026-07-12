@@ -1,5 +1,9 @@
 # Sprint 76 - Fireworks 800-Prompt Champion Arena
 
+## Final Status
+
+**Closed as `retain`; no Sprint 76 policy was promoted.** The complete paired arena is reproducible, but it failed the absolute accuracy gates and the initial analysis included final-holdout rows before policy freeze. See `reports/public/fireworks-champion-v3.md` for the evidence and limitations. The absent `configs/fireworks-intent-policy-v3.json` is an intentional fail-closed outcome.
+
 ## Parallel Contract
 
 This sprint runs concurrently with Sprint 77. It owns remote-model inference, blind judging and the Fireworks intent policy. Sprint 77 may consume the frozen judgments only after this sprint writes its immutable ledger; it must not modify arena prompts, candidates or labels.
