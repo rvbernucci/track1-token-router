@@ -42,6 +42,13 @@ Sprints 60-64 validate the exact public hybrid image rather than a source-tree a
 
 ## Completed Foundation
 
+## Parallel Championship Improvement Sequence
+
+Sprints 76 and 77 run concurrently against separate ownership boundaries. Sprint 76 improves the authorized Fireworks fallback with a 400-prompt blind arena; Sprint 77 recalibrates selective zero-token routing without reading the remote arena's sealed audit.
+
+- [ ] [Sprint 76 - Fireworks 400-Prompt Champion Arena](./76-fireworks-400-prompt-champion-arena/README.md)
+- [ ] [Sprint 77 - Local Router ML Recalibration](./77-local-router-ml-recalibration/README.md)
+
 ## Post-Submission Robustness Sequence
 
 Sprints 65-69 attack the largest remaining uncertainty: routing accuracy under unseen prompts and shifted evaluator distributions. They are sequential so that E2B safety is established before remote-policy expansion, live integration, contract fuzzing and distribution economics.
