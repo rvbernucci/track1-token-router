@@ -1,0 +1,26 @@
+{
+  "allowed_intents": [
+    "factual_qa",
+    "ner",
+    "sentiment"
+  ],
+  "artifact_sha256": "ab9513d982f7bb11309b37d53218efff887396678156a151022e072e0cfef685",
+  "artifact_sha256_scope": "full pre-holdout artifact, including protected-row metadata count",
+  "calibration_rows": 1157,
+  "decision_surface_sha256": "76e7e60f92667be3fc6f174d6287d446df72e29a811c3d1d017e17b840963fe4",
+  "decision_surface_sha256_scope": "all runtime decision fields; excludes protected_rows_not_used metadata only",
+  "fit_rows": 4047,
+  "hash_scope_migration": "Derived after opening holdout from the byte-identical frozen artifact; no candidate field changed.",
+  "holdout_opened": false,
+  "schema_version": "e2b-category-candidate-freeze-v1",
+  "thresholds_by_intent": {
+    "code_debugging": 1.0,
+    "code_generation": 1.0,
+    "factual_qa": 0.623097,
+    "logic_puzzle": 1.0,
+    "math_reasoning": 1.0,
+    "ner": 0.670514,
+    "sentiment": 0.764465,
+    "summarization": 1.0
+  }
+}

@@ -33,6 +33,10 @@ artifacts/
 evals/e2b-regression-v2/sealed/
 evals/e2b-regression-v2-adjudication/sealed/
 evals/e2b-regression-v2-championship/sealed/
+evals/e2b-expansion-v1/sealed/
+evals/e2b-expansion-v1/adjudication/development/
+evals/e2b-expansion-v1/adjudication/sealed/
+evals/e2b-expansion-v1/raw/
 
 # Ephemeral experiment process state and high-frequency resource samples.
 evals/**/state/

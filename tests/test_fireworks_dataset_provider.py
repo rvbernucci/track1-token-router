@@ -1,10 +1,20 @@
 import unittest
 
-from router.dataset_forge.providers import FireworksDatasetProvider, ProviderError, _parse_json_object
+from router.dataset_forge.providers import (
+    CodexProvider,
+    FireworksDatasetProvider,
+    ProviderError,
+    _parse_json_object,
+    provider_from_env,
+)
 from tests.fake_openai_server import FakeOpenAIServer
 
 
 class FireworksDatasetProviderTests(unittest.TestCase):
+    def test_provider_factory_supports_subscription_codex_judge(self) -> None:
+        provider = provider_from_env("codex", role="e2b_expansion_judge")
+        self.assertIsInstance(provider, CodexProvider)
+
     def test_structured_parser_preserves_first_complete_object_with_trailing_output(self) -> None:
         self.assertEqual(_parse_json_object('{"items": []}\n{"duplicate": true}', "test"), {"items": []})
 

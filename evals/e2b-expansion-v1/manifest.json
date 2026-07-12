@@ -1,0 +1,121 @@
+{
+  "artifacts": {
+    "generated": {
+      "bytes": 4825457,
+      "path": "evals/e2b-expansion-v1/raw/generated-candidates.jsonl",
+      "sha256": "d6701d4088115add08411aca626f879afe81d3d50b06e585551ac8bc72fd4650"
+    },
+    "metadata": {
+      "bytes": 1776444,
+      "path": "evals/e2b-expansion-v1/metadata.jsonl",
+      "sha256": "92b61ed88f64970ff18f1a296fd901c70bd7ca6f5bcd7f762c897378da6a40ea"
+    },
+    "plan": {
+      "bytes": 1549140,
+      "path": "evals/e2b-expansion-v1/plan.jsonl",
+      "sha256": "061683d52a1fa3b497900742550968bb7834ccbc17a9519dc57b1aa8371440e2"
+    },
+    "references_calibration": {
+      "bytes": 346877,
+      "path": "evals/e2b-expansion-v1/references/calibration.jsonl",
+      "sha256": "a945de2c28eec3d4252cb49cffd835a052ffd0eee99b2148f48cd9d673b6d0db"
+    },
+    "references_final_holdout": {
+      "bytes": 363794,
+      "path": "evals/e2b-expansion-v1/sealed/references/final_holdout.jsonl",
+      "sha256": "2a6b11a4a2de2ffcae3dd88ba3290bd39dd944db802dc21d53355cf5e843a282"
+    },
+    "references_train": {
+      "bytes": 1055912,
+      "path": "evals/e2b-expansion-v1/references/train.jsonl",
+      "sha256": "ae8b30196f029d896397fc33a2bfb6c822c301b4919f9185f07c930191f40d01"
+    },
+    "tasks_calibration": {
+      "bytes": 338662,
+      "path": "evals/e2b-expansion-v1/splits/calibration.jsonl",
+      "sha256": "2aa6ca92dc89e67898a4fb3e93cc55b6c4128cd217ce9cd2acb02c6347e744b4"
+    },
+    "tasks_final_holdout": {
+      "bytes": 356174,
+      "path": "evals/e2b-expansion-v1/sealed/tasks/final_holdout.jsonl",
+      "sha256": "29bbc21a595d33a6fb5973373350e2afc1f331b4a3b6e677f762e947b7ebfb22"
+    },
+    "tasks_train": {
+      "bytes": 1086703,
+      "path": "evals/e2b-expansion-v1/splits/train.jsonl",
+      "sha256": "4d1a6a4fc20e15c2ddcd7f769ea46c2ab696a253d8f47891475528c9a7316e6b"
+    }
+  },
+  "calibration_split": "calibration",
+  "deduplication": {
+    "gates": {
+      "all_prompts_runtime_safe": true,
+      "zero_internal_normalized_duplicates": true,
+      "zero_lineage_split_leakage": true,
+      "zero_normalized_history_overlap": true,
+      "zero_semantic_near_duplicates": true
+    },
+    "historical_prompts_scanned": 4480,
+    "internal_normalized_duplicates": 0,
+    "invalid_prompts": 0,
+    "near_duplicate_sample": [],
+    "normalized_cross_history": 0,
+    "retry_target_ids": [],
+    "semantic_near_duplicate_pairs": 0
+  },
+  "fit_splits": [
+    "train"
+  ],
+  "generation": {
+    "credentials_embedded": false,
+    "fireworks_billable_usd": 3.1369353,
+    "provider_models": {
+      "agy:Gemini 3.5 Flash (Medium)": 1200,
+      "fireworks:accounts/fireworks/models/kimi-k2p7-code": 226,
+      "fireworks:accounts/fireworks/models/minimax-m3": 974
+    }
+  },
+  "holdout_policy": "sealed_one_time_promotion_only",
+  "promotion_split": "final_holdout",
+  "rows": 2400,
+  "schema_version": "e2b-expansion-manifest-v1",
+  "seed": 70070,
+  "summary": {
+    "categories": {
+      "code_debugging": 300,
+      "code_generation": 300,
+      "factual_qa": 300,
+      "logic_puzzle": 300,
+      "math_reasoning": 300,
+      "ner": 300,
+      "sentiment": 300,
+      "summarization": 300
+    },
+    "difficulties": {
+      "easy": 800,
+      "hard": 800,
+      "moderate": 800
+    },
+    "evidence_modes": {
+      "grounded": 150,
+      "mechanical": 1800,
+      "semantic": 450
+    },
+    "languages": {
+      "en": 1920,
+      "es": 240,
+      "pt": 240
+    },
+    "lineages": 2400,
+    "providers": {
+      "agy": 1200,
+      "fireworks": 1200
+    },
+    "rows": 2400,
+    "splits": {
+      "calibration": 480,
+      "final_holdout": 480,
+      "train": 1440
+    }
+  }
+}

@@ -1,0 +1,60 @@
+name: Sprint 70 Category Calibration
+
+on:
+  push:
+    paths:
+      - "router/dataset_forge/e2b_expansion.py"
+      - "router/orchestration/e2b_mechanical_features.py"
+      - "router/orchestration/e2b_matrix_gate.py"
+      - "scripts/generate_e2b_expansion.py"
+      - "scripts/build_e2b_category_ledger.py"
+      - "scripts/fit_e2b_category_matrix_v2.py"
+      - "scripts/adjudicate_e2b_expansion.py"
+      - "scripts/compact_expansion_inference.py"
+      - "scripts/evaluate_e2b_expansion_championship.py"
+      - "scripts/materialize_e2b_expansion_evidence.py"
+      - "scripts/report_e2b_expansion_adjudication.py"
+      - "tests/test_adjudicate_e2b_expansion.py"
+      - "tests/test_e2b_expansion_corpus.py"
+      - "tests/test_e2b_mechanical_features.py"
+      - "tests/test_e2b_category_matrix_v2.py"
+      - ".github/workflows/sprint70-category-calibration.yml"
+  pull_request:
+    paths:
+      - "router/dataset_forge/e2b_expansion.py"
+      - "router/orchestration/e2b_mechanical_features.py"
+      - "router/orchestration/e2b_matrix_gate.py"
+      - "scripts/generate_e2b_expansion.py"
+      - "scripts/build_e2b_category_ledger.py"
+      - "scripts/fit_e2b_category_matrix_v2.py"
+      - "scripts/adjudicate_e2b_expansion.py"
+      - "scripts/compact_expansion_inference.py"
+      - "scripts/evaluate_e2b_expansion_championship.py"
+      - "scripts/materialize_e2b_expansion_evidence.py"
+      - "scripts/report_e2b_expansion_adjudication.py"
+      - "tests/test_adjudicate_e2b_expansion.py"
+      - "tests/test_e2b_expansion_corpus.py"
+      - "tests/test_e2b_mechanical_features.py"
+      - "tests/test_e2b_category_matrix_v2.py"
+      - ".github/workflows/sprint70-category-calibration.yml"
+
+jobs:
+  offline-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify frozen plan and routing contracts
+        run: |
+          python3 scripts/generate_e2b_expansion.py
+          test "$(wc -l < evals/e2b-expansion-v1/plan.jsonl)" -eq 2400
+          python3 -m unittest \
+            tests.test_e2b_expansion_corpus \
+            tests.test_e2b_mechanical_features \
+            tests.test_e2b_category_ledger \
+            tests.test_e2b_category_matrix_v2 \
+            tests.test_e2b_matrix_gate \
+            tests.test_adjudicate_e2b_expansion \
+            tests.test_fireworks_dataset_provider

@@ -10,6 +10,7 @@ def parser() -> argparse.ArgumentParser:
     root.add_argument("--host", default="127.0.0.1")
     root.add_argument("--port", type=int, default=9379)
     root.add_argument("--cpu-threads", type=int, default=2)
+    root.add_argument("--backend", choices=("cpu", "gpu"), default="cpu")
     root.add_argument("--max-context-tokens", type=int, default=2048)
     root.add_argument("--speculative-decoding", action="store_true")
     return root
@@ -29,12 +30,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         if not selected.exists():
             raise FileNotFoundError(f"Model {model_id} not found")
         backend = model.parse_backend(
-            "cpu",
+            args.backend,
             model_obj=selected,
             cpu_thread_count=args.cpu_threads,
         )
         print(
-            f"Loading model={model_id} backend=cpu threads={args.cpu_threads} "
+            f"Loading model={model_id} backend={args.backend} threads={args.cpu_threads} "
             f"context={args.max_context_tokens}",
             flush=True,
         )
@@ -65,7 +66,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     serve_util.get_or_initialize_server_engine = cpu_engine
     print(
-        f"Forced LiteRT-LM backend=cpu threads={args.cpu_threads} "
+        f"Forced LiteRT-LM backend={args.backend} threads={args.cpu_threads} "
         f"context={args.max_context_tokens} speculative={args.speculative_decoding}",
         flush=True,
     )

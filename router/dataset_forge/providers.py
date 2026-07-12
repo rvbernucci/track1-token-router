@@ -678,6 +678,8 @@ def _usage_window_id() -> str:
 def provider_from_env(name: str, *, role: str, max_tokens: int = 8192):
     if name == "claude":
         return ClaudeCodeProvider()
+    if name == "codex":
+        return CodexProvider()
     if name == "fireworks":
         api_key = os.getenv("FIREWORKS_API_KEY")
         if not api_key:

@@ -9,6 +9,7 @@ class LiteRTCpuServerTests(unittest.TestCase):
         self.assertEqual(args.host, "127.0.0.1")
         self.assertEqual(args.port, 9379)
         self.assertEqual(args.cpu_threads, 2)
+        self.assertEqual(args.backend, "cpu")
         self.assertEqual(args.max_context_tokens, 2048)
         self.assertFalse(args.speculative_decoding)
 

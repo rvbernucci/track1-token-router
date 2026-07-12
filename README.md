@@ -25,7 +25,9 @@ task
 - Kimi and MiniMax are validation-selected preferences and are never called unless the harness includes them in `ALLOWED_MODELS`.
 - Strict-format failures can retry another ranked allowed model; model unavailability is cached per batch.
 - The Answer Contract Engine performs only unambiguous mechanical transformations before the official JSON serializer.
-- FunctionGemma 270M and Gemma 4 E2B were evaluated on 2,000 post-contract answers. E2B produced 828 correct answers; 823 had valid 270M parameters. The intent-specific regression selected 252 of 1,991 evaluable tasks at 84.52% out-of-fold precision and 12.66% coverage.
+- The category-calibration ledger contains `6,845` unique observations: `4,462` historical rows plus `2,383/2,400` expansion rows with valid FunctionGemma assessments. All `2,400` E2B answers were processed by the production Answer Contract Engine and independently labeled; `824` were correct.
+- The frozen per-category challenger nominated factual QA, NER and sentiment. One-shot sealed evaluation promoted only sentiment: `44/46` selected answers were correct (`95.65%` precision, `85.47%` Wilson lower bound). Factual QA and NER remained remote because selected support was insufficient.
+- The promoted v2 policy replays at `88.41%` local precision and `8.82%` zero-Fireworks-token coverage across all `6,845` rows, versus `83.58%` and `7.74%` for the previous matrix.
 - The proof engine recovered both known correct deterministic ordering answers while refusing all five incorrect deterministic candidates. Its independent 260-case gate still reports 180 releases, 100% precision and zero false positives.
 
 The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
@@ -44,7 +46,7 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-The integrated `v3.5.0-full-hybrid` image passed public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract and fail-closed runtime gates. It includes the Sprint 65-69 routing, Pareto, contract-fuzzing and deadline hardening; `v2.1.0-proof-router` remains the compact rollback.
+`v3.6.0-category-calibrated` is the Sprint 70 release candidate. It adds the sealed category-calibrated sentiment policy and deadline guard to the verified `v3.5.0-full-hybrid` image. The release workflow must still prove public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network and exact local inference before the new tag replaces `v3.5.0` as the submission image.
 
 ## Quickstart
 
@@ -101,6 +103,9 @@ Files such as `.env.example` and `runtime-profiles/*.env.example` are developmen
 | [Gemma E2B token ladder](./docs/E2B_TOKEN_LADDER.md) | Adaptive 96/192/384 experiment, quantization and CPU runtime audit |
 | [Public E2B evidence](./reports/public/e2b-token-ladder.md) | Aggregate recovery, feature and latency results |
 | [E2B 270M matrix regression](./reports/public/e2b-270m-matrix-regression.md) | Post-contract correctness, model comparison and operating frontier |
+| [Category calibration V2](./reports/public/e2b-category-calibration-v2.md) | 6,845-row regression, per-category calibration and sealed promotion |
+| [Expansion adjudication](./reports/public/e2b-expansion-adjudication.md) | 2,400 post-contract labels and independent agreement evidence |
+| [Expansion championship](./reports/public/e2b-expansion-championship-scorecard.md) | Previous versus promoted local precision, coverage and token avoidance |
 | [Raw-prompt ablation](./reports/public/raw-prompt-answer-contract-ablation.md) | Byte-identical Kimi answers with 51.9% fewer Fireworks tokens |
 | [Sprints 45-49 completion audit](./reports/public/sprints-45-49-completion-audit.md) | Requirement-to-evidence map and final release proof |
 | [E2B runtime](./docs/GEMMA_E2B_TEXT_ONLY_RUNTIME.md) | Text-only LiteRT-LM packaging and 4 GB gates |
@@ -138,10 +143,10 @@ ROUTER_MODE=three_route
 The final hybrid championship candidate is:
 
 ```text
-ghcr.io/rvbernucci/track1-token-router:v3.5.0-full-hybrid
+ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated
 ```
 
-It embeds FunctionGemma 270M Q8 and text-only Gemma 4 E2B, requires no startup downloads, and falls through to evaluator-authorized Fireworks models. The compact rollback remains `v2.1.0-proof-router`.
+Once the release workflow passes, this tag embeds FunctionGemma 270M Q8 and text-only Gemma 4 E2B, requires no startup downloads, and falls through to evaluator-authorized Fireworks models. Until then, `v3.5.0-full-hybrid` remains the verified public image and `v2.1.0-proof-router` the compact rollback.
 
 ## Fireworks
 

@@ -50,6 +50,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     corpus, output, config, report = map(_absolute, (args.corpus, args.output, args.config, args.report))
     tasks = _load_tasks(corpus)
+    expected_count = _expected_count(corpus)
     if args.pilot:
         tasks = _balanced_pilot(tasks, corpus / "metadata.jsonl", args.pilot)
     if not args.check:
@@ -58,7 +59,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 tasks, output, args.functiongemma_base_url, args.functiongemma_model,
                 args.e2b_base_url, args.e2b_model, args.timeout_s, args.resume, args.only,
             )
-    result = _verify(tasks, output, require_full=not args.pilot, only=args.only)
+    result = _verify(tasks, output, expected_count=expected_count if not args.pilot else None, only=args.only)
     if not args.pilot and args.only is None and result["passed"]:
         _write_outputs(result, corpus, output, config, report, args)
     print(json.dumps(result, sort_keys=True))
@@ -131,7 +132,12 @@ def _request_e2b(base_url: str, model: str, prompt: str, timeout: float) -> str:
     return answer
 
 
-def _verify(tasks: list[dict[str, str]], output: Path, *, require_full: bool, only: str | None = None) -> dict[str, Any]:
+def _verify(
+    tasks: list[dict[str, str]], output: Path, *, expected_count: int | None = None,
+    only: str | None = None, require_full: bool | None = None,
+) -> dict[str, Any]:
+    if require_full is not None:
+        expected_count = 2000 if require_full else None
     expected = {row["task_id"]: row for row in tasks}
     engines = (only,) if only else ("functiongemma", "e2b")
     ledgers = {name: _rows(output / f"{name}.jsonl") for name in engines}
@@ -160,20 +166,39 @@ def _verify(tasks: list[dict[str, str]], output: Path, *, require_full: bool, on
             "p50_latency_ms": _percentile(latencies, .5), "p95_latency_ms": _percentile(latencies, .95),
             "sha256": _sha256(output / f"{name}.jsonl") if rows else None,
         }
-    checks["full_population"] = len(expected) == 2000 if require_full else bool(expected)
+    checks["full_population"] = len(expected) == expected_count if expected_count is not None else bool(expected)
     return {"schema_version": SCHEMA, "passed": all(checks.values()), "checks": checks, "metrics": metrics}
 
 
 def _load_tasks(corpus: Path) -> list[dict[str, str]]:
     tasks: list[dict[str, str]] = []
+    expansion = (corpus / "splits" / "train.jsonl").is_file()
     for split in SPLITS:
-        for row in _rows(corpus / "inputs" / f"{split}.jsonl"):
-            if set(row) != {"schema_version", "task_id", "prompt"}:
+        if expansion:
+            translated = "calibration" if split == "validation" else split
+            directory = "sealed/tasks" if translated == "final_holdout" else "splits"
+            path = corpus / directory / f"{translated}.jsonl"
+        else:
+            path = corpus / "inputs" / f"{split}.jsonl"
+        for row in _rows(path):
+            allowed = {"schema_version", "task_id", "prompt"}
+            if set(row) not in ({"task_id", "prompt"}, allowed):
                 raise ValueError("Runtime input contains non-contract fields.")
             tasks.append({"task_id": str(row["task_id"]), "prompt": str(row["prompt"])})
     if len(tasks) != len({row["task_id"] for row in tasks}):
         raise ValueError("Runtime input task IDs are not unique.")
     return tasks
+
+
+def _expected_count(corpus: Path) -> int:
+    manifest = corpus / "manifest.json"
+    if not manifest.is_file():
+        return 2000
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
+    rows = payload.get("rows")
+    if isinstance(rows, bool) or not isinstance(rows, int) or rows < 1:
+        raise ValueError("Corpus manifest rows are invalid.")
+    return rows
 
 
 def _balanced_pilot(tasks: list[dict[str, str]], metadata_path: Path, count: int) -> list[dict[str, str]]:

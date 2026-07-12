@@ -93,7 +93,7 @@ After generation, the selective gate rejects malformed output, refusals,
 explicit constraint violations, noncanonical sentiment labels, and candidates
 below its calibrated post-response probability.
 
-The earlier post-response selective policy remains disabled as historical evidence. The final image instead enables the per-intent five-score matrix gate at the grouped out-of-fold threshold `0.75`. That gate selected 252 of 1,991 valid development rows at 84.52% precision and 12.66% coverage. Final-image run `29158947843` proved two real E2B routes under 4 GB/2 vCPU with zero Fireworks tokens; failures still fall through to Fireworks.
+The earlier post-response selector and v1 global threshold remain historical evidence. Sprint 70 promotes a normalized per-category v2 matrix for sentiment only. On the once-opened expansion holdout, it selected 46 sentiment assessments and produced 44 correct post-contract answers (`95.65%` precision; `85.47%` Wilson lower bound). Factual QA and NER stayed disabled for insufficient selected support. Final-image run `29158947843` remains the prior proof that both embedded models execute under 4 GB/2 vCPU with zero Fireworks tokens; the v3.6 candidate must repeat that exact-image gate.
 
 ## OpenAI Adapter Compatibility
 

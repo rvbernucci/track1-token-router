@@ -4,14 +4,14 @@ Updated: 2026-07-11
 
 ## Final Runtime
 
-The promoted image is `ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid` (`linux/amd64`). It embeds both local models and performs no startup download.
+The Sprint 70 candidate is `ghcr.io/rvbernucci/track1-token-router:v3.6.0-category-calibrated` (`linux/amd64`). It embeds both local models and performs no startup download. `v3.5.0-full-hybrid` remains the verified rollback until the new public-image gates pass.
 
 ```text
 /input/tasks.json
 -> engine extracts each untouched prompt
 -> FunctionGemma 270M Q8 assessment
 -> proof-carrying deterministic solver when uniquely supported
--> per-intent E2B matrix gate at threshold 0.75
+-> category-specific normalized E2B matrix, calibrator and threshold
 -> text-only Gemma 4 E2B candidate plus Answer Contract Engine
 -> Fireworks Kimi/MiniMax policy on refusal, uncertainty or local failure
 -> engine reconstructs atomic /output/results.json
@@ -33,7 +33,9 @@ Registered solvers receive the untouched prompt and release an answer only with 
 
 ## Gemma E2B Route
 
-The per-intent five-score matrix uses the frozen grouped out-of-fold threshold `0.75`. Its development evidence selected 252 of 1,991 valid rows at 84.52% precision and 12.66% coverage; the Wilson 95% lower bound was 79.54%. Invalid assessments and runtime failures route to Fireworks.
+The v2 matrix combines FunctionGemma's five scores with 40 prompt-only mechanical features. It persists fit-only normalization, one ridge model, one Platt calibrator and one threshold per predicted intent. The `6,845`-row ledger includes `2,383` valid expansion assessments; `17` malformed assessments fail closed to Fireworks.
+
+The candidate decision surface was frozen before opening the 480-row expansion holdout. Sentiment alone passed promotion with `44/46` correct (`95.65%` precision, `85.47%` Wilson lower bound). Factual QA and NER were accurate in their selected samples but remained disabled because support was below the frozen minimum. Missing features, unknown intents, non-finite values, contract failures, local errors and insufficient deadline reserve all route to Fireworks.
 
 E2B receives only the original prompt and may generate at most 96 tokens. The engine, not the model, removes safe wrappers and reconstructs the official JSON envelope.
 
@@ -68,13 +70,13 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 
 ## Delivery Proof
 
-- Final image: `v3.3.0-full-hybrid`
-- OCI manifest digest: `sha256:6bcff04a9b5929b3788345d41304e3d6b98a9901116546afb16ae1e9445139ed`
-- Platform digest: `sha256:60677fbae98c2043f4c708de8cac00967cdcf5c41a0ef18f24cf0c116de9f2a0`
-- Compressed size: 2,666,216,379 bytes
-- Source revision: `cfeacd407ac7488883afdc6df580fb86b48a039e`
-- Release run: `29158458646`
-- Exact local-inference run: `29158947843`
+- Verified rollback image: `v3.5.0-full-hybrid`
+- Sprint 70 candidate: `v3.6.0-category-calibrated`
+- Verified rollback OCI manifest: `sha256:a8f2045a69518b72c7e8c5b9692e82fee8f43891b74dc64c9bdf75b0e2b17221`
+- Verified rollback platform digest: `sha256:ff4688aa1f21dacc26a01c676b1b9c4ebd866bc94aa61ac4b22a596d42c8c788`
+- Verified rollback compressed size: 2,666,207,512 bytes
+- Verified rollback source revision: `1f74aab876ec3c693516284f80bcfc9a3bf92769`
+- Verified rollback release and exact-image run: `29171230908`
 - Compact rollback: `v2.1.0-proof-router`
 
 ## Evidence Boundaries

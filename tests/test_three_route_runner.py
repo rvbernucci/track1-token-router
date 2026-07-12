@@ -68,9 +68,11 @@ class CalibratedProvider:
 class RecordingMatrixGate:
     def __init__(self):
         self.assessment = None
+        self.prompt = None
 
-    def decide(self, assessment):
+    def decide(self, assessment, prompt=None):
         self.assessment = assessment
+        self.prompt = prompt
         return E2BMatrixDecision(True, 0.77, 0.75, "probe_e2b")
 
 
@@ -169,6 +171,7 @@ class ThreeRouteRunnerTests(unittest.TestCase):
         result = runner.run(TaskEnvelope(id="task", input_text="Classify sentiment as positive or negative."))
 
         self.assertEqual(matrix.assessment.scores.generation_demand, 2)
+        self.assertEqual(matrix.prompt, "Classify sentiment as positive or negative.")
         self.assertEqual(result.route, "e2b_local")
         self.assertEqual(remote.calls, 0)
 
@@ -336,6 +339,22 @@ class ThreeRouteRunnerTests(unittest.TestCase):
         trace = result.metadata["routing_trace"]
         features = dict(zip(trace["features"]["names"], trace["features"]["values"], strict=True))
         self.assertLess(features["struct.deadline_remaining_ratio"], 0.11)
+
+    def test_matrix_probe_preserves_remote_fallback_deadline(self):
+        matrix = RecordingMatrixGate()
+        remote = Runner("remote", "fireworks_direct")
+        local = Runner("local", "e2b_local")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(), predictor=Predictor(e2b=0.2, fireworks=0.9),
+            selector=MinimaxRegretSelector(e2b_enabled=False),
+            e2b_runner=local, fireworks_runner=remote, matrix_gate=matrix,
+            e2b_min_remaining_ms=30_000,
+        )
+        runner.set_run_deadline(monotonic() + 1)
+        result = runner.run(TaskEnvelope(id="deadline", input_text="Return a short answer."))
+        self.assertEqual(result.answer, "remote")
+        self.assertEqual(local.calls, 0)
+        self.assertEqual(result.metadata["e2b_matrix"]["reason"], "matrix_deadline_guard")
 
 
 if __name__ == "__main__":

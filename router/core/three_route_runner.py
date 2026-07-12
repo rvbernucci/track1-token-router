@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from time import monotonic
 from router.core.contracts import AnswerResult, Engine, EngineDecision, EnginePrediction, RoutingTrace, TaskEnvelope, TokenUsage
 from router.core.logging import JsonlRunLogger
@@ -27,6 +28,7 @@ class ThreeRouteRunner:
         matrix_gate: E2BMatrixGate | None = None,
         logger: JsonlRunLogger | None = None,
         task_deadline_ms: int = 10 * 60 * 1000,
+        e2b_min_remaining_ms: int = 30_000,
     ) -> None:
         self.assessment_provider = assessment_provider
         self.predictor = predictor
@@ -37,6 +39,7 @@ class ThreeRouteRunner:
         self.matrix_gate = matrix_gate
         self.logger = logger
         self.task_deadline_ms = task_deadline_ms
+        self.e2b_min_remaining_ms = e2b_min_remaining_ms
         self.run_deadline: float | None = None
 
     def set_run_deadline(self, deadline_monotonic: float) -> None:
@@ -72,7 +75,12 @@ class ThreeRouteRunner:
             )
             # The matrix was fitted on raw FunctionGemma outputs; calibrated scores belong
             # to the legacy outcome selector and would shift the learned decision boundary.
-            matrix_decision = self.matrix_gate.decide(invocation.raw_assessment) if self.matrix_gate else None
+            matrix_decision = (
+                self.matrix_gate.decide(invocation.raw_assessment, task.input_text)
+                if self.matrix_gate else None
+            )
+            if matrix_decision is not None and matrix_decision.probe and remaining < self.e2b_min_remaining_ms:
+                matrix_decision = replace(matrix_decision, probe=False, reason="matrix_deadline_guard")
         except (FunctionGemmaProviderError, OSError, TimeoutError, ValueError) as exc:
             return self._fireworks_fallback(task, reason=f"assessment_or_decision_failure:{type(exc).__name__}")
 
