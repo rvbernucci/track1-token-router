@@ -88,7 +88,15 @@ def verify_tool_evidence(evidence: ToolEvidence) -> bool:
 
 def run_tool_route(task: TaskEnvelope, raw_plan: str) -> ToolRouteDecision:
     try:
-        plan = validate_tool_plan_provenance(task.input_text, parse_tool_plan(raw_plan))
+        plan = parse_tool_plan(raw_plan)
+        return run_validated_tool_plan(task, plan)
+    except (KeyError, TypeError, ValueError, ZeroDivisionError, OverflowError) as exc:
+        return ToolRouteDecision(False, reason=f"tool_route_rejected:{type(exc).__name__}")
+
+
+def run_validated_tool_plan(task: TaskEnvelope, plan: ToolPlan) -> ToolRouteDecision:
+    try:
+        plan = validate_tool_plan_provenance(task.input_text, plan)
         if plan.tool == "none":
             return ToolRouteDecision(False, reason="planner_selected_none")
         evidence = execute_tool_plan(plan)

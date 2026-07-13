@@ -5,6 +5,7 @@ from router.core.contracts import AnswerResult, TaskEnvelope, TokenUsage
 from router.core.model_client import ModelClientError, ModelResponse
 from router.core.tool_augmented_runner import ToolAugmentedRunner, is_tool_planner_candidate
 from router.core.tool_planner import TOOL_PLAN_SCHEMA_VERSION
+from router.functiongemma.tool_planner_provider import FunctionGemmaToolPlannerProvider
 
 
 class Fallback:
@@ -49,7 +50,7 @@ class ToolAugmentedRunnerTests(unittest.TestCase):
         runner = ToolAugmentedRunner(planner_client=client, fallback_runner=Fallback(), enabled=True)
         result = runner.run(TaskEnvelope(id="t", input_text="Calculate 2 + 3. Return only the number."))
         self.assertEqual(result.answer, "5")
-        self.assertEqual(result.route, "e2b_tool_verified")
+        self.assertEqual(result.route, "functiongemma_tool_verified")
         self.assertEqual(result.remote_tokens.total, 0)
         self.assertEqual(client.calls, 1)
 
@@ -77,6 +78,27 @@ class ToolAugmentedRunnerTests(unittest.TestCase):
             runner = ToolAugmentedRunner(planner_client=Client(raw), fallback_runner=Fallback(), enabled=True)
             result = runner.run(TaskEnvelope(id="t", input_text=prompt))
             self.assertEqual(result.route, "fireworks")
+
+    def test_native_functiongemma_plan_uses_the_same_proof_pipeline(self):
+        response = {"choices": [{"message": {"tool_calls": [{"function": {
+            "name": "safe_calculator",
+            "arguments": {"ast": {
+                "op": "add", "left": {"op": "literal", "value": 2},
+                "right": {"op": "literal", "value": 3},
+            }},
+        }}]}}]}
+        provider = FunctionGemmaToolPlannerProvider(
+            base_url="http://planner/v1", model="functiongemma-planner",
+            requester=lambda _: response,
+        )
+        runner = ToolAugmentedRunner(
+            planner_provider=provider, fallback_runner=Fallback(), enabled=True,
+        )
+        result = runner.run(TaskEnvelope(id="t", input_text="Calculate 2 + 3. Return only the number."))
+        self.assertEqual(result.answer, "5")
+        self.assertEqual(result.route, "functiongemma_tool_verified")
+        self.assertEqual(result.metadata["planner_model"], "functiongemma-planner")
+        self.assertEqual(result.remote_tokens.total, 0)
 
 
 if __name__ == "__main__":

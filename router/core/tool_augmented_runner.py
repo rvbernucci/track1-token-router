@@ -7,10 +7,11 @@ from router.core.contracts import AnswerResult, TaskEnvelope, TokenUsage
 from router.core.model_client import LocalModelClient, ModelClientError
 from router.core.runner import TaskRunner
 from router.core.tool_planner import TOOL_PLANNER_PROMPT_VERSION, build_tool_planner_messages
-from router.orchestration.tool_executor import run_tool_route
+from router.functiongemma.tool_planner_provider import FunctionGemmaToolPlannerError, FunctionGemmaToolPlannerProvider
+from router.orchestration.tool_executor import run_tool_route, run_validated_tool_plan
 
 
-TOOL_ROUTE_POLICY_VERSION = "e2b-deterministic-tool-route-v1"
+TOOL_ROUTE_POLICY_VERSION = "dual-functiongemma-tool-route-v1"
 
 
 class ToolAugmentedRunner:
@@ -19,7 +20,8 @@ class ToolAugmentedRunner:
     def __init__(
         self,
         *,
-        planner_client: LocalModelClient,
+        planner_client: LocalModelClient | None = None,
+        planner_provider: FunctionGemmaToolPlannerProvider | None = None,
         fallback_runner: TaskRunner,
         enabled: bool = False,
         max_tokens: int = 384,
@@ -27,7 +29,10 @@ class ToolAugmentedRunner:
     ) -> None:
         if max_tokens < 1 or minimum_remaining_ms < 1:
             raise ValueError("Tool runner limits must be positive.")
+        if (planner_client is None) == (planner_provider is None):
+            raise ValueError("Exactly one tool planner client or provider is required.")
         self.planner_client = planner_client
+        self.planner_provider = planner_provider
         self.fallback_runner = fallback_runner
         self.enabled = enabled
         self.max_tokens = max_tokens
@@ -42,28 +47,39 @@ class ToolAugmentedRunner:
             return self._fallback(task, "structural_prefilter_rejected")
         started = perf_counter()
         try:
-            response = self.planner_client.complete(
-                build_tool_planner_messages(task.input_text),
-                temperature=0,
-                max_tokens=self.max_tokens,
-                extra_body={"max_completion_tokens": self.max_tokens},
-            )
-        except (ModelClientError, OSError, TimeoutError, ValueError) as exc:
+            if self.planner_provider is not None:
+                invocation = self.planner_provider.plan_with_trace(task)
+                decision = run_validated_tool_plan(task, invocation.plan)
+                planner_model = invocation.model
+                planner_tokens = invocation.usage.to_dict()
+                planner_prompt_version = invocation.prompt_version
+            else:
+                assert self.planner_client is not None
+                response = self.planner_client.complete(
+                    build_tool_planner_messages(task.input_text),
+                    temperature=0,
+                    max_tokens=self.max_tokens,
+                    extra_body={"max_completion_tokens": self.max_tokens},
+                )
+                decision = run_tool_route(task, response.text)
+                planner_model = self.planner_client.model
+                planner_tokens = response.usage.to_dict()
+                planner_prompt_version = TOOL_PLANNER_PROMPT_VERSION
+        except (FunctionGemmaToolPlannerError, ModelClientError, OSError, TimeoutError, ValueError) as exc:
             return self._fallback(task, f"planner_failure:{type(exc).__name__}")
-        decision = run_tool_route(task, response.text)
         if not decision.accepted:
             return self._fallback(task, decision.reason)
         return AnswerResult(
             id=task.id,
             answer=decision.answer,
-            route="e2b_tool_verified",
+            route="functiongemma_tool_verified",
             remote_tokens=TokenUsage.empty(),
             metadata={
                 "runner": "tool_augmented",
                 "policy_version": TOOL_ROUTE_POLICY_VERSION,
-                "planner_prompt_version": TOOL_PLANNER_PROMPT_VERSION,
-                "planner_model": self.planner_client.model,
-                "planner_local_tokens": response.usage.to_dict(),
+                "planner_prompt_version": planner_prompt_version,
+                "planner_model": planner_model,
+                "planner_local_tokens": planner_tokens,
                 "latency_tool_route_ms": round((perf_counter() - started) * 1000),
                 "tool_decision": decision.to_dict(),
             },
