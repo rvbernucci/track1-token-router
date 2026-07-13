@@ -1,12 +1,12 @@
 # Submission Lock Checklist
 
-- [x] Public image: `ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma`
-- [x] Manifest digest: `sha256:86d9661ccff0fc181feb46fe517816f2bbb18b47e6fe4ee1a6aeb45f4575b363`
-- [x] Platform digest: `sha256:2df039de3ae7a4c89acb8318f70e1bc68db25fb5ec6a613101fc1cad653dc5e4`
-- [x] Source revision: `84f6d3fdc9d658508731bcca055219070842a100`
-- [x] Compressed size: `2938728348` bytes, below 10 GB.
-- [x] Release run: `29220259103`.
-- [x] Exact local inference run: `29220259103`.
-- [x] Rollback image: `ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract`.
+- [x] Public image: `ghcr.io/rvbernucci/track1-token-router:v3.10.1-s80-championship`
+- [x] Manifest digest: `sha256:876b2b91eeca0ddd6c35c6980425ee288bdf091183a39dd6513da1ca04d2bbf4`
+- [x] Platform digest: `sha256:36bda45addf63b4b1b46a1cfdff726fed04e060e6f797df2178307360fe8411b`
+- [x] Source revision: `0cee50fdb52da13a316fd2931fd1fe4b621fcc1f`
+- [x] Compressed size: `2938863471` bytes, below 10 GB.
+- [x] Release run: `29224007638`.
+- [x] Exact published-image run: `29224007638`.
+- [x] Rollback image: `ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma`.
 - [ ] Confirm the Docker Image field in lablab.ai uses the final tag.
 - [ ] Capture/export the final submitted form.

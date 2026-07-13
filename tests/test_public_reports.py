@@ -84,9 +84,9 @@ class PublicReportExportTests(unittest.TestCase):
         self.assertIn("FunctionGemma", content)
         self.assertIn("docker pull --platform linux/amd64", content)
         self.assertIn("docker run --rm --platform linux/amd64", content)
-        self.assertIn("v3.9.0-dual-functiongemma", content)
+        self.assertIn("v3.10.1-s80-championship", content)
         self.assertIn("84.2% / 4,198 tokens", content)
-        self.assertIn("758 automated tests", content)
+        self.assertIn("768 automated tests", content)
         self.assertIn("cat output/results.json", content)
         self.assertIn("solver_arithmetic", content)
 

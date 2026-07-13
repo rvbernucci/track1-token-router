@@ -4,7 +4,7 @@
     "The 23-task Fireworks microbench is deterministic-validator evidence, not hidden-evaluator accuracy.",
     "The final lablab.ai form and screenshot require manual confirmation outside this repository."
   ],
-  "candidate": "ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma",
+  "candidate": "ghcr.io/rvbernucci/track1-token-router:v3.10.1-s80-championship",
   "checks": {
     "candidate_is_immutable_version_tag": true,
     "compressed_size_below_10gb": true,
@@ -17,22 +17,22 @@
     "revision_is_sha40": true,
     "rollback_is_distinct_version_tag": true
   },
-  "compressed_size_bytes": 2938728348,
+  "compressed_size_bytes": 2938863471,
   "decision": "promote_full_hybrid",
   "exact_local_gate_run": {
-    "id": 29220259103,
-    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29220259103"
+    "id": 29224007638,
+    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29224007638"
   },
-  "manifest_digest": "sha256:86d9661ccff0fc181feb46fe517816f2bbb18b47e6fe4ee1a6aeb45f4575b363",
+  "manifest_digest": "sha256:876b2b91eeca0ddd6c35c6980425ee288bdf091183a39dd6513da1ca04d2bbf4",
   "passed": true,
-  "platform_digest": "sha256:2df039de3ae7a4c89acb8318f70e1bc68db25fb5ec6a613101fc1cad653dc5e4",
+  "platform_digest": "sha256:36bda45addf63b4b1b46a1cfdff726fed04e060e6f797df2178307360fe8411b",
   "release_run": {
-    "id": 29220259103,
-    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29220259103"
+    "id": 29224007638,
+    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29224007638"
   },
-  "revision": "84f6d3fdc9d658508731bcca055219070842a100",
-  "rollback": "ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract",
-  "rollback_action": "Replace only the Docker Image field with ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract",
+  "revision": "0cee50fdb52da13a316fd2931fd1fe4b621fcc1f",
+  "rollback": "ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma",
+  "rollback_action": "Replace only the Docker Image field with ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma",
   "schema_version": "final-release-decision-v1",
-  "submission_action": "Set the Docker Image field to ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma"
+  "submission_action": "Set the Docker Image field to ghcr.io/rvbernucci/track1-token-router:v3.10.1-s80-championship"
 }

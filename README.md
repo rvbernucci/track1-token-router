@@ -51,7 +51,7 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-`v3.9.0-dual-functiongemma` is the current recommended championship candidate. It adds an independently trained Q8 FunctionGemma tool planner whose answers are released only after deterministic provenance validation and recomputable proof. Release run `29220259103` passed clean public pull, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract and OCI-label gates. `v3.8.2-e2b-contract` remains the immediate rollback; `v3.7.3-public-sample` remains the scored rollback with 84.2% official accuracy and 4,198 Fireworks tokens.
+`v3.10.1-s80-championship` is the current recommended championship candidate. It retains the independently trained Q8 FunctionGemma tool planner, adds a hash-pinned E2B code-debugging gate, promotes the statistically supported Fireworks intent policy and retries only responses with concrete truncation evidence. Release run `29224007638` passed clean public pull, exact published-image execution, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract and OCI-label gates. `v3.9.0-dual-functiongemma` remains the immediate rollback; `v3.7.3-public-sample` remains the scored rollback with 84.2% official accuracy and 4,198 Fireworks tokens.
 
 ## Quickstart
 
@@ -73,7 +73,7 @@ python3 scripts/secret_scan.py
 git diff --check
 ```
 
-The current repository suite contains `758` passing tests with one environment-dependent skip.
+The current repository suite contains `768` passing tests with one environment-dependent skip.
 
 ## Official Offline Contract
 
@@ -156,10 +156,10 @@ ROUTER_MODE=three_route
 The final hybrid championship candidate is:
 
 ```text
-ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma
+ghcr.io/rvbernucci/track1-token-router:v3.10.1-s80-championship
 ```
 
-It embeds separate FunctionGemma 270M Q8 assessment and tool-planner models plus text-only Gemma 4 E2B, requires no startup downloads, and falls through only to evaluator-authorized Fireworks models. Release run `29220259103` built, publicly pulled and gated the exact published image under 4 GB RAM, 2 vCPU and disabled networking. Registry audit confirms OCI digest `sha256:86d9661ccff0fc181feb46fe517816f2bbb18b47e6fe4ee1a6aeb45f4575b363`, platform digest `sha256:2df039de3ae7a4c89acb8318f70e1bc68db25fb5ec6a613101fc1cad653dc5e4`, source revision `84f6d3fdc9d658508731bcca055219070842a100` and 2.94 GB compressed size. A second clean-pull smoke measured 16.221 s cold start, 1.461 s warm inference and 1,299.456 MiB sampled peak memory.
+It embeds separate FunctionGemma 270M Q8 assessment and tool-planner models plus text-only Gemma 4 E2B, requires no startup downloads, and falls through only to evaluator-authorized Fireworks models. Release run `29224007638` built, publicly pulled and gated the exact published image under 4 GB RAM, 2 vCPU and disabled networking. Registry audit confirms OCI digest `sha256:876b2b91eeca0ddd6c35c6980425ee288bdf091183a39dd6513da1ca04d2bbf4`, platform digest `sha256:36bda45addf63b4b1b46a1cfdff726fed04e060e6f797df2178307360fe8411b`, source revision `0cee50fdb52da13a316fd2931fd1fe4b621fcc1f` and 2.94 GB compressed size.
 
 ## Fireworks
 

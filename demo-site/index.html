@@ -244,11 +244,11 @@
       <aside class="panel router-card" aria-label="Router flow">
         <div class="node"><strong>1. Local assessment</strong> FunctionGemma 270M emits an intent and five routing scores.</div>
         <div class="arrow">↓</div>
-        <div class="node"><strong>2. Zero-token routes</strong> Proven solvers, FunctionGemma-planned tools or matrix-selected Gemma E2B tasks stay local.</div>
+        <div class="node"><strong>2. Zero-token routes</strong> Proven solvers, validated FunctionGemma-planned tools or matrix-selected Gemma E2B tasks stay local.</div>
         <div class="arrow">↓</div>
         <div class="node"><strong>3. Risk guard</strong> Wilson 90% and Nash/minimax can reject, but never expand, the calibrated E2B cohort.</div>
         <div class="arrow">↓</div>
-        <div class="node"><strong>4. Safe fallback</strong> Kimi or MiniMax is called only when present in <code>ALLOWED_MODELS</code>.</div>
+        <div class="node"><strong>4. Safe fallback</strong> Kimi is the efficient default; MiniMax is preferred for logic puzzles, always within <code>ALLOWED_MODELS</code>.</div>
       </aside>
     </section>
 
@@ -267,15 +267,15 @@
 
       <article class="card">
         <h2>Submission shape</h2>
-        <p>Public, immutable, no-download image with audited OCI labels and a compact rollback tag.</p>
+        <p>Public, immutable, no-download image with audited OCI labels and an exact-image evaluator gate.</p>
         <span class="metric">2.94 GB</span>
       </article>
 
       <article class="card wide">
         <h2>Pull the submitted image</h2>
         <pre><code>docker pull --platform linux/amd64 \
-  ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma</code></pre>
-        <p>This public tag exposes a <code>linux/amd64</code> manifest and passed the complete release workflow.</p>
+  ghcr.io/rvbernucci/track1-token-router:v3.10.1-s80-championship</code></pre>
+        <p>This public tag exposes a <code>linux/amd64</code> manifest and passed clean pull, exact-image execution and immutable-label audits.</p>
       </article>
 
       <article class="card">
@@ -306,7 +306,7 @@ docker run --rm --platform linux/amd64 \
   -e ALLOWED_MODELS \
   -v "$PWD/input:/input:ro" \
   -v "$PWD/output:/output" \
-  ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma
+  ghcr.io/rvbernucci/track1-token-router:v3.10.1-s80-championship
 
 cat output/results.json</code></pre>
       </article>
@@ -314,12 +314,22 @@ cat output/results.json</code></pre>
       <article class="card wide">
         <h2>Calibration status</h2>
         <p>
-          The runtime remains fail-closed. The generic E2B answer contract improved accuracy
-          from 62.50% to 84.38% on a balanced 64-task ablation. We then evaluated 4,400 local
-          answers: mechanical evidence handled 2,621 rows, while GLM-5.2 and Codex/Antigravity
-          agreed on 96.7% of the 1,779 semantic cases. The resulting neural challenger reached
-          95.95% protected precision at 8.41% coverage, but remains research evidence until it
-          proves end-to-end dominance over the shipped gate.
+          The runtime remains fail-closed. The established E2B policy achieved 80/87 correct
+          releases on protected holdout. Sprint 80 added a post-response Extra Trees gate for
+          code debugging that contributed 13/13 additional correct releases, raising the union
+          to 93/100 (93.00%) without adding an observed error. The new gate is hash-pinned and
+          can only add candidates inside its validated intent and contract boundary.
+        </p>
+      </article>
+
+      <article class="card wide">
+        <h2>Fireworks accuracy safeguards</h2>
+        <p>
+          An 800-task paired arena retained Kimi as the token-efficient default and selected
+          MiniMax only for logic puzzles, its statistically supported advantage. Completion
+          budgets remain contract-aware. If a response ends because of the length limit, or
+          reaches 95% of its budget with clear incomplete-output evidence, ProofRoute retries
+          once with a larger ceiling and accounts for tokens from both attempts.
         </p>
       </article>
 
@@ -341,7 +351,18 @@ cat output/results.json</code></pre>
         <pre><code>python3 -m pip install -e .
 scripts/offline_release_check.sh
 python3 scripts/export_public_report.py --check</code></pre>
-        <p><strong>Verified:</strong> 758 automated tests passed, with one environment-dependent skip.</p>
+        <p><strong>Verified:</strong> 768 automated tests passed, with one environment-dependent skip.</p>
+      </article>
+
+      <article class="card wide">
+        <h2>Immutable release evidence</h2>
+        <p>
+          Release <code>v3.10.1-s80-championship</code> was built from revision
+          <code>0cee50f</code>. Its OCI digest is
+          <code>sha256:876b2b91eeca0ddd6c35c6980425ee288bdf091183a39dd6513da1ca04d2bbf4</code>.
+          The exact public image completed the official I/O smoke under 4 GB RAM, 2 vCPU,
+          <code>linux/amd64</code> and disabled networking in the release workflow.
+        </p>
       </article>
     </section>
 
