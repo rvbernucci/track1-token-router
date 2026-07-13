@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import os
 import sys
@@ -27,7 +28,11 @@ def main() -> int:
     nonce = time.time_ns()
     start_marker = f"__CODEX_COMMAND_START_{nonce}__"
     marker = f"__CODEX_COMMAND_DONE_{nonce}__"
-    command = f"printf '{start_marker}\\n'\n{args.command}\nprintf '{marker}:%s\\n' $?\n"
+    script = f"printf '{start_marker}\\n'\n{args.command}\nprintf '{marker}:%s\\n' $?\n"
+    payload = base64.b64encode(script.encode("utf-8")).decode("ascii")
+    # Jupyter terminals echo stdin. Encoding keeps control markers out of that echo,
+    # so only output produced by the remote shell can complete the command.
+    command = f"printf '%s' '{payload}' | base64 -d | bash\n"
     base = args.base_url.rstrip("/")
     ws_base = base.replace("https://", "wss://", 1).replace("http://", "ws://", 1)
     origin = base.split("/instances/", 1)[0]
@@ -41,8 +46,15 @@ def main() -> int:
         while time.monotonic() < deadline:
             connection.settimeout(max(0.1, min(5.0, deadline - time.monotonic())))
             try:
-                message = json.loads(connection.recv())
+                frame = connection.recv()
+                if isinstance(frame, bytes):
+                    frame = frame.decode("utf-8", errors="replace")
+                if not frame.strip():
+                    continue
+                message = json.loads(frame)
             except (TimeoutError, websocket.WebSocketTimeoutException):
+                continue
+            except json.JSONDecodeError:
                 continue
             if not isinstance(message, list) or len(message) < 2 or message[0] != "stdout":
                 continue
