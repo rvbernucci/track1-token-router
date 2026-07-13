@@ -137,9 +137,11 @@ def _completion_rows(rows: list[dict]) -> list[dict]:
         messages = row.get("messages")
         if not isinstance(messages, list) or len(messages) != 3 or messages[-1].get("role") != "assistant":
             raise ValueError("Planner training rows require developer, user and assistant messages.")
+        completion = dict(messages[-1])
+        completion.setdefault("content", "")
         converted.append({
             "prompt": messages[:-1],
-            "completion": messages[-1:],
+            "completion": [completion],
             "tools": row["tools"],
         })
     return converted

@@ -58,7 +58,8 @@ class FunctionGemmaPlannerPreflightTests(unittest.TestCase):
         }
         converted = _completion_rows([row])
         self.assertEqual(converted[0]["prompt"], row["messages"][:2])
-        self.assertEqual(converted[0]["completion"], row["messages"][2:])
+        self.assertEqual(converted[0]["completion"][0]["tool_calls"], row["messages"][2]["tool_calls"])
+        self.assertEqual(converted[0]["completion"][0]["content"], "")
         self.assertEqual(converted[0]["tools"], row["tools"])
 
 
