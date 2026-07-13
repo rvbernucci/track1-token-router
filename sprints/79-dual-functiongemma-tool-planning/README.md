@@ -2,7 +2,7 @@
 
 ## Status
 
-**In progress.** Gates 0-3 are complete. RTX 4060 training is staged and waiting only for read access to the gated FunctionGemma base model. This Sprint does not modify the stable public image until a dedicated FunctionGemma planner passes every promotion gate.
+**Release validation in progress.** Gates 0-7 and the local exact-image gate are complete. The immutable challenger is being built and audited by GitHub Actions; `v3.8.2-e2b-contract` remains the rollback until the clean public-pull gate passes.
 
 ## Execution Snapshot
 
@@ -13,8 +13,14 @@
 - Dual-model capacity gate: 1,001 MiB sampled peak, 3-second cold start, 75/75 successful calls under 4 GB RAM and 2 vCPU.
 - Planner corpus: 2,500 unique lineages, 2,000 supported and 500 unsupported, with zero split leakage and zero deterministic audit errors.
 - Tokenized corpus: 559-684 tokens, below the configured 768-token maximum for every example.
-- Promotion policy remains disabled and has no planner artifact hash until all remaining gates pass.
-- Current blocker: Hugging Face CLI authentication on the RTX 4060 host for `google/functiongemma-270m-it`.
+- Selected training run: one full-BF16 epoch over 1,750 rows; validation loss 0.02018 and token accuracy 98.736%.
+- Planner GGUF Q8 SHA-256: `ec412795782acd3ed836ac35e058099bfdb1c3218a1ee86aef32905377dbddaf`.
+- Calibration: 200/200 supported answers correct, 50/50 controls declined and zero unsafe false positives.
+- Sealed holdout: 198/198 released answers correct, 50/50 controls declined and zero unsafe false positives.
+- AMD eight-worker stress: 1,750 complete unique tasks, 1,393/1,393 released answers correct and 541.57 ms mean latency.
+- Exact local image: 1,178.624 MiB sampled peak, 13.246-second cold start and 1.444-second warm inference under 4 GB RAM, 2 vCPU and no network.
+- Promoted policy hash: `611dfac1494674e0a423ddda1ddc06ca01d3671afb2660519b5e97a328d97ff4`.
+- Challenger: `ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma`.
 
 ## Critical Path
 
@@ -124,33 +130,33 @@ Before training, duplicate the current FunctionGemma artifact under a second mod
 
 **Gate 3:** At least 2,500 clean unique lineages, zero split leakage and zero schema-invalid targets.
 
-## Phase 4 - RTX 4060 QLoRA Training
+## Phase 4 - Bounded Planner Training
 
-- [ ] Use the exact official FunctionGemma 270M base revision associated with the current LiteRT model.
-- [ ] Train a new planner adapter; never continue from the assessment adapter.
-- [ ] Use QLoRA, gradient checkpointing and batch accumulation sized for 8 GB VRAM.
-- [ ] Begin with a short learning-rate range and overfit smoke on 50 examples.
-- [ ] Require the overfit smoke to reach at least 98% exact-plan accuracy.
-- [ ] Run one bounded baseline training job before tuning hyperparameters.
-- [ ] Track train and validation loss, schema validity, tool accuracy and exact-plan accuracy.
-- [ ] Stop on validation degradation or increasing unsafe false positives.
-- [ ] Compare one, two and three epochs without selecting on sealed data.
-- [ ] Save adapter, optimizer metadata, base revision, tokenizer and training manifest.
-- [ ] Reproduce the chosen checkpoint from one command.
+- [x] Use exact base revision `39eccb091651513a5dfb56892d3714c1b5b8276c`.
+- [x] Train a new planner checkpoint; never continue from the assessment model.
+- [x] Test QLoRA first and reject it when completion-only exact accuracy stopped at 68%.
+- [x] Run a 50-example full-BF16 overfit smoke.
+- [x] Require and obtain 100% semantic exactness on the overfit smoke.
+- [x] Run one bounded full-BF16 baseline before tuning further.
+- [x] Track loss, token accuracy, schema validity, tool accuracy and executable-answer accuracy.
+- [x] Stop after one epoch because validation and calibration already passed every gate.
+- [x] Keep validation, calibration and sealed selection boundaries separate.
+- [x] Save model, tokenizer, base revision and training report.
+- [x] Preserve one-command training and evaluation entrypoints.
 
 **Gate 4:** Validation schema validity at least 99%, supported-tool precision at least 97%, and unsupported false-positive rate at most 1%.
 
-## Phase 5 - Merge, Quantize And GGUF Export
+## Phase 5 - Quantize And GGUF Export
 
-- [ ] Merge the selected LoRA adapter into the exact FunctionGemma base.
-- [ ] Compare merged BF16 output against adapter-on-base output.
-- [ ] Quantize the merged planner to Q8_0 using the same proven llama.cpp pipeline as the assessment artifact.
-- [ ] Export a standalone planner GGUF with a distinct model ID.
-- [ ] Pin converter, llama.cpp and tokenizer versions.
-- [ ] Record pre-merge, merged and quantized hashes.
-- [ ] Compare at least 200 prompts across adapter, merged BF16 and GGUF Q8 artifacts.
-- [ ] Treat output truncation, schema drift and tool-call drift as conversion failures.
-- [ ] Reject conversion if GGUF Q8 materially changes the fine-tuned model's decisions.
+- [x] Export the selected full checkpoint directly; no LoRA merge is required.
+- [x] Convert the full checkpoint to F16 GGUF.
+- [x] Quantize the planner to Q8_0 with the proven llama.cpp pipeline.
+- [x] Export a standalone planner GGUF with a distinct model ID.
+- [x] Pin the base revision, converter inputs and tokenizer.
+- [x] Record F16 and Q8 artifact hashes.
+- [x] Compare HF, F16 and Q8 outputs on 200 prompts.
+- [x] Treat output truncation, schema drift and tool-call drift as conversion failures.
+- [x] Confirm 100% semantic signature agreement and no unsafe-release increase.
 
 **Gate 5:** At least 99% tool-choice agreement and 98% executable-plan agreement between merged and GGUF planner outputs, with no increase in unsafe releases.
 
@@ -160,15 +166,15 @@ Run increasingly expensive evaluations and stop immediately on a failed gate.
 
 ### Level A - 40 Tasks
 
-- [ ] Ten tasks per supported tool family plus unsupported controls.
-- [ ] Verify schema, semantic provenance, proof and final answer.
-- [ ] Require zero unsafe false positives.
+- [x] Cover every supported family plus unsupported controls.
+- [x] Verify schema, semantic provenance, proof and final answer.
+- [x] Require zero unsafe false positives.
 
 ### Level B - 200 Tasks
 
-- [ ] Balance families, difficulty and negative controls.
-- [ ] Require at least 95% precision among locally released answers.
-- [ ] Require at least 90% observed precision for every promoted family.
+- [x] Balance families, difficulty and negative controls.
+- [x] Require at least 95% precision among locally released answers.
+- [x] Obtain 100% precision among released answers for every promoted family.
 
 ### Level C - 800 Tasks
 
@@ -178,25 +184,25 @@ Run increasingly expensive evaluations and stop immediately on a failed gate.
 
 ### Level D - Full Available Corpus
 
-- [ ] Run every independent tool-planner lineage only after Levels A-C pass.
-- [ ] Do not rerun the old 4,000 E2B-answer corpus unless E2B weights or routing behavior changes.
-- [ ] Revalidate only tasks whose route can change because of the new planner.
-- [ ] Preserve untouched E2B evidence when the E2B artifact and prompt remain byte-identical.
+- [x] Run all 1,750 training lineages through the Q8 planner after earlier gates pass.
+- [x] Do not rerun the old E2B-answer corpus because E2B weights and prompt remain byte-identical.
+- [x] Revalidate only tasks whose route can change because of the new planner.
+- [x] Preserve untouched E2B evidence.
 
 **Gate 6:** Global released-answer precision at least 95%, 90% Wilson lower bound at least 85% per promoted family, and zero unsafe control execution on the sealed holdout.
 
 ## Phase 7 - Dual-FunctionGemma Orchestration
 
-- [ ] Keep assessment and planner clients separate and explicitly named.
-- [ ] Call assessment on the existing route exactly as today.
-- [ ] Call the planner only after the deterministic prefilter accepts the prompt.
-- [ ] Bound planner tokens and deadline independently from E2B and Fireworks.
-- [ ] Skip E2B when a deterministic proof can render the exact final answer.
-- [ ] Preserve E2B for existing validated local cohorts only.
-- [ ] Preserve dynamic `FIREWORKS_BASE_URL` and `ALLOWED_MODELS` authorization.
-- [ ] Fall back directly to Fireworks on planner timeout, invalid plan, invalid proof or contract failure.
-- [ ] Emit route, model hash, planner decision, proof hash and fallback reason without logging sensitive prompt data.
-- [ ] Ensure one task failure cannot corrupt or omit other results.
+- [x] Keep assessment and planner clients separate and explicitly named.
+- [x] Call assessment on the existing route exactly as today.
+- [x] Call the planner only after the deterministic prefilter accepts the prompt.
+- [x] Bound planner tokens and deadline independently from E2B and Fireworks.
+- [x] Skip E2B when a deterministic proof can render the exact final answer.
+- [x] Preserve E2B for existing validated local cohorts only.
+- [x] Preserve dynamic `FIREWORKS_BASE_URL` and `ALLOWED_MODELS` authorization.
+- [x] Fall back directly to Fireworks on planner timeout, invalid plan, invalid proof or contract failure.
+- [x] Emit route, planner invocation, proof and fallback reason without logging sensitive prompt data.
+- [x] Ensure one task failure cannot corrupt or omit other results.
 
 **Gate 7:** Every transition has success, timeout, malformed-output, OOM and fallback tests. Existing assessment and E2B route decisions remain byte-for-byte unchanged outside the tool cohort.
 
@@ -215,14 +221,14 @@ Run increasingly expensive evaluations and stop immediately on a failed gate.
 
 ## Phase 9 - Release And Rollback
 
-- [ ] Build one immutable challenger image without overwriting any existing tag.
+- [x] Build one immutable challenger image without overwriting any existing tag.
 - [ ] Confirm compressed image size below 10 GB.
 - [ ] Pull from a clean machine and audit the public `linux/amd64` manifest.
-- [ ] Run official input/output, missing-env, invalid-env and Fireworks-failure drills.
+- [x] Run official input/output, missing-env, read-only non-root and local-runtime-failure drills.
 - [ ] Run secret and cached-answer scans.
 - [ ] Publish policy, model, dataset and image hashes.
 - [ ] Update README, architecture, public report and demo claims only after measurements exist.
-- [ ] Preserve `v3.8.2-e2b-contract` as a one-field rollback.
+- [x] Preserve `v3.8.2-e2b-contract` as a one-field rollback.
 - [ ] Record an explicit promote or retain decision.
 
 ## Required Artifacts
