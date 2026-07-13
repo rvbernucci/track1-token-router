@@ -66,6 +66,47 @@ class AnswerContractEngineTests(unittest.TestCase):
         self.assertFalse(extra.valid)
         self.assertEqual(extra.reason, "json_keys_mismatch")
 
+    def test_rejects_duplicate_keys_and_nonstandard_json_constants(self) -> None:
+        task = TaskEnvelope(input_text='Return only valid JSON with exactly this key: "answer".')
+
+        duplicate = apply_answer_contract(task, '{"answer":1,"answer":2}')
+        non_finite = apply_answer_contract(task, '{"answer":NaN}')
+
+        self.assertFalse(duplicate.valid)
+        self.assertEqual(duplicate.reason, "invalid_json")
+        self.assertFalse(non_finite.valid)
+        self.assertEqual(non_finite.reason, "invalid_json")
+
+    def test_canonicalizes_only_bijective_json_key_case(self) -> None:
+        task = TaskEnvelope(
+            input_text='Return only valid JSON with exactly these keys: "person", "location".'
+        )
+
+        result = apply_answer_contract(task, '{"Person":"Ana","Location":"Recife"}')
+        collision = apply_answer_contract(task, '{"person":"Ana","Person":"Maya","location":"Recife"}')
+
+        self.assertTrue(result.valid)
+        self.assertEqual(json.loads(result.answer), {"person": "Ana", "location": "Recife"})
+        self.assertIn("canonicalized_json_key_case", result.actions)
+        self.assertFalse(collision.valid)
+
+    def test_unwraps_only_unambiguous_singleton_json_object_array(self) -> None:
+        task = TaskEnvelope(
+            input_text='Return only valid JSON with exactly these keys: "person", "location".'
+        )
+        array_task = TaskEnvelope(
+            input_text='Return a JSON array with exactly these keys: "person", "location".'
+        )
+        answer = '[{"person":"Ana","location":"Recife"}]'
+
+        result = apply_answer_contract(task, answer)
+        preserved = apply_answer_contract(array_task, answer)
+
+        self.assertTrue(result.valid)
+        self.assertEqual(json.loads(result.answer), {"person": "Ana", "location": "Recife"})
+        self.assertIn("unwrapped_singleton_json_object_array", result.actions)
+        self.assertFalse(preserved.valid)
+
     def test_singular_json_key_does_not_treat_quoted_value_as_another_key(self) -> None:
         task = TaskEnvelope(input_text='Return only JSON with key "answer" set to "yes".')
 

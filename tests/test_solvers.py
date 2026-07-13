@@ -14,6 +14,8 @@ class SolverPackTests(unittest.TestCase):
             names,
             [
                 "arithmetic",
+                "inventory_flow",
+                "recipe_cost",
                 "percent_fee_math",
                 "proportional_rate",
                 "numeric_compare",
@@ -55,6 +57,23 @@ class SolverPackTests(unittest.TestCase):
                 self.assertEqual(result.answer, answer)
                 self.assertEqual(result.confidence, "high")
 
+    def test_solves_explicit_parenthesized_fraction_expression(self) -> None:
+        cases = {
+            "Calculate the explicit expression (10 + 5) * 4. Return only the number.": "60",
+            "Evaluate the explicit expression (15 * 10) / 9. Return only the number.": "16.6666666667",
+            "Calculate the explicit expression (24 * 2) / 7. Return only the number.": "6.8571428571",
+        }
+        for prompt, answer in cases.items():
+            with self.subTest(prompt=prompt):
+                result = solve_deterministic(TaskEnvelope(input_text=prompt))
+                self.assertIsNotNone(result)
+                self.assertEqual(result.answer, answer)
+
+        self.assertIsNone(
+            solve_deterministic(
+                TaskEnvelope(input_text="Calculate the explicit expression (10 + 5) / 0. Return only the number.")
+            )
+        )
     def test_solves_safe_percent_and_rate_math(self) -> None:
         cases = {
             "A plan costs 80. It receives a 15 percent discount and then a 5 fee is added. Return only the final number.": "73",
@@ -71,6 +90,60 @@ class SolverPackTests(unittest.TestCase):
                 result = solve_deterministic(TaskEnvelope(input_text=prompt))
                 self.assertIsNotNone(result)
                 self.assertEqual(result.answer, answer)
+
+    def test_solves_proof_carrying_inventory_and_recipe_cost_tools(self) -> None:
+        cases = {
+            (
+                "A warehouse starts with 2,400 units. In Q1 it sells 37% of stock. "
+                "In Q2 it restocks 800 units. In Q3 it sells 640 units. "
+                "How many units remain at the end of Q3?"
+            ): ("1,672 units", "inventory_flow"),
+            (
+                "A recipe requires 3/4 cup of sugar for 12 cookies. "
+                "How much sugar is needed for 30 cookies? If sugar costs $2.40 per cup, "
+                "what is the total cost of sugar for 30 cookies?"
+            ): ("1.875 cups; $4.50", "recipe_cost"),
+            (
+                "A warehouse starts with 552 units. It sells 45% of stock, restocks 28 units, "
+                "then sells 109 units. How many units remain?"
+            ): ("222.6 units", "inventory_flow"),
+            (
+                "Inventory begins at 571. Sell 5 percent, add 29 units, and sell another 110 units. "
+                "Return the final count."
+            ): ("461.45 units", "inventory_flow"),
+            (
+                "For 7 portions, a dish needs 5/8 cup of rice. Find cups and cost for 27 portions "
+                "if rice costs $2.00 per cup."
+            ): ("2.4107142857 cups; $4.82", "recipe_cost"),
+            (
+                "A recipe uses 4/5 cup of flour for 6 servings. Scale to 26 servings and calculate "
+                "cost at $1.75 per cup."
+            ): ("3.4666666667 cups; $6.07", "recipe_cost"),
+            (
+                "A batch serving 8 uses 6/10 cup of sugar. Find amount and total cost for 28 servings "
+                "at $2.25 per cup."
+            ): ("2.1 cups; $4.72", "recipe_cost"),
+        }
+        for prompt, (answer, solver_name) in cases.items():
+            with self.subTest(prompt=prompt):
+                result = solve_deterministic(TaskEnvelope(input_text=prompt))
+                self.assertIsNotNone(result)
+                self.assertEqual(result.answer, answer)
+                self.assertEqual(result.solver_name, solver_name)
+
+    def test_inventory_and_recipe_tools_fail_closed_on_ambiguous_variants(self) -> None:
+        blocked = [
+            "A warehouse starts with 100 units and later changes its stock. How many remain?",
+            "A recipe requires 3/0 cup of sugar for 12 cookies. How much for 30 cookies?",
+            "A recipe requires some sugar for cookies and sugar has a variable price.",
+            (
+                "A recipe requires 3/4 gram of sugar for 12 cookies. How much sugar is needed for "
+                "30 cookies? If sugar costs $2.40 per cup, what is the total cost of sugar for 30 cookies?"
+            ),
+        ]
+        for prompt in blocked:
+            with self.subTest(prompt=prompt):
+                self.assertIsNone(solve_deterministic(TaskEnvelope(input_text=prompt)))
 
     def test_blocks_unsafe_or_complex_arithmetic(self) -> None:
         blocked = [
@@ -302,6 +375,17 @@ class SolverPackTests(unittest.TestCase):
                 result = solve_deterministic(TaskEnvelope(input_text=prompt))
                 self.assertIsNotNone(result)
                 self.assertEqual(result.answer, answer)
+
+        alphanumeric = solve_deterministic(
+            TaskEnvelope(
+                input_text=(
+                    "N4A is taller than N4B. N4B is taller than N4C. "
+                    "N4C is taller than N4D. Who is shortest?"
+                )
+            )
+        )
+        self.assertIsNotNone(alphanumeric)
+        self.assertEqual(alphanumeric.answer, "N4D")
 
     def test_blocks_ambiguous_logic_patterns(self) -> None:
         blocked = [

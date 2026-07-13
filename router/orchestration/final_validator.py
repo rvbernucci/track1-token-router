@@ -143,6 +143,11 @@ def apply_answer_contract(task: TaskEnvelope, answer: str) -> AnswerContractResu
         candidate = validation.repaired_answer or original
         actions = (validation.reason,) if validation.reason.startswith("safe_repair:") else ()
 
+    normalized_shape, shape_actions = _normalize_json_object_shape(task.input_text, candidate, contract)
+    if normalized_shape != candidate:
+        candidate = normalized_shape
+        actions = (*actions, *shape_actions)
+
     normalized_json = _normalize_singleton_json_values(task.input_text, candidate, contract)
     if normalized_json and normalized_json != candidate:
         candidate = normalized_json
@@ -194,8 +199,8 @@ def validate_final_answer(task: TaskEnvelope, answer: str) -> FinalValidationRes
         return FinalValidationResult(False, expected_format, "markdown_fence_in_strict_format", repaired)
     if expected_format == "json":
         try:
-            json.loads(stripped)
-        except json.JSONDecodeError:
+            _strict_json_loads(stripped)
+        except (json.JSONDecodeError, ValueError):
             repaired = repair_final_answer(task, answer).repaired_answer
             return FinalValidationResult(False, expected_format, "invalid_json", repaired)
         return FinalValidationResult(True, expected_format, "valid_json")
@@ -303,8 +308,8 @@ def _strip_markdown_fence(value: str) -> str:
 def _extract_single_json_value(value: str) -> str:
     stripped = _strip_markdown_fence(value)
     try:
-        json.loads(stripped)
-    except json.JSONDecodeError:
+        _strict_json_loads(stripped)
+    except (json.JSONDecodeError, ValueError):
         pass
     else:
         return stripped
@@ -314,14 +319,14 @@ def _extract_single_json_value(value: str) -> str:
 
 
 def _embedded_json_values(value: str) -> list[str]:
-    decoder = json.JSONDecoder()
+    decoder = json.JSONDecoder(object_pairs_hook=_reject_duplicate_json_keys, parse_constant=_reject_json_constant)
     spans: list[tuple[int, int, str]] = []
     for start, char in enumerate(value):
         if char not in "[{":
             continue
         try:
             _, length = decoder.raw_decode(value[start:])
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, ValueError):
             continue
         spans.append((start, start + length, value[start : start + length]))
 
@@ -595,8 +600,8 @@ def _normalize_singleton_json_values(
     if any(_looks_plural_json_key(key) for key in contract.json_keys):
         return answer
     try:
-        payload = json.loads(answer)
-    except json.JSONDecodeError:
+        payload = _strict_json_loads(answer)
+    except (json.JSONDecodeError, ValueError):
         return answer
     if not isinstance(payload, dict) or set(payload) != set(contract.json_keys):
         return answer
@@ -609,6 +614,63 @@ def _normalize_singleton_json_values(
         return answer
     normalized = {key: value[0] for key, value in payload.items()}
     return json.dumps(normalized, ensure_ascii=False, separators=(",", ":"))
+
+
+def _normalize_json_object_shape(
+    prompt: str,
+    answer: str,
+    contract: AnswerContract,
+) -> tuple[str, tuple[str, ...]]:
+    if contract.kind is not AnswerContractKind.JSON or not contract.json_keys:
+        return answer, ()
+    try:
+        payload = _strict_json_loads(answer)
+    except (json.JSONDecodeError, ValueError):
+        return answer, ()
+    actions: list[str] = []
+    if (
+        isinstance(payload, list)
+        and len(payload) == 1
+        and isinstance(payload[0], dict)
+        and not re.search(r"\b(?:array|arrays|list|lists|multiple|all entities|zero or more)\b", prompt, re.IGNORECASE)
+    ):
+        payload = payload[0]
+        actions.append("unwrapped_singleton_json_object_array")
+    if not isinstance(payload, dict):
+        return answer, ()
+    expected_by_folded = {key.casefold(): key for key in contract.json_keys}
+    observed_folded = [str(key).casefold() for key in payload]
+    if (
+        len(observed_folded) == len(set(observed_folded))
+        and set(observed_folded) == set(expected_by_folded)
+        and set(payload) != set(contract.json_keys)
+    ):
+        payload = {expected_by_folded[str(key).casefold()]: value for key, value in payload.items()}
+        actions.append("canonicalized_json_key_case")
+    if not actions:
+        return answer, ()
+    return json.dumps(payload, ensure_ascii=False, separators=(",", ":")), tuple(actions)
+
+
+def _strict_json_loads(value: str) -> Any:
+    return json.loads(
+        value,
+        object_pairs_hook=_reject_duplicate_json_keys,
+        parse_constant=_reject_json_constant,
+    )
+
+
+def _reject_duplicate_json_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    payload: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in payload:
+            raise ValueError(f"Duplicate JSON key: {key}")
+        payload[key] = value
+    return payload
+
+
+def _reject_json_constant(value: str) -> None:
+    raise ValueError(f"Non-standard JSON constant: {value}")
 
 
 def _looks_plural_json_key(key: str) -> bool:
@@ -629,8 +691,8 @@ def _looks_plural_json_key(key: str) -> bool:
 def _validate_contract_constraints(contract: AnswerContract, answer: str) -> str:
     if contract.kind is AnswerContractKind.JSON and contract.json_keys:
         try:
-            payload = json.loads(answer)
-        except json.JSONDecodeError:
+            payload = _strict_json_loads(answer)
+        except (json.JSONDecodeError, ValueError):
             return "invalid_json_after_normalization"
         if not isinstance(payload, dict) or set(payload) != set(contract.json_keys):
             return "json_keys_mismatch"
@@ -663,8 +725,8 @@ def _item_count(value: str) -> int:
     if bullets:
         return len(bullets)
     try:
-        payload = json.loads(value)
-    except json.JSONDecodeError:
+        payload = _strict_json_loads(value)
+    except (json.JSONDecodeError, ValueError):
         return 0
     return len(payload) if isinstance(payload, list) else 0
 

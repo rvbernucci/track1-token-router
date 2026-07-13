@@ -62,6 +62,31 @@ class ThreeRouteRunner:
 
     def run(self, task: TaskEnvelope) -> AnswerResult:
         started = monotonic()
+        solver = solve_deterministic(task)
+        if solver is not None:
+            decision = EngineDecision(
+                engine=Engine.DETERMINISTIC,
+                reason="proof_carrying_solver_precedes_model_assessment",
+                feasible_engines=(Engine.DETERMINISTIC, Engine.FIREWORKS),
+                probability_correct=1.0,
+            )
+            trace = RoutingTrace(
+                task_id=task.id,
+                assessment=None,
+                features=None,
+                predictions=(deterministic_solver_prediction(accepted=True),),
+                decision=decision,
+            )
+            candidate = _solver_result(task, solver)
+            result = AnswerResult(
+                id=candidate.id,
+                answer=candidate.answer,
+                route=candidate.route,
+                remote_tokens=candidate.remote_tokens,
+                metadata={**candidate.metadata, "routing_trace": trace.to_dict()},
+            )
+            self._log(task, result, trace)
+            return result
         try:
             invocation = self.assessment_provider.assess_with_trace(task)
             task_remaining = self.task_deadline_ms - round((monotonic() - started) * 1000)
@@ -75,7 +100,6 @@ class ThreeRouteRunner:
                 invocation.assessment,
                 compute_structural_features(task, deadline_remaining_ms=remaining),
             )
-            solver = solve_deterministic(task)
             predictions = self._predictions(task, features, solver)
             uncertainty = {
                 engine: 0.0 if engine is Engine.DETERMINISTIC else self.predictor.uncertainty(prediction)

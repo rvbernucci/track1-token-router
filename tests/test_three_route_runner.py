@@ -197,6 +197,27 @@ class ExtraTreesGate:
 
 
 class ThreeRouteRunnerTests(unittest.TestCase):
+    def test_proof_solver_precedes_even_broken_assessment_provider(self):
+        remote = Runner("remote", "fireworks_direct")
+        local = Runner("local", "e2b_local")
+        runner = ThreeRouteRunner(
+            assessment_provider=BrokenProvider(), predictor=Predictor(),
+            selector=MinimaxRegretSelector(e2b_enabled=False),
+            e2b_runner=local, fireworks_runner=remote,
+        )
+
+        result = runner.run(TaskEnvelope(id="proof", input_text="What is 7 * 8? Return only the number."))
+
+        self.assertEqual(result.answer, "56")
+        self.assertEqual(result.route, "solver_arithmetic")
+        self.assertEqual(result.remote_tokens.total, 0)
+        self.assertEqual(remote.calls, 0)
+        self.assertEqual(local.calls, 0)
+        self.assertEqual(
+            result.metadata["routing_trace"]["decision"]["reason"],
+            "proof_carrying_solver_precedes_model_assessment",
+        )
+
     def test_functiongemma_planner_releases_only_recomputed_tool_answer(self):
         planner = PlannerProvider(ToolPlan("safe_calculator", {"ast": {
             "op": "add", "left": {"op": "literal", "value": 2},

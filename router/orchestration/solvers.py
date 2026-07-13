@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+from fractions import Fraction
 import json
 import re
 from dataclasses import asdict, dataclass
@@ -35,6 +36,16 @@ class SolverRegistration:
 
 SOLVERS: tuple[SolverRegistration, ...] = (
     SolverRegistration("arithmetic", lambda task: _solve_arithmetic(task), ((Intent.MATH_REASONING, "arithmetic"),)),
+    SolverRegistration(
+        "inventory_flow",
+        lambda task: _solve_inventory_flow(task),
+        ((Intent.MATH_REASONING, "inventory_flow"),),
+    ),
+    SolverRegistration(
+        "recipe_cost",
+        lambda task: _solve_recipe_cost(task),
+        ((Intent.MATH_REASONING, "proportional_rate"),),
+    ),
     SolverRegistration(
         "percent_fee_math",
         lambda task: _solve_percent_fee_math(task),
@@ -175,6 +186,20 @@ def _solve_arithmetic(task: TaskEnvelope) -> SolverResult | None:
     fraction_capacity = _solve_fraction_capacity(text)
     if fraction_capacity is not None:
         return fraction_capacity
+    explicit = re.fullmatch(
+        r"(?i)(?:calculate|evaluate)\s+the\s+explicit\s+expression\s+"
+        r"\((-?\d{1,9})\s*([+\-*])\s*(-?\d{1,9})\)\s*([+\-*/])\s*(-?\d{1,9})\.\s*"
+        r"return\s+only\s+the\s+number\.",
+        text,
+    )
+    if explicit:
+        left = _apply_fraction_operator(Fraction(int(explicit.group(1))), explicit.group(2), Fraction(int(explicit.group(3))))
+        if left is None:
+            return None
+        answer = _apply_fraction_operator(left, explicit.group(4), Fraction(int(explicit.group(5))))
+        if answer is None:
+            return None
+        return _result(_format_fraction(answer), "arithmetic", "explicit_parenthesized_fraction_expression")
     match = re.fullmatch(
         r"(?i)(?:what is|calculate|compute|solve)?\s*"
         r"(-?\d{1,9})\s*([+\-*/])\s*(-?\d{1,9})"
@@ -208,6 +233,98 @@ def _solve_arithmetic(task: TaskEnvelope) -> SolverResult | None:
     if answer is None:
         return None
     return _result(str(answer), "arithmetic", "safe_integer_expression")
+
+
+def _solve_inventory_flow(task: TaskEnvelope) -> SolverResult | None:
+    text = _single_line(task.input_text)
+    patterns = (
+        r"a\s+[a-z][a-z -]{0,40}\s+starts\s+with\s+([\d,]+)\s+units\.\s+"
+        r"in\s+[a-z0-9 -]+\s+it\s+sells\s+(\d+(?:\.\d+)?)%\s+of\s+(?:the\s+)?stock\.\s+"
+        r"in\s+[a-z0-9 -]+\s+it\s+restocks\s+([\d,]+)\s+units\.\s+"
+        r"in\s+[a-z0-9 -]+\s+it\s+sells\s+([\d,]+)\s+units\.\s+"
+        r"how\s+many\s+units\s+remain\s+at\s+the\s+end\s+of\s+[a-z0-9 -]+\?",
+        r"a\s+warehouse\s+starts\s+with\s+([\d,]+)\s+units\.\s+it\s+sells\s+"
+        r"(\d+(?:\.\d+)?)%\s+of\s+stock,\s+restocks\s+([\d,]+)\s+units,\s+then\s+sells\s+"
+        r"([\d,]+)\s+units\.\s+how\s+many\s+units\s+remain\?",
+        r"inventory\s+begins\s+at\s+([\d,]+)\.\s+sell\s+(\d+(?:\.\d+)?)\s+percent,\s+"
+        r"add\s+([\d,]+)\s+units,\s+and\s+sell\s+another\s+([\d,]+)\s+units\.\s+"
+        r"return\s+the\s+final\s+count\.",
+        r"a\s+depot\s+has\s+([\d,]+)\s+items;\s+(\d+(?:\.\d+)?)%\s+are\s+sold,\s+"
+        r"([\d,]+)\s+arrive,\s+and\s+([\d,]+)\s+more\s+are\s+sold\.\s+"
+        r"determine\s+ending\s+inventory\.",
+        r"starting\s+stock\s+is\s+([\d,]+)\.\s+sell\s+(\d+(?:\.\d+)?)%\s+of\s+stock,\s+"
+        r"restock\s+([\d,]+)\s+units,\s+then\s+sell\s+([\d,]+)\s+units\.\s+"
+        r"find\s+the\s+remaining\s+units\.",
+    )
+    match = next((found for pattern in patterns if (found := re.fullmatch(pattern, text, re.IGNORECASE))), None)
+    if not match:
+        return None
+    initial = int(match.group(1).replace(",", ""))
+    percent = Fraction(match.group(2))
+    restocked = int(match.group(3).replace(",", ""))
+    sold = int(match.group(4).replace(",", ""))
+    if initial < 0 or percent < 0 or percent > 100 or restocked < 0 or sold < 0:
+        return None
+    remaining = Fraction(initial) * (1 - percent / 100) + restocked - sold
+    if remaining < 0:
+        return None
+    rendered_remaining = (
+        f"{remaining.numerator:,}"
+        if remaining.denominator == 1
+        else _format_fraction(remaining)
+    )
+    return _result(
+        f"{rendered_remaining} units",
+        "inventory_flow",
+        "ordered_percent_sale_restock_absolute_sale_proof",
+    )
+
+
+def _solve_recipe_cost(task: TaskEnvelope) -> SolverResult | None:
+    text = _single_line(task.input_text)
+    patterns = (
+        r"a\s+recipe\s+requires\s+(\d{1,4})/(\d{1,4})\s+(cup|cups|gram|grams|kilogram|kilograms)\s+"
+        r"of\s+([a-z][a-z -]{0,40})\s+for\s+(\d{1,6})\s+([a-z][a-z -]{0,30})\.\s+"
+        r"how\s+much\s+\4\s+is\s+needed\s+for\s+(\d{1,6})\s+\6\?\s+"
+        r"if\s+\4\s+costs\s+\$(\d+(?:\.\d{1,2})?)\s+per\s+(cup|gram|kilogram),\s+"
+        r"what\s+is\s+the\s+total\s+cost\s+of\s+\4\s+for\s+\7\s+\6\?",
+        r"for\s+(\d{1,6})\s+portions,\s+a\s+dish\s+needs\s+(\d{1,4})/(\d{1,4})\s+cup\s+of\s+"
+        r"([a-z][a-z -]{0,40})\.\s+find\s+cups\s+and\s+cost\s+for\s+(\d{1,6})\s+portions\s+"
+        r"if\s+\4\s+costs\s+\$(\d+(?:\.\d{1,2})?)\s+per\s+cup\.",
+        r"a\s+recipe\s+uses\s+(\d{1,4})/(\d{1,4})\s+cup\s+of\s+([a-z][a-z -]{0,40})\s+for\s+"
+        r"(\d{1,6})\s+servings\.\s+scale\s+to\s+(\d{1,6})\s+servings\s+and\s+calculate\s+cost\s+"
+        r"at\s+\$(\d+(?:\.\d{1,2})?)\s+per\s+cup\.",
+        r"a\s+batch\s+serving\s+(\d{1,6})\s+uses\s+(\d{1,4})/(\d{1,4})\s+cup\s+of\s+"
+        r"([a-z][a-z -]{0,40})\.\s+find\s+amount\s+and\s+total\s+cost\s+for\s+(\d{1,6})\s+"
+        r"servings\s+at\s+\$(\d+(?:\.\d{1,2})?)\s+per\s+cup\.",
+    )
+    match = next((found for pattern in patterns if (found := re.fullmatch(pattern, text, re.IGNORECASE))), None)
+    if not match:
+        return None
+    if len(match.groups()) == 9:
+        numerator, denominator = int(match.group(1)), int(match.group(2))
+        source_count, target_count = int(match.group(5)), int(match.group(7))
+        price, unit = Fraction(match.group(8)), match.group(9).lower()
+        amount_unit = match.group(3).lower().rstrip("s")
+        if amount_unit != unit:
+            return None
+    elif text.casefold().startswith("for ") or text.casefold().startswith("a batch"):
+        source_count = int(match.group(1))
+        numerator, denominator = int(match.group(2)), int(match.group(3))
+        target_count, price, unit = int(match.group(5)), Fraction(match.group(6)), "cup"
+    else:
+        numerator, denominator = int(match.group(1)), int(match.group(2))
+        source_count, target_count = int(match.group(4)), int(match.group(5))
+        price, unit = Fraction(match.group(6)), "cup"
+    if denominator <= 0 or numerator < 0 or source_count <= 0 or target_count < 0 or price < 0:
+        return None
+    amount = Fraction(numerator, denominator) * target_count / source_count
+    cost = amount * price
+    return _result(
+        f"{_format_fraction(amount)} {unit}s; ${float(cost):.2f}",
+        "recipe_cost",
+        "fractional_recipe_scaling_and_unit_cost_proof",
+    )
 
 
 def _solve_percent_fee_math(task: TaskEnvelope) -> SolverResult | None:
@@ -521,7 +638,7 @@ def _solve_logic_ordering(task: TaskEnvelope) -> SolverResult | None:
         return None
     edges: list[tuple[str, str]] = []
     for left, relation, right in re.findall(
-        r"\b([A-Z][a-zA-Z'-]*)\s+is\s+(taller|older|heavier|larger|greater|shorter|younger|lighter|smaller)\s+than\s+([A-Z][a-zA-Z'-]*)\b",
+        r"\b([A-Z][a-zA-Z0-9'-]*)\s+is\s+(taller|older|heavier|larger|greater|shorter|younger|lighter|smaller)\s+than\s+([A-Z][a-zA-Z0-9'-]*)\b",
         text,
     ):
         if relation in {"taller", "older", "heavier", "larger", "greater"}:
@@ -1015,6 +1132,25 @@ def _format_number(value: float) -> str:
     if value.is_integer():
         return str(int(value))
     return str(value).rstrip("0").rstrip(".")
+
+
+def _format_fraction(value: Fraction) -> str:
+    if value.denominator == 1:
+        return str(value.numerator)
+    rendered = f"{float(value):.10f}".rstrip("0").rstrip(".")
+    return rendered
+
+
+def _apply_fraction_operator(left: Fraction, operator: str, right: Fraction) -> Fraction | None:
+    if operator == "+":
+        return left + right
+    if operator == "-":
+        return left - right
+    if operator == "*":
+        return left * right
+    if operator == "/" and right != 0:
+        return left / right
+    return None
 
 
 def _safe_integer_expression(value: str) -> int | None:
