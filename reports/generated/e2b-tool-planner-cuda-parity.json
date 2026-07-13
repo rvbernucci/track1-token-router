@@ -1,0 +1,237 @@
+{
+  "schema_version": "tool-planner-runtime-parity-v1",
+  "litert_sha256": "4cb9f8b9396e0e4262bf63ca269f95fd84d31306c5d7f09a422e88ed635e1a49",
+  "cuda_sha256": "4e2469bf754ff9f96ba887dc5ac716dcccbc4955f4d4ae90c804f68ce31e1a7b",
+  "common_tasks": 25,
+  "tool_agreement": 15,
+  "plan_agreement": 15,
+  "release_agreement": 17,
+  "answer_agreement": 17,
+  "rows": [
+    {
+      "id": "calculator_000",
+      "litert_tool": null,
+      "cuda_tool": null,
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "calculator_005",
+      "litert_tool": "safe_calculator",
+      "cuda_tool": null,
+      "tool_agreement": false,
+      "plan_agreement": false,
+      "release_agreement": false,
+      "answer_agreement": false
+    },
+    {
+      "id": "calculator_010",
+      "litert_tool": "safe_calculator",
+      "cuda_tool": null,
+      "tool_agreement": false,
+      "plan_agreement": false,
+      "release_agreement": false,
+      "answer_agreement": false
+    },
+    {
+      "id": "calculator_015",
+      "litert_tool": null,
+      "cuda_tool": null,
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "calculator_020",
+      "litert_tool": "safe_calculator",
+      "cuda_tool": null,
+      "tool_agreement": false,
+      "plan_agreement": false,
+      "release_agreement": false,
+      "answer_agreement": false
+    },
+    {
+      "id": "inventory_000",
+      "litert_tool": "inventory_flow",
+      "cuda_tool": "inventory_flow",
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "inventory_005",
+      "litert_tool": null,
+      "cuda_tool": "inventory_flow",
+      "tool_agreement": false,
+      "plan_agreement": false,
+      "release_agreement": false,
+      "answer_agreement": false
+    },
+    {
+      "id": "inventory_010",
+      "litert_tool": "inventory_flow",
+      "cuda_tool": "inventory_flow",
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "inventory_015",
+      "litert_tool": "inventory_flow",
+      "cuda_tool": "inventory_flow",
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "inventory_020",
+      "litert_tool": null,
+      "cuda_tool": "inventory_flow",
+      "tool_agreement": false,
+      "plan_agreement": false,
+      "release_agreement": false,
+      "answer_agreement": false
+    },
+    {
+      "id": "logic_000",
+      "litert_tool": "logic_ordering",
+      "cuda_tool": "logic_ordering",
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "logic_005",
+      "litert_tool": null,
+      "cuda_tool": null,
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "logic_010",
+      "litert_tool": null,
+      "cuda_tool": "logic_ordering",
+      "tool_agreement": false,
+      "plan_agreement": false,
+      "release_agreement": false,
+      "answer_agreement": false
+    },
+    {
+      "id": "logic_015",
+      "litert_tool": null,
+      "cuda_tool": "logic_ordering",
+      "tool_agreement": false,
+      "plan_agreement": false,
+      "release_agreement": false,
+      "answer_agreement": false
+    },
+    {
+      "id": "logic_020",
+      "litert_tool": null,
+      "cuda_tool": "logic_ordering",
+      "tool_agreement": false,
+      "plan_agreement": false,
+      "release_agreement": false,
+      "answer_agreement": false
+    },
+    {
+      "id": "none_000",
+      "litert_tool": "none",
+      "cuda_tool": "none",
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "none_005",
+      "litert_tool": null,
+      "cuda_tool": "none",
+      "tool_agreement": false,
+      "plan_agreement": false,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "none_010",
+      "litert_tool": "none",
+      "cuda_tool": "none",
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "none_015",
+      "litert_tool": "none",
+      "cuda_tool": "none",
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "none_020",
+      "litert_tool": "none",
+      "cuda_tool": null,
+      "tool_agreement": false,
+      "plan_agreement": false,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "recipe_000",
+      "litert_tool": "recipe_cost",
+      "cuda_tool": "recipe_cost",
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "recipe_005",
+      "litert_tool": null,
+      "cuda_tool": null,
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "recipe_010",
+      "litert_tool": null,
+      "cuda_tool": null,
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "recipe_015",
+      "litert_tool": "recipe_cost",
+      "cuda_tool": "recipe_cost",
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    },
+    {
+      "id": "recipe_020",
+      "litert_tool": null,
+      "cuda_tool": null,
+      "tool_agreement": true,
+      "plan_agreement": true,
+      "release_agreement": true,
+      "answer_agreement": true
+    }
+  ]
+}

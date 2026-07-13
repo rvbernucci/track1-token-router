@@ -1,0 +1,27 @@
+{
+  "schema_version": "e2b-tool-exact-image-decision-v1",
+  "decision": "retain",
+  "candidate_image_built": false,
+  "reason": "The experimental route failed LiteRT/CUDA parity and worst-case runtime gates before image promotion. Building a larger public image would not change those model-level results.",
+  "stable_image": "ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract",
+  "stable_image_digest": "sha256:7ae875639a6b13c8ef84514646b1b6e501da4ef8efd448479615f015239313d9",
+  "stable_image_status": "previously audited public linux/amd64 rollback",
+  "experimental_policy_enabled": false,
+  "official_constraints": {
+    "memory_limit_gib": 4,
+    "cpu_limit": 2,
+    "runtime_limit_seconds": 600,
+    "network_required_for_local_route": false,
+    "compressed_image_limit_gib": 10
+  },
+  "measured": {
+    "litert_mean_latency_ms": 8081.05,
+    "projected_100_candidate_tasks_seconds": 808.105,
+    "cuda_litert_release_agreement": "17/25",
+    "cuda_litert_answer_agreement": "17/25"
+  },
+  "failed_gates": [
+    "runtime equivalence",
+    "worst-case ten-minute envelope"
+  ]
+}

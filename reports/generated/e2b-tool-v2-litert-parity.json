@@ -1,0 +1,1493 @@
+{
+  "summary": {
+    "tasks": 25,
+    "schema_valid": 13,
+    "tool_correct": 13,
+    "exact_plan": 13,
+    "final_correct": 14,
+    "unsafe_false_positive": 0,
+    "mean_latency_ms": 8081.05,
+    "by_family": {
+      "calculator": {
+        "tasks": 5,
+        "final_correct": 3,
+        "accepted": 3,
+        "unsafe_false_positive": 0
+      },
+      "inventory": {
+        "tasks": 5,
+        "final_correct": 3,
+        "accepted": 3,
+        "unsafe_false_positive": 0
+      },
+      "logic": {
+        "tasks": 5,
+        "final_correct": 1,
+        "accepted": 1,
+        "unsafe_false_positive": 0
+      },
+      "none": {
+        "tasks": 5,
+        "final_correct": 5,
+        "accepted": 0,
+        "unsafe_false_positive": 0
+      },
+      "recipe": {
+        "tasks": 5,
+        "final_correct": 2,
+        "accepted": 2,
+        "unsafe_false_positive": 0
+      }
+    }
+  },
+  "rows": [
+    {
+      "id": "inventory_000",
+      "family": "inventory",
+      "difficulty": "easy",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "inventory_flow",
+        "arguments": {
+          "initial_stock": 500,
+          "operations": [
+            {
+              "type": "percent_sale",
+              "value": 5
+            },
+            {
+              "type": "restock",
+              "value": 40
+            },
+            {
+              "type": "sale",
+              "value": 10
+            }
+          ]
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "505 units",
+      "actual": {
+        "schema_version": "tool-plan-v2",
+        "tool": "inventory_flow",
+        "arguments": {
+          "initial_stock": 500,
+          "operations": [
+            {
+              "type": "percent_sale",
+              "value": 5
+            },
+            {
+              "type": "restock",
+              "value": 40
+            },
+            {
+              "type": "sale",
+              "value": 10
+            }
+          ]
+        },
+        "confidence": "high"
+      },
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"inventory_flow\",\n\"arguments\": {\n\"initial_stock\":500,\n\"operations\": [\n{\n\"type\": \"percent_sale\",\n\"value\":5\n},\n{\n\"type\": \"restock\",\n\"value\":40\n},\n{\n\"type\": \"sale\",\n\"value\":10\n}\n]\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": true,
+      "tool_correct": true,
+      "exact_plan": true,
+      "route": {
+        "accepted": true,
+        "answer": "505 units",
+        "reason": "verified_deterministic_tool",
+        "evidence": {
+          "schema_version": "tool-evidence-v1",
+          "tool": "inventory_flow",
+          "normalized_inputs": {
+            "initial_stock": 500,
+            "operations": [
+              {
+                "type": "percent_sale",
+                "value": 5
+              },
+              {
+                "type": "restock",
+                "value": 40
+              },
+              {
+                "type": "sale",
+                "value": 10
+              }
+            ]
+          },
+          "steps": [
+            "start=500",
+            "percent_sale(5)=475",
+            "restock(40)=515",
+            "sale(10)=505"
+          ],
+          "result": "505 units",
+          "proof_hash": "08e8d56f5dc5f00cc709e9f9b6028dfb7576f032a65423fbdba84b2dc9c831f3"
+        }
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "",
+      "latency_ms": 9505.9
+    },
+    {
+      "id": "inventory_005",
+      "family": "inventory",
+      "difficulty": "difficult",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "inventory_flow",
+        "arguments": {
+          "initial_stock": 685,
+          "operations": [
+            {
+              "type": "percent_sale",
+              "value": 30
+            },
+            {
+              "type": "restock",
+              "value": 55
+            },
+            {
+              "type": "sale",
+              "value": 20
+            }
+          ]
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "514.5 units",
+      "actual": null,
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"inventory_flow\",\n\"arguments\": {\n\"initial_stock\":685,\n\"operations\": [\n{\n\"type\": \"sale\",\n\"value\":30}\n},\n{\n\"type\": \"restock\",\n\"value\":55}\n},\n{\n\"type\": \"sale\",\n\"value\":20}\n]\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": false,
+      "tool_correct": false,
+      "exact_plan": false,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "tool_route_rejected:ValueError",
+        "evidence": null
+      },
+      "final_correct": false,
+      "unsafe_false_positive": false,
+      "error": "Tool plan must be one JSON object without wrappers.",
+      "latency_ms": 9386.97
+    },
+    {
+      "id": "inventory_010",
+      "family": "inventory",
+      "difficulty": "moderate",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "inventory_flow",
+        "arguments": {
+          "initial_stock": 870,
+          "operations": [
+            {
+              "type": "percent_sale",
+              "value": 10
+            },
+            {
+              "type": "restock",
+              "value": 70
+            },
+            {
+              "type": "sale",
+              "value": 30
+            }
+          ]
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "823 units",
+      "actual": {
+        "schema_version": "tool-plan-v2",
+        "tool": "inventory_flow",
+        "arguments": {
+          "initial_stock": 870,
+          "operations": [
+            {
+              "type": "percent_sale",
+              "value": 10
+            },
+            {
+              "type": "restock",
+              "value": 70
+            },
+            {
+              "type": "sale",
+              "value": 30
+            }
+          ]
+        },
+        "confidence": "high"
+      },
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"inventory_flow\",\n\"arguments\": {\n\"initial_stock\":870,\n\"operations\": [\n{\n\"type\": \"percent_sale\",\n\"value\":10\n},\n{\n\"type\": \"restock\",\n\"value\":70\n},\n{\n\"type\": \"sale\",\n\"value\":30\n}\n]\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": true,
+      "tool_correct": true,
+      "exact_plan": true,
+      "route": {
+        "accepted": true,
+        "answer": "823 units",
+        "reason": "verified_deterministic_tool",
+        "evidence": {
+          "schema_version": "tool-evidence-v1",
+          "tool": "inventory_flow",
+          "normalized_inputs": {
+            "initial_stock": 870,
+            "operations": [
+              {
+                "type": "percent_sale",
+                "value": 10
+              },
+              {
+                "type": "restock",
+                "value": 70
+              },
+              {
+                "type": "sale",
+                "value": 30
+              }
+            ]
+          },
+          "steps": [
+            "start=870",
+            "percent_sale(10)=783",
+            "restock(70)=853",
+            "sale(30)=823"
+          ],
+          "result": "823 units",
+          "proof_hash": "808612b2b83d2ed8f36737861167c508eeb3d30fd942bce6d175aa1bf779e6f4"
+        }
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "",
+      "latency_ms": 9405.03
+    },
+    {
+      "id": "inventory_015",
+      "family": "inventory",
+      "difficulty": "easy",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "inventory_flow",
+        "arguments": {
+          "initial_stock": 1055,
+          "operations": [
+            {
+              "type": "percent_sale",
+              "value": 35
+            },
+            {
+              "type": "restock",
+              "value": 85
+            },
+            {
+              "type": "sale",
+              "value": 40
+            }
+          ]
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "730.75 units",
+      "actual": {
+        "schema_version": "tool-plan-v2",
+        "tool": "inventory_flow",
+        "arguments": {
+          "initial_stock": 1055,
+          "operations": [
+            {
+              "type": "percent_sale",
+              "value": 35
+            },
+            {
+              "type": "restock",
+              "value": 85
+            },
+            {
+              "type": "sale",
+              "value": 40
+            }
+          ]
+        },
+        "confidence": "high"
+      },
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"inventory_flow\",\n\"arguments\": {\n\"initial_stock\":1055,\n\"operations\": [\n{\n\"type\": \"percent_sale\",\n\"value\":35\n},\n{\n\"type\": \"restock\",\n\"value\":85\n},\n{\n\"type\": \"sale\",\n\"value\":40\n}\n]\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": true,
+      "tool_correct": true,
+      "exact_plan": true,
+      "route": {
+        "accepted": true,
+        "answer": "730.75 units",
+        "reason": "verified_deterministic_tool",
+        "evidence": {
+          "schema_version": "tool-evidence-v1",
+          "tool": "inventory_flow",
+          "normalized_inputs": {
+            "initial_stock": 1055,
+            "operations": [
+              {
+                "type": "percent_sale",
+                "value": 35
+              },
+              {
+                "type": "restock",
+                "value": 85
+              },
+              {
+                "type": "sale",
+                "value": 40
+              }
+            ]
+          },
+          "steps": [
+            "start=1,055",
+            "percent_sale(35)=685.75",
+            "restock(85)=770.75",
+            "sale(40)=730.75"
+          ],
+          "result": "730.75 units",
+          "proof_hash": "a69ef605e55669f2c23331a3d3859a71b5ba6b069de01b9c431d81d270536f21"
+        }
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "",
+      "latency_ms": 9493.52
+    },
+    {
+      "id": "inventory_020",
+      "family": "inventory",
+      "difficulty": "difficult",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "inventory_flow",
+        "arguments": {
+          "initial_stock": 1240,
+          "operations": [
+            {
+              "type": "percent_sale",
+              "value": 15
+            },
+            {
+              "type": "restock",
+              "value": 100
+            },
+            {
+              "type": "sale",
+              "value": 50
+            }
+          ]
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "1,104 units",
+      "actual": null,
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"inventory_flow\",\n\"arguments\": {\n\"initial_stock\": 1240,\n\"operations\": [\n{\n\"type\": \"percent_sale\",\n\"value\": 0.15\n},\n{\n\"type\": \"restock\",\n\"value\": 100\n},\n{\n\"type\": \"sale\",\n\"value\": 50\n}\n]\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": false,
+      "tool_correct": false,
+      "exact_plan": false,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "tool_route_rejected:ValueError",
+        "evidence": null
+      },
+      "final_correct": false,
+      "unsafe_false_positive": false,
+      "error": "Tool plan contains a number that is absent from the task.",
+      "latency_ms": 9732.87
+    },
+    {
+      "id": "recipe_000",
+      "family": "recipe",
+      "difficulty": "easy",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "recipe_cost",
+        "arguments": {
+          "amount_numerator": 1,
+          "amount_denominator": 2,
+          "source_count": 4,
+          "target_count": 6,
+          "unit_price": 1.25
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "0.75 cups; $0.94",
+      "actual": {
+        "schema_version": "tool-plan-v2",
+        "tool": "recipe_cost",
+        "arguments": {
+          "amount_numerator": 1,
+          "amount_denominator": 2,
+          "source_count": 4,
+          "target_count": 6,
+          "unit_price": 1.25
+        },
+        "confidence": "high"
+      },
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"recipe_cost\",\n\"arguments\": {\n\"amount_numerator\":1,\n\"amount_denominator\":2,\n\"source_count\":4,\n\"target_count\":6,\n\"unit_price\":1.25\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": true,
+      "tool_correct": true,
+      "exact_plan": true,
+      "route": {
+        "accepted": true,
+        "answer": "0.75 cups; $0.94",
+        "reason": "verified_deterministic_tool",
+        "evidence": {
+          "schema_version": "tool-evidence-v1",
+          "tool": "recipe_cost",
+          "normalized_inputs": {
+            "amount_denominator": 2,
+            "amount_numerator": 1,
+            "source_count": 4,
+            "target_count": 6,
+            "unit_price": 1.25
+          },
+          "steps": [
+            "base=1/2",
+            "scale=6/4",
+            "amount=0.75",
+            "cost=0.9375"
+          ],
+          "result": "0.75 cups; $0.94",
+          "proof_hash": "a77aad25fa6077e4971717162b894ee6dbc940ed7c8c64aed01df193f017a1fe"
+        }
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "",
+      "latency_ms": 8178.19
+    },
+    {
+      "id": "recipe_005",
+      "family": "recipe",
+      "difficulty": "difficult",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "recipe_cost",
+        "arguments": {
+          "amount_numerator": 2,
+          "amount_denominator": 2,
+          "source_count": 9,
+          "target_count": 16,
+          "unit_price": 2.5
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "1.7777777778 cups; $4.44",
+      "actual": null,
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"recipe_cost\",\n\"arguments\": {\n\"amount_numerator\":16,\n\"amount_denominator\":9,\n\"source_count\":2,\n\"target_count\":16,\n\"unit_price\":2.50\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": false,
+      "tool_correct": false,
+      "exact_plan": false,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "tool_route_rejected:ValueError",
+        "evidence": null
+      },
+      "final_correct": false,
+      "unsafe_false_positive": false,
+      "error": "Recipe fraction roles are not grounded.",
+      "latency_ms": 8393.69
+    },
+    {
+      "id": "recipe_010",
+      "family": "recipe",
+      "difficulty": "moderate",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "recipe_cost",
+        "arguments": {
+          "amount_numerator": 1,
+          "amount_denominator": 2,
+          "source_count": 14,
+          "target_count": 26,
+          "unit_price": 3.75
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "0.9285714286 cups; $3.48",
+      "actual": null,
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"recipe_cost\",\n\"arguments\": {\n\"amount_numerator\": 14,\n\"amount_denominator\": 2,\n\"source_count\": 1,\n\"target_count\": 14,\n\"unit_price\": 3.75\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": false,
+      "tool_correct": false,
+      "exact_plan": false,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "tool_route_rejected:ValueError",
+        "evidence": null
+      },
+      "final_correct": false,
+      "unsafe_false_positive": false,
+      "error": "Recipe fraction roles are not grounded.",
+      "latency_ms": 8659.66
+    },
+    {
+      "id": "recipe_015",
+      "family": "recipe",
+      "difficulty": "easy",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "recipe_cost",
+        "arguments": {
+          "amount_numerator": 2,
+          "amount_denominator": 2,
+          "source_count": 6,
+          "target_count": 23,
+          "unit_price": 5.0
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "3.8333333333 cups; $19.17",
+      "actual": {
+        "schema_version": "tool-plan-v2",
+        "tool": "recipe_cost",
+        "arguments": {
+          "amount_numerator": 2,
+          "amount_denominator": 2,
+          "source_count": 6,
+          "target_count": 23,
+          "unit_price": 5.0
+        },
+        "confidence": "high"
+      },
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"recipe_cost\",\n\"arguments\": {\n\"amount_numerator\": 2,\n\"amount_denominator\": 2,\n\"source_count\": 6,\n\"target_count\": 23,\n\"unit_price\": 5.00\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": true,
+      "tool_correct": true,
+      "exact_plan": true,
+      "route": {
+        "accepted": true,
+        "answer": "3.8333333333 cups; $19.17",
+        "reason": "verified_deterministic_tool",
+        "evidence": {
+          "schema_version": "tool-evidence-v1",
+          "tool": "recipe_cost",
+          "normalized_inputs": {
+            "amount_denominator": 2,
+            "amount_numerator": 2,
+            "source_count": 6,
+            "target_count": 23,
+            "unit_price": 5.0
+          },
+          "steps": [
+            "base=2/2",
+            "scale=23/6",
+            "amount=3.8333333333",
+            "cost=19.1666666667"
+          ],
+          "result": "3.8333333333 cups; $19.17",
+          "proof_hash": "94c79eac17a07166ec036122bbb033a26a816b3bffee1b2b94059d1a56937ade"
+        }
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "",
+      "latency_ms": 8525.06
+    },
+    {
+      "id": "recipe_020",
+      "family": "recipe",
+      "difficulty": "difficult",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "recipe_cost",
+        "arguments": {
+          "amount_numerator": 1,
+          "amount_denominator": 2,
+          "source_count": 11,
+          "target_count": 14,
+          "unit_price": 2.0
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "0.6363636364 cups; $1.27",
+      "actual": null,
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"recipe_cost\",\n\"arguments\": {\n\"amount_numerator\":14,\n\"amount_denominator\":2,\n\"source_count\":1,\n\"target_count\":1,\n\"unit_price\":2.00\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": false,
+      "tool_correct": false,
+      "exact_plan": false,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "tool_route_rejected:ValueError",
+        "evidence": null
+      },
+      "final_correct": false,
+      "unsafe_false_positive": false,
+      "error": "Recipe fraction roles are not grounded.",
+      "latency_ms": 8316.79
+    },
+    {
+      "id": "calculator_000",
+      "family": "calculator",
+      "difficulty": "easy",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "safe_calculator",
+        "arguments": {
+          "ast": {
+            "op": "mul",
+            "left": {
+              "op": "add",
+              "left": {
+                "op": "literal",
+                "value": 10
+              },
+              "right": {
+                "op": "literal",
+                "value": 2
+              }
+            },
+            "right": {
+              "op": "literal",
+              "value": 1
+            }
+          }
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "12",
+      "actual": null,
+      "raw": "{\"schema_version\":\"tool-plan-v2\",\"tool\":\"safe_calculator\",\"arguments\":{\"ast\":[{\"op\":\"add\",\"left\":{\"op\":\"literal\",\"value\":10},\"right\":{\"op\":\"literal\",\"value\":2}},{\"op\":\"mul\",\"left\":{\"op\":\"literal\",\"value\":10,\"right\":{\"op\":\"literal\",\"value\":2}},\"right\":{\"op\":\"literal\",\"value\":1}}],}, \"confidence\":\"high\"}",
+      "schema_valid": false,
+      "tool_correct": false,
+      "exact_plan": false,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "tool_route_rejected:ValueError",
+        "evidence": null
+      },
+      "final_correct": false,
+      "unsafe_false_positive": false,
+      "error": "Tool plan must be one JSON object without wrappers.",
+      "latency_ms": 8382.35
+    },
+    {
+      "id": "calculator_005",
+      "family": "calculator",
+      "difficulty": "difficult",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "safe_calculator",
+        "arguments": {
+          "ast": {
+            "op": "div",
+            "left": {
+              "op": "mul",
+              "left": {
+                "op": "literal",
+                "value": 15
+              },
+              "right": {
+                "op": "literal",
+                "value": 7
+              }
+            },
+            "right": {
+              "op": "literal",
+              "value": 6
+            }
+          }
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "17.5",
+      "actual": {
+        "schema_version": "tool-plan-v2",
+        "tool": "safe_calculator",
+        "arguments": {
+          "ast": {
+            "op": "div",
+            "left": {
+              "op": "mul",
+              "left": {
+                "op": "literal",
+                "value": 15
+              },
+              "right": {
+                "op": "literal",
+                "value": 7
+              }
+            },
+            "right": {
+              "op": "literal",
+              "value": 6
+            }
+          }
+        },
+        "confidence": "high"
+      },
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"safe_calculator\",\n\"arguments\": {\n\"ast\": {\n\"op\": \"div\",\n\"left\": {\n\"op\": \"mul\",\n\"left\": {\n\"op\": \"literal\",\n\"value\": 15\n},\n\"right\": {\n\"op\": \"literal\",\n\"value\": 7\n}\n},\n\"right\": {\n\"op\": \"literal\",\n\"value\": 6\n}\n}\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": true,
+      "tool_correct": true,
+      "exact_plan": true,
+      "route": {
+        "accepted": true,
+        "answer": "17.5",
+        "reason": "verified_deterministic_tool",
+        "evidence": {
+          "schema_version": "tool-evidence-v1",
+          "tool": "safe_calculator",
+          "normalized_inputs": {
+            "ast": {
+              "left": {
+                "left": {
+                  "op": "literal",
+                  "value": 15
+                },
+                "op": "mul",
+                "right": {
+                  "op": "literal",
+                  "value": 7
+                }
+              },
+              "op": "div",
+              "right": {
+                "op": "literal",
+                "value": 6
+              }
+            }
+          },
+          "steps": [
+            "literal=15",
+            "literal=7",
+            "mul(15,7)=105",
+            "literal=6",
+            "div(105,6)=17.5"
+          ],
+          "result": "17.5",
+          "proof_hash": "48596b69ececfd5ad1e39a33c2680a0292464b14358be1d1acdd86bd5b631d4e"
+        }
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "",
+      "latency_ms": 10197.15
+    },
+    {
+      "id": "calculator_010",
+      "family": "calculator",
+      "difficulty": "moderate",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "safe_calculator",
+        "arguments": {
+          "ast": {
+            "op": "add",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "literal",
+                "value": 20
+              },
+              "right": {
+                "op": "literal",
+                "value": 12
+              }
+            },
+            "right": {
+              "op": "literal",
+              "value": 4
+            }
+          }
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "12",
+      "actual": {
+        "schema_version": "tool-plan-v2",
+        "tool": "safe_calculator",
+        "arguments": {
+          "ast": {
+            "op": "add",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "literal",
+                "value": 20
+              },
+              "right": {
+                "op": "literal",
+                "value": 12
+              }
+            },
+            "right": {
+              "op": "literal",
+              "value": 4
+            }
+          }
+        },
+        "confidence": "high"
+      },
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"safe_calculator\",\n\"arguments\": {\n\"ast\": {\n\"op\": \"add\",\n\"left\": {\n\"op\": \"sub\",\n\"left\": {\n\"op\": \"literal\",\n\"value\": 20\n},\n\"right\": {\n\"op\": \"literal\",\n\"value\": 12\n}\n},\n\"right\": {\n\"op\": \"literal\",\n\"value\": 4\n}\n}\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": true,
+      "tool_correct": true,
+      "exact_plan": true,
+      "route": {
+        "accepted": true,
+        "answer": "12",
+        "reason": "verified_deterministic_tool",
+        "evidence": {
+          "schema_version": "tool-evidence-v1",
+          "tool": "safe_calculator",
+          "normalized_inputs": {
+            "ast": {
+              "left": {
+                "left": {
+                  "op": "literal",
+                  "value": 20
+                },
+                "op": "sub",
+                "right": {
+                  "op": "literal",
+                  "value": 12
+                }
+              },
+              "op": "add",
+              "right": {
+                "op": "literal",
+                "value": 4
+              }
+            }
+          },
+          "steps": [
+            "literal=20",
+            "literal=12",
+            "sub(20,12)=8",
+            "literal=4",
+            "add(8,4)=12"
+          ],
+          "result": "12",
+          "proof_hash": "d9040f94b75969e0da10533f04e3ecaa1825a4359a63a421575a3ecaa9b782e0"
+        }
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "",
+      "latency_ms": 10168.73
+    },
+    {
+      "id": "calculator_015",
+      "family": "calculator",
+      "difficulty": "easy",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "safe_calculator",
+        "arguments": {
+          "ast": {
+            "op": "mul",
+            "left": {
+              "op": "add",
+              "left": {
+                "op": "literal",
+                "value": 25
+              },
+              "right": {
+                "op": "literal",
+                "value": 6
+              }
+            },
+            "right": {
+              "op": "literal",
+              "value": 2
+            }
+          }
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "62",
+      "actual": null,
+      "raw": "{\"schema_version\":\"tool-plan-v2\",\"tool\":\"safe_calculator\",\"arguments\":{\"ast\":[{\"op\":\"add\",\"left\":{\"op\":\"literal\",\"value\":25},\"right\":{\"op\":\"literal\",\"value\":6}},{\"op\":\"mul\",\"left\":{\"op\":\"literal\",\"value\":31},\"right\":{\"op\":\"literal\",\"value\":2}}]},\"confidence\":\"high\"}",
+      "schema_valid": false,
+      "tool_correct": false,
+      "exact_plan": false,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "tool_route_rejected:ValueError",
+        "evidence": null
+      },
+      "final_correct": false,
+      "unsafe_false_positive": false,
+      "error": "Arithmetic AST exceeds its safety bounds.",
+      "latency_ms": 8100.68
+    },
+    {
+      "id": "calculator_020",
+      "family": "calculator",
+      "difficulty": "difficult",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "safe_calculator",
+        "arguments": {
+          "ast": {
+            "op": "div",
+            "left": {
+              "op": "mul",
+              "left": {
+                "op": "literal",
+                "value": 30
+              },
+              "right": {
+                "op": "literal",
+                "value": 11
+              }
+            },
+            "right": {
+              "op": "literal",
+              "value": 7
+            }
+          }
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "47.1428571429",
+      "actual": {
+        "schema_version": "tool-plan-v2",
+        "tool": "safe_calculator",
+        "arguments": {
+          "ast": {
+            "op": "div",
+            "left": {
+              "op": "mul",
+              "left": {
+                "op": "literal",
+                "value": 30
+              },
+              "right": {
+                "op": "literal",
+                "value": 11
+              }
+            },
+            "right": {
+              "op": "literal",
+              "value": 7
+            }
+          }
+        },
+        "confidence": "high"
+      },
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"safe_calculator\",\n\"arguments\": {\n\"ast\": {\n\"op\": \"div\",\n\"left\": {\n\"op\": \"mul\",\n\"left\": {\n\"op\": \"literal\",\n\"value\": 30\n},\n\"right\": {\n\"op\": \"literal\",\n\"value\": 11\n}\n},\n\"right\": {\n\"op\": \"literal\",\n\"value\": 7\n}\n}\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": true,
+      "tool_correct": true,
+      "exact_plan": true,
+      "route": {
+        "accepted": true,
+        "answer": "47.1428571429",
+        "reason": "verified_deterministic_tool",
+        "evidence": {
+          "schema_version": "tool-evidence-v1",
+          "tool": "safe_calculator",
+          "normalized_inputs": {
+            "ast": {
+              "left": {
+                "left": {
+                  "op": "literal",
+                  "value": 30
+                },
+                "op": "mul",
+                "right": {
+                  "op": "literal",
+                  "value": 11
+                }
+              },
+              "op": "div",
+              "right": {
+                "op": "literal",
+                "value": 7
+              }
+            }
+          },
+          "steps": [
+            "literal=30",
+            "literal=11",
+            "mul(30,11)=330",
+            "literal=7",
+            "div(330,7)=47.1428571429"
+          ],
+          "result": "47.1428571429",
+          "proof_hash": "f9de39393a70fa8f8878a6adc0a4ca58f006a60db2129cf32e73c09a8807c403"
+        }
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "",
+      "latency_ms": 10139.59
+    },
+    {
+      "id": "logic_000",
+      "family": "logic",
+      "difficulty": "easy",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "logic_ordering",
+        "arguments": {
+          "relations": [
+            {
+              "left": "Person0A",
+              "relation": "greater_than",
+              "right": "Person0B"
+            },
+            {
+              "left": "Person0B",
+              "relation": "greater_than",
+              "right": "Person0C"
+            },
+            {
+              "left": "Person0C",
+              "relation": "greater_than",
+              "right": "Person0D"
+            }
+          ],
+          "query": "shortest"
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "Person0D",
+      "actual": {
+        "schema_version": "tool-plan-v2",
+        "tool": "logic_ordering",
+        "arguments": {
+          "relations": [
+            {
+              "left": "Person0A",
+              "relation": "greater_than",
+              "right": "Person0B"
+            },
+            {
+              "left": "Person0B",
+              "relation": "greater_than",
+              "right": "Person0C"
+            },
+            {
+              "left": "Person0C",
+              "relation": "greater_than",
+              "right": "Person0D"
+            }
+          ],
+          "query": "shortest"
+        },
+        "confidence": "high"
+      },
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"logic_ordering\",\n\"arguments\": {\n\"relations\": [\n{\n\"left\": \"Person0A\",\n\"relation\": \"greater_than\",\n\"right\": \"Person0B\"\n},\n{\n\"left\": \"Person0B\",\n\"relation\": \"greater_than\",\n\"right\": \"Person0C\"\n},\n{\n\"left\": \"Person0C\",\n\"relation\": \"greater_than\",\n\"right\": \"Person0D\"\n}\n],\n\"query\": \"shortest\"\n},\n\"confidence\": \"high\"\n}\n```",
+      "schema_valid": true,
+      "tool_correct": true,
+      "exact_plan": true,
+      "route": {
+        "accepted": true,
+        "answer": "Person0D",
+        "reason": "verified_deterministic_tool",
+        "evidence": {
+          "schema_version": "tool-evidence-v1",
+          "tool": "logic_ordering",
+          "normalized_inputs": {
+            "query": "shortest",
+            "relations": [
+              {
+                "left": "Person0A",
+                "relation": "greater_than",
+                "right": "Person0B"
+              },
+              {
+                "left": "Person0B",
+                "relation": "greater_than",
+                "right": "Person0C"
+              },
+              {
+                "left": "Person0C",
+                "relation": "greater_than",
+                "right": "Person0D"
+              }
+            ]
+          },
+          "steps": [
+            "Person0A>Person0B",
+            "Person0B>Person0C",
+            "Person0C>Person0D",
+            "shortest=Person0D"
+          ],
+          "result": "Person0D",
+          "proof_hash": "709db75329a5f1ebbc0095c80b8f34ffa8c77284158c7e84d6b0c786c1b9fa6e"
+        }
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "",
+      "latency_ms": 10812.98
+    },
+    {
+      "id": "logic_005",
+      "family": "logic",
+      "difficulty": "difficult",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "logic_ordering",
+        "arguments": {
+          "relations": [
+            {
+              "left": "Person5A",
+              "relation": "greater_than",
+              "right": "Person5B"
+            },
+            {
+              "left": "Person5B",
+              "relation": "greater_than",
+              "right": "Person5C"
+            },
+            {
+              "left": "Person5C",
+              "relation": "greater_than",
+              "right": "Person5D"
+            }
+          ],
+          "query": "tallest"
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "Person5A",
+      "actual": null,
+      "raw": "{\"schema_version\":\"tool-plan-v2\",\"tool\":\"logic_ordering\",\"arguments\":{},\"confidence\":\"high\"}",
+      "schema_valid": false,
+      "tool_correct": false,
+      "exact_plan": false,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "tool_route_rejected:ValueError",
+        "evidence": null
+      },
+      "final_correct": false,
+      "unsafe_false_positive": false,
+      "error": "Tool arguments do not match the required schema.",
+      "latency_ms": 5933.98
+    },
+    {
+      "id": "logic_010",
+      "family": "logic",
+      "difficulty": "moderate",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "logic_ordering",
+        "arguments": {
+          "relations": [
+            {
+              "left": "Person10A",
+              "relation": "greater_than",
+              "right": "Person10B"
+            },
+            {
+              "left": "Person10B",
+              "relation": "greater_than",
+              "right": "Person10C"
+            },
+            {
+              "left": "Person10C",
+              "relation": "greater_than",
+              "right": "Person10D"
+            }
+          ],
+          "query": "shortest"
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "Person10D",
+      "actual": null,
+      "raw": "{\"schema_version\":\"tool-plan-v2\",\"tool\":\"logic_ordering\",\"arguments\":{},\"confidence\":\"high\"}",
+      "schema_valid": false,
+      "tool_correct": false,
+      "exact_plan": false,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "tool_route_rejected:ValueError",
+        "evidence": null
+      },
+      "final_correct": false,
+      "unsafe_false_positive": false,
+      "error": "Tool arguments do not match the required schema.",
+      "latency_ms": 5776.8
+    },
+    {
+      "id": "logic_015",
+      "family": "logic",
+      "difficulty": "easy",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "logic_ordering",
+        "arguments": {
+          "relations": [
+            {
+              "left": "Person15A",
+              "relation": "greater_than",
+              "right": "Person15B"
+            },
+            {
+              "left": "Person15B",
+              "relation": "greater_than",
+              "right": "Person15C"
+            },
+            {
+              "left": "Person15C",
+              "relation": "greater_than",
+              "right": "Person15D"
+            }
+          ],
+          "query": "tallest"
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "Person15A",
+      "actual": null,
+      "raw": "{\"schema_version\":\"tool-plan-v2\",\"tool\":\"logic_ordering\",\"arguments\":{},\"confidence\":\"high\"}",
+      "schema_valid": false,
+      "tool_correct": false,
+      "exact_plan": false,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "tool_route_rejected:ValueError",
+        "evidence": null
+      },
+      "final_correct": false,
+      "unsafe_false_positive": false,
+      "error": "Tool arguments do not match the required schema.",
+      "latency_ms": 5728.65
+    },
+    {
+      "id": "logic_020",
+      "family": "logic",
+      "difficulty": "difficult",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "logic_ordering",
+        "arguments": {
+          "relations": [
+            {
+              "left": "Person20A",
+              "relation": "greater_than",
+              "right": "Person20B"
+            },
+            {
+              "left": "Person20B",
+              "relation": "greater_than",
+              "right": "Person20C"
+            },
+            {
+              "left": "Person20C",
+              "relation": "greater_than",
+              "right": "Person20D"
+            }
+          ],
+          "query": "shortest"
+        },
+        "confidence": "high"
+      },
+      "expected_answer": "Person20D",
+      "actual": null,
+      "raw": "{\"schema_version\":\"tool-plan-v2\",\"tool\":\"logic_ordering\",\"arguments\":{\"relations\":[{\"left\":\"Person20A\",\"relation\":\"greater_than\",\"right\":\"Person20B\"},{\"left\":\"Person20B\",\"relation\":\"greater_than\",\"right\":\"Person20C\"},{\"left\":\"Person20C\",\"relation\":\"greater_than\",\"right\":\"Person20D\"}],\"query\":\"shortest\"}}\n",
+      "schema_valid": false,
+      "tool_correct": false,
+      "exact_plan": false,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "tool_route_rejected:ValueError",
+        "evidence": null
+      },
+      "final_correct": false,
+      "unsafe_false_positive": false,
+      "error": "Tool plan has an invalid top-level schema.",
+      "latency_ms": 8102.51
+    },
+    {
+      "id": "none_000",
+      "family": "none",
+      "difficulty": "easy",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "none",
+        "arguments": {},
+        "confidence": "low"
+      },
+      "expected_answer": "",
+      "actual": {
+        "schema_version": "tool-plan-v2",
+        "tool": "none",
+        "arguments": {},
+        "confidence": "low"
+      },
+      "raw": "{\"schema_version\":\"tool-plan-v2\",\"tool\":\"none\",\"arguments\":{},\"confidence\":\"low\"}",
+      "schema_valid": true,
+      "tool_correct": true,
+      "exact_plan": true,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "planner_selected_none",
+        "evidence": null
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "",
+      "latency_ms": 5698.54
+    },
+    {
+      "id": "none_005",
+      "family": "none",
+      "difficulty": "difficult",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "none",
+        "arguments": {},
+        "confidence": "low"
+      },
+      "expected_answer": "",
+      "actual": null,
+      "raw": "{\"schema_version\":\"tool-plan-v2\",\"tool\":\"recipe_cost\",\"arguments\":{},\"confidence\":\"low\"}",
+      "schema_valid": false,
+      "tool_correct": false,
+      "exact_plan": false,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "tool_route_rejected:ValueError",
+        "evidence": null
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "Executable tool plans require high confidence.",
+      "latency_ms": 5730.51
+    },
+    {
+      "id": "none_010",
+      "family": "none",
+      "difficulty": "moderate",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "none",
+        "arguments": {},
+        "confidence": "low"
+      },
+      "expected_answer": "",
+      "actual": {
+        "schema_version": "tool-plan-v2",
+        "tool": "none",
+        "arguments": {},
+        "confidence": "low"
+      },
+      "raw": "{\"schema_version\":\"tool-plan-v2\",\"tool\":\"none\",\"arguments\":{},\"confidence\":\"low\"}",
+      "schema_valid": true,
+      "tool_correct": true,
+      "exact_plan": true,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "planner_selected_none",
+        "evidence": null
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "",
+      "latency_ms": 5681.55
+    },
+    {
+      "id": "none_015",
+      "family": "none",
+      "difficulty": "easy",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "none",
+        "arguments": {},
+        "confidence": "low"
+      },
+      "expected_answer": "",
+      "actual": {
+        "schema_version": "tool-plan-v2",
+        "tool": "none",
+        "arguments": {},
+        "confidence": "low"
+      },
+      "raw": "{\"schema_version\":\"tool-plan-v2\",\"tool\":\"none\",\"arguments\":{},\"confidence\":\"low\"}",
+      "schema_valid": true,
+      "tool_correct": true,
+      "exact_plan": true,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "planner_selected_none",
+        "evidence": null
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "",
+      "latency_ms": 5651.75
+    },
+    {
+      "id": "none_020",
+      "family": "none",
+      "difficulty": "difficult",
+      "split": "sealed",
+      "expected": {
+        "schema_version": "tool-plan-v2",
+        "tool": "none",
+        "arguments": {},
+        "confidence": "low"
+      },
+      "expected_answer": "",
+      "actual": {
+        "schema_version": "tool-plan-v2",
+        "tool": "none",
+        "arguments": {},
+        "confidence": "low"
+      },
+      "raw": "```json\n{\n\"schema_version\": \"tool-plan-v2\",\n\"tool\": \"none\",\n\"arguments\": {},\n\"confidence\": \"low\"\n}\n```",
+      "schema_valid": true,
+      "tool_correct": true,
+      "exact_plan": true,
+      "route": {
+        "accepted": false,
+        "answer": "",
+        "reason": "planner_selected_none",
+        "evidence": null
+      },
+      "final_correct": true,
+      "unsafe_false_positive": false,
+      "error": "",
+      "latency_ms": 6322.77
+    }
+  ]
+}

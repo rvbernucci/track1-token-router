@@ -1,0 +1,24 @@
+{
+  "schema_version": "e2b-tool-policy-v1",
+  "enabled": false,
+  "decision": "retain_stable_runtime",
+  "planner_prompt_version": "e2b-tool-planner-v2",
+  "tool_plan_schema_version": "tool-plan-v2",
+  "promoted_tools": [],
+  "rejected_tools": {
+    "inventory_flow": "runtime parity 3/5",
+    "recipe_cost": "sealed support 4/20 and insufficient Wilson bound",
+    "safe_calculator": "sealed support 2/20 and runtime parity 2/5",
+    "logic_ordering": "sealed support 14/20, Wilson lower bound below 85%, runtime parity 2/5"
+  },
+  "fallback": "fireworks",
+  "stable_image": "ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract",
+  "stable_image_digest": "sha256:7ae875639a6b13c8ef84514646b1b6e501da4ef8efd448479615f015239313d9",
+  "evidence": {
+    "corpus_sha256": "f8052ef5148e133e24d109506194e2cc49be57be9f18bed8d6c65a029ffdd4f9",
+    "cuda_sealed_sha256": "4e2469bf754ff9f96ba887dc5ac716dcccbc4955f4d4ae90c804f68ce31e1a7b",
+    "litert_parity_sha256": "4cb9f8b9396e0e4262bf63ca269f95fd84d31306c5d7f09a422e88ed635e1a49",
+    "executor_audit_sha256": "ef8992f3d41ecd6108367ad9f42cca50ac2b1ada7814c0b67cbc4f9e63dea950",
+    "runtime_parity_sha256": "2005f34691e38e159174bd8e3f5a17fded14a431e657a30182c7b9418bbe9668"
+  }
+}
