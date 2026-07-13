@@ -25,7 +25,7 @@ Proof-carrying deterministic solver
 -> Answer Contract Engine
 ```
 
-The current recommended public image is `ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry`. It embeds separate SHA-pinned FunctionGemma assessment and planner Q8 artifacts plus Gemma E2B and requires no model downloads during evaluation. `v3.12.1-no-hardcoded-startup-sla` is the immediate rollback; `v3.7.3-public-sample` remains the officially scored rollback.
+The final submitted and scored public image is `ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry`. It embeds separate SHA-pinned FunctionGemma assessment and planner Q8 artifacts plus Gemma E2B and requires no model downloads during evaluation. The official result was 94.7% accuracy (18/19) with 3,051 Fireworks tokens. `v3.12.1-no-hardcoded-startup-sla` is the immediate rollback; `v3.7.3-public-sample` is retained as a historical scored baseline.
 
 ## Evaluator Variables
 
@@ -48,4 +48,4 @@ Every local stage fails closed to an authorized Fireworks model. The system neve
 
 ## Rollback
 
-The immediate rollback is `ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla`. The officially scored rollback is `ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample`; the compact emergency rollback remains `v2.1.0-proof-router`. Rollback requires changing only the Docker Image field.
+The immediate rollback is `ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla`. The historical scored baseline is `ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample`; the compact emergency rollback remains `v2.1.0-proof-router`. Rollback requires changing only the Docker Image field.

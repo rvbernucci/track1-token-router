@@ -1,13 +1,13 @@
 {
   "artifacts": {
-    "submission/final/README.md": 768,
+    "submission/final/README.md": 1206,
     "submission/final/cover.png": 54732,
     "submission/final/demo.mp4": 195503,
-    "submission/final/lablab-submit-fields.md": 3004,
+    "submission/final/lablab-submit-fields.md": 3361,
     "submission/final/slides.pdf": 4458,
     "submission/final/speaker-notes.md": 1683,
-    "submission/final/video-placeholder-approved.md": 178
+    "submission/final/video-placeholder-approved.md": 234
   },
-  "notes": "Generated submission artifacts. Replace visuals before final submission if a designed deck/cover is available.",
+  "notes": "Generated reference artifacts plus final designed presentation and video. Documentation updated after scoring; submitted code and Docker image unchanged.",
   "slides": 10
 }

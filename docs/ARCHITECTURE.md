@@ -4,7 +4,7 @@ Updated: 2026-07-13
 
 ## Final Runtime
 
-The current recommended image is `ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry` (`linux/amd64`). It embeds three local artifacts and performs no startup download. `v3.12.1-no-hardcoded-startup-sla` is the immediate rollback and `v3.7.3-public-sample` remains the officially scored rollback.
+The final submitted and scored image is `ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry` (`linux/amd64`). It embeds three local artifacts and performs no startup download. `v3.12.1-no-hardcoded-startup-sla` is the immediate rollback and `v3.7.3-public-sample` is retained as a historical scored baseline.
 
 ```text
 /input/tasks.json
@@ -62,7 +62,7 @@ The Wilson-Nash guard is scoped to the exact v2 decision surface. It cannot tran
 
 ## Fireworks Route
 
-The current validation policy is Kimi K2.7 Code by default and MiniMax M3 for logic puzzles, sentiment and summarization. It is a preference, never an authorization override. If the preferred model is absent, the runtime uses only another model present in `ALLOWED_MODELS`.
+The final validation policy is Kimi K2.7 Code by default and MiniMax M3 only for logic puzzles. It is a preference, never an authorization override. If the preferred model is absent, the runtime uses only another model present in `ALLOWED_MODELS`.
 
 | Policy | Valid | Tokens |
 | --- | ---: | ---: |
@@ -89,7 +89,7 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 
 ## Delivery Proof
 
-- Recommended image: `v3.12.3-proof-pull-retry`
+- Final submitted image: `v3.12.3-proof-pull-retry`
 - OCI manifest digest: `sha256:ec0d62c4c08489e8b8f06abf26087d1c1bfa43128d330b591f8588976b333c59`
 - Platform digest: `sha256:782f1266a5b1e74f5adca9d7ebef21f1bb576f0c5ab81990965660a08c089c5e`
 - Compressed size: 2,938,881,530 bytes
@@ -97,7 +97,8 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 - Release and exact published-image gate: `29247825641`
 - Exact-image cold-start smoke: 5 seconds (60-second gate)
 - Clean-pull local inference: 16.221 s cold, 1.461 s warm, 1,299.456 MiB sampled peak
-- Officially scored rollback image: `v3.7.3-public-sample` (84.2% accuracy, 4,198 Fireworks tokens)
+- Official final score: 94.7% accuracy (18/19), 3,051 Fireworks tokens
+- Historical scored baseline: `v3.7.3-public-sample` (84.2% accuracy, 4,198 Fireworks tokens)
 - Compact rollback: `v2.1.0-proof-router`
 
 ## Evidence Boundaries

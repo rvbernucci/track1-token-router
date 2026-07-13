@@ -54,7 +54,9 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-`v3.12.3-proof-pull-retry` is the current recommended championship candidate. It runs proof-carrying solvers before model assessment, enforces an absolute 28-second Fireworks deadline, rejects non-standard or duplicate-key JSON, contains no factual-answer lookup table, and expands one mechanically proven inventory grammar. Release run `29247825641` passed clean public pull, exact published-image execution, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract, cold-start and OCI-label gates. `v3.12.1-no-hardcoded-startup-sla` is the immediate rollback; `v3.7.3-public-sample` remains the scored rollback with 84.2% official accuracy and 4,198 Fireworks tokens.
+`v3.12.3-proof-pull-retry` is the final submitted and scored image. It achieved **94.7% accuracy (18/19)** with **3,051 scored Fireworks tokens**. It runs proof-carrying solvers before model assessment, enforces an absolute 28-second Fireworks deadline, rejects non-standard or duplicate-key JSON, contains no factual-answer lookup table, and expands one mechanically proven inventory grammar. Release run `29247825641` passed clean public pull, exact published-image execution, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract, cold-start and OCI-label gates. `v3.12.1-no-hardcoded-startup-sla` is the immediate rollback; `v3.7.3-public-sample` is retained as a historical scored baseline (84.2% accuracy and 4,198 Fireworks tokens).
+
+The [final official score report](reports/public/final-official-score.md) separates evaluator results from immutable release evidence. Documentation was corrected after scoring with organizer approval; the submitted source revision, Docker tag and image digests were not changed.
 
 ## Quickstart
 
@@ -157,7 +159,7 @@ ROUTER_MODE=three_route
 
 ## Public Image
 
-The final hybrid championship candidate is:
+The final submitted and scored hybrid image is:
 
 ```text
 ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry

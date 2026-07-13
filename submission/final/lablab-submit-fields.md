@@ -14,7 +14,7 @@ Accuracy-first hybrid router combining proof solvers, calibrated local Gemma inf
 
 ProofRoute is a CLI-first hybrid agent for AMD Developer Hackathon Track 1. The engine removes the official JSON envelope before inference and reconstructs `/output/results.json` deterministically afterward. Each untouched prompt first reaches fail-closed proof solvers. Remaining tasks are assessed by embedded, fine-tuned FunctionGemma 270M Q8. Its intent and five scores feed a per-intent matrix that may select embedded, text-only Gemma 4 E2B. A hash-pinned Wilson 90% and Nash/minimax guard can reject, but never expand, that calibrated local cohort. Every refusal, uncertainty or local failure falls through to a model authorized at runtime by `ALLOWED_MODELS`, exclusively through `FIREWORKS_BASE_URL`.
 
-The Answer Contract Engine performs only unambiguous mechanical normalization and leaves final JSON construction to code. This prompt-envelope boundary reduced Fireworks input tokens by 51.9% in controlled ablation while preserving byte-identical Kimi answers. The championship image embeds both local models, performs no startup downloads and passed 682 tests plus public `linux/amd64`, 4 GB RAM, 2 vCPU, no-network, exact local-inference and hostile harness gates. The exact image produced two E2B answers with zero Fireworks tokens, a 9.737-second cold start and 745.7 MiB sampled peak memory.
+The Answer Contract Engine performs only unambiguous mechanical normalization and leaves final JSON construction to code. This prompt-envelope boundary reduced Fireworks input tokens by 51.9% in controlled ablation while preserving byte-identical Kimi answers. The championship image embeds all three local artifacts, performs no startup downloads and passed 774 tests with three environment-dependent skips plus public `linux/amd64`, 4 GB RAM, 2 vCPU, no-network, exact local-inference and hostile harness gates. The final submission scored 94.7% accuracy (18/19) with 3,051 Fireworks tokens. Exact-image testing also produced two E2B answers with zero Fireworks tokens, a 9.737-second cold start and 745.7 MiB sampled peak memory.
 
 ## Tags
 
@@ -50,6 +50,13 @@ Local MP4 included in repository: submission/final/proofroute-retro-cli.mp4
 ## Public Docker Image
 
 ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry
+
+## Official Automated Score
+
+- accuracy: `94.7%` (`18/19`)
+- scored Fireworks tokens: `3051`
+- final image: `ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry`
+- scoring timestamp: `2026-07-13 10:12 GMT-3`
 
 ## Release Evidence
 

@@ -7,6 +7,7 @@
 - [x] Compressed size: `2938881530` bytes, below 10 GB.
 - [x] Release run: `29247825641`.
 - [x] Exact published-image run: `29247825641`.
+- [x] Official score: `94.7%` accuracy (`18/19`) with `3,051` Fireworks tokens.
 - [x] Rollback image: `ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla`.
-- [ ] Confirm the Docker Image field in lablab.ai uses the final tag.
-- [ ] Capture/export the final submitted form.
+- [x] Docker Image field in lablab.ai uses the final tag.
+- [x] Final submission was scored successfully.

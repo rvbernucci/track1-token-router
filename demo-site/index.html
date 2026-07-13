@@ -261,8 +261,9 @@
 
       <article class="card">
         <h2>Live score</h2>
-        <p>Our best reported evaluator score completed successfully and became the accuracy control for every later release.</p>
-        <span class="metric">94.7% / 4,723 tokens</span>
+        <p>The final submitted image answered 18 of 19 evaluator tasks correctly.</p>
+        <span class="metric">94.7% / 3,051 tokens</span>
+        <p>Previous evaluator run: 94.7% / 4,723 tokens. The final run preserved accuracy while using 35.4% fewer scored Fireworks tokens.</p>
       </article>
 
       <article class="card">
@@ -363,6 +364,16 @@ python3 scripts/export_public_report.py --check</code></pre>
           The exact public image completed the official I/O smoke under 4 GB RAM, 2 vCPU,
           <code>linux/amd64</code> and disabled networking in five seconds. Fireworks calls share
           an absolute 28-second task deadline, and factual questions are never answered from a lookup table.
+        </p>
+      </article>
+
+      <article class="card wide">
+        <h2>Final official result</h2>
+        <p>
+          The final submitted image scored <strong>94.7% accuracy (18/19)</strong> with
+          <strong>3,051 Fireworks tokens</strong>. Documentation was corrected after scoring
+          with organizer approval; the submitted source revision, Docker tag and OCI digests
+          remain unchanged.
         </p>
       </article>
     </section>
