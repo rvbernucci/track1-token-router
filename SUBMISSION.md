@@ -6,7 +6,7 @@ Track 1 first gates on accuracy and then rewards low Fireworks token usage. Call
 
 ## Solution
 
-Track 1 Token Router assesses the untouched task with embedded FunctionGemma 270M, releases proof-carrying deterministic answers when available, and selectively probes embedded Gemma 4 E2B. Remaining tasks use a validation-selected Kimi/MiniMax policy constrained by runtime `ALLOWED_MODELS`. Strict output validation protects the official response contract.
+Track 1 Token Router first releases a deterministic answer only when it can produce a unique, recomputable proof. Unresolved tasks are assessed by embedded FunctionGemma 270M and may use a verified tool plan or selectively probe embedded Gemma 4 E2B. Remaining tasks use a validation-selected Kimi/MiniMax policy constrained by runtime `ALLOWED_MODELS`. Strict output validation protects the official response contract.
 
 We trained FunctionGemma 270M on AMD and built a `6,845`-row routing ledger. The expansion adds `2,400` E2B answers processed by the production Answer Contract Engine and independently labeled; `824` were correct. The frozen category model promoted sentiment only after a once-opened holdout produced `44/46` correct selected answers (`95.65%` precision; `85.47%` Wilson lower bound). The final image embeds both local models and requires no model download at startup.
 
@@ -35,6 +35,8 @@ scripts/offline_release_check.sh
 - compressed image below 10 GB;
 - 4 GB RAM and 2 vCPU;
 - complete run below 10 minutes;
+- cold start below 60 seconds and each task below 30 seconds;
+- English natural-language responses;
 - valid `/output/results.json`;
 - no startup downloads or embedded secrets;
 - only allowed Fireworks models.
@@ -45,4 +47,4 @@ No `.env` file is required or included. The harness injects `FIREWORKS_API_KEY`,
 
 ## Current Status
 
-The current recommended image is `ghcr.io/rvbernucci/track1-token-router:v3.10.1-s80-championship`; `v3.9.0-dual-functiongemma` is the immediate rollback and `v3.7.3-public-sample` the officially scored rollback. Release run `29224007638` passed exact published-image, 4 GB RAM, 2 vCPU, no-network, public manifest and OCI-label gates. Registry audit reports 2,938,863,471 compressed bytes, OCI digest `sha256:876b2b91eeca0ddd6c35c6980425ee288bdf091183a39dd6513da1ca04d2bbf4` and `linux/amd64`. The 84.2% / 4,198-token official result belongs to `v3.7.3`; later images are evidence-backed successors without separately published evaluator scores.
+The current recommended image is `ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla`; `v3.12.0-proof-first-deadline` is the immediate rollback and `v3.7.3-public-sample` the officially scored rollback. Release run `29229926996` passed exact published-image, 4 GB RAM, 2 vCPU, no-network, 60-second startup, public manifest and OCI-label gates. Registry audit reports 2,938,881,133 compressed bytes, OCI digest `sha256:cb00e42063260edc3bf57a73ca187646d4394edbdf7c8ede5c4e38fbd7b7dea2` and `linux/amd64`. The 84.2% / 4,198-token official result belongs to `v3.7.3`; later images are evidence-backed successors without separately published evaluator scores.

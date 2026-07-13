@@ -4,13 +4,13 @@ Updated: 2026-07-13
 
 ## Final Runtime
 
-The current recommended image is `ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma` (`linux/amd64`). It embeds three local artifacts and performs no startup download. `v3.8.2-e2b-contract` is the immediate rollback and `v3.7.3-public-sample` remains the officially scored rollback.
+The current recommended image is `ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla` (`linux/amd64`). It embeds three local artifacts and performs no startup download. `v3.12.0-proof-first-deadline` is the immediate rollback and `v3.7.3-public-sample` remains the officially scored rollback.
 
 ```text
 /input/tasks.json
 -> engine extracts each untouched prompt
--> FunctionGemma 270M Q8 assessment
 -> proof-carrying deterministic solver when uniquely supported
+-> FunctionGemma 270M Q8 assessment for unresolved tasks
 -> narrow structural tool prefilter
 -> independent FunctionGemma 270M Q8 planner
 -> allowlisted tool plus deterministic provenance validation and recomputable proof
@@ -84,16 +84,18 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 | E2B malformed, timed out or runtime failure | Fireworks with structured fallback reason |
 | Preferred remote model not allowed | Select another runtime-authorized model |
 | Terminal Fireworks failure | Exit non-zero before publishing synthetic output |
+| Fireworks task budget exhausted | Stop retries at the absolute 28-second deadline |
 | Deadline reserve reached | Preserve one controlled result per remaining task |
 
 ## Delivery Proof
 
-- Recommended image: `v3.9.0-dual-functiongemma`
-- OCI manifest digest: `sha256:86d9661ccff0fc181feb46fe517816f2bbb18b47e6fe4ee1a6aeb45f4575b363`
-- Platform digest: `sha256:2df039de3ae7a4c89acb8318f70e1bc68db25fb5ec6a613101fc1cad653dc5e4`
-- Compressed size: 2,938,728,348 bytes
-- Source revision: `84f6d3fdc9d658508731bcca055219070842a100`
-- Release and exact published-image gate: `29220259103`
+- Recommended image: `v3.12.1-no-hardcoded-startup-sla`
+- OCI manifest digest: `sha256:cb00e42063260edc3bf57a73ca187646d4394edbdf7c8ede5c4e38fbd7b7dea2`
+- Platform digest: `sha256:41bea5a5cc695fb5e51822d6a5d618eabb482c6e709445e39425a1d2764a7fce`
+- Compressed size: 2,938,881,133 bytes
+- Source revision: `8545d0fbe7170d9e782678ad296fc9586c7f8893`
+- Release and exact published-image gate: `29229926996`
+- Exact-image cold-start smoke: 5 seconds (60-second gate)
 - Clean-pull local inference: 16.221 s cold, 1.461 s warm, 1,299.456 MiB sampled peak
 - Officially scored rollback image: `v3.7.3-public-sample` (84.2% accuracy, 4,198 Fireworks tokens)
 - Compact rollback: `v2.1.0-proof-router`

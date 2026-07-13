@@ -226,8 +226,8 @@
         <p class="eyebrow">AMD Developer Hackathon ACT II / Track 1</p>
         <h1>Accuracy first. Remote tokens only when needed.</h1>
         <p class="lead">
-          ProofRoute combines embedded FunctionGemma assessment, proof-carrying deterministic
-          solvers, selective Gemma E2B inference and evaluator-authorized Fireworks fallback.
+          ProofRoute combines proof-first deterministic computation, embedded FunctionGemma assessment,
+          selective Gemma E2B inference and evaluator-authorized Fireworks fallback.
         </p>
         <div class="actions">
           <a class="button" href="https://github.com/rvbernucci/track1-token-router/blob/main/reports/public/final-hybrid-scorecard.md">Final scorecard</a>
@@ -242,9 +242,9 @@
       </div>
 
       <aside class="panel router-card" aria-label="Router flow">
-        <div class="node"><strong>1. Local assessment</strong> FunctionGemma 270M emits an intent and five routing scores.</div>
+        <div class="node"><strong>1. Proof first</strong> Deterministic solvers release only unique, recomputable answers.</div>
         <div class="arrow">↓</div>
-        <div class="node"><strong>2. Zero-token routes</strong> Proven solvers, validated FunctionGemma-planned tools or matrix-selected Gemma E2B tasks stay local.</div>
+        <div class="node"><strong>2. Local assessment</strong> FunctionGemma assesses only unresolved tasks; verified tools and matrix-selected Gemma E2B tasks stay local.</div>
         <div class="arrow">↓</div>
         <div class="node"><strong>3. Risk guard</strong> Wilson 90% and Nash/minimax can reject, but never expand, the calibrated E2B cohort.</div>
         <div class="arrow">↓</div>
@@ -274,7 +274,7 @@
       <article class="card wide">
         <h2>Pull the submitted image</h2>
         <pre><code>docker pull --platform linux/amd64 \
-  ghcr.io/rvbernucci/track1-token-router:v3.10.1-s80-championship</code></pre>
+  ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla</code></pre>
         <p>This public tag exposes a <code>linux/amd64</code> manifest and passed clean pull, exact-image execution and immutable-label audits.</p>
       </article>
 
@@ -306,7 +306,7 @@ docker run --rm --platform linux/amd64 \
   -e ALLOWED_MODELS \
   -v "$PWD/input:/input:ro" \
   -v "$PWD/output:/output" \
-  ghcr.io/rvbernucci/track1-token-router:v3.10.1-s80-championship
+  ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla
 
 cat output/results.json</code></pre>
       </article>
@@ -351,17 +351,18 @@ cat output/results.json</code></pre>
         <pre><code>python3 -m pip install -e .
 scripts/offline_release_check.sh
 python3 scripts/export_public_report.py --check</code></pre>
-        <p><strong>Verified:</strong> 768 automated tests passed, with one environment-dependent skip.</p>
+        <p><strong>Verified:</strong> release CI completed 774 tests with three environment-dependent skips.</p>
       </article>
 
       <article class="card wide">
         <h2>Immutable release evidence</h2>
         <p>
-          Release <code>v3.10.1-s80-championship</code> was built from revision
-          <code>0cee50f</code>. Its OCI digest is
-          <code>sha256:876b2b91eeca0ddd6c35c6980425ee288bdf091183a39dd6513da1ca04d2bbf4</code>.
+          Release <code>v3.12.1-no-hardcoded-startup-sla</code> was built from revision
+          <code>8545d0f</code>. Its OCI digest is
+          <code>sha256:cb00e42063260edc3bf57a73ca187646d4394edbdf7c8ede5c4e38fbd7b7dea2</code>.
           The exact public image completed the official I/O smoke under 4 GB RAM, 2 vCPU,
-          <code>linux/amd64</code> and disabled networking in the release workflow.
+          <code>linux/amd64</code> and disabled networking in five seconds. Fireworks calls share
+          an absolute 28-second task deadline, and factual questions are never answered from a lookup table.
         </p>
       </article>
     </section>

@@ -7,6 +7,8 @@ Updated: 2026-07-13
 - Public Docker image with a Linux `amd64` manifest.
 - Compressed image below 10 GB.
 - 4 GB RAM, 2 vCPU and at most 10 minutes.
+- Ready within 60 seconds; each task completes in under 30 seconds.
+- All natural-language responses are in English.
 - Valid atomic `/output/results.json` and exit code zero on success.
 - Only runtime `ALLOWED_MODELS` through `FIREWORKS_BASE_URL`.
 - No hardcoded answers, credentials or startup downloads.
@@ -15,15 +17,15 @@ Updated: 2026-07-13
 ## Promoted Candidate
 
 ```text
-FunctionGemma assessment
--> proof-carrying deterministic solver
+Proof-carrying deterministic solver
+-> FunctionGemma assessment for unresolved tasks
 -> FunctionGemma planner plus mechanically proven tool execution
 -> selective Gemma 4 E2B
 -> Kimi by default / MiniMax for logic, sentiment and summarization
 -> Answer Contract Engine
 ```
 
-The current recommended public image is `ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma`. It embeds separate SHA-pinned FunctionGemma assessment and planner Q8 artifacts plus Gemma E2B and requires no model downloads during evaluation. `v3.8.2-e2b-contract` is the immediate rollback; `v3.7.3-public-sample` remains the officially scored rollback.
+The current recommended public image is `ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla`. It embeds separate SHA-pinned FunctionGemma assessment and planner Q8 artifacts plus Gemma E2B and requires no model downloads during evaluation. `v3.12.0-proof-first-deadline` is the immediate rollback; `v3.7.3-public-sample` remains the officially scored rollback.
 
 ## Evaluator Variables
 
@@ -31,12 +33,14 @@ The image contains no `.env` file. The evaluator injects `FIREWORKS_API_KEY`, `F
 
 ## Resource Proof
 
-- compressed size: 2,938,728,348 bytes;
+- compressed size: 2,938,881,133 bytes;
 - exact public-image platform: `linux/amd64`;
-- exact published-image release run: `29220259103`;
+- exact published-image release run: `29229926996`;
 - clean-pull local-inference peak: 1,299.456 MiB;
 - resource gate: 4 GB, 2 vCPU, no network, 600-second ceiling;
-- OCI digest: `sha256:86d9661ccff0fc181feb46fe517816f2bbb18b47e6fe4ee1a6aeb45f4575b363`.
+- cold-start plus official smoke: 5 seconds, below the 60-second gate;
+- absolute Fireworks task deadline: 28 seconds;
+- OCI digest: `sha256:cb00e42063260edc3bf57a73ca187646d4394edbdf7c8ede5c4e38fbd7b7dea2`.
 
 ## Failure Strategy
 
@@ -44,4 +48,4 @@ Every local stage fails closed to an authorized Fireworks model. The system neve
 
 ## Rollback
 
-The immediate rollback is `ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract`. The officially scored rollback is `ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample`; the compact emergency rollback remains `v2.1.0-proof-router`. Rollback requires changing only the Docker Image field.
+The immediate rollback is `ghcr.io/rvbernucci/track1-token-router:v3.12.0-proof-first-deadline`. The officially scored rollback is `ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample`; the compact emergency rollback remains `v2.1.0-proof-router`. Rollback requires changing only the Docker Image field.

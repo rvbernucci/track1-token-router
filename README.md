@@ -9,8 +9,9 @@ The runner handles factual Q&A, math reasoning, sentiment, summarization, NER, c
 ```text
 task
 -> strip official JSON envelope; retain task_id only in the engine
--> embedded FunctionGemma 270M Q8 assessment
 -> proof-carrying deterministic solver (release only a unique, recomputable result)
+-> embedded FunctionGemma 270M Q8 assessment for unresolved tasks
+-> independently verified FunctionGemma tool plan when structurally eligible
 -> per-intent matrix selects embedded Gemma 4 E2B or Fireworks
 -> Wilson 90% + Nash/minimax guard confirms or rejects the local decision
 -> Kimi by default / MiniMax for logic, sentiment and summarization, only when authorized
@@ -42,6 +43,8 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 - input is adapted to the official task contract and final output is valid `/output/results.json`;
 - exit code 0 on success;
 - maximum runtime 10 minutes;
+- container ready within 60 seconds and each task below 30 seconds;
+- all natural-language responses in English;
 - final environment 4 GB RAM and 2 vCPU;
 - public Docker image with a `linux/amd64` manifest;
 - compressed image below 10 GB;
@@ -51,7 +54,7 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-`v3.10.1-s80-championship` is the current recommended championship candidate. It retains the independently trained Q8 FunctionGemma tool planner, adds a hash-pinned E2B code-debugging gate, promotes the statistically supported Fireworks intent policy and retries only responses with concrete truncation evidence. Release run `29224007638` passed clean public pull, exact published-image execution, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract and OCI-label gates. `v3.9.0-dual-functiongemma` remains the immediate rollback; `v3.7.3-public-sample` remains the scored rollback with 84.2% official accuracy and 4,198 Fireworks tokens.
+`v3.12.1-no-hardcoded-startup-sla` is the current recommended championship candidate. It runs proof-carrying solvers before model assessment, enforces an absolute 28-second Fireworks deadline, rejects non-standard or duplicate-key JSON, and contains no factual-answer lookup table. Release run `29229926996` passed clean public pull, exact published-image execution, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract, cold-start and OCI-label gates. `v3.12.0-proof-first-deadline` is the immediate rollback; `v3.7.3-public-sample` remains the scored rollback with 84.2% official accuracy and 4,198 Fireworks tokens.
 
 ## Quickstart
 
@@ -73,7 +76,7 @@ python3 scripts/secret_scan.py
 git diff --check
 ```
 
-The current repository suite contains `768` passing tests with one environment-dependent skip.
+The release CI completed `774` tests with three environment-dependent skips.
 
 ## Official Offline Contract
 
@@ -156,10 +159,10 @@ ROUTER_MODE=three_route
 The final hybrid championship candidate is:
 
 ```text
-ghcr.io/rvbernucci/track1-token-router:v3.10.1-s80-championship
+ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla
 ```
 
-It embeds separate FunctionGemma 270M Q8 assessment and tool-planner models plus text-only Gemma 4 E2B, requires no startup downloads, and falls through only to evaluator-authorized Fireworks models. Release run `29224007638` built, publicly pulled and gated the exact published image under 4 GB RAM, 2 vCPU and disabled networking. Registry audit confirms OCI digest `sha256:876b2b91eeca0ddd6c35c6980425ee288bdf091183a39dd6513da1ca04d2bbf4`, platform digest `sha256:36bda45addf63b4b1b46a1cfdff726fed04e060e6f797df2178307360fe8411b`, source revision `0cee50fdb52da13a316fd2931fd1fe4b621fcc1f` and 2.94 GB compressed size.
+It embeds separate FunctionGemma 270M Q8 assessment and tool-planner models plus text-only Gemma 4 E2B, requires no startup downloads, and falls through only to evaluator-authorized Fireworks models. Release run `29229926996` built, publicly pulled and gated the exact image under 4 GB RAM, 2 vCPU and disabled networking. Registry audit confirms OCI digest `sha256:cb00e42063260edc3bf57a73ca187646d4394edbdf7c8ede5c4e38fbd7b7dea2`, platform digest `sha256:41bea5a5cc695fb5e51822d6a5d618eabb482c6e709445e39425a1d2764a7fce`, source revision `8545d0fbe7170d9e782678ad296fc9586c7f8893`, 2,938,881,133 compressed bytes and a five-second cold-start smoke.
 
 ## Fireworks
 
