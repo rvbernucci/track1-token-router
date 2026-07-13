@@ -1,0 +1,14 @@
+FROM ubuntu:24.04
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ca-certificates libgomp1 libssl3t64 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY runtime/ /opt/llama/
+COPY model/gemma-4-E2B_q4_0-it.gguf /models/gemma-4-E2B_q4_0-it.gguf
+
+ENV LD_LIBRARY_PATH=/opt/llama
+EXPOSE 8080
+ENTRYPOINT ["/opt/llama/llama-server"]
+CMD ["-m", "/models/gemma-4-E2B_q4_0-it.gguf", "--alias", "gemma4-e2b", "--host", "0.0.0.0", "--port", "8080", "-ngl", "0", "-c", "2048", "-np", "1", "-t", "2", "--no-webui", "--reasoning-budget", "64"]
