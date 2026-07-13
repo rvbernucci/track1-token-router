@@ -80,23 +80,24 @@ class E2BExtraTreesGateTests(unittest.TestCase):
                 E2BExtraTreesGate.load(path, expected_sha256=digest)
 
     def test_protected_code_debugging_cohort_replays_13_of_13(self) -> None:
-        prompts = {}
-        for path in (
+        required = (
             Path("evals/e2b-expansion-v1/sealed/tasks/final_holdout.jsonl"),
             Path("evals/e2b-regression-v2/inputs/final_holdout.jsonl"),
-        ):
-            prompts.update({row["task_id"]: row["prompt"] for row in _rows(path)})
-        candidates = {}
-        for path in (
             Path("evals/e2b-expansion-v1/adjudication/sealed/candidates.jsonl"),
             Path("evals/e2b-regression-v2-adjudication/sealed/final-holdout-candidates.jsonl"),
-        ):
-            candidates.update({row["task_id"]: row for row in _rows(path)})
-        labels = {}
-        for path in (
             Path("evals/e2b-expansion-v1/adjudication/sealed/labels.jsonl"),
             Path("evals/e2b-regression-v2-adjudication/sealed/final-holdout-labels.jsonl"),
-        ):
+        )
+        if not all(path.is_file() for path in required):
+            self.skipTest("protected E2B replay corpora are not included in the public checkout")
+        prompts = {}
+        for path in required[:2]:
+            prompts.update({row["task_id"]: row["prompt"] for row in _rows(path)})
+        candidates = {}
+        for path in required[2:4]:
+            candidates.update({row["task_id"]: row for row in _rows(path)})
+        labels = {}
+        for path in required[4:]:
             labels.update({row["task_id"]: int(row["binary_label"]) for row in _rows(path)})
 
         selected = set()
