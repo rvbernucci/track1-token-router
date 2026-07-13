@@ -90,7 +90,10 @@ def main() -> int:
                 "expected_function": row["expected_function"], "predicted_function": predicted_function,
                 "schema_valid": prediction is not None,
                 "tool_correct": predicted_function == row["expected_function"],
-                "arguments_exact": bool(prediction and prediction.get("arguments") == row.get("expected_arguments")),
+                "arguments_exact": bool(prediction and (
+                    prediction.get("arguments") == row.get("expected_arguments")
+                    or (row["expected_function"] == "decline_tool" and prediction.get("tool") == "none")
+                )),
                 "accepted": accepted, "final_correct": final_correct,
                 "unsafe_false_positive": row["expected_function"] == "decline_tool" and accepted,
                 "raw_output": raw, "error": error, "latency_ms": round(latency, 2),

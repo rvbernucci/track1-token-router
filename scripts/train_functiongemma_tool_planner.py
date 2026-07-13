@@ -18,6 +18,8 @@ def main() -> int:
     parser.add_argument("--gradient-accumulation-steps", type=int)
     parser.add_argument("--learning-rate", type=float)
     parser.add_argument("--rank", type=int)
+    parser.add_argument("--full-finetune", action="store_true")
+    parser.add_argument("--batch-size", type=int)
     parser.add_argument("--eval-strategy", choices=("epoch", "no"), default="epoch")
     parser.add_argument("--max-train-rows", type=int, default=0)
     parser.add_argument("--max-validation-rows", type=int, default=0)
@@ -46,35 +48,42 @@ def main() -> int:
     model_config = config["model"]
     qlora = config["qlora"]
     tokenizer = AutoTokenizer.from_pretrained(model_config["id"], revision=model_config["revision"])
-    quantization = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type=qlora["quantization"],
-        bnb_4bit_use_double_quant=bool(qlora["double_quantization"]),
-        bnb_4bit_compute_dtype=torch.bfloat16,
-    )
-    model = AutoModelForCausalLM.from_pretrained(
-        model_config["id"], revision=model_config["revision"],
-        quantization_config=quantization, device_map={"": 0}, attn_implementation="eager",
-    )
-    model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
-    model = get_peft_model(model, LoraConfig(
-        task_type=TaskType.CAUSAL_LM,
-        r=int(args.rank or qlora["rank"]), lora_alpha=int(qlora["alpha"]),
-        lora_dropout=float(qlora["dropout"]), bias="none",
-        target_modules=list(qlora["target_modules"]),
-    ))
+    if args.full_finetune:
+        model = AutoModelForCausalLM.from_pretrained(
+            model_config["id"], revision=model_config["revision"],
+            dtype=torch.bfloat16, device_map={"": 0}, attn_implementation="eager",
+        )
+        model.gradient_checkpointing_enable()
+    else:
+        quantization = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type=qlora["quantization"],
+            bnb_4bit_use_double_quant=bool(qlora["double_quantization"]),
+            bnb_4bit_compute_dtype=torch.bfloat16,
+        )
+        model = AutoModelForCausalLM.from_pretrained(
+            model_config["id"], revision=model_config["revision"],
+            quantization_config=quantization, device_map={"": 0}, attn_implementation="eager",
+        )
+        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
+        model = get_peft_model(model, LoraConfig(
+            task_type=TaskType.CAUSAL_LM,
+            r=int(args.rank or qlora["rank"]), lora_alpha=int(qlora["alpha"]),
+            lora_dropout=float(qlora["dropout"]), bias="none",
+            target_modules=list(qlora["target_modules"]),
+        ))
     args.output.mkdir(parents=True, exist_ok=True)
     evaluate = args.eval_strategy != "no"
     training_args = SFTConfig(
         output_dir=str(args.output / "checkpoints"),
         max_length=int(config["dataset"]["max_length"]), packing=False, completion_only_loss=True,
         num_train_epochs=float(args.epochs or qlora["epochs"]),
-        per_device_train_batch_size=int(qlora["batch_size"]),
-        per_device_eval_batch_size=int(qlora["batch_size"]),
+        per_device_train_batch_size=int(args.batch_size or qlora["batch_size"]),
+        per_device_eval_batch_size=int(args.batch_size or qlora["batch_size"]),
         gradient_accumulation_steps=int(args.gradient_accumulation_steps or qlora["gradient_accumulation_steps"]),
         learning_rate=float(args.learning_rate or qlora["learning_rate"]), warmup_ratio=float(qlora["warmup_ratio"]),
         weight_decay=float(qlora["weight_decay"]), lr_scheduler_type="cosine",
-        eval_strategy=args.eval_strategy, save_strategy="epoch", save_total_limit=2,
+        eval_strategy=args.eval_strategy, save_strategy="epoch", save_total_limit=3,
         load_best_model_at_end=evaluate, metric_for_best_model="eval_loss" if evaluate else None,
         greater_is_better=False if evaluate else None,
         bf16=True, gradient_checkpointing=True, optim="paged_adamw_8bit",
@@ -88,15 +97,17 @@ def main() -> int:
     )
     started = monotonic()
     result = trainer.train()
-    adapter_dir = args.output / "adapter"
-    trainer.model.save_pretrained(adapter_dir, safe_serialization=True)
-    tokenizer.save_pretrained(adapter_dir)
+    artifact_dir = args.output / ("model" if args.full_finetune else "adapter")
+    trainer.model.save_pretrained(artifact_dir, safe_serialization=True)
+    tokenizer.save_pretrained(artifact_dir)
     report = {
         "schema_version": "functiongemma-tool-planner-training-v1",
         "base_model": model_config, "qlora": qlora,
         "train_rows": len(train_rows), "validation_rows": len(validation_rows),
         "epochs": float(args.epochs or qlora["epochs"]),
         "completion_only_loss": True,
+        "tuning_mode": "full_bf16" if args.full_finetune else "qlora",
+        "artifact_dir": str(artifact_dir),
         "gradient_accumulation_steps": training_args.gradient_accumulation_steps,
         "learning_rate": training_args.learning_rate,
         "rank": int(args.rank or qlora["rank"]),
