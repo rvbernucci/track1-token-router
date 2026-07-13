@@ -123,6 +123,7 @@ Files such as `.env.example` and `runtime-profiles/*.env.example` are developmen
 | [Router ML v3 contract audit](./reports/public/router-ml-v3.md) | AMD neural sweeps, protected replay and rejected runtime promotion |
 | [Fireworks Champion v3](./reports/public/fireworks-champion-v3.md) | 800-prompt paired arena and retain decision |
 | [Raw-prompt ablation](./reports/public/raw-prompt-answer-contract-ablation.md) | Byte-identical Kimi answers with 51.9% fewer Fireworks tokens |
+| [v3.12.1 exact-image smoke](./reports/public/v3.12.1-exact-image-smoke.md) | Public pull, constrained offline, E2B, hybrid and retired public-suite evidence |
 | [Sprints 45-49 completion audit](./reports/public/sprints-45-49-completion-audit.md) | Requirement-to-evidence map and final release proof |
 | [E2B runtime](./docs/GEMMA_E2B_TEXT_ONLY_RUNTIME.md) | Text-only LiteRT-LM packaging and 4 GB gates |
 | [Deterministic solvers](./docs/DETERMINISTIC_SOLVERS.md) | Mechanical registry and proof rules |
