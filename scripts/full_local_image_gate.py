@@ -17,6 +17,7 @@ import uuid
 
 
 FUNCTIONGEMMA_SHA256 = "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77"
+FUNCTIONGEMMA_PLANNER_SHA256 = "ec412795782acd3ed836ac35e058099bfdb1c3218a1ee86aef32905377dbddaf"
 E2B_SHA256 = "181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c"
 DEFAULT_IMAGE = "ghcr.io/rvbernucci/track1-token-router:v3.0.0-full-local"
 PROBES = (
@@ -66,7 +67,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     if platform != "linux/amd64":
         raise SystemExit(f"expected linux/amd64, received {platform}")
     hashes = _model_hashes(args.image)
-    if hashes != {"functiongemma": FUNCTIONGEMMA_SHA256, "e2b": E2B_SHA256}:
+    expected_hashes = {
+        "functiongemma": FUNCTIONGEMMA_SHA256,
+        "functiongemma_planner": FUNCTIONGEMMA_PLANNER_SHA256,
+        "e2b": E2B_SHA256,
+    }
+    if hashes != expected_hashes:
         raise SystemExit(f"model hash mismatch: {hashes}")
 
     with tempfile.TemporaryDirectory(prefix="proofroute-sprint60-") as raw:
@@ -128,12 +134,13 @@ def _model_hashes(image: str) -> dict[str, str]:
     output = _capture([
         "docker", "run", "--rm", "--network", "none", "--entrypoint", "sha256sum", image,
         "/app/artifacts/functiongemma-scale789/functiongemma-scale789-q8_0.gguf",
+        "/app/artifacts/functiongemma-tool-planner/functiongemma-tool-planner-q8_0.gguf",
         "/opt/litert/models/gemma4-e2b/model.litertlm",
     ])
     values = [line.split()[0] for line in output.splitlines() if line.strip()]
-    if len(values) != 2:
+    if len(values) != 3:
         raise SystemExit("could not inspect embedded model hashes")
-    return {"functiongemma": values[0], "e2b": values[1]}
+    return {"functiongemma": values[0], "functiongemma_planner": values[1], "e2b": values[2]}
 
 
 def _sample_memory(name: str, started: float, samples: list[dict[str, Any]], stop: threading.Event) -> None:
@@ -175,7 +182,11 @@ def _report(args, platform, hashes, started, finished, inspect, results, logs, s
     peak_mib = max((row["memory_mib"] for row in samples), default=0.0)
     checks = {
         "platform_linux_amd64": platform == "linux/amd64",
-        "model_hashes": hashes == {"functiongemma": FUNCTIONGEMMA_SHA256, "e2b": E2B_SHA256},
+        "model_hashes": hashes == {
+            "functiongemma": FUNCTIONGEMMA_SHA256,
+            "functiongemma_planner": FUNCTIONGEMMA_PLANNER_SHA256,
+            "e2b": E2B_SHA256,
+        },
         "container_exit_zero": int(inspect["State"]["ExitCode"]) == 0,
         "not_oom_killed": inspect["State"].get("OOMKilled") is False,
         "two_local_routes": len(routes) == 2 and all(route.startswith("e2b_local") for route in routes),
