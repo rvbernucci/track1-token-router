@@ -1,46 +1,6 @@
 {
-  "schema_version": "full-local-exact-image-smoke-v1",
-  "passed": true,
-  "image": "ghcr.io/rvbernucci/track1-token-router:v3.3.0-full-hybrid",
-  "platform": "linux/amd64",
-  "workflow_run": {
-    "id": 29158947843,
-    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29158947843",
-    "conclusion": "success",
-    "head_sha": "cfeacd407ac7488883afdc6df580fb86b48a039e"
-  },
-  "limits": {
-    "memory": "4g",
-    "cpus": "2",
-    "network": "none"
-  },
-  "metrics": {
-    "cold_seconds": 12.147,
-    "warm_seconds": 1.825,
-    "wall_seconds": 15.355,
-    "sampled_peak_memory_mib": 727.5
-  },
-  "model_sha256": {
-    "functiongemma": "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77",
-    "e2b": "181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c"
-  },
-  "probes": [
-    {
-      "task_id": "sprint60-cold",
-      "answer": "positive",
-      "route": "e2b_local",
-      "fireworks_prompt_tokens": 0,
-      "fireworks_completion_tokens": 0
-    },
-    {
-      "task_id": "sprint60-warm",
-      "answer": "negative",
-      "route": "e2b_local",
-      "fireworks_prompt_tokens": 0,
-      "fireworks_completion_tokens": 0
-    }
-  ],
   "checks": {
+    "cold_at_most_120_seconds": true,
     "container_exit_zero": true,
     "model_hashes": true,
     "network_disabled": true,
@@ -49,9 +9,350 @@
     "peak_memory_at_most_3584_mib": true,
     "platform_linux_amd64": true,
     "two_local_routes": true,
-    "cold_at_most_120_seconds": true,
     "warm_at_most_30_seconds": true,
     "zero_fireworks_tokens": true
   },
-  "source_artifact_sha256": "f3b88bf1a44e093fcfe50db30f466b5433509fb1815092ab2d64e3e0c3d605dd"
+  "image": "ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma",
+  "limits": {
+    "cpus": "2",
+    "memory": "4g",
+    "network": "none"
+  },
+  "metrics": {
+    "cold_seconds": 16.221,
+    "memory_samples": 9,
+    "sampled_peak_memory_mib": 1299.456,
+    "wall_seconds": 19.497,
+    "warm_seconds": 1.461
+  },
+  "model_sha256": {
+    "e2b": "181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c",
+    "functiongemma": "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77",
+    "functiongemma_planner": "ec412795782acd3ed836ac35e058099bfdb1c3218a1ee86aef32905377dbddaf"
+  },
+  "passed": true,
+  "platform": "linux/amd64",
+  "remote_tokens": [
+    {
+      "completion": 0,
+      "prompt": 0,
+      "total": 0
+    },
+    {
+      "completion": 0,
+      "prompt": 0,
+      "total": 0
+    }
+  ],
+  "results": [
+    {
+      "answer": "positive",
+      "task_id": "sprint60-cold"
+    },
+    {
+      "answer": "negative",
+      "task_id": "sprint60-warm"
+    }
+  ],
+  "routes": [
+    "e2b_local",
+    "e2b_local"
+  ],
+  "routing_traces": [
+    {
+      "assessment": {
+        "intent": "sentiment",
+        "scores": {
+          "deterministic_fit": 5,
+          "format_complexity": 2,
+          "generation_demand": 4,
+          "knowledge_uncertainty": 0,
+          "reasoning_demand": 3
+        }
+      },
+      "decision": {
+        "engine": "gemma_e2b",
+        "feasible_engines": [
+          "gemma_e2b",
+          "fireworks"
+        ],
+        "probability_correct": 0.9233537873155883,
+        "reason": "per_intent_matrix_probe",
+        "safe_fallback": false,
+        "solver_hint": null,
+        "worst_case_regret": null
+      },
+      "fallback": null,
+      "features": {
+        "names": [
+          "intent.factual_qa",
+          "intent.math_reasoning",
+          "intent.sentiment",
+          "intent.summarization",
+          "intent.ner",
+          "intent.code_debugging",
+          "intent.logic_puzzle",
+          "intent.code_generation",
+          "score.deterministic_fit",
+          "score.reasoning_demand",
+          "score.knowledge_uncertainty",
+          "score.generation_demand",
+          "score.format_complexity",
+          "struct.input_tokens_log",
+          "shape.free_text",
+          "shape.short_text",
+          "shape.number",
+          "shape.boolean",
+          "shape.json",
+          "shape.code",
+          "shape.list",
+          "struct.deadline_remaining_ratio",
+          "solver_hint.arithmetic",
+          "solver_hint.percent_fee_math",
+          "solver_hint.proportional_rate",
+          "solver_hint.numeric_compare",
+          "solver_hint.literal_echo",
+          "solver_hint.stable_factual_qa",
+          "solver_hint.sentiment_lexicon",
+          "solver_hint.constrained_summary",
+          "solver_hint.entity_extract",
+          "solver_hint.logic_ordering",
+          "solver_hint.modus_ponens",
+          "solver_hint.modus_tollens",
+          "solver_hint.python_code_debug",
+          "solver_hint.python_code_generation",
+          "solver_hint.char_count",
+          "solver_hint.word_count",
+          "solver_hint.case_transform",
+          "solver_hint.whitespace",
+          "solver_hint.json_transform",
+          "solver_hint.list_item"
+        ],
+        "schema_version": "feature-vector-v1",
+        "values": [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.5,
+          0.3,
+          0.0,
+          0.4,
+          0.2,
+          0.5195996923788065,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.8647733333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "predictions": [
+        {
+          "engine": "deterministic",
+          "expected_fireworks_tokens": 0.0,
+          "expected_latency_ms": 0.0,
+          "expected_peak_memory_mb": 0.0,
+          "model_version": "solver-manifest-v1",
+          "probability_correct": 0.0,
+          "probability_runtime_failure": 1.0
+        },
+        {
+          "engine": "fireworks",
+          "expected_fireworks_tokens": 112.56884200850624,
+          "expected_latency_ms": 968.3175482504171,
+          "expected_peak_memory_mb": 0.0,
+          "model_version": "927a64303501d43f3b509a8f48d397d372c4211f8347890827206e82bda60712:model=accounts/fireworks/models/kimi-k2p7-code",
+          "probability_correct": 0.9510223108757256,
+          "probability_runtime_failure": 0.010526315789473684
+        },
+        {
+          "engine": "gemma_e2b",
+          "expected_fireworks_tokens": 0.0,
+          "expected_latency_ms": 713.3254994671433,
+          "expected_peak_memory_mb": 2712.926,
+          "model_version": "927a64303501d43f3b509a8f48d397d372c4211f8347890827206e82bda60712:model=gemma4-e2b",
+          "probability_correct": 0.87800977362159,
+          "probability_runtime_failure": 0.0005017561465127947
+        }
+      ],
+      "schema_version": "routing-trace-v1",
+      "task_id": "sprint60-cold"
+    },
+    {
+      "assessment": {
+        "intent": "sentiment",
+        "scores": {
+          "deterministic_fit": 5,
+          "format_complexity": 2,
+          "generation_demand": 4,
+          "knowledge_uncertainty": 0,
+          "reasoning_demand": 3
+        }
+      },
+      "decision": {
+        "engine": "gemma_e2b",
+        "feasible_engines": [
+          "gemma_e2b",
+          "fireworks"
+        ],
+        "probability_correct": 0.9386158609442358,
+        "reason": "per_intent_matrix_probe",
+        "safe_fallback": false,
+        "solver_hint": null,
+        "worst_case_regret": null
+      },
+      "fallback": null,
+      "features": {
+        "names": [
+          "intent.factual_qa",
+          "intent.math_reasoning",
+          "intent.sentiment",
+          "intent.summarization",
+          "intent.ner",
+          "intent.code_debugging",
+          "intent.logic_puzzle",
+          "intent.code_generation",
+          "score.deterministic_fit",
+          "score.reasoning_demand",
+          "score.knowledge_uncertainty",
+          "score.generation_demand",
+          "score.format_complexity",
+          "struct.input_tokens_log",
+          "shape.free_text",
+          "shape.short_text",
+          "shape.number",
+          "shape.boolean",
+          "shape.json",
+          "shape.code",
+          "shape.list",
+          "struct.deadline_remaining_ratio",
+          "solver_hint.arithmetic",
+          "solver_hint.percent_fee_math",
+          "solver_hint.proportional_rate",
+          "solver_hint.numeric_compare",
+          "solver_hint.literal_echo",
+          "solver_hint.stable_factual_qa",
+          "solver_hint.sentiment_lexicon",
+          "solver_hint.constrained_summary",
+          "solver_hint.entity_extract",
+          "solver_hint.logic_ordering",
+          "solver_hint.modus_ponens",
+          "solver_hint.modus_tollens",
+          "solver_hint.python_code_debug",
+          "solver_hint.python_code_generation",
+          "solver_hint.char_count",
+          "solver_hint.word_count",
+          "solver_hint.case_transform",
+          "solver_hint.whitespace",
+          "solver_hint.json_transform",
+          "solver_hint.list_item"
+        ],
+        "schema_version": "feature-vector-v1",
+        "values": [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.5,
+          0.3,
+          0.0,
+          0.4,
+          0.2,
+          0.4917100640683845,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.8452416666666667,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "predictions": [
+        {
+          "engine": "deterministic",
+          "expected_fireworks_tokens": 0.0,
+          "expected_latency_ms": 0.0,
+          "expected_peak_memory_mb": 0.0,
+          "model_version": "solver-manifest-v1",
+          "probability_correct": 0.0,
+          "probability_runtime_failure": 1.0
+        },
+        {
+          "engine": "fireworks",
+          "expected_fireworks_tokens": 108.81440018446905,
+          "expected_latency_ms": 959.9272512086941,
+          "expected_peak_memory_mb": 0.0,
+          "model_version": "927a64303501d43f3b509a8f48d397d372c4211f8347890827206e82bda60712:model=accounts/fireworks/models/kimi-k2p7-code",
+          "probability_correct": 0.9509635036319255,
+          "probability_runtime_failure": 0.010526315789473684
+        },
+        {
+          "engine": "gemma_e2b",
+          "expected_fireworks_tokens": 0.0,
+          "expected_latency_ms": 638.2330684194156,
+          "expected_peak_memory_mb": 2712.926,
+          "model_version": "927a64303501d43f3b509a8f48d397d372c4211f8347890827206e82bda60712:model=gemma4-e2b",
+          "probability_correct": 0.8781338013339598,
+          "probability_runtime_failure": 0.0005017561465127947
+        }
+      ],
+      "schema_version": "routing-trace-v1",
+      "task_id": "sprint60-warm"
+    }
+  ],
+  "schema_version": "full-local-exact-image-smoke-v1"
 }

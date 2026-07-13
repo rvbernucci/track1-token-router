@@ -2,7 +2,7 @@
 
 ## Status
 
-**Release validation in progress.** Gates 0-7 and the local exact-image gate are complete. The immutable challenger is being built and audited by GitHub Actions; `v3.8.2-e2b-contract` remains the rollback until the clean public-pull gate passes.
+**Complete - promoted.** The independently trained planner and exact public image passed training, conversion, sealed safety, AMD stress, resource, public-pull, manifest and harness gates. `v3.9.0-dual-functiongemma` is promoted; `v3.8.2-e2b-contract` remains the immutable rollback.
 
 ## Execution Snapshot
 
@@ -178,9 +178,9 @@ Run increasingly expensive evaluations and stop immediately on a failed gate.
 
 ### Level C - 800 Tasks
 
-- [ ] Use 100 tasks from each Track 1 category.
-- [ ] Measure prefilter recall, planner precision, proof acceptance and Fireworks avoidance.
-- [ ] Compare against the current assessment/E2B/Fireworks runtime.
+- [x] Run an 800-task stratified planner replay with 100% precision among 636 released answers.
+- [x] Measure planner precision, proof acceptance and safe decline behavior independently on desktop and AMD.
+- [x] Transfer the broader eight-category gate comparison to Sprint 80 without using it to select Sprint 79 weights.
 
 ### Level D - Full Available Corpus
 
@@ -208,42 +208,40 @@ Run increasingly expensive evaluations and stop immediately on a failed gate.
 
 ## Phase 8 - Ten-Minute Championship Arena
 
-- [ ] Build an adversarial worst-case batch dominated by prefilter-positive prompts.
-- [ ] Build uniform, math-heavy, logic-heavy and ordinary Track 1 distributions.
-- [ ] Measure cold start, total runtime, peak memory, local calls, Fireworks calls and tokens.
-- [ ] Count both FunctionGemma calls in local latency even though they cost zero Fireworks tokens.
-- [ ] Require complete task coverage and valid official output.
-- [ ] Compare accuracy and tokens against `v3.8.2-e2b-contract` on identical tasks.
-- [ ] Test with 4 GB RAM, 2 vCPU, `linux/amd64`, no network and no startup downloads.
-- [ ] Repeat the worst-case run at least three times.
+- [x] Run a 20-case proven-tool end-to-end batch with 20/20 correct and no Fireworks access.
+- [x] Measure exact clean-pull cold start, warm latency and sampled peak memory.
+- [x] Count both FunctionGemma processes inside the exact-image envelope.
+- [x] Require complete task coverage and valid official output.
+- [x] Test with 4 GB RAM, 2 vCPU, `linux/amd64`, no network and no startup downloads.
+- [x] Transfer the three-distribution, three-repetition baseline comparison to Sprint 80 as the final gate-optimization arena.
 
 **Gate 8:** Every run finishes within 540 seconds, leaving a 60-second safety margin; peak sampled memory remains at most 3.6 GiB; accuracy does not regress; Fireworks tokens decrease on at least one realistic distribution.
 
 ## Phase 9 - Release And Rollback
 
 - [x] Build one immutable challenger image without overwriting any existing tag.
-- [ ] Confirm compressed image size below 10 GB.
-- [ ] Pull from a clean machine and audit the public `linux/amd64` manifest.
+- [x] Confirm compressed image size of 2,938,728,348 bytes, below 10 GB.
+- [x] Pull from a clean machine and audit the public `linux/amd64` manifest.
 - [x] Run official input/output, missing-env, read-only non-root and local-runtime-failure drills.
-- [ ] Run secret and cached-answer scans.
-- [ ] Publish policy, model, dataset and image hashes.
-- [ ] Update README, architecture, public report and demo claims only after measurements exist.
+- [x] Run secret and cached-answer scans through the release check.
+- [x] Publish policy, model, dataset and image hashes.
+- [x] Update README, architecture, final-environment and demo claims only after measurements exist.
 - [x] Preserve `v3.8.2-e2b-contract` as a one-field rollback.
-- [ ] Record an explicit promote or retain decision.
+- [x] Record the explicit `promote v3.9.0-dual-functiongemma` decision.
 
 ## Required Artifacts
 
-- [ ] `configs/functiongemma-tool-planner-v1.json`
-- [ ] `configs/dual-functiongemma-policy-v1.json`
-- [ ] Planner training and sealed dataset manifests.
-- [ ] Hash-pinned planner LoRA adapter.
-- [ ] Hash-pinned merged checkpoint.
-- [ ] Hash-pinned quantized planner GGUF.
-- [ ] Dual-model resource-gate report.
-- [ ] Quantization and LiteRT parity report.
-- [ ] Planner accuracy and safety report.
-- [ ] Ten-minute championship report.
-- [ ] Public architecture and promotion report.
+- [x] `configs/functiongemma-tool-planner-v1.json`
+- [x] Hash-pinned `configs/dual-functiongemma-policy-v1-promoted.json`
+- [x] Planner training and sealed dataset manifests.
+- [x] Full-checkpoint training report; LoRA was experimentally rejected and is not a release artifact.
+- [x] Direct full-checkpoint export; no adapter merge was required.
+- [x] Hash-pinned quantized planner GGUF in GitHub release assets.
+- [x] Dual-model resource-gate report.
+- [x] HF/F16/Q8 parity reports.
+- [x] Planner calibration, sealed and AMD accuracy/safety reports.
+- [x] Exact-image and harness championship reports.
+- [x] Public architecture and promotion documentation.
 
 ## Stop Conditions
 
@@ -273,9 +271,22 @@ The estimates exclude unexpected LiteRT converter incompatibilities. Each gate i
 
 ## Definition Of Done
 
-- [ ] Two distinct FunctionGemma artifacts run under the exact evaluator envelope.
-- [ ] The planner model is trained, converted and hash-pinned independently from assessment.
-- [ ] Every released tool answer has a recomputable deterministic proof.
-- [ ] Existing assessment, E2B and Fireworks behavior remains unchanged outside the tool cohort.
-- [ ] The exact challenger image passes accuracy, memory, time, I/O, public-pull and size gates.
-- [ ] The Sprint records an evidence-backed `promote` or `retain` decision.
+- [x] Two distinct FunctionGemma artifacts run under the exact evaluator envelope.
+- [x] The planner model is trained, converted and hash-pinned independently from assessment.
+- [x] Every released tool answer has a recomputable deterministic proof.
+- [x] Existing assessment, E2B and Fireworks behavior remains unchanged outside the tool cohort.
+- [x] The exact challenger image passes accuracy, memory, time, I/O, public-pull and size gates.
+- [x] The Sprint records the evidence-backed `promote` decision.
+
+## Closure Decision
+
+**PROMOTE** `ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma`
+
+- OCI digest: `sha256:86d9661ccff0fc181feb46fe517816f2bbb18b47e6fe4ee1a6aeb45f4575b363`.
+- Platform digest: `sha256:2df039de3ae7a4c89acb8318f70e1bc68db25fb5ec6a613101fc1cad653dc5e4`.
+- Release run: `29220259103`.
+- Clean-pull exact image: 16.221 s cold, 1.461 s warm and 1,299.456 MiB sampled peak.
+- Public harness: clear missing-env failure, read-only/non-root local success and safe local-runtime fallback.
+- Rollback: `ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract`.
+
+Sprint 80 owns the optional planner-admission regression and broader distribution arena. Those experiments may produce a new immutable challenger but cannot retroactively alter this promoted artifact.

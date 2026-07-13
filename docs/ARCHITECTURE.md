@@ -1,16 +1,19 @@
 # Championship Architecture
 
-Updated: 2026-07-12
+Updated: 2026-07-13
 
 ## Final Runtime
 
-The current recommended image is `ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract` (`linux/amd64`). It embeds both local models and performs no startup download. `v3.7.3-public-sample` remains the officially scored rollback.
+The current recommended image is `ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma` (`linux/amd64`). It embeds three local artifacts and performs no startup download. `v3.8.2-e2b-contract` is the immediate rollback and `v3.7.3-public-sample` remains the officially scored rollback.
 
 ```text
 /input/tasks.json
 -> engine extracts each untouched prompt
 -> FunctionGemma 270M Q8 assessment
 -> proof-carrying deterministic solver when uniquely supported
+-> narrow structural tool prefilter
+-> independent FunctionGemma 270M Q8 planner
+-> allowlisted tool plus deterministic provenance validation and recomputable proof
 -> category-specific normalized E2B matrix, calibrator and threshold
 -> Wilson 90% confidence bound plus deterministic Nash/minimax guard
 -> text-only Gemma 4 E2B candidate plus Answer Contract Engine
@@ -31,6 +34,16 @@ FunctionGemma emits one structured assessment containing an intent and five scor
 ## Deterministic Route
 
 Registered solvers receive the untouched prompt and release an answer only with a unique, independently recomputable proof. A regression score can propose a solver but cannot override failed proof. Unsupported or ambiguous tasks continue safely.
+
+## FunctionGemma Tool Route
+
+A narrow structural prefilter may invoke an independently fine-tuned FunctionGemma planner. The planner cannot release prose or authorize itself: its allowlisted tool name, arguments, numeric provenance, semantic roles and execution result are validated mechanically. Any decline, malformed plan, invalid proof or contract failure falls directly to Fireworks.
+
+- Artifact: FunctionGemma tool planner Q8 GGUF
+- SHA-256: `ec412795782acd3ed836ac35e058099bfdb1c3218a1ee86aef32905377dbddaf`
+- Output ceiling: 160 tokens
+- Sealed evidence: 198/198 released answers correct; 50/50 controls declined
+- AMD eight-worker replay: 1,393/1,393 released answers correct; zero unsafe controls
 
 ## Gemma E2B Route
 
@@ -65,6 +78,7 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 | --- | --- |
 | Deterministic refusal or failed proof | Continue to E2B/Fireworks |
 | Invalid FunctionGemma assessment | Fireworks |
+| Tool planner decline, malformed plan or failed proof | Fireworks |
 | E2B below threshold | Fireworks without E2B inference |
 | Wilson-Nash guard rejects matrix probe | Fireworks without E2B inference |
 | E2B malformed, timed out or runtime failure | Fireworks with structured fallback reason |
@@ -74,13 +88,13 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 
 ## Delivery Proof
 
-- Recommended image: `v3.8.2-e2b-contract`
-- OCI manifest digest: `sha256:7ae875639a6b13c8ef84514646b1b6e501da4ef8efd448479615f015239313d9`
-- Platform digest: `sha256:04ce0867fab0973e063c9da61363849c37c4703ef7a2a73e6121e52e949b6d63`
-- Compressed size: 2,666,356,424 bytes
-- Source revision: `f2223c56322f187c2b53797f92d9083fa0d4ca83`
-- Release and exact published-image gate: `29204166556`
-- Resource gate: 4 GB, 2 vCPU, no network, 2 seconds observed runtime, 28.645 MiB sampled process peak
+- Recommended image: `v3.9.0-dual-functiongemma`
+- OCI manifest digest: `sha256:86d9661ccff0fc181feb46fe517816f2bbb18b47e6fe4ee1a6aeb45f4575b363`
+- Platform digest: `sha256:2df039de3ae7a4c89acb8318f70e1bc68db25fb5ec6a613101fc1cad653dc5e4`
+- Compressed size: 2,938,728,348 bytes
+- Source revision: `84f6d3fdc9d658508731bcca055219070842a100`
+- Release and exact published-image gate: `29220259103`
+- Clean-pull local inference: 16.221 s cold, 1.461 s warm, 1,299.456 MiB sampled peak
 - Officially scored rollback image: `v3.7.3-public-sample` (84.2% accuracy, 4,198 Fireworks tokens)
 - Compact rollback: `v2.1.0-proof-router`
 
@@ -88,7 +102,7 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 
 The 80-row balanced arena is a frozen holdout replay plus exact-image envelope projection, not a live 80-row container run. Historical rejected policies remain in the repository for reproducibility and are explicitly marked as historical. Current release truth is defined by this document, `README.md`, `SUBMISSION.md` and `submission/final/final-release-decision.json`.
 
-Sprints 71-77 are frozen championship evidence. Semantic-v3 Q8, cluster augmentation, verify-or-repair and both Router ML v3 neural challengers failed their promotion gates and remain outside the runtime. The Wilson-Nash fail-closed guard remains hash-pinned in `v3.8.2-e2b-contract` and cannot expand the proven v2 E2B cohort.
+Sprints 71-77 are frozen championship evidence. Semantic-v3 Q8, cluster augmentation, verify-or-repair and both Router ML v3 neural challengers failed their promotion gates and remain outside the runtime. The Wilson-Nash E2B guard remains hash-pinned and cannot expand the proven v2 E2B cohort. Sprint 79 adds only the independently proven tool route; unrelated E2B and Fireworks decisions remain unchanged.
 
 ## Non-Goals
 

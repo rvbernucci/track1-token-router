@@ -1,32 +1,375 @@
 {
-  "schema_version": "final-image-audit-v2",
-  "image": "ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract",
-  "source_revision": "f2223c56322f187c2b53797f92d9083fa0d4ca83",
-  "manifest_digest": "sha256:7ae875639a6b13c8ef84514646b1b6e501da4ef8efd448479615f015239313d9",
-  "platform_digest": "sha256:04ce0867fab0973e063c9da61363849c37c4703ef7a2a73e6121e52e949b6d63",
+  "compressed_size_bytes": 2938728348,
+  "image": "ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma",
+  "manifest_digest": "sha256:86d9661ccff0fc181feb46fe517816f2bbb18b47e6fe4ee1a6aeb45f4575b363",
+  "passed": true,
   "platform": "linux/amd64",
-  "compressed_size_bytes": 2666356424,
-  "release_run_id": 29204166556,
-  "exact_published_image_gate_run_id": 29204166556,
-  "limits": {"memory": "4g", "cpus": 2, "network": "none", "maximum_runtime_seconds": 600},
-  "exact_published_image_metrics": {
-    "observed_runtime_seconds": 2,
-    "process_elapsed_ms": 6,
-    "sampled_process_peak_memory_mib": 28.645,
-    "result_rows": 2
+  "platform_digest": "sha256:2df039de3ae7a4c89acb8318f70e1bc68db25fb5ec6a613101fc1cad653dc5e4",
+  "real_local_inference": {
+    "checks": {
+      "cold_at_most_120_seconds": true,
+      "container_exit_zero": true,
+      "model_hashes": true,
+      "network_disabled": true,
+      "not_oom_killed": true,
+      "official_output_contract": true,
+      "peak_memory_at_most_3584_mib": true,
+      "platform_linux_amd64": true,
+      "two_local_routes": true,
+      "warm_at_most_30_seconds": true,
+      "zero_fireworks_tokens": true
+    },
+    "image": "ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma",
+    "limits": {
+      "cpus": "2",
+      "memory": "4g",
+      "network": "none"
+    },
+    "metrics": {
+      "cold_seconds": 16.221,
+      "memory_samples": 9,
+      "sampled_peak_memory_mib": 1299.456,
+      "wall_seconds": 19.497,
+      "warm_seconds": 1.461
+    },
+    "model_sha256": {
+      "e2b": "181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c",
+      "functiongemma": "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77",
+      "functiongemma_planner": "ec412795782acd3ed836ac35e058099bfdb1c3218a1ee86aef32905377dbddaf"
+    },
+    "passed": true,
+    "platform": "linux/amd64",
+    "remote_tokens": [
+      {
+        "completion": 0,
+        "prompt": 0,
+        "total": 0
+      },
+      {
+        "completion": 0,
+        "prompt": 0,
+        "total": 0
+      }
+    ],
+    "results": [
+      {
+        "answer": "positive",
+        "task_id": "sprint60-cold"
+      },
+      {
+        "answer": "negative",
+        "task_id": "sprint60-warm"
+      }
+    ],
+    "routes": [
+      "e2b_local",
+      "e2b_local"
+    ],
+    "routing_traces": [
+      {
+        "assessment": {
+          "intent": "sentiment",
+          "scores": {
+            "deterministic_fit": 5,
+            "format_complexity": 2,
+            "generation_demand": 4,
+            "knowledge_uncertainty": 0,
+            "reasoning_demand": 3
+          }
+        },
+        "decision": {
+          "engine": "gemma_e2b",
+          "feasible_engines": [
+            "gemma_e2b",
+            "fireworks"
+          ],
+          "probability_correct": 0.9233537873155883,
+          "reason": "per_intent_matrix_probe",
+          "safe_fallback": false,
+          "solver_hint": null,
+          "worst_case_regret": null
+        },
+        "fallback": null,
+        "features": {
+          "names": [
+            "intent.factual_qa",
+            "intent.math_reasoning",
+            "intent.sentiment",
+            "intent.summarization",
+            "intent.ner",
+            "intent.code_debugging",
+            "intent.logic_puzzle",
+            "intent.code_generation",
+            "score.deterministic_fit",
+            "score.reasoning_demand",
+            "score.knowledge_uncertainty",
+            "score.generation_demand",
+            "score.format_complexity",
+            "struct.input_tokens_log",
+            "shape.free_text",
+            "shape.short_text",
+            "shape.number",
+            "shape.boolean",
+            "shape.json",
+            "shape.code",
+            "shape.list",
+            "struct.deadline_remaining_ratio",
+            "solver_hint.arithmetic",
+            "solver_hint.percent_fee_math",
+            "solver_hint.proportional_rate",
+            "solver_hint.numeric_compare",
+            "solver_hint.literal_echo",
+            "solver_hint.stable_factual_qa",
+            "solver_hint.sentiment_lexicon",
+            "solver_hint.constrained_summary",
+            "solver_hint.entity_extract",
+            "solver_hint.logic_ordering",
+            "solver_hint.modus_ponens",
+            "solver_hint.modus_tollens",
+            "solver_hint.python_code_debug",
+            "solver_hint.python_code_generation",
+            "solver_hint.char_count",
+            "solver_hint.word_count",
+            "solver_hint.case_transform",
+            "solver_hint.whitespace",
+            "solver_hint.json_transform",
+            "solver_hint.list_item"
+          ],
+          "schema_version": "feature-vector-v1",
+          "values": [
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.5,
+            0.3,
+            0.0,
+            0.4,
+            0.2,
+            0.5195996923788065,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.8647733333333333,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "predictions": [
+          {
+            "engine": "deterministic",
+            "expected_fireworks_tokens": 0.0,
+            "expected_latency_ms": 0.0,
+            "expected_peak_memory_mb": 0.0,
+            "model_version": "solver-manifest-v1",
+            "probability_correct": 0.0,
+            "probability_runtime_failure": 1.0
+          },
+          {
+            "engine": "fireworks",
+            "expected_fireworks_tokens": 112.56884200850624,
+            "expected_latency_ms": 968.3175482504171,
+            "expected_peak_memory_mb": 0.0,
+            "model_version": "927a64303501d43f3b509a8f48d397d372c4211f8347890827206e82bda60712:model=accounts/fireworks/models/kimi-k2p7-code",
+            "probability_correct": 0.9510223108757256,
+            "probability_runtime_failure": 0.010526315789473684
+          },
+          {
+            "engine": "gemma_e2b",
+            "expected_fireworks_tokens": 0.0,
+            "expected_latency_ms": 713.3254994671433,
+            "expected_peak_memory_mb": 2712.926,
+            "model_version": "927a64303501d43f3b509a8f48d397d372c4211f8347890827206e82bda60712:model=gemma4-e2b",
+            "probability_correct": 0.87800977362159,
+            "probability_runtime_failure": 0.0005017561465127947
+          }
+        ],
+        "schema_version": "routing-trace-v1",
+        "task_id": "sprint60-cold"
+      },
+      {
+        "assessment": {
+          "intent": "sentiment",
+          "scores": {
+            "deterministic_fit": 5,
+            "format_complexity": 2,
+            "generation_demand": 4,
+            "knowledge_uncertainty": 0,
+            "reasoning_demand": 3
+          }
+        },
+        "decision": {
+          "engine": "gemma_e2b",
+          "feasible_engines": [
+            "gemma_e2b",
+            "fireworks"
+          ],
+          "probability_correct": 0.9386158609442358,
+          "reason": "per_intent_matrix_probe",
+          "safe_fallback": false,
+          "solver_hint": null,
+          "worst_case_regret": null
+        },
+        "fallback": null,
+        "features": {
+          "names": [
+            "intent.factual_qa",
+            "intent.math_reasoning",
+            "intent.sentiment",
+            "intent.summarization",
+            "intent.ner",
+            "intent.code_debugging",
+            "intent.logic_puzzle",
+            "intent.code_generation",
+            "score.deterministic_fit",
+            "score.reasoning_demand",
+            "score.knowledge_uncertainty",
+            "score.generation_demand",
+            "score.format_complexity",
+            "struct.input_tokens_log",
+            "shape.free_text",
+            "shape.short_text",
+            "shape.number",
+            "shape.boolean",
+            "shape.json",
+            "shape.code",
+            "shape.list",
+            "struct.deadline_remaining_ratio",
+            "solver_hint.arithmetic",
+            "solver_hint.percent_fee_math",
+            "solver_hint.proportional_rate",
+            "solver_hint.numeric_compare",
+            "solver_hint.literal_echo",
+            "solver_hint.stable_factual_qa",
+            "solver_hint.sentiment_lexicon",
+            "solver_hint.constrained_summary",
+            "solver_hint.entity_extract",
+            "solver_hint.logic_ordering",
+            "solver_hint.modus_ponens",
+            "solver_hint.modus_tollens",
+            "solver_hint.python_code_debug",
+            "solver_hint.python_code_generation",
+            "solver_hint.char_count",
+            "solver_hint.word_count",
+            "solver_hint.case_transform",
+            "solver_hint.whitespace",
+            "solver_hint.json_transform",
+            "solver_hint.list_item"
+          ],
+          "schema_version": "feature-vector-v1",
+          "values": [
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.5,
+            0.3,
+            0.0,
+            0.4,
+            0.2,
+            0.4917100640683845,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.8452416666666667,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "predictions": [
+          {
+            "engine": "deterministic",
+            "expected_fireworks_tokens": 0.0,
+            "expected_latency_ms": 0.0,
+            "expected_peak_memory_mb": 0.0,
+            "model_version": "solver-manifest-v1",
+            "probability_correct": 0.0,
+            "probability_runtime_failure": 1.0
+          },
+          {
+            "engine": "fireworks",
+            "expected_fireworks_tokens": 108.81440018446905,
+            "expected_latency_ms": 959.9272512086941,
+            "expected_peak_memory_mb": 0.0,
+            "model_version": "927a64303501d43f3b509a8f48d397d372c4211f8347890827206e82bda60712:model=accounts/fireworks/models/kimi-k2p7-code",
+            "probability_correct": 0.9509635036319255,
+            "probability_runtime_failure": 0.010526315789473684
+          },
+          {
+            "engine": "gemma_e2b",
+            "expected_fireworks_tokens": 0.0,
+            "expected_latency_ms": 638.2330684194156,
+            "expected_peak_memory_mb": 2712.926,
+            "model_version": "927a64303501d43f3b509a8f48d397d372c4211f8347890827206e82bda60712:model=gemma4-e2b",
+            "probability_correct": 0.8781338013339598,
+            "probability_runtime_failure": 0.0005017561465127947
+          }
+        ],
+        "schema_version": "routing-trace-v1",
+        "task_id": "sprint60-warm"
+      }
+    ],
+    "schema_version": "full-local-exact-image-smoke-v1"
   },
-  "checks": {
-    "public_clean_pull": true,
-    "manifest_and_labels": true,
-    "resource_gate": true,
-    "official_output_contract": true,
-    "model_hashes": true,
-    "no_startup_downloads": true
+  "resource_gate": {
+    "cpus": 2,
+    "maximum_runtime_seconds": 600,
+    "memory": "4g",
+    "network": "none"
   },
-  "historical_harness_evidence": {
-    "image": "ghcr.io/rvbernucci/track1-token-router:v3.7.1-harness-safe",
-    "run_id": 29198549870,
-    "scope": "Entry-point compatibility evidence only; not attributed to v3.8.2"
-  },
-  "passed": true
+  "revision": "84f6d3fdc9d658508731bcca055219070842a100",
+  "schema_version": "final-image-audit-v1",
+  "version": "v3.9.0-dual-functiongemma"
 }

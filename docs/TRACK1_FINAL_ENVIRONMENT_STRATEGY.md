@@ -1,6 +1,6 @@
 # Track 1 Final Environment Strategy
 
-Updated: 2026-07-11
+Updated: 2026-07-13
 
 ## Hard Constraints
 
@@ -17,12 +17,13 @@ Updated: 2026-07-11
 ```text
 FunctionGemma assessment
 -> proof-carrying deterministic solver
+-> FunctionGemma planner plus mechanically proven tool execution
 -> selective Gemma 4 E2B
 -> Kimi by default / MiniMax for logic, sentiment and summarization
 -> Answer Contract Engine
 ```
 
-The current recommended public image is `ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract`. It embeds the SHA-pinned FunctionGemma Q8 and Gemma E2B artifacts and requires no model downloads during evaluation. `v3.7.3-public-sample` remains the officially scored rollback.
+The current recommended public image is `ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma`. It embeds separate SHA-pinned FunctionGemma assessment and planner Q8 artifacts plus Gemma E2B and requires no model downloads during evaluation. `v3.8.2-e2b-contract` is the immediate rollback; `v3.7.3-public-sample` remains the officially scored rollback.
 
 ## Evaluator Variables
 
@@ -30,11 +31,12 @@ The image contains no `.env` file. The evaluator injects `FIREWORKS_API_KEY`, `F
 
 ## Resource Proof
 
-- compressed size: 2,666,356,424 bytes;
+- compressed size: 2,938,728,348 bytes;
 - exact public-image platform: `linux/amd64`;
-- exact published-image release run: `29204166556`;
-- sampled resource-gate process peak: 28.645 MiB;
-- resource gate: 4 GB, 2 vCPU, no network, 600-second ceiling.
+- exact published-image release run: `29220259103`;
+- clean-pull local-inference peak: 1,299.456 MiB;
+- resource gate: 4 GB, 2 vCPU, no network, 600-second ceiling;
+- OCI digest: `sha256:86d9661ccff0fc181feb46fe517816f2bbb18b47e6fe4ee1a6aeb45f4575b363`.
 
 ## Failure Strategy
 
@@ -42,4 +44,4 @@ Every local stage fails closed to an authorized Fireworks model. The system neve
 
 ## Rollback
 
-The officially scored rollback is `ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample`. The compact emergency rollback remains `ghcr.io/rvbernucci/track1-token-router:v2.1.0-proof-router`. Rollback requires changing only the Docker Image field in the submission form.
+The immediate rollback is `ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract`. The officially scored rollback is `ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample`; the compact emergency rollback remains `v2.1.0-proof-router`. Rollback requires changing only the Docker Image field.

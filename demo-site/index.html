@@ -244,7 +244,7 @@
       <aside class="panel router-card" aria-label="Router flow">
         <div class="node"><strong>1. Local assessment</strong> FunctionGemma 270M emits an intent and five routing scores.</div>
         <div class="arrow">↓</div>
-        <div class="node"><strong>2. Zero-token routes</strong> Proven deterministic tasks or matrix-selected Gemma E2B tasks stay local.</div>
+        <div class="node"><strong>2. Zero-token routes</strong> Proven solvers, FunctionGemma-planned tools or matrix-selected Gemma E2B tasks stay local.</div>
         <div class="arrow">↓</div>
         <div class="node"><strong>3. Risk guard</strong> Wilson 90% and Nash/minimax can reject, but never expand, the calibrated E2B cohort.</div>
         <div class="arrow">↓</div>
@@ -268,13 +268,13 @@
       <article class="card">
         <h2>Submission shape</h2>
         <p>Public, immutable, no-download image with audited OCI labels and a compact rollback tag.</p>
-        <span class="metric">2.67 GB</span>
+        <span class="metric">2.94 GB</span>
       </article>
 
       <article class="card wide">
         <h2>Pull the submitted image</h2>
         <pre><code>docker pull --platform linux/amd64 \
-  ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract</code></pre>
+  ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma</code></pre>
         <p>This public tag exposes a <code>linux/amd64</code> manifest and passed the complete release workflow.</p>
       </article>
 
@@ -306,7 +306,7 @@ docker run --rm --platform linux/amd64 \
   -e ALLOWED_MODELS \
   -v "$PWD/input:/input:ro" \
   -v "$PWD/output:/output" \
-  ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract
+  ghcr.io/rvbernucci/track1-token-router:v3.9.0-dual-functiongemma
 
 cat output/results.json</code></pre>
       </article>
@@ -341,7 +341,7 @@ cat output/results.json</code></pre>
         <pre><code>python3 -m pip install -e .
 scripts/offline_release_check.sh
 python3 scripts/export_public_report.py --check</code></pre>
-        <p><strong>Verified:</strong> 712 automated tests passed, with one environment-dependent skip.</p>
+        <p><strong>Verified:</strong> 758 automated tests passed, with one environment-dependent skip.</p>
       </article>
     </section>
 
