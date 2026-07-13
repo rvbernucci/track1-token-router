@@ -49,25 +49,25 @@ Local MP4 included in repository: submission/final/proofroute-retro-cli.mp4
 
 ## Public Docker Image
 
-ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla
+ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry
 
 ## Release Evidence
 
-- release_tag: `v3.12.1-no-hardcoded-startup-sla`
-- commit_sha: `8545d0fbe7170d9e782678ad296fc9586c7f8893`
+- release_tag: `v3.12.3-proof-pull-retry`
+- commit_sha: `76df56564f0a17e0db8b743ceaac441f573ca104`
 - ci_status: `green`
 - release_status: `green`
 - image_audit_status: `green`
 - image_platform: `linux/amd64`
-- image_compressed_size_bytes: `2938881133`
+- image_compressed_size_bytes: `2938881530`
 
 ## Image Audit Command
 
 ```bash
 python3 scripts/competition_submission_audit.py \
-  --image ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla \
-  --expected-revision 8545d0fbe7170d9e782678ad296fc9586c7f8893 \
-  --expected-version v3.12.1-no-hardcoded-startup-sla
+  --image ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry \
+  --expected-revision 76df56564f0a17e0db8b743ceaac441f573ca104 \
+  --expected-version v3.12.3-proof-pull-retry
 ```
 
 ## Notes

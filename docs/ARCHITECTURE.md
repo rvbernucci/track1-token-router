@@ -4,7 +4,7 @@ Updated: 2026-07-13
 
 ## Final Runtime
 
-The current recommended image is `ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla` (`linux/amd64`). It embeds three local artifacts and performs no startup download. `v3.12.0-proof-first-deadline` is the immediate rollback and `v3.7.3-public-sample` remains the officially scored rollback.
+The current recommended image is `ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry` (`linux/amd64`). It embeds three local artifacts and performs no startup download. `v3.12.1-no-hardcoded-startup-sla` is the immediate rollback and `v3.7.3-public-sample` remains the officially scored rollback.
 
 ```text
 /input/tasks.json
@@ -89,12 +89,12 @@ The final policy is nondominated: it matches the strongest deterministic-validat
 
 ## Delivery Proof
 
-- Recommended image: `v3.12.1-no-hardcoded-startup-sla`
-- OCI manifest digest: `sha256:cb00e42063260edc3bf57a73ca187646d4394edbdf7c8ede5c4e38fbd7b7dea2`
-- Platform digest: `sha256:41bea5a5cc695fb5e51822d6a5d618eabb482c6e709445e39425a1d2764a7fce`
-- Compressed size: 2,938,881,133 bytes
-- Source revision: `8545d0fbe7170d9e782678ad296fc9586c7f8893`
-- Release and exact published-image gate: `29229926996`
+- Recommended image: `v3.12.3-proof-pull-retry`
+- OCI manifest digest: `sha256:ec0d62c4c08489e8b8f06abf26087d1c1bfa43128d330b591f8588976b333c59`
+- Platform digest: `sha256:782f1266a5b1e74f5adca9d7ebef21f1bb576f0c5ab81990965660a08c089c5e`
+- Compressed size: 2,938,881,530 bytes
+- Source revision: `76df56564f0a17e0db8b743ceaac441f573ca104`
+- Release and exact published-image gate: `29247825641`
 - Exact-image cold-start smoke: 5 seconds (60-second gate)
 - Clean-pull local inference: 16.221 s cold, 1.461 s warm, 1,299.456 MiB sampled peak
 - Officially scored rollback image: `v3.7.3-public-sample` (84.2% accuracy, 4,198 Fireworks tokens)

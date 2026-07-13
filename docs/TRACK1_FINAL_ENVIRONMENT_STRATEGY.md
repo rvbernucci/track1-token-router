@@ -25,7 +25,7 @@ Proof-carrying deterministic solver
 -> Answer Contract Engine
 ```
 
-The current recommended public image is `ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla`. It embeds separate SHA-pinned FunctionGemma assessment and planner Q8 artifacts plus Gemma E2B and requires no model downloads during evaluation. `v3.12.0-proof-first-deadline` is the immediate rollback; `v3.7.3-public-sample` remains the officially scored rollback.
+The current recommended public image is `ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry`. It embeds separate SHA-pinned FunctionGemma assessment and planner Q8 artifacts plus Gemma E2B and requires no model downloads during evaluation. `v3.12.1-no-hardcoded-startup-sla` is the immediate rollback; `v3.7.3-public-sample` remains the officially scored rollback.
 
 ## Evaluator Variables
 
@@ -33,14 +33,14 @@ The image contains no `.env` file. The evaluator injects `FIREWORKS_API_KEY`, `F
 
 ## Resource Proof
 
-- compressed size: 2,938,881,133 bytes;
+- compressed size: 2,938,881,530 bytes;
 - exact public-image platform: `linux/amd64`;
-- exact published-image release run: `29229926996`;
+- exact published-image release run: `29247825641`;
 - clean-pull local-inference peak: 1,299.456 MiB;
 - resource gate: 4 GB, 2 vCPU, no network, 600-second ceiling;
 - cold-start plus official smoke: 5 seconds, below the 60-second gate;
 - absolute Fireworks task deadline: 28 seconds;
-- OCI digest: `sha256:cb00e42063260edc3bf57a73ca187646d4394edbdf7c8ede5c4e38fbd7b7dea2`.
+- OCI digest: `sha256:ec0d62c4c08489e8b8f06abf26087d1c1bfa43128d330b591f8588976b333c59`.
 
 ## Failure Strategy
 
@@ -48,4 +48,4 @@ Every local stage fails closed to an authorized Fireworks model. The system neve
 
 ## Rollback
 
-The immediate rollback is `ghcr.io/rvbernucci/track1-token-router:v3.12.0-proof-first-deadline`. The officially scored rollback is `ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample`; the compact emergency rollback remains `v2.1.0-proof-router`. Rollback requires changing only the Docker Image field.
+The immediate rollback is `ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla`. The officially scored rollback is `ghcr.io/rvbernucci/track1-token-router:v3.7.3-public-sample`; the compact emergency rollback remains `v2.1.0-proof-router`. Rollback requires changing only the Docker Image field.

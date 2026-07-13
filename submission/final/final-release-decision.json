@@ -4,7 +4,7 @@
     "The 23-task Fireworks microbench is deterministic-validator evidence, not hidden-evaluator accuracy.",
     "The final lablab.ai form and screenshot require manual confirmation outside this repository."
   ],
-  "candidate": "ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla",
+  "candidate": "ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry",
   "checks": {
     "candidate_is_immutable_version_tag": true,
     "compressed_size_below_10gb": true,
@@ -17,22 +17,22 @@
     "revision_is_sha40": true,
     "rollback_is_distinct_version_tag": true
   },
-  "compressed_size_bytes": 2938881133,
+  "compressed_size_bytes": 2938881530,
   "decision": "promote_full_hybrid",
   "exact_local_gate_run": {
-    "id": 29229926996,
-    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29229926996"
+    "id": 29247825641,
+    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29247825641"
   },
-  "manifest_digest": "sha256:cb00e42063260edc3bf57a73ca187646d4394edbdf7c8ede5c4e38fbd7b7dea2",
+  "manifest_digest": "sha256:ec0d62c4c08489e8b8f06abf26087d1c1bfa43128d330b591f8588976b333c59",
   "passed": true,
-  "platform_digest": "sha256:41bea5a5cc695fb5e51822d6a5d618eabb482c6e709445e39425a1d2764a7fce",
+  "platform_digest": "sha256:782f1266a5b1e74f5adca9d7ebef21f1bb576f0c5ab81990965660a08c089c5e",
   "release_run": {
-    "id": 29229926996,
-    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29229926996"
+    "id": 29247825641,
+    "url": "https://github.com/rvbernucci/track1-token-router/actions/runs/29247825641"
   },
-  "revision": "8545d0fbe7170d9e782678ad296fc9586c7f8893",
-  "rollback": "ghcr.io/rvbernucci/track1-token-router:v3.12.0-proof-first-deadline",
-  "rollback_action": "Replace only the Docker Image field with ghcr.io/rvbernucci/track1-token-router:v3.12.0-proof-first-deadline",
+  "revision": "76df56564f0a17e0db8b743ceaac441f573ca104",
+  "rollback": "ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla",
+  "rollback_action": "Replace only the Docker Image field with ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla",
   "schema_version": "final-release-decision-v1",
-  "submission_action": "Set the Docker Image field to ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla"
+  "submission_action": "Set the Docker Image field to ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry"
 }

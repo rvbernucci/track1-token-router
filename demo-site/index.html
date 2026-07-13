@@ -261,8 +261,8 @@
 
       <article class="card">
         <h2>Live score</h2>
-        <p>Our last scored evaluator baseline completed successfully and became the immutable control for every later change.</p>
-        <span class="metric">84.2% / 4,198 tokens</span>
+        <p>Our best reported evaluator score completed successfully and became the accuracy control for every later release.</p>
+        <span class="metric">94.7% / 4,723 tokens</span>
       </article>
 
       <article class="card">
@@ -274,7 +274,7 @@
       <article class="card wide">
         <h2>Pull the submitted image</h2>
         <pre><code>docker pull --platform linux/amd64 \
-  ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla</code></pre>
+  ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry</code></pre>
         <p>This public tag exposes a <code>linux/amd64</code> manifest and passed clean pull, exact-image execution and immutable-label audits.</p>
       </article>
 
@@ -306,7 +306,7 @@ docker run --rm --platform linux/amd64 \
   -e ALLOWED_MODELS \
   -v "$PWD/input:/input:ro" \
   -v "$PWD/output:/output" \
-  ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla
+  ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry
 
 cat output/results.json</code></pre>
       </article>
@@ -357,9 +357,9 @@ python3 scripts/export_public_report.py --check</code></pre>
       <article class="card wide">
         <h2>Immutable release evidence</h2>
         <p>
-          Release <code>v3.12.1-no-hardcoded-startup-sla</code> was built from revision
-          <code>8545d0f</code>. Its OCI digest is
-          <code>sha256:cb00e42063260edc3bf57a73ca187646d4394edbdf7c8ede5c4e38fbd7b7dea2</code>.
+          Release <code>v3.12.3-proof-pull-retry</code> was built from revision
+          <code>76df565</code>. Its OCI digest is
+          <code>sha256:ec0d62c4c08489e8b8f06abf26087d1c1bfa43128d330b591f8588976b333c59</code>.
           The exact public image completed the official I/O smoke under 4 GB RAM, 2 vCPU,
           <code>linux/amd64</code> and disabled networking in five seconds. Fireworks calls share
           an absolute 28-second task deadline, and factual questions are never answered from a lookup table.

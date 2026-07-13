@@ -54,7 +54,7 @@ The canonical specification is [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Status
 
-`v3.12.1-no-hardcoded-startup-sla` is the current recommended championship candidate. It runs proof-carrying solvers before model assessment, enforces an absolute 28-second Fireworks deadline, rejects non-standard or duplicate-key JSON, and contains no factual-answer lookup table. Release run `29229926996` passed clean public pull, exact published-image execution, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract, cold-start and OCI-label gates. `v3.12.0-proof-first-deadline` is the immediate rollback; `v3.7.3-public-sample` remains the scored rollback with 84.2% official accuracy and 4,198 Fireworks tokens.
+`v3.12.3-proof-pull-retry` is the current recommended championship candidate. It runs proof-carrying solvers before model assessment, enforces an absolute 28-second Fireworks deadline, rejects non-standard or duplicate-key JSON, contains no factual-answer lookup table, and expands one mechanically proven inventory grammar. Release run `29247825641` passed clean public pull, exact published-image execution, `linux/amd64`, sub-10 GB, 4 GB, 2 vCPU, no-network, official-contract, cold-start and OCI-label gates. `v3.12.1-no-hardcoded-startup-sla` is the immediate rollback; `v3.7.3-public-sample` remains the scored rollback with 84.2% official accuracy and 4,198 Fireworks tokens.
 
 ## Quickstart
 
@@ -160,10 +160,10 @@ ROUTER_MODE=three_route
 The final hybrid championship candidate is:
 
 ```text
-ghcr.io/rvbernucci/track1-token-router:v3.12.1-no-hardcoded-startup-sla
+ghcr.io/rvbernucci/track1-token-router:v3.12.3-proof-pull-retry
 ```
 
-It embeds separate FunctionGemma 270M Q8 assessment and tool-planner models plus text-only Gemma 4 E2B, requires no startup downloads, and falls through only to evaluator-authorized Fireworks models. Release run `29229926996` built, publicly pulled and gated the exact image under 4 GB RAM, 2 vCPU and disabled networking. Registry audit confirms OCI digest `sha256:cb00e42063260edc3bf57a73ca187646d4394edbdf7c8ede5c4e38fbd7b7dea2`, platform digest `sha256:41bea5a5cc695fb5e51822d6a5d618eabb482c6e709445e39425a1d2764a7fce`, source revision `8545d0fbe7170d9e782678ad296fc9586c7f8893`, 2,938,881,133 compressed bytes and a five-second cold-start smoke.
+It embeds separate FunctionGemma 270M Q8 assessment and tool-planner models plus text-only Gemma 4 E2B, requires no startup downloads, and falls through only to evaluator-authorized Fireworks models. Release run `29247825641` built, publicly pulled and gated the exact image under 4 GB RAM, 2 vCPU and disabled networking. Registry audit confirms OCI digest `sha256:ec0d62c4c08489e8b8f06abf26087d1c1bfa43128d330b591f8588976b333c59`, platform digest `sha256:782f1266a5b1e74f5adca9d7ebef21f1bb576f0c5ab81990965660a08c089c5e`, source revision `76df56564f0a17e0db8b743ceaac441f573ca104`, 2,938,881,530 compressed bytes and a five-second cold-start smoke.
 
 ## Fireworks
 
