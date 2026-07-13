@@ -54,6 +54,7 @@ Sprints 76 and 77 run concurrently against separate ownership boundaries. Sprint
 Sprint 78 evaluates a new zero-Fireworks-token path in which Gemma E2B creates a constrained plan and deterministic code validates, proves, executes and renders exact answers. A second E2B rendering call was rejected as unnecessary. The path remains experimental unless it passes sealed accuracy, safety, latency and exact-image gates.
 
 - [x] [Sprint 78 - E2B Deterministic Tool Reasoning](./78-e2b-deterministic-tool-reasoning/README.md) - closed as retain; exact-runtime parity and worst-case latency gates failed.
+- [ ] [Sprint 79 - Dual FunctionGemma Tool Planning](./79-dual-functiongemma-tool-planning/README.md) - planned; prove the dual-model envelope before training a dedicated planner.
 
 ## Post-Submission Robustness Sequence
 
