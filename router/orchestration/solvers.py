@@ -247,8 +247,8 @@ def _solve_inventory_flow(task: TaskEnvelope) -> SolverResult | None:
         r"(\d+(?:\.\d+)?)%\s+of\s+stock,\s+restocks\s+([\d,]+)\s+units,\s+then\s+sells\s+"
         r"([\d,]+)\s+units\.\s+how\s+many\s+units\s+remain\?",
         r"inventory\s+begins\s+at\s+([\d,]+)\.\s+sell\s+(\d+(?:\.\d+)?)\s+percent,\s+"
-        r"add\s+([\d,]+)\s+units,\s+and\s+sell\s+another\s+([\d,]+)\s+units\.\s+"
-        r"return\s+the\s+final\s+count\.",
+        r"add\s+([\d,]+)(?:\s+units)?,\s+and\s+sell\s+another\s+([\d,]+)\s+units\.\s+"
+        r"return\s+the\s+final\s+(?:unit\s+)?count\.",
         r"a\s+depot\s+has\s+([\d,]+)\s+items;\s+(\d+(?:\.\d+)?)%\s+are\s+sold,\s+"
         r"([\d,]+)\s+arrive,\s+and\s+([\d,]+)\s+more\s+are\s+sold\.\s+"
         r"determine\s+ending\s+inventory\.",

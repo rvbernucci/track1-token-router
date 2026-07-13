@@ -112,6 +112,10 @@ class SolverPackTests(unittest.TestCase):
                 "Return the final count."
             ): ("461.45 units", "inventory_flow"),
             (
+                "Inventory begins at 2,313. Sell 25 percent, add 187, and sell another 108 units. "
+                "Return the final unit count."
+            ): ("1813.75 units", "inventory_flow"),
+            (
                 "For 7 portions, a dish needs 5/8 cup of rice. Find cups and cost for 27 portions "
                 "if rice costs $2.00 per cup."
             ): ("2.4107142857 cups; $4.82", "recipe_cost"),
