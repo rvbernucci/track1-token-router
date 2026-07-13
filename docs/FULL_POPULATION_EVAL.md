@@ -71,9 +71,29 @@ Eight guarded fallbacks introduced a number absent from the prompt. One proposed
 | Recipe | 400 | 400 | 100.00% |
 | Unsupported/none | 400 safe declines | 400 | 100.00% safe |
 
+## Proof-First Deterministic Replay
+
+After the planner replay, the proof engine was extended with closed grammars for the four eligible families. The runtime recognizes only complete expressions, ordered inventory operations, dimensionally consistent recipe-cost statements, and ordering graphs with a unique endpoint. It executes arithmetic with exact rational values and rejects division by zero, incompatible units, negative inventory, incomplete operations, and ambiguous graphs.
+
+The updated proof engine was replayed against the same 2,000 prompts without access to expected answers at inference time:
+
+| Family | Proven answers | Exact matches | Precision |
+|---|---:|---:|---:|
+| Calculator | 400 | 400 | 100.00% |
+| Inventory | 400 | 400 | 100.00% |
+| Logic | 400 | 400 | 100.00% |
+| Recipe | 400 | 400 | 100.00% |
+| Unsupported/none | 0 | 0 | Safe decline |
+| **Total** | **1,600/2,000** | **1,600/1,600** | **100.00% selective** |
+
+Proof-carrying solvers now run before FunctionGemma assessment. This removes local-model latency and failure risk for accepted tasks while preserving the planner and Fireworks fallback for every non-matching prompt. The change does not cache task answers: each result is recomputed from literals and operations parsed from the current prompt.
+
+Fireworks calls also share an absolute 28-second per-task deadline. Initial calls, option fallbacks, alternate-model attempts, and truncation retries receive only the remaining budget, preventing a late retry from violating the 30-second evaluator limit.
+
 ## Implications
 
 - Keep deterministic tool execution behind provenance validation and independent proof recomputation.
+- Prefer direct proof execution before model assessment whenever the full closed grammar accepts the task.
 - Use the 4,400 labeled E2B outcomes to retrain the selective gate, not to enable whole categories.
 - Optimize first for precision on released E2B answers; Fireworks remains the fallback for rejected or invalid local decisions.
 - Preserve planner calibration and sealed-holdout splits for the final no-tuning confirmation.
