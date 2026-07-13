@@ -18,6 +18,7 @@ from router.core.runner import TaskRunner
 from router.core.three_route_runner import ThreeRouteRunner
 from router.functiongemma.calibration import load_calibration
 from router.functiongemma.provider import FunctionGemmaAssessmentProvider
+from router.functiongemma.tool_planner_provider import FunctionGemmaToolPlannerProvider
 from router.orchestration.budget import TaskBudget
 from router.orchestration.competition import CompetitionRunner
 from router.orchestration.game_theory_selector import MinimaxRegretSelector, RobustSelectionConfig
@@ -233,6 +234,7 @@ def _build_three_route_runner(config: RouterConfig, logger: JsonlRunLogger) -> T
                 config.risk_ladder_policy,
                 expected_sha256=config.risk_ladder_policy_sha256,
             )
+        tool_planner_provider = _load_tool_planner_provider(config)
         policy_limit = int(e2b_policy["baseline"]["output_tokens"])
         if config.e2b_max_tokens != policy_limit:
             raise ValueError("E2B runtime token ceiling differs from its pinned route policy.")
@@ -276,6 +278,7 @@ def _build_three_route_runner(config: RouterConfig, logger: JsonlRunLogger) -> T
             selective_policy=selective_policy,
             matrix_gate=matrix_gate,
             risk_ladder=risk_ladder,
+            tool_planner_provider=tool_planner_provider,
             logger=logger,
         )
     except (OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
@@ -301,6 +304,35 @@ def _load_e2b_policy(path, *, expected_sha256: str | None) -> Mapping[str, Any]:
     if not isinstance(baseline, Mapping) or not isinstance(evidence, Mapping):
         raise ValueError("E2B route policy is missing baseline or evidence.")
     return payload
+
+
+def _load_tool_planner_provider(config: RouterConfig) -> FunctionGemmaToolPlannerProvider | None:
+    path = config.dual_functiongemma_policy
+    if path is None:
+        return None
+    if not path.is_file():
+        raise ValueError("Configured dual FunctionGemma policy does not exist.")
+    raw = path.read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    if config.dual_functiongemma_policy_sha256 is not None and digest != config.dual_functiongemma_policy_sha256:
+        raise ValueError("Dual FunctionGemma policy SHA-256 does not match the pinned digest.")
+    policy = json.loads(raw)
+    if not isinstance(policy, Mapping) or policy.get("schema_version") != "dual-functiongemma-policy-v1":
+        raise ValueError("Dual FunctionGemma policy schema is invalid.")
+    if policy.get("enabled") is not True:
+        return None
+    planner = policy.get("planner")
+    if not isinstance(planner, Mapping) or planner.get("sha256") in {None, ""}:
+        raise ValueError("Enabled dual FunctionGemma policy requires a pinned planner artifact.")
+    if planner.get("model_id") != config.functiongemma_planner_model:
+        raise ValueError("Planner runtime model ID differs from the pinned policy.")
+    return FunctionGemmaToolPlannerProvider(
+        base_url=config.functiongemma_planner_base_url,
+        model=config.functiongemma_planner_model,
+        api_key=config.functiongemma_planner_api_key,
+        timeout_s=config.functiongemma_planner_timeout_s,
+        max_tokens=config.functiongemma_planner_max_tokens,
+    )
 
 
 def _build_fireworks_direct_runner(

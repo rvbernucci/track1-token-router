@@ -45,6 +45,13 @@ class RouterConfig:
     functiongemma_max_tokens: int
     functiongemma_calibration: Path | None
     functiongemma_calibration_sha256: str | None
+    functiongemma_planner_base_url: str
+    functiongemma_planner_model: str
+    functiongemma_planner_api_key: str | None
+    functiongemma_planner_timeout_s: float
+    functiongemma_planner_max_tokens: int
+    dual_functiongemma_policy: Path | None
+    dual_functiongemma_policy_sha256: str | None
     e2b_base_url: str
     e2b_model: str
     e2b_api_key: str | None
@@ -110,6 +117,13 @@ class RouterConfig:
             functiongemma_max_tokens=int(os.getenv("FUNCTIONGEMMA_MAX_TOKENS", "64")),
             functiongemma_calibration=_optional_path(os.getenv("FUNCTIONGEMMA_CALIBRATION")),
             functiongemma_calibration_sha256=os.getenv("FUNCTIONGEMMA_CALIBRATION_SHA256") or None,
+            functiongemma_planner_base_url=os.getenv("FUNCTIONGEMMA_PLANNER_BASE_URL", "http://127.0.0.1:8092/v1"),
+            functiongemma_planner_model=os.getenv("FUNCTIONGEMMA_PLANNER_MODEL", "functiongemma-planner"),
+            functiongemma_planner_api_key=os.getenv("FUNCTIONGEMMA_PLANNER_API_KEY") or None,
+            functiongemma_planner_timeout_s=float(os.getenv("FUNCTIONGEMMA_PLANNER_TIMEOUT_S", "8")),
+            functiongemma_planner_max_tokens=int(os.getenv("FUNCTIONGEMMA_PLANNER_MAX_TOKENS", "160")),
+            dual_functiongemma_policy=_optional_path(os.getenv("DUAL_FUNCTIONGEMMA_POLICY")),
+            dual_functiongemma_policy_sha256=os.getenv("DUAL_FUNCTIONGEMMA_POLICY_SHA256") or None,
             e2b_base_url=os.getenv("E2B_BASE_URL", "http://127.0.0.1:9379/v1"),
             e2b_model=os.getenv("E2B_MODEL", "gemma4-e2b"),
             e2b_api_key=os.getenv("E2B_API_KEY") or None,

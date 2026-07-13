@@ -6,6 +6,8 @@ from router.core.contracts import AnswerResult, Engine, EngineDecision, EnginePr
 from router.core.logging import JsonlRunLogger
 from router.core.runner import TaskRunner
 from router.functiongemma.provider import FunctionGemmaAssessmentProvider, FunctionGemmaProviderError
+from router.functiongemma.tool_planner_provider import FunctionGemmaToolPlannerError, FunctionGemmaToolPlannerProvider
+from router.core.tool_augmented_runner import is_tool_planner_candidate
 from router.orchestration.assessment import build_feature_vector, compute_structural_features
 from router.orchestration.final_validator import validate_or_safely_repair_final_answer
 from router.orchestration.e2b_selective_gate import E2BSelectivePolicy
@@ -14,6 +16,7 @@ from router.orchestration.game_theory_selector import MinimaxRegretSelector, det
 from router.orchestration.outcome_models import OutcomeModelPredictor
 from router.orchestration.risk_ladder import RiskLadderPolicy
 from router.orchestration.solvers import SolverResult, solve_deterministic
+from router.orchestration.tool_executor import run_validated_tool_plan
 
 
 class ThreeRouteRunner:
@@ -28,6 +31,7 @@ class ThreeRouteRunner:
         selective_policy: E2BSelectivePolicy | None = None,
         matrix_gate: E2BMatrixGate | None = None,
         risk_ladder: RiskLadderPolicy | None = None,
+        tool_planner_provider: FunctionGemmaToolPlannerProvider | None = None,
         logger: JsonlRunLogger | None = None,
         task_deadline_ms: int = 10 * 60 * 1000,
         e2b_min_remaining_ms: int = 30_000,
@@ -40,6 +44,7 @@ class ThreeRouteRunner:
         self.selective_policy = selective_policy
         self.matrix_gate = matrix_gate
         self.risk_ladder = risk_ladder
+        self.tool_planner_provider = tool_planner_provider
         self.logger = logger
         self.task_deadline_ms = task_deadline_ms
         self.e2b_min_remaining_ms = e2b_min_remaining_ms
@@ -99,6 +104,44 @@ class ThreeRouteRunner:
                 matrix_decision = replace(matrix_decision, probe=False, reason="matrix_deadline_guard")
         except (FunctionGemmaProviderError, OSError, TimeoutError, ValueError) as exc:
             return self._fireworks_fallback(task, reason=f"assessment_or_decision_failure:{type(exc).__name__}")
+
+        if solver is None and self.tool_planner_provider is not None and is_tool_planner_candidate(task.input_text):
+            try:
+                planner_invocation = self.tool_planner_provider.plan_with_trace(task)
+                tool_decision = run_validated_tool_plan(task, planner_invocation.plan)
+            except (FunctionGemmaToolPlannerError, OSError, TimeoutError, ValueError) as exc:
+                return self._fireworks_fallback(task, reason=f"tool_planner_failure:{type(exc).__name__}")
+            if not tool_decision.accepted:
+                return self._fireworks_fallback(task, reason=f"tool_planner_rejected:{tool_decision.reason}")
+            tool_selection = EngineDecision(
+                engine=Engine.DETERMINISTIC,
+                reason="functiongemma_planned_verified_tool",
+                feasible_engines=(Engine.DETERMINISTIC, Engine.FIREWORKS),
+                probability_correct=1.0,
+            )
+            trace = RoutingTrace(
+                task_id=task.id,
+                assessment=invocation.assessment,
+                features=features,
+                predictions=tuple(predictions[engine] for engine in sorted(predictions, key=lambda item: item.value)),
+                decision=tool_selection,
+            )
+            result = AnswerResult(
+                id=task.id,
+                answer=tool_decision.answer,
+                route="functiongemma_tool_verified",
+                remote_tokens=TokenUsage.empty(),
+                metadata={
+                    "runner": "three_route",
+                    "assessment_invocation": invocation.to_dict(),
+                    "robust_selection": selection.to_dict(),
+                    "tool_planner_invocation": planner_invocation.to_dict(),
+                    "tool_decision": tool_decision.to_dict(),
+                    "routing_trace": trace.to_dict(),
+                },
+            )
+            self._log(task, result, trace)
+            return result
 
         decision = selection.decision
         if solver is None and matrix_decision is not None and matrix_decision.probe:

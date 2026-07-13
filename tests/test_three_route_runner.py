@@ -1,5 +1,6 @@
 import unittest
 from time import monotonic
+from unittest.mock import patch
 
 from router.core.contracts import (
     AnswerResult,
@@ -13,6 +14,8 @@ from router.core.contracts import (
 )
 from router.core.three_route_runner import ThreeRouteRunner
 from router.functiongemma.provider import AssessmentInvocation, FunctionGemmaProviderError
+from router.functiongemma.tool_planner_provider import ToolPlannerInvocation
+from router.core.tool_planner import ToolPlan
 from router.orchestration.game_theory_selector import MinimaxRegretSelector
 from router.orchestration.e2b_selective_gate import E2BSelectiveDecision
 from router.orchestration.e2b_matrix_gate import E2BMatrixDecision
@@ -131,6 +134,18 @@ class BrokenRunner:
         raise MemoryError("simulated local allocation failure")
 
 
+class PlannerProvider:
+    def __init__(self, plan):
+        self.plan = plan
+        self.calls = 0
+
+    def plan_with_trace(self, _task):
+        self.calls += 1
+        return ToolPlannerInvocation(
+            plan=self.plan, latency_ms=1.0, usage=TokenUsage.empty(), model="functiongemma-planner",
+        )
+
+
 class SelectivePolicy:
     def __init__(self, *, accepted: bool):
         self.accepted = accepted
@@ -150,6 +165,43 @@ class SelectivePolicy:
 
 
 class ThreeRouteRunnerTests(unittest.TestCase):
+    def test_functiongemma_planner_releases_only_recomputed_tool_answer(self):
+        planner = PlannerProvider(ToolPlan("safe_calculator", {"ast": {
+            "op": "add", "left": {"op": "literal", "value": 2},
+            "right": {"op": "literal", "value": 3},
+        }}, "high"))
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(), predictor=Predictor(),
+            selector=MinimaxRegretSelector(e2b_enabled=False),
+            e2b_runner=Runner("local", "e2b_local"), fireworks_runner=remote,
+            tool_planner_provider=planner,
+        )
+        task = TaskEnvelope(id="tool", input_text="Calculate 2 + 3. Return only the number.")
+        with patch("router.core.three_route_runner.solve_deterministic", return_value=None):
+            result = runner.run(task)
+        self.assertEqual(result.route, "functiongemma_tool_verified")
+        self.assertEqual(result.answer, "5")
+        self.assertEqual(result.remote_tokens.total, 0)
+        self.assertEqual(planner.calls, 1)
+        self.assertEqual(remote.calls, 0)
+
+    def test_functiongemma_planner_rejection_falls_directly_to_fireworks(self):
+        planner = PlannerProvider(ToolPlan("none", {}, "low"))
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(), predictor=Predictor(),
+            selector=MinimaxRegretSelector(e2b_enabled=False),
+            e2b_runner=Runner("local", "e2b_local"), fireworks_runner=remote,
+            tool_planner_provider=planner,
+        )
+        task = TaskEnvelope(id="tool", input_text="Calculate 2 + 3. Return only the number.")
+        with patch("router.core.three_route_runner.solve_deterministic", return_value=None):
+            result = runner.run(task)
+        self.assertEqual(result.route, "fireworks_direct")
+        self.assertIn("tool_planner_rejected", result.metadata["routing_trace"]["fallback"])
+        self.assertEqual(remote.calls, 1)
+
     def test_safe_runtime_telemetry_is_logged_without_prompt(self):
         logger = CaptureLogger()
         remote = Runner(

@@ -25,6 +25,8 @@ ENV = {
     "E2B_SELECTIVE_POLICY_SHA256": "d65caea1cccf0ee4173fbfedbd1ba9c580642608e4def45c5f0cff9dff9a6a6b",
     "RISK_LADDER_POLICY": "configs/wilson-nash-risk-ladder-v1.json",
     "RISK_LADDER_POLICY_SHA256": "66a85965cd271b22a8a91696e6506f7f99dda4186d54b59b3eb2d6ced42aab53",
+    "DUAL_FUNCTIONGEMMA_POLICY": "configs/dual-functiongemma-policy-v1.json",
+    "DUAL_FUNCTIONGEMMA_POLICY_SHA256": "5cc3ec9f0b3e7bb7d3512960eb5602988c1dd5eb2939913c58deb6ec9f36eeeb",
 }
 
 
@@ -38,9 +40,17 @@ class ThreeRouteFactoryTests(unittest.TestCase):
         self.assertIsNotNone(runner.selective_policy)
         self.assertFalse(runner.selective_policy.enabled)
         self.assertIsNotNone(runner.risk_ladder)
+        self.assertIsNone(runner.tool_planner_provider)
 
     def test_bad_artifact_hash_fails_closed(self):
         env = {**ENV, "OUTCOME_MODELS_SHA256": "0" * 64}
+        with tempfile.TemporaryDirectory() as tmp, patch.dict(os.environ, env, clear=False):
+            config = RouterConfig.from_env()
+            runner = build_runner(config, JsonlRunLogger(Path(tmp) / "run.jsonl"))
+        self.assertIsInstance(runner, AssessmentSafeModeRunner)
+
+    def test_bad_dual_functiongemma_policy_hash_fails_closed(self):
+        env = {**ENV, "DUAL_FUNCTIONGEMMA_POLICY_SHA256": "0" * 64}
         with tempfile.TemporaryDirectory() as tmp, patch.dict(os.environ, env, clear=False):
             config = RouterConfig.from_env()
             runner = build_runner(config, JsonlRunLogger(Path(tmp) / "run.jsonl"))
