@@ -1,0 +1,42 @@
+{
+  "schema_version": "dual-functiongemma-policy-v1",
+  "enabled": true,
+  "status": "sealed_evaluation_pending",
+  "selection_split": "calibration",
+  "promoted_families": [
+    "calculator",
+    "inventory",
+    "logic",
+    "recipe"
+  ],
+  "assessment": {
+    "model_id": "functiongemma-assessment",
+    "format": "GGUF",
+    "quantization": "Q8_0",
+    "sha256": "74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77"
+  },
+  "planner": {
+    "model_id": "functiongemma-planner",
+    "format": "GGUF",
+    "quantization": "Q8_0",
+    "sha256": "ec412795782acd3ed836ac35e058099bfdb1c3218a1ee86aef32905377dbddaf"
+  },
+  "e2b": {
+    "model_id": "gemma4-e2b",
+    "format": "LiteRT-LM",
+    "sha256": "181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c"
+  },
+  "planner_prefilter_enabled": true,
+  "planner_max_tokens": 160,
+  "planner_timeout_seconds": 8,
+  "fallback": "fireworks",
+  "calibration_evidence": {
+    "tasks": 250,
+    "schema_validity": 1.0,
+    "tool_accuracy": 1.0,
+    "supported_precision": 1.0,
+    "unsafe_false_positive_rate": 0.0
+  },
+  "stable_image": "ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract",
+  "stable_image_digest": "sha256:7ae875639a6b13c8ef84514646b1b6e501da4ef8efd448479615f015239313d9"
+}
