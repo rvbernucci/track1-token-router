@@ -29,6 +29,7 @@ timeout 600 docker run --rm \
   -v "$TMP/output:/output" \
   "$IMAGE"
 elapsed="$(( $(date +%s) - started ))"
+[ "$elapsed" -le 60 ] || { printf 'cold-start smoke exceeded 60 seconds: %ss\n' "$elapsed" >&2; exit 44; }
 
 python3 - "$TMP/output/results.json" "$TMP/output/resource-usage.json" "$REPORT" "$platform" "$compressed_size" "$uncompressed_size" "$elapsed" <<'PY'
 import json
@@ -60,6 +61,7 @@ report = {
     "cpus": 2,
     "network": "none",
     "maximum_runtime_seconds": 600,
+    "cold_start_completion_limit_seconds": 60,
     "observed_runtime_seconds": int(sys.argv[7]),
     "process_elapsed_ms": int(resources["elapsed_ms"]),
     "process_max_rss_mib": float(resources["max_rss_mib"]),

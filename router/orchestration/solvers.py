@@ -68,7 +68,7 @@ SOLVERS: tuple[SolverRegistration, ...] = (
     ),
     SolverRegistration(
         "stable_factual_qa",
-        lambda task: _solve_stable_factual_qa(task),
+        lambda task: None,
         ((Intent.FACTUAL_QA, "stable_fact"),),
     ),
     SolverRegistration(
@@ -457,32 +457,6 @@ def _solve_literal_echo(task: TaskEnvelope) -> SolverResult | None:
     if token_match:
         return _result(token_match.group(1), "literal_echo", "explicit_single_token_echo")
     return None
-
-
-def _solve_stable_factual_qa(task: TaskEnvelope) -> SolverResult | None:
-    text = _single_line(task.input_text)
-    lowered = text.lower()
-    if "return only" not in lowered:
-        return None
-    if re.search(r"\b(today|latest|current|now|as\s+of)\b", lowered):
-        return None
-    normalized = _normalize_fact_prompt(text)
-    facts = {
-        "return only the city what is the capital of canada": "Ottawa",
-        "what is the capital city of canada return only the city": "Ottawa",
-        "who wrote pride and prejudice return only the author name": "Jane Austen",
-        "which planet is known as the red planet return only the planet name": "Mars",
-        "which planet is called the red planet return only the planet name": "Mars",
-        "what is the capital of canada return only the city": "Ottawa",
-        "what is the primary language of brazil return only the language name": "Portuguese",
-        "what language is primarily spoken in brazil return only the language name": "Portuguese",
-        "who wrote the hobbit return only the author name": "J. R. R. Tolkien",
-        "what currency is used in japan return only the full currency name": "Japanese yen",
-    }
-    answer = facts.get(normalized)
-    if answer is None:
-        return None
-    return _result(answer, "stable_factual_qa", "whitelisted_stable_fact_exact_prompt")
 
 
 def _solve_sentiment_lexicon(task: TaskEnvelope) -> SolverResult | None:
@@ -1316,13 +1290,6 @@ def _extract_inline_extraction_payload(text: str) -> str | None:
 
 def _json_result(payload: dict[str, object], solver_name: str, reason: str) -> SolverResult:
     return _result(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), solver_name, reason)
-
-
-def _normalize_fact_prompt(text: str) -> str:
-    normalized = text.lower()
-    normalized = normalized.replace("&", " and ")
-    normalized = re.sub(r"[^a-z0-9]+", " ", normalized)
-    return re.sub(r"\s+", " ", normalized).strip()
 
 
 def _summary_required_terms(instruction: str) -> list[str]:

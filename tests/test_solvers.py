@@ -184,27 +184,11 @@ class SolverPackTests(unittest.TestCase):
                 self.assertIsNotNone(result)
                 self.assertEqual(result.answer, answer)
 
-    def test_solves_whitelisted_stable_facts(self) -> None:
-        cases = {
-            "Who wrote Pride and Prejudice? Return only the author name.": "Jane Austen",
-            "Which planet is known as the Red Planet? Return only the planet name.": "Mars",
-            "Which planet is called the Red Planet? Return only the planet name.": "Mars",
-            "What is the capital of Canada? Return only the city.": "Ottawa",
-            "Return only the city: what is the capital of Canada?": "Ottawa",
-            "What language is primarily spoken in Brazil? Return only the language name.": "Portuguese",
-            "What is the primary language of Brazil? Return only the language name.": "Portuguese",
-            "Who wrote The Hobbit? Return only the author name.": "J. R. R. Tolkien",
-            "What currency is used in Japan? Return only the full currency name.": "Japanese yen",
-        }
-        for prompt, answer in cases.items():
-            with self.subTest(prompt=prompt):
-                result = solve_deterministic(TaskEnvelope(input_text=prompt))
-                self.assertIsNotNone(result)
-                self.assertEqual(result.solver_name, "stable_factual_qa")
-                self.assertEqual(result.answer, answer)
-
-    def test_blocks_unlisted_or_current_facts(self) -> None:
+    def test_factual_lookups_are_never_hardcoded(self) -> None:
         blocked = [
+            "Who wrote Pride and Prejudice? Return only the author name.",
+            "Which planet is known as the Red Planet? Return only the planet name.",
+            "What is the capital of Canada? Return only the city.",
             "Who wrote an obscure unpublished manuscript? Return only the author name.",
             "Who is the current CEO of AMD? Return only the name.",
             "What is the latest Fireworks model? Return only the model id.",

@@ -3,7 +3,7 @@
   "source_bundle": [
     {
       "path": "configs/championship-shadow-policy-v1.json",
-      "sha256": "a37029de107c0754a30df4c5df24e58b9a86c1f6f5df9c2c95f1b0546f357aa1"
+      "sha256": "1805e99efd8f7acfdabc3b68ae135aadc541c2c741511a859dfd7d85e1587ebe"
     },
     {
       "path": "configs/functiongemma-scale789-q8-runtime.json",
@@ -23,7 +23,7 @@
     },
     {
       "path": "scripts/docker_resource_gate.sh",
-      "sha256": "19833d0690b2f44b60004e9690bbe21fd2b07fa8cf1b66a3e1e8b99110d2e94d"
+      "sha256": "1f27365273e92242c5cd34e7c0ba00cb8211802244c52fac25b70c48cf01fb68"
     },
     {
       "path": "docs/AMD_RETURN_RUNBOOK.md",

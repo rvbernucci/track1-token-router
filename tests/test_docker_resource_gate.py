@@ -15,6 +15,8 @@ class DockerResourceGateTests(unittest.TestCase):
         self.assertIn("--cpus=2", content)
         self.assertIn("--network=none", content)
         self.assertIn("timeout 600", content)
+        self.assertIn("cold-start smoke exceeded 60 seconds", content)
+        self.assertIn('"cold_start_completion_limit_seconds": 60', content)
         self.assertIn("linux/amd64", content)
         self.assertIn("10000000000", content)
         self.assertIn("results.json", content)

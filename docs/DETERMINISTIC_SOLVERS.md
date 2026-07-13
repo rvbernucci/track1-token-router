@@ -22,7 +22,7 @@ It is not the core intelligence of Track 1. The core is the general-purpose agen
 | `percent_fee_math` | single percentage discount followed by a fixed fee; explicit repeated percentage increase | requires a verifiable textual formula and limited percentages |
 | `proportional_rate` | linear rate of identical units | requires a phrase with identical units, total production, and a new number of units |
 | `numeric_compare` | greater/lesser between two numbers; JSON min/max; JSON sum/product | requires a short numeric list or exactly two numbers and a comparison keyword |
-| `stable_factual_qa` | stable facts of extremely high confidence | only whitelist exact-prompt with `return only`; blocks `today/latest/current/now/as of` |
+| `stable_factual_qa` | reserved feature-schema slot | disabled; factual lookups always route to a model so no answer is hardcoded or cached |
 | `sentiment_lexicon` | explicit sentiment `positive/neutral/negative` | requires a sentiment prompt, `Text:` marker, and clear lexical margin or factual neutral phrase |
 | `constrained_summary` | short summaries with word limits and mandatory/inferable terms | only templates that mechanically obey `at most N words` |
 | `entity_extract` | minified JSON and simple fields for mechanical NER patterns | only dated payment, invoice/date/amount, person/org/city foundation, customer/item/city purchase/order, key/value pairs, simple names, title, and invoice code |
