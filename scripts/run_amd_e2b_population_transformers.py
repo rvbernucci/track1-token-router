@@ -83,7 +83,7 @@ def main() -> int:
         latency_ms = (perf_counter() - started) * 1000 / len(batch)
         decoded = processor.batch_decode(generated[:, input_length:], skip_special_tokens=False)
         records = [
-            _record(task, _answer(processor.parse_response(raw)), raw, latency_ms)
+            _record(task, _parsed_answer(processor, raw), raw, latency_ms)
             for task, raw in zip(batch, decoded, strict=True)
         ]
         with args.output.open("a", encoding="utf-8") as stream:
@@ -107,6 +107,14 @@ def main() -> int:
     return 0
 
 
+def _parsed_answer(processor: Any, raw: str) -> str:
+    try:
+        return _answer(processor.parse_response(raw))
+    except (KeyError, TypeError, ValueError):
+        # A single unusual Gemma response shape must not discard the full batch.
+        return raw.replace("<end_of_turn>", "").strip()
+
+
 def _answer(parsed: Any) -> str:
     if isinstance(parsed, str):
         return parsed.strip()
@@ -115,8 +123,24 @@ def _answer(parsed: Any) -> str:
             value = parsed.get(key)
             if isinstance(value, str):
                 return value.strip()
+            if isinstance(value, (Mapping, list)):
+                try:
+                    nested = _answer(value)
+                except ValueError:
+                    continue
+                if nested:
+                    return nested
     if isinstance(parsed, list):
-        text = "".join(str(item.get("text", "")) for item in parsed if isinstance(item, Mapping))
+        chunks = []
+        for item in parsed:
+            if isinstance(item, str):
+                chunks.append(item)
+            elif isinstance(item, (Mapping, list)):
+                try:
+                    chunks.append(_answer(item))
+                except ValueError:
+                    continue
+        text = "".join(chunks)
         if text.strip():
             return text.strip()
     raise ValueError(f"Unsupported Gemma response shape: {type(parsed).__name__}")
