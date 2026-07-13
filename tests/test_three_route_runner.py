@@ -135,6 +135,20 @@ class BrokenRunner:
         raise MemoryError("simulated local allocation failure")
 
 
+class ContractRetryRunner:
+    def __init__(self):
+        self.calls = 0
+        self.retry_calls = 0
+
+    def run(self, task):
+        self.calls += 1
+        return AnswerResult(id=task.id, answer='{"answer":', route="e2b_local")
+
+    def retry(self, task):
+        self.retry_calls += 1
+        return AnswerResult(id=task.id, answer='{"answer": 4}', route="e2b_local_retry")
+
+
 class PlannerProvider:
     def __init__(self, plan):
         self.plan = plan
@@ -312,6 +326,25 @@ class ThreeRouteRunnerTests(unittest.TestCase):
         result = runner.run(TaskEnvelope(id="task", input_text="Explain why the sky is blue."))
         self.assertEqual(result.answer, "remote")
         self.assertIn("e2b_rejected", result.metadata["routing_trace"]["fallback"])
+
+    def test_invalid_contract_retries_once_before_remote_fallback(self):
+        e2b = ContractRetryRunner()
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(),
+            predictor=Predictor(e2b=0.99, fireworks=0.61),
+            selector=MinimaxRegretSelector(e2b_enabled=True),
+            e2b_runner=e2b,
+            fireworks_runner=remote,
+        )
+
+        result = runner.run(TaskEnvelope(id="task", input_text="Return only JSON with key answer."))
+
+        self.assertEqual(result.answer, '{"answer": 4}')
+        self.assertEqual(result.route, "e2b_local_retry")
+        self.assertEqual(e2b.calls, 1)
+        self.assertEqual(e2b.retry_calls, 1)
+        self.assertEqual(remote.calls, 0)
 
     def test_selective_policy_can_probe_after_preselector_chose_fireworks(self):
         e2b = Runner("positive", "e2b_local")

@@ -8,11 +8,15 @@ if False:  # pragma: no cover - imported only for type checkers without runtime 
 
 
 ANSWER_PROMPT_VERSION = "raw-prompt-v1"
-FIREWORKS_ANSWER_PROMPT_VERSION = "domain-aware-succinct-v1"
-CONCISE_ANSWER_PROMPT_VERSION = "concise-system-v1"
+FIREWORKS_ANSWER_PROMPT_VERSION = "domain-aware-succinct-v2-english"
+CONCISE_ANSWER_PROMPT_VERSION = "concise-system-v2-english"
+ENGLISH_RESPONSE_DIRECTIVE = (
+    "Use English for all natural-language text. Preserve required code, JSON keys, labels, names, "
+    "and quoted source spans exactly."
+)
 CONCISE_ANSWER_SYSTEM_PROMPT = (
-    "Follow the user's requested format exactly. Otherwise answer succinctly and precisely. "
-    "Return only the answer."
+    f"{ENGLISH_RESPONSE_DIRECTIVE} Follow the user's requested format exactly. Otherwise answer "
+    "succinctly and precisely. Return only the answer."
 )
 
 
@@ -35,12 +39,15 @@ def build_m1_messages(task: TaskEnvelope) -> list[dict[str, str]]:
 def build_fireworks_answer_messages(task: TaskEnvelope, *, domain: str) -> list[dict[str, str]]:
     """Add concise guidance only where the frozen ablation improved accuracy."""
     if domain in {"formatting", "extraction"}:
-        prefix = "Answer succinctly and follow the requested format exactly:\n"
+        guidance = "Answer succinctly and follow the requested format exactly."
     elif domain in {"current_factual", "math_reasoning"}:
-        prefix = "Answer succinctly:\n"
+        guidance = "Answer succinctly."
     else:
-        return build_m1_messages(task)
-    return [{"role": "user", "content": prefix + task.input_text}]
+        guidance = "Answer directly."
+    return [
+        {"role": "system", "content": ENGLISH_RESPONSE_DIRECTIVE},
+        {"role": "user", "content": f"{guidance}\n{task.input_text}"},
+    ]
 
 
 M2A_SYSTEM_PROMPT = """You are M2A, the local verifier and routing judge.

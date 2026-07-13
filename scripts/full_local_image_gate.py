@@ -193,7 +193,7 @@ def _report(args, platform, hashes, started, finished, inspect, results, logs, s
         "zero_fireworks_tokens": len(remote) == 2 and all(int(row.get("prompt", 0)) == 0 and int(row.get("completion", 0)) == 0 for row in remote),
         "official_output_contract": result_contract,
         "peak_memory_at_most_3584_mib": peak_mib <= 3584,
-        "cold_at_most_120_seconds": cold_seconds <= 120,
+        "cold_at_most_60_seconds": cold_seconds <= 60,
         "warm_at_most_30_seconds": warm_seconds is not None and warm_seconds <= 30,
         "network_disabled": args.network == "none",
     }

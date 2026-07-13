@@ -71,7 +71,7 @@ class E2BOutcomeExperimentTests(unittest.TestCase):
                 {"role": "user", "content": "question"},
             ],
         )
-        self.assertEqual(row["prompt_version"], "generic-answer-contract-v1")
+        self.assertEqual(row["prompt_version"], "generic-answer-contract-v2-english")
 
     @patch("urllib.request.urlopen")
     def test_run_is_append_only_and_resumable(self, urlopen) -> None:

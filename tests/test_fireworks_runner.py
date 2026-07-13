@@ -10,11 +10,15 @@ from router.core.contracts import TaskEnvelope, TokenUsage
 from router.core.fireworks import FireworksClient
 from router.core.fireworks_runner import FireworksDirectRunner, _retry_truncated_response
 from router.core.model_client import ModelClientError, ModelResponse
+from router.core.prompts import ENGLISH_RESPONSE_DIRECTIVE
 from router.orchestration.matrix_regression_selector import FEATURE_NAMES, MatrixRegressionWeights, save_weights
 from tests.fake_openai_server import FakeOpenAIServer
 
 
 class FireworksDirectRunnerTests(unittest.TestCase):
+    def test_prompt_requires_english_natural_language(self) -> None:
+        self.assertIn("Use English for all natural-language text", ENGLISH_RESPONSE_DIRECTIVE)
+
     def test_truncated_response_is_retried_once_with_a_larger_cap(self) -> None:
         initial = ModelResponse(
             text="An incomplete answer",
@@ -89,24 +93,27 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertEqual(server.requests[0]["payload"]["model"], "fake-fireworks")
         self.assertEqual(
             server.requests[0]["payload"]["messages"],
-            [{"role": "user", "content": "Summarise this: token routing matters."}],
+            [
+                {"role": "system", "content": ENGLISH_RESPONSE_DIRECTIVE},
+                {"role": "user", "content": "Answer directly.\nSummarise this: token routing matters."},
+            ],
         )
-        self.assertEqual(result.metadata["answer_prompt_version"], "domain-aware-succinct-v1")
+        self.assertEqual(result.metadata["answer_prompt_version"], "domain-aware-succinct-v2-english")
 
     def test_fireworks_uses_succinct_prefix_only_for_promoted_domains(self) -> None:
         cases = (
             (
                 "What is the capital of France?",
-                "Answer succinctly:\nWhat is the capital of France?",
+                "Answer succinctly.\nWhat is the capital of France?",
             ),
             (
                 "Extract the named entities from: Ada founded Example Labs.",
-                "Answer succinctly and follow the requested format exactly:\n"
+                "Answer succinctly and follow the requested format exactly.\n"
                 "Extract the named entities from: Ada founded Example Labs.",
             ),
             (
                 "Write a Python function that returns its input.",
-                "Write a Python function that returns its input.",
+                "Answer directly.\nWrite a Python function that returns its input.",
             ),
         )
         for index, (prompt, expected) in enumerate(cases):
@@ -114,7 +121,13 @@ class FireworksDirectRunnerTests(unittest.TestCase):
                 client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
                 runner = FireworksDirectRunner(client, enable_deterministic_solvers=False)
                 runner.run(TaskEnvelope(id=f"prompt-{index}", input_text=prompt))
-            self.assertEqual(server.requests[0]["payload"]["messages"][0]["content"], expected)
+            self.assertEqual(
+                server.requests[0]["payload"]["messages"],
+                [
+                    {"role": "system", "content": ENGLISH_RESPONSE_DIRECTIVE},
+                    {"role": "user", "content": expected},
+                ],
+            )
 
     def test_repairs_code_fence_for_code_only_task(self) -> None:
         fenced = "```python\ndef add(a, b):\n    return a + b\n```"

@@ -37,6 +37,7 @@ class ThreeRouteRunner:
         logger: JsonlRunLogger | None = None,
         task_deadline_ms: int = 10 * 60 * 1000,
         e2b_min_remaining_ms: int = 30_000,
+        e2b_retry_latest_start_ms: int = 3_000,
     ) -> None:
         self.assessment_provider = assessment_provider
         self.predictor = predictor
@@ -51,6 +52,7 @@ class ThreeRouteRunner:
         self.logger = logger
         self.task_deadline_ms = task_deadline_ms
         self.e2b_min_remaining_ms = e2b_min_remaining_ms
+        self.e2b_retry_latest_start_ms = e2b_retry_latest_start_ms
         self.run_deadline: float | None = None
 
     def set_run_deadline(self, deadline_monotonic: float) -> None:
@@ -172,6 +174,20 @@ class ThreeRouteRunner:
         elif decision.engine is Engine.GEMMA_E2B or (selective_probe is not None and selective_probe.probe) or extra_trees_probe:
             try:
                 candidate = self.e2b_runner.run(task)
+                validation = validate_or_safely_repair_final_answer(task, candidate.answer)
+                retry = getattr(self.e2b_runner, "retry", None)
+                elapsed_ms = round((monotonic() - started) * 1000)
+                if (
+                    candidate.route != "e2b_error"
+                    and not validation.valid
+                    and callable(retry)
+                    and elapsed_ms <= self.e2b_retry_latest_start_ms
+                ):
+                    retried = retry(task)
+                    retried_validation = validate_or_safely_repair_final_answer(task, retried.answer)
+                    if retried.route != "e2b_error" and retried_validation.valid:
+                        candidate = retried
+                        validation = retried_validation
                 extra_trees_decision = (
                     self.extra_trees_gate.evaluate(task, invocation.raw_assessment, candidate.answer)
                     if extra_trees_probe and self.extra_trees_gate is not None
@@ -182,7 +198,6 @@ class ThreeRouteRunner:
                     if self.selective_policy is not None
                     else None
                 )
-                validation = validate_or_safely_repair_final_answer(task, candidate.answer)
                 if candidate.route == "e2b_error":
                     fallback = "e2b_rejected:runtime_error"
                     candidate = self.fireworks_runner.run(task)

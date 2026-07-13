@@ -3,7 +3,7 @@
   "source_bundle": [
     {
       "path": "configs/championship-shadow-policy-v1.json",
-      "sha256": "87c701fc53beaa9097c9f1bfa7c710fb418854cfbca4301490225e03186b7ebd"
+      "sha256": "a37029de107c0754a30df4c5df24e58b9a86c1f6f5df9c2c95f1b0546f357aa1"
     },
     {
       "path": "configs/functiongemma-scale789-q8-runtime.json",
@@ -15,7 +15,7 @@
     },
     {
       "path": "Dockerfile",
-      "sha256": "4419a828888813be621b9551e03dc5dcbbeafe16862e76501038022be23a7482"
+      "sha256": "6ce812c9bc843a1078ceb39f35fcc36bcd060fff80f57be1fb6b8923c52ce319"
     },
     {
       "path": ".dockerignore",

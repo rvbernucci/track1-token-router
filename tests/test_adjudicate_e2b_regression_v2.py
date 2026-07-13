@@ -10,6 +10,18 @@ class AdjudicateE2BV2Tests(unittest.TestCase):
         self.assertEqual(_mechanical(number, "1,250", True, "math_reasoning")["verdict"], "correct")
         self.assertEqual(_mechanical(label, "negative", True, "sentiment")["verdict"], "incorrect")
 
+    def test_invalid_reference_shape_requires_semantic_judgment(self) -> None:
+        number = {"reference_answer": "{3}", "output_shape": "number"}
+        json_reference = {"reference_answer": "Dana", "output_shape": "json"}
+
+        numeric_result = _mechanical(number, "3", True, "math_reasoning")
+        json_result = _mechanical(json_reference, '{"answer":"Dana"}', True, "logic_puzzle")
+
+        self.assertFalse(numeric_result["hard"])
+        self.assertEqual(numeric_result["reason"], "invalid_numeric_reference")
+        self.assertFalse(json_result["hard"])
+        self.assertEqual(json_result["reason"], "invalid_json_reference")
+
     def test_semantic_mismatch_abstains(self) -> None:
         reference = {"reference_answer": "Paris", "output_shape": "short_text"}
         result = _mechanical(reference, "The capital is Paris.", True, "factual_qa")

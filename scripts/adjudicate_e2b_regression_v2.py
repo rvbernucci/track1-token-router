@@ -238,7 +238,11 @@ def _mechanical(
     shape = reference["output_shape"]
     if shape == "number":
         try:
-            equal = float(answer.replace(",", "")) == float(expected.replace(",", ""))
+            expected_number = float(expected.replace(",", ""))
+        except ValueError:
+            return {"verdict": "uncertain", "hard": False, "reason": "invalid_numeric_reference"}
+        try:
+            equal = float(answer.replace(",", "")) == expected_number
         except ValueError:
             return {"verdict": "incorrect", "hard": True, "reason": "invalid_number"}
         return {"verdict": "correct" if equal else "incorrect", "hard": True, "reason": "numeric_equality"}
@@ -247,7 +251,11 @@ def _mechanical(
         return {"verdict": "correct" if equal else "incorrect", "hard": True, "reason": "label_equality"}
     if shape == "json":
         try:
-            equal = _json_norm(json.loads(answer)) == _json_norm(json.loads(expected))
+            expected_json = json.loads(expected)
+        except (json.JSONDecodeError, TypeError):
+            return {"verdict": "uncertain", "hard": False, "reason": "invalid_json_reference"}
+        try:
+            equal = _json_norm(json.loads(answer)) == _json_norm(expected_json)
         except (json.JSONDecodeError, TypeError):
             return {"verdict": "incorrect", "hard": True, "reason": "invalid_json"}
         return {"verdict": "correct" if equal else "incorrect", "hard": True, "reason": "json_equality"}

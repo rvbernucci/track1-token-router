@@ -143,6 +143,7 @@ class RouterConfigTests(unittest.TestCase):
             config = RouterConfig.from_env()
 
         self.assertLess(config.fireworks_timeout_s, 30)
+        self.assertLess(config.e2b_timeout_s, 30)
         self.assertEqual(config.fireworks_max_retries, 0)
 
     def test_official_remote_runtime_requires_all_harness_variables(self) -> None:

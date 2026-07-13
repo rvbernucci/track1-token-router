@@ -13,19 +13,19 @@ The additional planner calibration and sealed-holdout splits were intentionally 
 
 ## E2B Results
 
-All 4,400 answers were validated after the Answer Contract Engine. Mechanical validators made 2,535 hard decisions. Antigravity, pinned to the expected account and Gemini 3.5 Flash Medium, judged the remaining 1,865 cases against their reference answers and rubrics. Failed judge batches were discarded and replayed until all candidate IDs had exactly one verdict.
+All 4,400 answers were validated after the Answer Contract Engine. Mechanical validators made 2,504 hard decisions. Antigravity, pinned to the expected account and Gemini 3.5 Flash Medium, judged the remaining 1,896 cases against their reference answers and rubrics. Failed judge batches were discarded and replayed until all candidate IDs had exactly one verdict. A reference-shape audit moved 31 cases with inconsistent reference metadata out of mechanical rejection and into semantic adjudication; 17 were accepted.
 
 | Category | Correct | Incorrect | Accuracy |
 |---|---:|---:|---:|
 | Code debugging | 323 | 227 | 58.73% |
 | Code generation | 186 | 364 | 33.82% |
 | Factual Q&A | 373 | 177 | 67.82% |
-| Logic puzzles | 221 | 329 | 40.18% |
-| Math reasoning | 249 | 301 | 45.27% |
-| NER | 219 | 331 | 39.82% |
+| Logic puzzles | 229 | 321 | 41.64% |
+| Math reasoning | 253 | 297 | 46.00% |
+| NER | 224 | 326 | 40.73% |
 | Sentiment | 498 | 52 | 90.55% |
 | Summarization | 310 | 240 | 56.36% |
-| **Total** | **2,379** | **2,021** | **54.07%** |
+| **Total** | **2,396** | **2,004** | **54.45%** |
 
 The unrestricted E2B result is not a routing target. It demonstrates why the local model must remain behind a calibrated selective gate. Sentiment is the strongest broad category, while the other categories require sub-cohort selection rather than category-wide release.
 
@@ -33,11 +33,17 @@ The unrestricted E2B result is not a routing target. It demonstrates why the loc
 
 | Role | Correct | Incorrect | Accuracy |
 |---|---:|---:|---:|
-| Fit | 1,437 | 1,203 | 54.43% |
-| Calibration | 481 | 399 | 54.66% |
-| Protected holdout | 461 | 419 | 52.39% |
+| Fit | 1,448 | 1,192 | 54.85% |
+| Calibration | 483 | 397 | 54.89% |
+| Protected holdout | 465 | 415 | 52.84% |
 
 The small fit-to-holdout decline indicates limited distribution shift, but it also confirms that broad E2B release would be unsafe.
+
+## Selective 192-token retry
+
+The 411 answers rejected by the 96-token Answer Contract Engine were replayed once with a 192-token ceiling. The retry restored a valid contract for 105 cases, but semantic adjudication accepted only 26 additional answers. Correctness increased from 2,396/4,400 (54.45%) to 2,422/4,400 (55.05%). Recoveries were limited to code debugging (11), NER (10), code generation (4), and summarization (1).
+
+This supports one retry only after a concrete contract failure. It does not support a global 192-token default. The AMD replay remained well below 30 seconds per request, but the exact `linux/amd64`, 4 GB, 2 vCPU image must repeat the latency gate before promotion.
 
 ## Planner Results
 

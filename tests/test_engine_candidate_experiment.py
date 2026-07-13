@@ -94,7 +94,7 @@ class EngineCandidateExperimentTests(unittest.TestCase):
             )
             row = json.loads(output.read_text())
 
-        self.assertEqual(row["prompt_version"], "concise-system-v1")
+        self.assertEqual(row["prompt_version"], "concise-system-v2-english")
         self.assertEqual([message["role"] for message in client.messages[0]], ["system", "user"])
 
     def test_zero_budget_stops_before_fireworks_call(self) -> None:
