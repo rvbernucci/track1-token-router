@@ -4,7 +4,7 @@ import tempfile
 import unittest
 
 from scripts.preflight_functiongemma_tool_planner import audit_corpus, audit_token_lengths
-from scripts.train_functiongemma_tool_planner import _reject_sealed_training_path
+from scripts.train_functiongemma_tool_planner import _completion_rows, _reject_sealed_training_path
 
 
 class _Tokenizer:
@@ -46,6 +46,20 @@ class FunctionGemmaPlannerPreflightTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "sealed split"):
             _reject_sealed_training_path(Path("data/sealed/planner"))
         _reject_sealed_training_path(Path("data/functiongemma-tool-planner-v1"))
+
+    def test_training_converts_messages_to_completion_only_contract(self):
+        row = {
+            "messages": [
+                {"role": "developer", "content": "plan"},
+                {"role": "user", "content": "task"},
+                {"role": "assistant", "tool_calls": [{"function": {"name": "decline_tool", "arguments": {"reason": "unsupported"}}}]},
+            ],
+            "tools": [{"type": "function"}],
+        }
+        converted = _completion_rows([row])
+        self.assertEqual(converted[0]["prompt"], row["messages"][:2])
+        self.assertEqual(converted[0]["completion"], row["messages"][2:])
+        self.assertEqual(converted[0]["tools"], row["tools"])
 
 
 if __name__ == "__main__":

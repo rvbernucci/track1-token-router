@@ -15,6 +15,10 @@ def main() -> int:
     parser.add_argument("--data", type=Path, default=Path("data/functiongemma-tool-planner-v1"))
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--epochs", type=float)
+    parser.add_argument("--gradient-accumulation-steps", type=int)
+    parser.add_argument("--learning-rate", type=float)
+    parser.add_argument("--rank", type=int)
+    parser.add_argument("--eval-strategy", choices=("epoch", "no"), default="epoch")
     parser.add_argument("--max-train-rows", type=int, default=0)
     parser.add_argument("--max-validation-rows", type=int, default=0)
     args = parser.parse_args()
@@ -55,29 +59,32 @@ def main() -> int:
     model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
     model = get_peft_model(model, LoraConfig(
         task_type=TaskType.CAUSAL_LM,
-        r=int(qlora["rank"]), lora_alpha=int(qlora["alpha"]),
+        r=int(args.rank or qlora["rank"]), lora_alpha=int(qlora["alpha"]),
         lora_dropout=float(qlora["dropout"]), bias="none",
         target_modules=list(qlora["target_modules"]),
     ))
     args.output.mkdir(parents=True, exist_ok=True)
+    evaluate = args.eval_strategy != "no"
     training_args = SFTConfig(
         output_dir=str(args.output / "checkpoints"),
-        max_length=int(config["dataset"]["max_length"]), packing=False,
+        max_length=int(config["dataset"]["max_length"]), packing=False, completion_only_loss=True,
         num_train_epochs=float(args.epochs or qlora["epochs"]),
         per_device_train_batch_size=int(qlora["batch_size"]),
         per_device_eval_batch_size=int(qlora["batch_size"]),
-        gradient_accumulation_steps=int(qlora["gradient_accumulation_steps"]),
-        learning_rate=float(qlora["learning_rate"]), warmup_ratio=float(qlora["warmup_ratio"]),
+        gradient_accumulation_steps=int(args.gradient_accumulation_steps or qlora["gradient_accumulation_steps"]),
+        learning_rate=float(args.learning_rate or qlora["learning_rate"]), warmup_ratio=float(qlora["warmup_ratio"]),
         weight_decay=float(qlora["weight_decay"]), lr_scheduler_type="cosine",
-        eval_strategy="epoch", save_strategy="epoch", save_total_limit=2,
-        load_best_model_at_end=True, metric_for_best_model="eval_loss", greater_is_better=False,
+        eval_strategy=args.eval_strategy, save_strategy="epoch", save_total_limit=2,
+        load_best_model_at_end=evaluate, metric_for_best_model="eval_loss" if evaluate else None,
+        greater_is_better=False if evaluate else None,
         bf16=True, gradient_checkpointing=True, optim="paged_adamw_8bit",
         report_to="none", logging_steps=5, seed=seed,
     )
     trainer = SFTTrainer(
         model=model, args=training_args,
-        train_dataset=Dataset.from_list(train_rows),
-        eval_dataset=Dataset.from_list(validation_rows), processing_class=tokenizer,
+        train_dataset=Dataset.from_list(_completion_rows(train_rows)),
+        eval_dataset=Dataset.from_list(_completion_rows(validation_rows)) if evaluate else None,
+        processing_class=tokenizer,
     )
     started = monotonic()
     result = trainer.train()
@@ -89,6 +96,11 @@ def main() -> int:
         "base_model": model_config, "qlora": qlora,
         "train_rows": len(train_rows), "validation_rows": len(validation_rows),
         "epochs": float(args.epochs or qlora["epochs"]),
+        "completion_only_loss": True,
+        "gradient_accumulation_steps": training_args.gradient_accumulation_steps,
+        "learning_rate": training_args.learning_rate,
+        "rank": int(args.rank or qlora["rank"]),
+        "eval_strategy": args.eval_strategy,
         "elapsed_seconds": monotonic() - started,
         "peak_rss_mb": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024,
         "peak_cuda_allocated_mb": torch.cuda.max_memory_allocated() / 1024**2,
@@ -106,6 +118,20 @@ def main() -> int:
 
 def _rows(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+
+
+def _completion_rows(rows: list[dict]) -> list[dict]:
+    converted = []
+    for row in rows:
+        messages = row.get("messages")
+        if not isinstance(messages, list) or len(messages) != 3 or messages[-1].get("role") != "assistant":
+            raise ValueError("Planner training rows require developer, user and assistant messages.")
+        converted.append({
+            "prompt": messages[:-1],
+            "completion": messages[-1:],
+            "tools": row["tools"],
+        })
+    return converted
 
 
 def _stratified(rows: list[dict], limit: int) -> list[dict]:
