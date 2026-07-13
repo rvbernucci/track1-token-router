@@ -1,0 +1,972 @@
+{
+  "best_sweep": {
+    "config": [
+      8,
+      20,
+      6
+    ],
+    "min_source_precision": 0.9310344827586207,
+    "precision": 0.9423076923076923,
+    "selected": 104,
+    "thresholds": {
+      "code_debugging": {
+        "precision": 1.0,
+        "selected": 17,
+        "threshold": 0.564067,
+        "wilson90": 0.862701403775133
+      },
+      "code_generation": {
+        "precision": null,
+        "selected": 0,
+        "threshold": 1.1,
+        "wilson90": 0
+      },
+      "factual_qa": {
+        "precision": 0.9565217391304348,
+        "selected": 23,
+        "threshold": 0.537849,
+        "wilson90": 0.8267046003271961
+      },
+      "invalid": {
+        "precision": null,
+        "selected": 0,
+        "threshold": 1.1,
+        "wilson90": 0
+      },
+      "logic_puzzle": {
+        "precision": null,
+        "selected": 0,
+        "threshold": 1.1,
+        "wilson90": 0
+      },
+      "math_reasoning": {
+        "precision": null,
+        "selected": 0,
+        "threshold": 1.1,
+        "wilson90": 0
+      },
+      "ner": {
+        "precision": null,
+        "selected": 0,
+        "threshold": 1.1,
+        "wilson90": 0
+      },
+      "sentiment": {
+        "precision": 0.921875,
+        "selected": 64,
+        "threshold": 0.773706,
+        "wilson90": 0.8480723126851034
+      },
+      "summarization": {
+        "precision": null,
+        "selected": 0,
+        "threshold": 1.1,
+        "wilson90": 0
+      }
+    }
+  },
+  "calibration": {
+    "by_intent": {
+      "code_debugging": {
+        "correct": 16,
+        "precision": 1.0,
+        "selected": 16
+      },
+      "code_generation": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      },
+      "factual_qa": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      },
+      "invalid": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      },
+      "logic_puzzle": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      },
+      "math_reasoning": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      },
+      "ner": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      },
+      "sentiment": {
+        "correct": 52,
+        "precision": 0.9285714285714286,
+        "selected": 56
+      },
+      "summarization": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      }
+    },
+    "correct": 68,
+    "coverage": 0.08237986270022883,
+    "population": 874,
+    "precision": 0.9444444444444444,
+    "selected": 72
+  },
+  "holdout_total_e2b_correct": 332,
+  "protected_holdout": {
+    "by_intent": {
+      "code_debugging": {
+        "correct": 13,
+        "precision": 1.0,
+        "selected": 13
+      },
+      "code_generation": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      },
+      "factual_qa": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      },
+      "invalid": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      },
+      "logic_puzzle": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      },
+      "math_reasoning": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      },
+      "ner": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      },
+      "sentiment": {
+        "correct": 51,
+        "precision": 0.9272727272727272,
+        "selected": 55
+      },
+      "summarization": {
+        "correct": 0,
+        "precision": null,
+        "selected": 0
+      }
+    },
+    "correct": 64,
+    "coverage": 0.07771428571428571,
+    "population": 875,
+    "precision": 0.9411764705882353,
+    "selected": 68
+  },
+  "selection_protocol": "fit model; choose per-intent thresholds on calibration; open protected labels once",
+  "sweep": [
+    {
+      "config": [
+        4,
+        4,
+        10
+      ],
+      "min_source_precision": 0.9285714285714286,
+      "precision": 0.9428571428571428,
+      "selected": 70,
+      "thresholds": {
+        "code_debugging": {
+          "precision": 1.0,
+          "selected": 15,
+          "threshold": 0.454135,
+          "wilson90": 0.8471922953898597
+        },
+        "code_generation": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "factual_qa": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "invalid": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "logic_puzzle": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "math_reasoning": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "ner": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "sentiment": {
+          "precision": 0.9272727272727272,
+          "selected": 55,
+          "threshold": 0.723894,
+          "wilson90": 0.8475476297060228
+        },
+        "summarization": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        }
+      }
+    },
+    {
+      "config": [
+        4,
+        8,
+        6
+      ],
+      "min_source_precision": 0.9215686274509803,
+      "precision": 0.9310344827586207,
+      "selected": 87,
+      "thresholds": {
+        "code_debugging": {
+          "precision": 0.9354838709677419,
+          "selected": 31,
+          "threshold": 0.434628,
+          "wilson90": 0.8226395894897707
+        },
+        "code_generation": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "factual_qa": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "invalid": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "logic_puzzle": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "math_reasoning": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "ner": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "sentiment": {
+          "precision": 0.9285714285714286,
+          "selected": 56,
+          "threshold": 0.629101,
+          "wilson90": 0.8501097871095792
+        },
+        "summarization": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        }
+      }
+    },
+    {
+      "config": [
+        4,
+        8,
+        10
+      ],
+      "min_source_precision": 0.9387755102040817,
+      "precision": 0.9452054794520548,
+      "selected": 73,
+      "thresholds": {
+        "code_debugging": {
+          "precision": 1.0,
+          "selected": 16,
+          "threshold": 0.482294,
+          "wilson90": 0.8553614087323906
+        },
+        "code_generation": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "factual_qa": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "invalid": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "logic_puzzle": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "math_reasoning": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "ner": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "sentiment": {
+          "precision": 0.9298245614035088,
+          "selected": 57,
+          "threshold": 0.755383,
+          "wilson90": 0.8525873358036249
+        },
+        "summarization": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        }
+      }
+    },
+    {
+      "config": [
+        4,
+        12,
+        6
+      ],
+      "min_source_precision": 0.92,
+      "precision": 0.9583333333333334,
+      "selected": 72,
+      "thresholds": {
+        "code_debugging": {
+          "precision": 1.0,
+          "selected": 16,
+          "threshold": 0.43672,
+          "wilson90": 0.8553614087323906
+        },
+        "code_generation": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "factual_qa": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "invalid": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "logic_puzzle": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "math_reasoning": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "ner": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "sentiment": {
+          "precision": 0.9464285714285714,
+          "selected": 56,
+          "threshold": 0.681652,
+          "wilson90": 0.8733187315837779
+        },
+        "summarization": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        }
+      }
+    },
+    {
+      "config": [
+        4,
+        20,
+        6
+      ],
+      "min_source_precision": 0.9,
+      "precision": 0.9259259259259259,
+      "selected": 54,
+      "thresholds": {
+        "code_debugging": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "code_generation": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "factual_qa": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "invalid": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "logic_puzzle": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "math_reasoning": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "ner": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "sentiment": {
+          "precision": 0.9259259259259259,
+          "selected": 54,
+          "threshold": 0.681439,
+          "wilson90": 0.8448964598331057
+        },
+        "summarization": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        }
+      }
+    },
+    {
+      "config": [
+        6,
+        4,
+        10
+      ],
+      "min_source_precision": 0.9375,
+      "precision": 0.956989247311828,
+      "selected": 93,
+      "thresholds": {
+        "code_debugging": {
+          "precision": 1.0,
+          "selected": 19,
+          "threshold": 0.528679,
+          "wilson90": 0.8753524204626663
+        },
+        "code_generation": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "factual_qa": {
+          "precision": 1.0,
+          "selected": 15,
+          "threshold": 0.545827,
+          "wilson90": 0.8471922953898597
+        },
+        "invalid": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "logic_puzzle": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "math_reasoning": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "ner": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "sentiment": {
+          "precision": 0.9322033898305084,
+          "selected": 59,
+          "threshold": 0.781669,
+          "wilson90": 0.8573048176858381
+        },
+        "summarization": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        }
+      }
+    },
+    {
+      "config": [
+        6,
+        8,
+        10
+      ],
+      "min_source_precision": 0.9259259259259259,
+      "precision": 0.9466666666666667,
+      "selected": 75,
+      "thresholds": {
+        "code_debugging": {
+          "precision": 1.0,
+          "selected": 19,
+          "threshold": 0.551798,
+          "wilson90": 0.8753524204626663
+        },
+        "code_generation": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "factual_qa": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "invalid": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "logic_puzzle": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "math_reasoning": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "ner": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "sentiment": {
+          "precision": 0.9285714285714286,
+          "selected": 56,
+          "threshold": 0.804806,
+          "wilson90": 0.8501097871095792
+        },
+        "summarization": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        }
+      }
+    },
+    {
+      "config": [
+        6,
+        12,
+        6
+      ],
+      "min_source_precision": 0.9333333333333333,
+      "precision": 0.9382716049382716,
+      "selected": 81,
+      "thresholds": {
+        "code_debugging": {
+          "precision": 0.9565217391304348,
+          "selected": 23,
+          "threshold": 0.511994,
+          "wilson90": 0.8267046003271961
+        },
+        "code_generation": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "factual_qa": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "invalid": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "logic_puzzle": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "math_reasoning": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "ner": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "sentiment": {
+          "precision": 0.9310344827586207,
+          "selected": 58,
+          "threshold": 0.724132,
+          "wilson90": 0.8549843941193737
+        },
+        "summarization": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        }
+      }
+    },
+    {
+      "config": [
+        6,
+        20,
+        6
+      ],
+      "min_source_precision": 0.9583333333333334,
+      "precision": 0.958904109589041,
+      "selected": 73,
+      "thresholds": {
+        "code_debugging": {
+          "precision": 1.0,
+          "selected": 16,
+          "threshold": 0.517382,
+          "wilson90": 0.8553614087323906
+        },
+        "code_generation": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "factual_qa": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "invalid": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "logic_puzzle": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "math_reasoning": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "ner": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "sentiment": {
+          "precision": 0.9473684210526315,
+          "selected": 57,
+          "threshold": 0.762982,
+          "wilson90": 0.8754197892940535
+        },
+        "summarization": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        }
+      }
+    },
+    {
+      "config": [
+        8,
+        8,
+        10
+      ],
+      "min_source_precision": 0.9166666666666666,
+      "precision": 0.9484536082474226,
+      "selected": 97,
+      "thresholds": {
+        "code_debugging": {
+          "precision": 1.0,
+          "selected": 15,
+          "threshold": 0.638948,
+          "wilson90": 0.8471922953898597
+        },
+        "code_generation": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "factual_qa": {
+          "precision": 1.0,
+          "selected": 17,
+          "threshold": 0.574248,
+          "wilson90": 0.862701403775133
+        },
+        "invalid": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "logic_puzzle": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "math_reasoning": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "ner": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "sentiment": {
+          "precision": 0.9230769230769231,
+          "selected": 65,
+          "threshold": 0.806762,
+          "wilson90": 0.8502845176146762
+        },
+        "summarization": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        }
+      }
+    },
+    {
+      "config": [
+        8,
+        12,
+        6
+      ],
+      "min_source_precision": 0.9245283018867925,
+      "precision": 0.925531914893617,
+      "selected": 94,
+      "thresholds": {
+        "code_debugging": {
+          "precision": 0.925,
+          "selected": 40,
+          "threshold": 0.461384,
+          "wilson90": 0.8265198212630996
+        },
+        "code_generation": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "factual_qa": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "invalid": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "logic_puzzle": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "math_reasoning": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "ner": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "sentiment": {
+          "precision": 0.9259259259259259,
+          "selected": 54,
+          "threshold": 0.769679,
+          "wilson90": 0.8448964598331057
+        },
+        "summarization": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        }
+      }
+    },
+    {
+      "config": [
+        8,
+        20,
+        6
+      ],
+      "min_source_precision": 0.9310344827586207,
+      "precision": 0.9423076923076923,
+      "selected": 104,
+      "thresholds": {
+        "code_debugging": {
+          "precision": 1.0,
+          "selected": 17,
+          "threshold": 0.564067,
+          "wilson90": 0.862701403775133
+        },
+        "code_generation": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "factual_qa": {
+          "precision": 0.9565217391304348,
+          "selected": 23,
+          "threshold": 0.537849,
+          "wilson90": 0.8267046003271961
+        },
+        "invalid": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "logic_puzzle": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "math_reasoning": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "ner": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        },
+        "sentiment": {
+          "precision": 0.921875,
+          "selected": 64,
+          "threshold": 0.773706,
+          "wilson90": 0.8480723126851034
+        },
+        "summarization": {
+          "precision": null,
+          "selected": 0,
+          "threshold": 1.1,
+          "wilson90": 0
+        }
+      }
+    }
+  ]
+}

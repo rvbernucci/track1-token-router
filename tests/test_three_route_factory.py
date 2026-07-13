@@ -23,6 +23,8 @@ ENV = {
     "E2B_ROUTE_POLICY_SHA256": "24607dda80f861ecde022987111302590b0e17a61842ad5b3e0b17302047c4ad",
     "E2B_SELECTIVE_POLICY": "configs/e2b-selective-policy-v1.json",
     "E2B_SELECTIVE_POLICY_SHA256": "d65caea1cccf0ee4173fbfedbd1ba9c580642608e4def45c5f0cff9dff9a6a6b",
+    "E2B_EXTRA_TREES_POLICY": "configs/e2b-extra-trees-code-debug-v1.json",
+    "E2B_EXTRA_TREES_POLICY_SHA256": "d6c8d222f62d545b299d4ee4506f3a782c4c998e054781ca3aeb0fe5e120df20",
     "RISK_LADDER_POLICY": "configs/wilson-nash-risk-ladder-v1.json",
     "RISK_LADDER_POLICY_SHA256": "66a85965cd271b22a8a91696e6506f7f99dda4186d54b59b3eb2d6ced42aab53",
     "DUAL_FUNCTIONGEMMA_POLICY": "configs/dual-functiongemma-policy-v1.json",
@@ -40,6 +42,7 @@ class ThreeRouteFactoryTests(unittest.TestCase):
         self.assertIsNotNone(runner.selective_policy)
         self.assertFalse(runner.selective_policy.enabled)
         self.assertIsNotNone(runner.risk_ladder)
+        self.assertIsNotNone(runner.extra_trees_gate)
         self.assertIsNone(runner.tool_planner_provider)
 
     def test_bad_artifact_hash_fails_closed(self):

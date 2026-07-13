@@ -8,13 +8,36 @@ from pathlib import Path
 
 from router.core.contracts import TaskEnvelope, TokenUsage
 from router.core.fireworks import FireworksClient
-from router.core.fireworks_runner import FireworksDirectRunner
+from router.core.fireworks_runner import FireworksDirectRunner, _retry_truncated_response
 from router.core.model_client import ModelClientError, ModelResponse
 from router.orchestration.matrix_regression_selector import FEATURE_NAMES, MatrixRegressionWeights, save_weights
 from tests.fake_openai_server import FakeOpenAIServer
 
 
 class FireworksDirectRunnerTests(unittest.TestCase):
+    def test_truncated_response_is_retried_once_with_a_larger_cap(self) -> None:
+        initial = ModelResponse(
+            text="An incomplete answer",
+            usage=TokenUsage(prompt=10, completion=128, total=138),
+            raw={"choices": [{"finish_reason": "length"}]},
+        )
+        with FakeOpenAIServer(response_text="A complete answer.", prompt_tokens=10, completion_tokens=40) as server:
+            client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
+            response, usage, metadata = _retry_truncated_response(
+                client,
+                TaskEnvelope(id="retry", input_text="Explain the result."),
+                initial,
+                domain="current_factual",
+                temperature=0.0,
+                initial_max_tokens=128,
+                configured_max_tokens=640,
+                request_options={},
+            )
+        self.assertEqual(response.text, "A complete answer.")
+        self.assertEqual(usage.total, 50)
+        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 256)
+        self.assertTrue(metadata["succeeded"])
+
     def test_429_503_and_malformed_json_fail_closed_with_one_answer(self) -> None:
         scenarios = (
             {"status": 429},
@@ -68,7 +91,30 @@ class FireworksDirectRunnerTests(unittest.TestCase):
             server.requests[0]["payload"]["messages"],
             [{"role": "user", "content": "Summarise this: token routing matters."}],
         )
-        self.assertEqual(result.metadata["answer_prompt_version"], "raw-prompt-v1")
+        self.assertEqual(result.metadata["answer_prompt_version"], "domain-aware-succinct-v1")
+
+    def test_fireworks_uses_succinct_prefix_only_for_promoted_domains(self) -> None:
+        cases = (
+            (
+                "What is the capital of France?",
+                "Answer succinctly:\nWhat is the capital of France?",
+            ),
+            (
+                "Extract the named entities from: Ada founded Example Labs.",
+                "Answer succinctly and follow the requested format exactly:\n"
+                "Extract the named entities from: Ada founded Example Labs.",
+            ),
+            (
+                "Write a Python function that returns its input.",
+                "Write a Python function that returns its input.",
+            ),
+        )
+        for index, (prompt, expected) in enumerate(cases):
+            with self.subTest(prompt=prompt), FakeOpenAIServer(response_text="answer") as server:
+                client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
+                runner = FireworksDirectRunner(client, enable_deterministic_solvers=False)
+                runner.run(TaskEnvelope(id=f"prompt-{index}", input_text=prompt))
+            self.assertEqual(server.requests[0]["payload"]["messages"][0]["content"], expected)
 
     def test_repairs_code_fence_for_code_only_task(self) -> None:
         fenced = "```python\ndef add(a, b):\n    return a + b\n```"
@@ -211,7 +257,7 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertEqual(result.metadata["fireworks_completion_token_policy"]["max_tokens"], 16)
         self.assertEqual(
             result.metadata["fireworks_completion_token_policy"]["policy_version"],
-            "accuracy-first-contract-v4",
+            "accuracy-first-contract-v5",
         )
 
     def test_label_and_access_code_use_small_completion_budgets(self) -> None:
@@ -261,14 +307,18 @@ class FireworksDirectRunnerTests(unittest.TestCase):
             client = FireworksClient(base_url=server.url, model="fake-fireworks", api_key="test", max_retries=0)
             runner = FireworksDirectRunner(client, max_tokens=512, enable_deterministic_solvers=False)
 
-            runner.run(
+            result = runner.run(
                 TaskEnvelope(
                     id="comparison",
                     input_text="Explain the difference between RAM and ROM and what each is used for.",
                 )
             )
 
-        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 256)
+        self.assertEqual(server.requests[0]["payload"]["max_tokens"], 384)
+        self.assertEqual(
+            result.metadata["fireworks_completion_token_policy"]["policy_version"],
+            "accuracy-first-contract-v5",
+        )
 
     def test_code_task_keeps_larger_completion_budget(self) -> None:
         response = "def slugify_title(value):\n    return value.strip().lower().replace(' ', '-')"

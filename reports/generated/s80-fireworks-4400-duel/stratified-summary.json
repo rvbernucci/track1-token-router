@@ -1,0 +1,477 @@
+{
+  "by_category": {
+    "code_debugging": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.67,
+        "completion_tokens": 10265,
+        "correct": 67,
+        "median_latency_ms": 4171.465,
+        "n": 100,
+        "prompt_tokens": 19070,
+        "total_tokens": 29335,
+        "truncations": 12
+      },
+      "minimax-m3": {
+        "accuracy": 0.65,
+        "completion_tokens": 10775,
+        "correct": 65,
+        "median_latency_ms": 2376.505,
+        "n": 100,
+        "prompt_tokens": 29024,
+        "total_tokens": 39799,
+        "truncations": 17
+      },
+      "paired": {
+        "discordant": 12,
+        "kimi_only": 7,
+        "mcnemar_exact_p": 0.7744140625,
+        "minimax_only": 5
+      }
+    },
+    "code_generation": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.41,
+        "completion_tokens": 25024,
+        "correct": 41,
+        "median_latency_ms": 3595.0600000000004,
+        "n": 100,
+        "prompt_tokens": 19914,
+        "total_tokens": 44938,
+        "truncations": 34
+      },
+      "minimax-m3": {
+        "accuracy": 0.35,
+        "completion_tokens": 26728,
+        "correct": 35,
+        "median_latency_ms": 4038.795,
+        "n": 100,
+        "prompt_tokens": 29684,
+        "total_tokens": 56412,
+        "truncations": 45
+      },
+      "paired": {
+        "discordant": 20,
+        "kimi_only": 13,
+        "mcnemar_exact_p": 0.26317596435546875,
+        "minimax_only": 7
+      }
+    },
+    "factual_qa": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.78,
+        "completion_tokens": 3904,
+        "correct": 78,
+        "median_latency_ms": 1225.1599999999999,
+        "n": 100,
+        "prompt_tokens": 10663,
+        "total_tokens": 14567,
+        "truncations": 4
+      },
+      "minimax-m3": {
+        "accuracy": 0.77,
+        "completion_tokens": 4618,
+        "correct": 77,
+        "median_latency_ms": 1971.245,
+        "n": 100,
+        "prompt_tokens": 20553,
+        "total_tokens": 25171,
+        "truncations": 3
+      },
+      "paired": {
+        "discordant": 3,
+        "kimi_only": 2,
+        "mcnemar_exact_p": 1.0,
+        "minimax_only": 1
+      }
+    },
+    "logic_puzzle": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.16,
+        "completion_tokens": 16596,
+        "correct": 16,
+        "median_latency_ms": 3264.25,
+        "n": 100,
+        "prompt_tokens": 13944,
+        "total_tokens": 30540,
+        "truncations": 37
+      },
+      "minimax-m3": {
+        "accuracy": 0.3,
+        "completion_tokens": 8719,
+        "correct": 30,
+        "median_latency_ms": 1885.255,
+        "n": 100,
+        "prompt_tokens": 23763,
+        "total_tokens": 32482,
+        "truncations": 15
+      },
+      "paired": {
+        "discordant": 28,
+        "kimi_only": 7,
+        "mcnemar_exact_p": 0.012540951371192932,
+        "minimax_only": 21
+      }
+    },
+    "math_reasoning": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.18,
+        "completion_tokens": 7626,
+        "correct": 18,
+        "median_latency_ms": 1897.005,
+        "n": 100,
+        "prompt_tokens": 6811,
+        "total_tokens": 14437,
+        "truncations": 15
+      },
+      "minimax-m3": {
+        "accuracy": 0.22,
+        "completion_tokens": 8339,
+        "correct": 22,
+        "median_latency_ms": 2274.895,
+        "n": 100,
+        "prompt_tokens": 17101,
+        "total_tokens": 25440,
+        "truncations": 23
+      },
+      "paired": {
+        "discordant": 4,
+        "kimi_only": 0,
+        "mcnemar_exact_p": 0.125,
+        "minimax_only": 4
+      }
+    },
+    "ner": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.26,
+        "completion_tokens": 11645,
+        "correct": 26,
+        "median_latency_ms": 2007.7800000000002,
+        "n": 100,
+        "prompt_tokens": 19665,
+        "total_tokens": 31310,
+        "truncations": 7
+      },
+      "minimax-m3": {
+        "accuracy": 0.27,
+        "completion_tokens": 10440,
+        "correct": 27,
+        "median_latency_ms": 2006.74,
+        "n": 100,
+        "prompt_tokens": 28644,
+        "total_tokens": 39084,
+        "truncations": 3
+      },
+      "paired": {
+        "discordant": 13,
+        "kimi_only": 6,
+        "mcnemar_exact_p": 1.0,
+        "minimax_only": 7
+      }
+    },
+    "sentiment": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.87,
+        "completion_tokens": 1013,
+        "correct": 87,
+        "median_latency_ms": 1037.35,
+        "n": 100,
+        "prompt_tokens": 12338,
+        "total_tokens": 13351,
+        "truncations": 1
+      },
+      "minimax-m3": {
+        "accuracy": 0.93,
+        "completion_tokens": 642,
+        "correct": 93,
+        "median_latency_ms": 1385.52,
+        "n": 100,
+        "prompt_tokens": 22034,
+        "total_tokens": 22676,
+        "truncations": 1
+      },
+      "paired": {
+        "discordant": 8,
+        "kimi_only": 1,
+        "mcnemar_exact_p": 0.0703125,
+        "minimax_only": 7
+      }
+    },
+    "summarization": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.79,
+        "completion_tokens": 5976,
+        "correct": 79,
+        "median_latency_ms": 1574.8000000000002,
+        "n": 100,
+        "prompt_tokens": 19748,
+        "total_tokens": 25724,
+        "truncations": 2
+      },
+      "minimax-m3": {
+        "accuracy": 0.77,
+        "completion_tokens": 6051,
+        "correct": 77,
+        "median_latency_ms": 2144.56,
+        "n": 100,
+        "prompt_tokens": 28801,
+        "total_tokens": 34852,
+        "truncations": 1
+      },
+      "paired": {
+        "discordant": 14,
+        "kimi_only": 8,
+        "mcnemar_exact_p": 0.79052734375,
+        "minimax_only": 6
+      }
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.6691176470588235,
+        "completion_tokens": 7045,
+        "correct": 91,
+        "median_latency_ms": 1577.9650000000001,
+        "n": 136,
+        "prompt_tokens": 10075,
+        "total_tokens": 17120,
+        "truncations": 3
+      },
+      "minimax-m3": {
+        "accuracy": 0.6323529411764706,
+        "completion_tokens": 8436,
+        "correct": 86,
+        "median_latency_ms": 1702.18,
+        "n": 136,
+        "prompt_tokens": 23854,
+        "total_tokens": 32290,
+        "truncations": 4
+      },
+      "paired": {
+        "discordant": 13,
+        "kimi_only": 9,
+        "mcnemar_exact_p": 0.266845703125,
+        "minimax_only": 4
+      }
+    },
+    "hard": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.4296875,
+        "completion_tokens": 21730,
+        "correct": 55,
+        "median_latency_ms": 2627.81,
+        "n": 128,
+        "prompt_tokens": 33051,
+        "total_tokens": 54781,
+        "truncations": 45
+      },
+      "minimax-m3": {
+        "accuracy": 0.4609375,
+        "completion_tokens": 20643,
+        "correct": 59,
+        "median_latency_ms": 2727.0550000000003,
+        "n": 128,
+        "prompt_tokens": 44427,
+        "total_tokens": 65070,
+        "truncations": 41
+      },
+      "paired": {
+        "discordant": 12,
+        "kimi_only": 4,
+        "mcnemar_exact_p": 0.3876953125,
+        "minimax_only": 8
+      }
+    },
+    "moderate": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.47794117647058826,
+        "completion_tokens": 17593,
+        "correct": 65,
+        "median_latency_ms": 2188.08,
+        "n": 136,
+        "prompt_tokens": 24579,
+        "total_tokens": 42172,
+        "truncations": 22
+      },
+      "minimax-m3": {
+        "accuracy": 0.47794117647058826,
+        "completion_tokens": 16620,
+        "correct": 65,
+        "median_latency_ms": 2376.365,
+        "n": 136,
+        "prompt_tokens": 37638,
+        "total_tokens": 54258,
+        "truncations": 23
+      },
+      "paired": {
+        "discordant": 12,
+        "kimi_only": 6,
+        "mcnemar_exact_p": 1.0,
+        "minimax_only": 6
+      }
+    },
+    "unspecified": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.5025,
+        "completion_tokens": 35681,
+        "correct": 201,
+        "median_latency_ms": 1728.335,
+        "n": 400,
+        "prompt_tokens": 54448,
+        "total_tokens": 90129,
+        "truncations": 42
+      },
+      "minimax-m3": {
+        "accuracy": 0.54,
+        "completion_tokens": 30613,
+        "correct": 216,
+        "median_latency_ms": 1961.2849999999999,
+        "n": 400,
+        "prompt_tokens": 93685,
+        "total_tokens": 124298,
+        "truncations": 40
+      },
+      "paired": {
+        "discordant": 65,
+        "kimi_only": 25,
+        "mcnemar_exact_p": 0.08168153394154005,
+        "minimax_only": 40
+      }
+    }
+  },
+  "by_expected_length": {
+    "long_31_plus": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.4756756756756757,
+        "completion_tokens": 37566,
+        "correct": 88,
+        "median_latency_ms": 3481.12,
+        "n": 185,
+        "prompt_tokens": 48082,
+        "total_tokens": 85648,
+        "truncations": 46
+      },
+      "minimax-m3": {
+        "accuracy": 0.4594594594594595,
+        "completion_tokens": 38449,
+        "correct": 85,
+        "median_latency_ms": 2979.21,
+        "n": 185,
+        "prompt_tokens": 64908,
+        "total_tokens": 103357,
+        "truncations": 55
+      },
+      "paired": {
+        "discordant": 33,
+        "kimi_only": 18,
+        "mcnemar_exact_p": 0.7283324808813632,
+        "minimax_only": 15
+      }
+    },
+    "medium_6_30": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.5813953488372093,
+        "completion_tokens": 19892,
+        "correct": 125,
+        "median_latency_ms": 2059.4,
+        "n": 215,
+        "prompt_tokens": 32267,
+        "total_tokens": 52159,
+        "truncations": 25
+      },
+      "minimax-m3": {
+        "accuracy": 0.5488372093023256,
+        "completion_tokens": 19458,
+        "correct": 118,
+        "median_latency_ms": 2203.97,
+        "n": 215,
+        "prompt_tokens": 53238,
+        "total_tokens": 72696,
+        "truncations": 22
+      },
+      "paired": {
+        "discordant": 21,
+        "kimi_only": 14,
+        "mcnemar_exact_p": 0.18924713134765625,
+        "minimax_only": 7
+      }
+    },
+    "short_0_5": {
+      "kimi-k2p7-code": {
+        "accuracy": 0.4975,
+        "completion_tokens": 24591,
+        "correct": 199,
+        "median_latency_ms": 1441.945,
+        "n": 400,
+        "prompt_tokens": 41804,
+        "total_tokens": 66395,
+        "truncations": 41
+      },
+      "minimax-m3": {
+        "accuracy": 0.5575,
+        "completion_tokens": 18405,
+        "correct": 223,
+        "median_latency_ms": 1663.3600000000001,
+        "n": 400,
+        "prompt_tokens": 81458,
+        "total_tokens": 99863,
+        "truncations": 31
+      },
+      "paired": {
+        "discordant": 48,
+        "kimi_only": 12,
+        "mcnemar_exact_p": 0.0007172696733945827,
+        "minimax_only": 36
+      }
+    }
+  },
+  "decision": {
+    "candidate_only_not_promoted": {
+      "math_reasoning": "minimax-m3",
+      "ner": "minimax-m3",
+      "sentiment": "minimax-m3"
+    },
+    "default": "kimi-k2p7-code",
+    "reason": "Kimi is materially more token-efficient and numerically leads four categories; only the MiniMax logic advantage clears paired p<0.05. Expected length alone does not identify a reliable MiniMax advantage.",
+    "statistically_supported_override": {
+      "logic_puzzle": "minimax-m3"
+    }
+  },
+  "overall": {
+    "kimi-k2p7-code": {
+      "accuracy": 0.515,
+      "completion_tokens": 82049,
+      "correct": 412,
+      "median_latency_ms": 1919.375,
+      "n": 800,
+      "prompt_tokens": 122153,
+      "total_tokens": 204202,
+      "truncations": 112
+    },
+    "minimax-m3": {
+      "accuracy": 0.5325,
+      "completion_tokens": 76312,
+      "correct": 426,
+      "median_latency_ms": 2122.4700000000003,
+      "n": 800,
+      "prompt_tokens": 199604,
+      "total_tokens": 275916,
+      "truncations": 108
+    },
+    "paired": {
+      "discordant": 102,
+      "kimi_only": 44,
+      "mcnemar_exact_p": 0.19778986306808324,
+      "minimax_only": 58
+    }
+  },
+  "population": {
+    "categories": 8,
+    "per_category": 100,
+    "responses": 1600,
+    "source": "4400-task router ML corpora stratified benchmark subset",
+    "tasks": 800
+  },
+  "schema_version": "s80-fireworks-paired-duel-v1",
+  "spend_usd": 0.595697
+}

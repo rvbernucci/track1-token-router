@@ -8,6 +8,7 @@ if False:  # pragma: no cover - imported only for type checkers without runtime 
 
 
 ANSWER_PROMPT_VERSION = "raw-prompt-v1"
+FIREWORKS_ANSWER_PROMPT_VERSION = "domain-aware-succinct-v1"
 CONCISE_ANSWER_PROMPT_VERSION = "concise-system-v1"
 CONCISE_ANSWER_SYSTEM_PROMPT = (
     "Follow the user's requested format exactly. Otherwise answer succinctly and precisely. "
@@ -29,6 +30,17 @@ def build_answer_messages(task: TaskEnvelope, *, mode: str = "raw") -> list[dict
 def build_m1_messages(task: TaskEnvelope) -> list[dict[str, str]]:
     """Build the championship answer request without envelope or routing data."""
     return build_answer_messages(task, mode="raw")
+
+
+def build_fireworks_answer_messages(task: TaskEnvelope, *, domain: str) -> list[dict[str, str]]:
+    """Add concise guidance only where the frozen ablation improved accuracy."""
+    if domain in {"formatting", "extraction"}:
+        prefix = "Answer succinctly and follow the requested format exactly:\n"
+    elif domain in {"current_factual", "math_reasoning"}:
+        prefix = "Answer succinctly:\n"
+    else:
+        return build_m1_messages(task)
+    return [{"role": "user", "content": prefix + task.input_text}]
 
 
 M2A_SYSTEM_PROMPT = """You are M2A, the local verifier and routing judge.

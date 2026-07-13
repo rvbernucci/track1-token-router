@@ -1,0 +1,49 @@
+{
+  "baseline": {
+    "default_model": "accounts/fireworks/models/kimi-k2p7-code",
+    "intent_models": {
+      "code_debugging": "accounts/fireworks/models/kimi-k2p7-code",
+      "code_generation": "accounts/fireworks/models/kimi-k2p7-code",
+      "factual_qa": "accounts/fireworks/models/kimi-k2p7-code",
+      "logic_puzzle": "accounts/fireworks/models/minimax-m3",
+      "math_reasoning": "accounts/fireworks/models/kimi-k2p7-code",
+      "ner": "accounts/fireworks/models/kimi-k2p7-code",
+      "sentiment": "accounts/fireworks/models/minimax-m3",
+      "summarization": "accounts/fireworks/models/minimax-m3"
+    },
+    "source_sha256": "87a9d2a96453f06e49ea574f5fe0d11b4f41214560efa8281e09adb66856a124"
+  },
+  "feature_schema": {
+    "categorical": [
+      "category",
+      "intent",
+      "difficulty",
+      "contract",
+      "response_length",
+      "strict_contract"
+    ],
+    "functiongemma_raw_scores": [
+      "fg.deterministic_fit",
+      "fg.format_complexity",
+      "fg.generation_demand",
+      "fg.knowledge_uncertainty",
+      "fg.reasoning_demand"
+    ],
+    "mechanical": [
+      "mechanical.prompt_tokens_log",
+      "mechanical.word_count_log",
+      "mechanical.number_density",
+      "mechanical.operator_count",
+      "mechanical.code_lines_log",
+      "prompt.constraint_count"
+    ]
+  },
+  "objective": "maximize_accuracy_then_minimize_tokens",
+  "rules": [],
+  "runtime": {
+    "asymptotic_cost": "O(1) predicates per task",
+    "dependencies": "Python standard library only",
+    "evaluation": "ordered predicate list over precomputed assessment/mechanical features"
+  },
+  "schema_version": "fireworks-pair-selector-s80-v1"
+}

@@ -65,6 +65,8 @@ class RouterConfig:
     e2b_selective_policy_sha256: str | None
     e2b_matrix_policy: Path | None
     e2b_matrix_policy_sha256: str | None
+    e2b_extra_trees_policy: Path | None
+    e2b_extra_trees_policy_sha256: str | None
     risk_ladder_policy: Path | None
     risk_ladder_policy_sha256: str | None
     three_route_accuracy_gate: float
@@ -137,6 +139,8 @@ class RouterConfig:
             e2b_selective_policy_sha256=os.getenv("E2B_SELECTIVE_POLICY_SHA256") or None,
             e2b_matrix_policy=_optional_path(os.getenv("E2B_MATRIX_POLICY")),
             e2b_matrix_policy_sha256=os.getenv("E2B_MATRIX_POLICY_SHA256") or None,
+            e2b_extra_trees_policy=_optional_path(os.getenv("E2B_EXTRA_TREES_POLICY")),
+            e2b_extra_trees_policy_sha256=os.getenv("E2B_EXTRA_TREES_POLICY_SHA256") or None,
             risk_ladder_policy=_optional_path(os.getenv("RISK_LADDER_POLICY")),
             risk_ladder_policy_sha256=os.getenv("RISK_LADDER_POLICY_SHA256") or None,
             three_route_accuracy_gate=float(os.getenv("THREE_ROUTE_ACCURACY_GATE", "0.60")),

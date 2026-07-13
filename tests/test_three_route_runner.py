@@ -19,6 +19,7 @@ from router.core.tool_planner import ToolPlan
 from router.orchestration.game_theory_selector import MinimaxRegretSelector
 from router.orchestration.e2b_selective_gate import E2BSelectiveDecision
 from router.orchestration.e2b_matrix_gate import E2BMatrixDecision
+from router.orchestration.e2b_extra_trees_gate import E2BExtraTreesDecision
 from router.orchestration.risk_ladder import RiskLadderDecision
 
 
@@ -161,6 +162,23 @@ class SelectivePolicy:
             0.95 if self.accepted else 0.4,
             "selective_local_accept" if self.accepted else "post_probability_below_accept_threshold",
             answer=answer if self.accepted else "",
+        )
+
+
+class ExtraTreesGate:
+    def __init__(self, *, accepted: bool):
+        self.accepted = accepted
+
+    def should_probe(self, intent):
+        return intent is Intent.FACTUAL_QA
+
+    def evaluate(self, _task, _assessment, answer):
+        return E2BExtraTreesDecision(
+            probability=0.97 if self.accepted else 0.2,
+            accepted=self.accepted,
+            reason="extra_trees_code_debug_accept" if self.accepted else "extra_trees_below_threshold",
+            answer=answer if self.accepted else "",
+            contract_valid=True,
         )
 
 
@@ -328,6 +346,35 @@ class ThreeRouteRunnerTests(unittest.TestCase):
 
         self.assertEqual(result.answer, "remote")
         self.assertIn("e2b_selective_rejected", result.metadata["routing_trace"]["fallback"])
+
+    def test_extra_trees_gate_can_add_a_local_cohort(self):
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(),
+            predictor=Predictor(e2b=0.2, fireworks=0.9),
+            selector=MinimaxRegretSelector(e2b_enabled=False),
+            e2b_runner=Runner("fixed code", "e2b_local"),
+            fireworks_runner=remote,
+            extra_trees_gate=ExtraTreesGate(accepted=True),
+        )
+        result = runner.run(TaskEnvelope(id="debug", input_text="Fix this code."))
+        self.assertEqual(result.route, "e2b_local_extra_trees")
+        self.assertEqual(result.answer, "fixed code")
+        self.assertEqual(remote.calls, 0)
+
+    def test_extra_trees_rejection_falls_closed_to_fireworks(self):
+        remote = Runner("remote", "fireworks_direct")
+        runner = ThreeRouteRunner(
+            assessment_provider=Provider(),
+            predictor=Predictor(e2b=0.2, fireworks=0.9),
+            selector=MinimaxRegretSelector(e2b_enabled=False),
+            e2b_runner=Runner("candidate", "e2b_local"),
+            fireworks_runner=remote,
+            extra_trees_gate=ExtraTreesGate(accepted=False),
+        )
+        result = runner.run(TaskEnvelope(id="debug", input_text="Fix this code."))
+        self.assertEqual(result.answer, "remote")
+        self.assertIn("e2b_extra_trees_rejected", result.metadata["routing_trace"]["fallback"])
 
     def test_degenerate_e2b_answer_falls_back_to_fireworks(self):
         e2b = Runner(

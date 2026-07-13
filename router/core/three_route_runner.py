@@ -11,6 +11,7 @@ from router.core.tool_augmented_runner import is_tool_planner_candidate
 from router.orchestration.assessment import build_feature_vector, compute_structural_features
 from router.orchestration.final_validator import validate_or_safely_repair_final_answer
 from router.orchestration.e2b_selective_gate import E2BSelectivePolicy
+from router.orchestration.e2b_extra_trees_gate import E2BExtraTreesGate
 from router.orchestration.e2b_matrix_gate import E2BMatrixGate
 from router.orchestration.game_theory_selector import MinimaxRegretSelector, deterministic_solver_prediction
 from router.orchestration.outcome_models import OutcomeModelPredictor
@@ -30,6 +31,7 @@ class ThreeRouteRunner:
         fireworks_runner: TaskRunner,
         selective_policy: E2BSelectivePolicy | None = None,
         matrix_gate: E2BMatrixGate | None = None,
+        extra_trees_gate: E2BExtraTreesGate | None = None,
         risk_ladder: RiskLadderPolicy | None = None,
         tool_planner_provider: FunctionGemmaToolPlannerProvider | None = None,
         logger: JsonlRunLogger | None = None,
@@ -43,6 +45,7 @@ class ThreeRouteRunner:
         self.fireworks_runner = fireworks_runner
         self.selective_policy = selective_policy
         self.matrix_gate = matrix_gate
+        self.extra_trees_gate = extra_trees_gate
         self.risk_ladder = risk_ladder
         self.tool_planner_provider = tool_planner_provider
         self.logger = logger
@@ -157,13 +160,23 @@ class ThreeRouteRunner:
             if self.selective_policy is not None and decision.engine is not Engine.DETERMINISTIC
             else None
         )
+        extra_trees_probe = (
+            self.extra_trees_gate.should_probe(invocation.raw_assessment.intent)
+            if self.extra_trees_gate is not None and decision.engine is not Engine.DETERMINISTIC
+            else False
+        )
         if decision.engine is Engine.DETERMINISTIC:
             if solver is None:
                 return self._fireworks_fallback(task, reason="selected_solver_did_not_accept_task")
             candidate = _solver_result(task, solver)
-        elif decision.engine is Engine.GEMMA_E2B or (selective_probe is not None and selective_probe.probe):
+        elif decision.engine is Engine.GEMMA_E2B or (selective_probe is not None and selective_probe.probe) or extra_trees_probe:
             try:
                 candidate = self.e2b_runner.run(task)
+                extra_trees_decision = (
+                    self.extra_trees_gate.evaluate(task, invocation.raw_assessment, candidate.answer)
+                    if extra_trees_probe and self.extra_trees_gate is not None
+                    else None
+                )
                 selective_decision = (
                     self.selective_policy.evaluate(task, candidate.answer, features)
                     if self.selective_policy is not None
@@ -173,6 +186,31 @@ class ThreeRouteRunner:
                 if candidate.route == "e2b_error":
                     fallback = "e2b_rejected:runtime_error"
                     candidate = self.fireworks_runner.run(task)
+                elif extra_trees_decision is not None and not extra_trees_decision.accepted:
+                    fallback = f"e2b_extra_trees_rejected:{extra_trees_decision.reason}"
+                    candidate = self.fireworks_runner.run(task)
+                elif extra_trees_decision is not None:
+                    candidate = AnswerResult(
+                        id=candidate.id,
+                        answer=extra_trees_decision.answer,
+                        route="e2b_local_extra_trees",
+                        remote_tokens=candidate.remote_tokens,
+                        metadata={
+                            **candidate.metadata,
+                            "e2b_extra_trees": {
+                                "probability": extra_trees_decision.probability,
+                                "accepted": True,
+                                "reason": extra_trees_decision.reason,
+                                "contract_valid": extra_trees_decision.contract_valid,
+                            },
+                        },
+                    )
+                    decision = EngineDecision(
+                        engine=Engine.GEMMA_E2B,
+                        reason="post_response_extra_trees_accept",
+                        feasible_engines=(Engine.GEMMA_E2B, Engine.FIREWORKS),
+                        probability_correct=extra_trees_decision.probability,
+                    )
                 elif selective_decision is not None and not selective_decision.accepted:
                     fallback = f"e2b_selective_rejected:{selective_decision.reason}"
                     candidate = self.fireworks_runner.run(task)

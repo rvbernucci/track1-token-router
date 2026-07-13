@@ -24,6 +24,7 @@ from router.orchestration.competition import CompetitionRunner
 from router.orchestration.game_theory_selector import MinimaxRegretSelector, RobustSelectionConfig
 from router.orchestration.outcome_models import OutcomeModelBundle, OutcomeModelPredictor
 from router.orchestration.e2b_selective_gate import E2BSelectivePolicy
+from router.orchestration.e2b_extra_trees_gate import E2BExtraTreesGate
 from router.orchestration.e2b_matrix_gate import E2BMatrixGate
 from router.orchestration.risk_ladder import RiskLadderPolicy
 from router.orchestration.state_machine import OrchestratedRunner
@@ -226,6 +227,14 @@ def _build_three_route_runner(config: RouterConfig, logger: JsonlRunLogger) -> T
                 config.e2b_matrix_policy,
                 expected_sha256=config.e2b_matrix_policy_sha256,
             )
+        extra_trees_gate = None
+        if config.e2b_extra_trees_policy is not None:
+            if not config.e2b_extra_trees_policy.is_file() or not config.e2b_extra_trees_policy_sha256:
+                raise ValueError("Configured E2B Extra Trees policy or SHA-256 pin is missing.")
+            extra_trees_gate = E2BExtraTreesGate.load(
+                config.e2b_extra_trees_policy,
+                expected_sha256=config.e2b_extra_trees_policy_sha256,
+            )
         risk_ladder = None
         if config.risk_ladder_policy is not None:
             if not config.risk_ladder_policy.is_file():
@@ -277,6 +286,7 @@ def _build_three_route_runner(config: RouterConfig, logger: JsonlRunLogger) -> T
             fireworks_runner=fallback,
             selective_policy=selective_policy,
             matrix_gate=matrix_gate,
+            extra_trees_gate=extra_trees_gate,
             risk_ladder=risk_ladder,
             tool_planner_provider=tool_planner_provider,
             logger=logger,

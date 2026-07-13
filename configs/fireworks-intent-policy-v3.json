@@ -1,0 +1,28 @@
+{
+  "allowed_models": [
+    "accounts/fireworks/models/minimax-m3",
+    "accounts/fireworks/models/kimi-k2p7-code"
+  ],
+  "default_enabled": true,
+  "default_model": "accounts/fireworks/models/kimi-k2p7-code",
+  "intent_models": {
+    "code_debugging": "accounts/fireworks/models/kimi-k2p7-code",
+    "code_generation": "accounts/fireworks/models/kimi-k2p7-code",
+    "factual_qa": "accounts/fireworks/models/kimi-k2p7-code",
+    "logic_puzzle": "accounts/fireworks/models/minimax-m3",
+    "math_reasoning": "accounts/fireworks/models/kimi-k2p7-code",
+    "ner": "accounts/fireworks/models/kimi-k2p7-code",
+    "sentiment": "accounts/fireworks/models/kimi-k2p7-code",
+    "summarization": "accounts/fireworks/models/kimi-k2p7-code"
+  },
+  "locked_test_used_for_selection": false,
+  "schema_version": "fireworks-intent-policy-v1",
+  "selection_split": "validation",
+  "source": {
+    "comparison_report": "reports/generated/s80-fireworks-4400-duel/README.md",
+    "comparison_report_sha256": "1eec18cb3019c7d216a1f3a18c73408c38a59bb6dfb565de5baad23598271900",
+    "estimated_spend_usd": 0.595697,
+    "live_calls": 1600,
+    "promotion_basis": "paired 800-task duel; MiniMax logic_puzzle advantage McNemar p=0.01254; all other overrides lacked p<0.05"
+  }
+}

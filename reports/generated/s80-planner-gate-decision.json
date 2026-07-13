@@ -1,0 +1,45 @@
+{
+  "schema_version": "s80-planner-gate-decision-v1",
+  "decision": "no_promotion",
+  "production_changed": false,
+  "population": {
+    "total": 4400,
+    "fit": 2640,
+    "calibration": 880,
+    "protected_holdout": 880
+  },
+  "dedicated_tool_corpus": {
+    "released": 1393,
+    "correct": 1393,
+    "observed_precision": 1.0,
+    "unsafe_false_positives": 0
+  },
+  "broad_replay": {
+    "structural_prefilter_candidates": 81,
+    "candidates_after_existing_deterministic_solver": 71,
+    "planner_releases": 0,
+    "correct_releases": 0,
+    "mean_planner_latency_ms": 524.294,
+    "runtime_candidate_outcomes": {
+      "planner_selected_none": 20,
+      "tool_route_rejected_value_error": 14,
+      "tool_route_rejected_key_error": 18,
+      "planner_parse_exception": 19
+    }
+  },
+  "protected_holdout": {
+    "runtime_candidates": 23,
+    "planner_releases": 0,
+    "correct_releases": 0,
+    "safe_declines": 7,
+    "rejected_plans": 8,
+    "parse_exceptions": 8
+  },
+  "promotion_gate": {
+    "requires_positive_protected_evidence": true,
+    "positive_protected_examples": 0,
+    "coverage_gain": 0,
+    "passed": false
+  },
+  "reason": "The broad population has no validated post-solver planner release. Retraining on broad negatives can improve decline syntax but cannot demonstrate Fireworks-call reduction or calibrate a safe admission threshold."
+}

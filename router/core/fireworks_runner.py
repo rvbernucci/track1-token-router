@@ -11,7 +11,7 @@ from router.core.contracts import AnswerResult, TaskEnvelope, TokenUsage
 from router.core.fireworks import FireworksClient
 from router.core.logging import JsonlRunLogger
 from router.core.model_client import ModelClientError, ModelResponse
-from router.core.prompts import ANSWER_PROMPT_VERSION, build_m1_messages
+from router.core.prompts import FIREWORKS_ANSWER_PROMPT_VERSION, build_fireworks_answer_messages
 from router.orchestration.fireworks_model_router import (
     normalize_fireworks_model_id,
     select_fireworks_model,
@@ -33,7 +33,7 @@ from router.orchestration.prompt_packet import extract_literal_echo
 from router.orchestration.solvers import solve_deterministic
 
 
-FIREWORKS_COMPLETION_POLICY_VERSION = "accuracy-first-contract-v4"
+FIREWORKS_COMPLETION_POLICY_VERSION = "accuracy-first-contract-v5"
 
 
 class FireworksDirectRunner:
@@ -126,12 +126,25 @@ class FireworksDirectRunner:
                 try:
                     response = _complete_with_optional_request_options(
                         self.client,
-                        build_m1_messages(task),
+                        build_fireworks_answer_messages(task, domain=selection.domain),
                         temperature=self.temperature,
                         max_tokens=request_max_tokens,
                         request_options=request_options,
                     )
                     total_usage = _add_usage(total_usage, response.usage)
+                    response, retry_usage, retry_metadata = _retry_truncated_response(
+                        self.client,
+                        task,
+                        response,
+                        domain=selection.domain,
+                        temperature=self.temperature,
+                        initial_max_tokens=request_max_tokens,
+                        configured_max_tokens=self.max_tokens,
+                        request_options=request_options,
+                    )
+                    total_usage = _add_usage(total_usage, retry_usage)
+                    if retry_metadata:
+                        token_policy["truncation_retry"] = retry_metadata
                     final_validation = validate_final_answer(task, response.text)
                     safe_validation = validate_or_safely_repair_final_answer(task, response.text)
                     if (
@@ -156,6 +169,19 @@ class FireworksDirectRunner:
                 except _RequestOptionsFallback as fallback:
                     response = fallback.response
                     total_usage = _add_usage(total_usage, response.usage)
+                    response, retry_usage, retry_metadata = _retry_truncated_response(
+                        self.client,
+                        task,
+                        response,
+                        domain=selection.domain,
+                        temperature=self.temperature,
+                        initial_max_tokens=request_max_tokens,
+                        configured_max_tokens=self.max_tokens,
+                        request_options={},
+                    )
+                    total_usage = _add_usage(total_usage, retry_usage)
+                    if retry_metadata:
+                        token_policy["truncation_retry"] = retry_metadata
                     final_validation = validate_final_answer(task, response.text)
                     safe_validation = validate_or_safely_repair_final_answer(task, response.text)
                     request_options_fallback = fallback.reason
@@ -203,7 +229,7 @@ class FireworksDirectRunner:
                 remote_tokens=TokenUsage.empty(),
                 metadata={
                     "runner": "fireworks_direct",
-                    "answer_prompt_version": ANSWER_PROMPT_VERSION,
+                    "answer_prompt_version": FIREWORKS_ANSWER_PROMPT_VERSION,
                     "fireworks_model": selected_model,
                     "fireworks_model_selection": selection.to_dict(),
                     "fireworks_matrix_selection": matrix_selection,
@@ -248,7 +274,7 @@ class FireworksDirectRunner:
             remote_tokens=total_usage,
             metadata={
                 "runner": "fireworks_direct",
-                "answer_prompt_version": ANSWER_PROMPT_VERSION,
+                "answer_prompt_version": FIREWORKS_ANSWER_PROMPT_VERSION,
                 "fireworks_model": selected_model,
                 "fireworks_model_selection": selection.to_dict(),
                 "fireworks_matrix_selection": matrix_selection,
@@ -413,6 +439,60 @@ def _completion_token_policy(
     }
 
 
+def _retry_truncated_response(
+    client: FireworksClient,
+    task: TaskEnvelope,
+    response: ModelResponse,
+    *,
+    domain: str,
+    temperature: float,
+    initial_max_tokens: int,
+    configured_max_tokens: int,
+    request_options: dict[str, Any],
+) -> tuple[ModelResponse, TokenUsage, dict[str, object] | None]:
+    if not _response_is_truncated(response, initial_max_tokens):
+        return response, TokenUsage.empty(), None
+    retry_cap = min(max(1, configured_max_tokens), max(initial_max_tokens + 1, initial_max_tokens * 2))
+    if retry_cap <= initial_max_tokens:
+        return response, TokenUsage.empty(), None
+    metadata: dict[str, object] = {
+        "trigger": "finish_reason_length_or_incomplete_near_cap",
+        "initial_max_tokens": initial_max_tokens,
+        "retry_max_tokens": retry_cap,
+        "attempted": True,
+    }
+    try:
+        retried = _complete_with_optional_request_options(
+            client,
+            build_fireworks_answer_messages(task, domain=domain),
+            temperature=temperature,
+            max_tokens=retry_cap,
+            request_options=request_options,
+        )
+    except _RequestOptionsFallback as fallback:
+        retried = fallback.response
+        metadata["request_options_fallback"] = fallback.reason
+    except ModelClientError as exc:
+        metadata["succeeded"] = False
+        metadata["error"] = type(exc).__name__
+        return response, TokenUsage.empty(), metadata
+    metadata["succeeded"] = True
+    return retried, retried.usage, metadata
+
+
+def _response_is_truncated(response: ModelResponse, max_tokens: int) -> bool:
+    choices = response.raw.get("choices") if isinstance(response.raw, dict) else None
+    first = choices[0] if isinstance(choices, list) and choices and isinstance(choices[0], dict) else {}
+    if str(first.get("finish_reason") or "").lower() == "length":
+        return True
+    if response.usage.completion < math.ceil(max_tokens * 0.95):
+        return False
+    text = response.text.rstrip()
+    if not text or text.count("```") % 2:
+        return True
+    return text[-1] not in ".!?;:)}]`\"'"
+
+
 def _completion_token_cap(task: TaskEnvelope, *, expected_format: str, tier: str, domain: str) -> int:
     text = task.input_text
     lowered = text.lower()
@@ -449,6 +529,11 @@ def _completion_token_cap(task: TaskEnvelope, *, expected_format: str, tier: str
     ):
         return 64
     if re.search(r"\b(?:explain|compare|comparison|difference between|distinguish)\b", lowered):
+        # Explanatory factual comparisons frequently need enough room to close a
+        # final contrast or table. Keep the larger cap away from cheap
+        # classification and non-factual domains, where it adds no value.
+        if domain in {"general", "current_factual"} and tier != "cheap":
+            return 384
         return 256
     if domain in {"classification", "formatting"} or tier == "cheap":
         return 128
