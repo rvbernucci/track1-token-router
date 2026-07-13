@@ -24,6 +24,8 @@ class ReleaseAutomationTests(unittest.TestCase):
         self.assertIn("org.opencontainers.image.source", content)
         self.assertIn("org.opencontainers.image.revision", content)
         self.assertIn("org.opencontainers.image.version", content)
+        self.assertIn("for attempt in 1 2 3 4 5", content)
+        self.assertIn("public image pull failed after", content)
         self.assertIn("Gate the exact published image under evaluator limits", content)
         self.assertIn("competition_submission_audit.py", content)
         self.assertNotIn("FIREWORKS_API_KEY", content)
