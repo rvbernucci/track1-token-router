@@ -1,0 +1,902 @@
+{
+  "summary": {
+    "calls": 75,
+    "iterations": 25,
+    "failures": 0,
+    "mean_latency_ms": 1352.22,
+    "by_engine": {
+      "assessment": {
+        "calls": 25,
+        "failures": 0,
+        "mean_latency_ms": 425.06
+      },
+      "planner": {
+        "calls": 25,
+        "failures": 0,
+        "mean_latency_ms": 424.29
+      },
+      "e2b": {
+        "calls": 25,
+        "failures": 0,
+        "mean_latency_ms": 3207.29
+      }
+    }
+  },
+  "rows": [
+    {
+      "iteration": 0,
+      "engine": "assessment",
+      "latency_ms": 248.53,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 22,
+        "total_tokens": 39,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      }
+    },
+    {
+      "iteration": 0,
+      "engine": "planner",
+      "latency_ms": 244.61,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 22,
+        "total_tokens": 39,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      }
+    },
+    {
+      "iteration": 0,
+      "engine": "e2b",
+      "latency_ms": 10572.09,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 1,
+      "engine": "assessment",
+      "latency_ms": 584.17,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 35,
+        "total_tokens": 83,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 1,
+      "engine": "planner",
+      "latency_ms": 583.31,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 35,
+        "total_tokens": 83,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 1,
+      "engine": "e2b",
+      "latency_ms": 6192.19,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 2,
+      "engine": "assessment",
+      "latency_ms": 180.87,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 13,
+        "prompt_tokens": 19,
+        "total_tokens": 32,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 2,
+      "engine": "planner",
+      "latency_ms": 174.35,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 13,
+        "prompt_tokens": 19,
+        "total_tokens": 32,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 2,
+      "engine": "e2b",
+      "latency_ms": 2490.99,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 3,
+      "engine": "assessment",
+      "latency_ms": 565.93,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 18,
+        "total_tokens": 66,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 3,
+      "engine": "planner",
+      "latency_ms": 563.9,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 18,
+        "total_tokens": 66,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 3,
+      "engine": "e2b",
+      "latency_ms": 619.35,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 4,
+      "engine": "assessment",
+      "latency_ms": 567.65,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 16,
+        "total_tokens": 64,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 4,
+      "engine": "planner",
+      "latency_ms": 560.15,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 16,
+        "total_tokens": 64,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 4,
+      "engine": "e2b",
+      "latency_ms": 554.41,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 5,
+      "engine": "assessment",
+      "latency_ms": 233.07,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 22,
+        "total_tokens": 39,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 5,
+      "engine": "planner",
+      "latency_ms": 226.45,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 22,
+        "total_tokens": 39,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 5,
+      "engine": "e2b",
+      "latency_ms": 5131.76,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 6,
+      "engine": "assessment",
+      "latency_ms": 580.8,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 35,
+        "total_tokens": 83,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 6,
+      "engine": "planner",
+      "latency_ms": 581.58,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 35,
+        "total_tokens": 83,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 6,
+      "engine": "e2b",
+      "latency_ms": 6158.56,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 7,
+      "engine": "assessment",
+      "latency_ms": 173.72,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 13,
+        "prompt_tokens": 19,
+        "total_tokens": 32,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 7,
+      "engine": "planner",
+      "latency_ms": 173.27,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 13,
+        "prompt_tokens": 19,
+        "total_tokens": 32,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 7,
+      "engine": "e2b",
+      "latency_ms": 2459.63,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 8,
+      "engine": "assessment",
+      "latency_ms": 564.3,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 18,
+        "total_tokens": 66,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 8,
+      "engine": "planner",
+      "latency_ms": 562.64,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 18,
+        "total_tokens": 66,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 8,
+      "engine": "e2b",
+      "latency_ms": 620.38,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 9,
+      "engine": "assessment",
+      "latency_ms": 554.9,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 16,
+        "total_tokens": 64,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 9,
+      "engine": "planner",
+      "latency_ms": 571.23,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 16,
+        "total_tokens": 64,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 9,
+      "engine": "e2b",
+      "latency_ms": 553.39,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 10,
+      "engine": "assessment",
+      "latency_ms": 231.63,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 22,
+        "total_tokens": 39,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 10,
+      "engine": "planner",
+      "latency_ms": 220.77,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 22,
+        "total_tokens": 39,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 10,
+      "engine": "e2b",
+      "latency_ms": 5131.31,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 11,
+      "engine": "assessment",
+      "latency_ms": 586.51,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 35,
+        "total_tokens": 83,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 11,
+      "engine": "planner",
+      "latency_ms": 572.86,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 35,
+        "total_tokens": 83,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 11,
+      "engine": "e2b",
+      "latency_ms": 6122.54,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 12,
+      "engine": "assessment",
+      "latency_ms": 179.68,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 13,
+        "prompt_tokens": 19,
+        "total_tokens": 32,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 12,
+      "engine": "planner",
+      "latency_ms": 176.86,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 13,
+        "prompt_tokens": 19,
+        "total_tokens": 32,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 12,
+      "engine": "e2b",
+      "latency_ms": 2457.51,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 13,
+      "engine": "assessment",
+      "latency_ms": 566.52,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 18,
+        "total_tokens": 66,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 13,
+      "engine": "planner",
+      "latency_ms": 553.42,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 18,
+        "total_tokens": 66,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 13,
+      "engine": "e2b",
+      "latency_ms": 624.38,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 14,
+      "engine": "assessment",
+      "latency_ms": 555.47,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 16,
+        "total_tokens": 64,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 14,
+      "engine": "planner",
+      "latency_ms": 560.8,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 16,
+        "total_tokens": 64,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 14,
+      "engine": "e2b",
+      "latency_ms": 569.86,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 15,
+      "engine": "assessment",
+      "latency_ms": 225.76,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 22,
+        "total_tokens": 39,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 15,
+      "engine": "planner",
+      "latency_ms": 221.88,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 22,
+        "total_tokens": 39,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 15,
+      "engine": "e2b",
+      "latency_ms": 5157.51,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 16,
+      "engine": "assessment",
+      "latency_ms": 580.73,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 35,
+        "total_tokens": 83,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 16,
+      "engine": "planner",
+      "latency_ms": 580.93,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 35,
+        "total_tokens": 83,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 16,
+      "engine": "e2b",
+      "latency_ms": 6149.14,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 17,
+      "engine": "assessment",
+      "latency_ms": 175.34,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 13,
+        "prompt_tokens": 19,
+        "total_tokens": 32,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 17,
+      "engine": "planner",
+      "latency_ms": 174.81,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 13,
+        "prompt_tokens": 19,
+        "total_tokens": 32,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 17,
+      "engine": "e2b",
+      "latency_ms": 2470.23,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 18,
+      "engine": "assessment",
+      "latency_ms": 565.58,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 18,
+        "total_tokens": 66,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 18,
+      "engine": "planner",
+      "latency_ms": 561.97,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 18,
+        "total_tokens": 66,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 18,
+      "engine": "e2b",
+      "latency_ms": 635.59,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 19,
+      "engine": "assessment",
+      "latency_ms": 578.76,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 16,
+        "total_tokens": 64,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 19,
+      "engine": "planner",
+      "latency_ms": 622.27,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 16,
+        "total_tokens": 64,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 19,
+      "engine": "e2b",
+      "latency_ms": 570.43,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 20,
+      "engine": "assessment",
+      "latency_ms": 235.22,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 22,
+        "total_tokens": 39,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 20,
+      "engine": "planner",
+      "latency_ms": 224.07,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 22,
+        "total_tokens": 39,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 20,
+      "engine": "e2b",
+      "latency_ms": 5154.47,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 21,
+      "engine": "assessment",
+      "latency_ms": 585.59,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 35,
+        "total_tokens": 83,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 21,
+      "engine": "planner",
+      "latency_ms": 583.62,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 35,
+        "total_tokens": 83,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 21,
+      "engine": "e2b",
+      "latency_ms": 6137.95,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 22,
+      "engine": "assessment",
+      "latency_ms": 176.79,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 13,
+        "prompt_tokens": 19,
+        "total_tokens": 32,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 22,
+      "engine": "planner",
+      "latency_ms": 175.2,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 13,
+        "prompt_tokens": 19,
+        "total_tokens": 32,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 22,
+      "engine": "e2b",
+      "latency_ms": 2476.34,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 23,
+      "engine": "assessment",
+      "latency_ms": 568.08,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 18,
+        "total_tokens": 66,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 23,
+      "engine": "planner",
+      "latency_ms": 582.49,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 18,
+        "total_tokens": 66,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 23,
+      "engine": "e2b",
+      "latency_ms": 617.14,
+      "nonempty": true,
+      "usage": {}
+    },
+    {
+      "iteration": 24,
+      "engine": "assessment",
+      "latency_ms": 560.8,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 16,
+        "total_tokens": 64,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 24,
+      "engine": "planner",
+      "latency_ms": 553.93,
+      "nonempty": true,
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_tokens": 16,
+        "total_tokens": 64,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      }
+    },
+    {
+      "iteration": 24,
+      "engine": "e2b",
+      "latency_ms": 555.21,
+      "nonempty": true,
+      "usage": {}
+    }
+  ]
+}

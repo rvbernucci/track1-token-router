@@ -24,7 +24,7 @@ Non-tool route:
   -> existing Gemma 4 E2B LiteRT or Fireworks
 ```
 
-The two FunctionGemma models share an architecture but not trained weights. They are separate, hash-pinned `.litertlm` artifacts. Runtime parameters cannot substitute for the second fine-tune.
+The two FunctionGemma models share an architecture but not trained weights. They are separate, hash-pinned Q8 GGUF artifacts served by independent `llama.cpp` processes. E2B remains the only `.litertlm` artifact. Runtime parameters cannot substitute for the second fine-tune.
 
 ## Guiding Principles
 
@@ -117,19 +117,19 @@ Before training, duplicate the current FunctionGemma artifact under a second mod
 
 **Gate 4:** Validation schema validity at least 99%, supported-tool precision at least 97%, and unsupported false-positive rate at most 1%.
 
-## Phase 5 - Merge, Quantize And LiteRT Export
+## Phase 5 - Merge, Quantize And GGUF Export
 
 - [ ] Merge the selected LoRA adapter into the exact FunctionGemma base.
 - [ ] Compare merged BF16 output against adapter-on-base output.
-- [ ] Quantize the merged planner using the same supported LiteRT quantization family as the existing FunctionGemma artifact.
-- [ ] Export a standalone planner `.litertlm` with a distinct model ID.
-- [ ] Pin converter, LiteRT-LM and tokenizer versions.
+- [ ] Quantize the merged planner to Q8_0 using the same proven llama.cpp pipeline as the assessment artifact.
+- [ ] Export a standalone planner GGUF with a distinct model ID.
+- [ ] Pin converter, llama.cpp and tokenizer versions.
 - [ ] Record pre-merge, merged and quantized hashes.
-- [ ] Compare at least 200 prompts across adapter, merged and LiteRT artifacts.
+- [ ] Compare at least 200 prompts across adapter, merged BF16 and GGUF Q8 artifacts.
 - [ ] Treat output truncation, schema drift and tool-call drift as conversion failures.
-- [ ] Reject conversion if the supported LiteRT toolchain cannot reproduce the fine-tuned model reliably.
+- [ ] Reject conversion if GGUF Q8 materially changes the fine-tuned model's decisions.
 
-**Gate 5:** At least 99% tool-choice agreement and 98% executable-plan agreement between merged and LiteRT planner outputs, with no increase in unsafe releases.
+**Gate 5:** At least 99% tool-choice agreement and 98% executable-plan agreement between merged and GGUF planner outputs, with no increase in unsafe releases.
 
 ## Phase 6 - Planner Evaluation Ladder
 
@@ -209,7 +209,7 @@ Run increasingly expensive evaluations and stop immediately on a failed gate.
 - [ ] Planner training and sealed dataset manifests.
 - [ ] Hash-pinned planner LoRA adapter.
 - [ ] Hash-pinned merged checkpoint.
-- [ ] Hash-pinned quantized planner `.litertlm`.
+- [ ] Hash-pinned quantized planner GGUF.
 - [ ] Dual-model resource-gate report.
 - [ ] Quantization and LiteRT parity report.
 - [ ] Planner accuracy and safety report.
@@ -223,7 +223,7 @@ Stop and retain the stable image immediately if any condition occurs:
 - Dual FunctionGemma plus E2B exceeds 3.6 GiB sampled memory.
 - The second local engine causes unstable startup or model swapping.
 - FunctionGemma cannot learn `tool-plan-v2` above the precision floor.
-- LiteRT conversion is unavailable or materially changes planner decisions.
+- GGUF conversion materially changes planner decisions.
 - Any unsupported sealed control executes a tool.
 - Released-answer precision falls below 95%.
 - Worst-case runtime exceeds 540 seconds.
@@ -236,7 +236,7 @@ Stop and retain the stable image immediately if any condition occurs:
 | Baseline and dual-model capacity gate | 1-2 hours |
 | Corpus expansion and audit | 3-6 hours |
 | QLoRA smoke and bounded training | 2-5 hours |
-| Merge, quantization and LiteRT export | 1-4 hours |
+| Merge, quantization and GGUF export | 1-3 hours |
 | Evaluation ladder | 2-6 hours |
 | Docker championship and release | 2-4 hours |
 

@@ -1,0 +1,29 @@
+{
+  "errors": [],
+  "passed": true,
+  "summary": {
+    "errors": 0,
+    "families": {
+      "calculator": 500,
+      "inventory": 500,
+      "logic": 500,
+      "none": 500,
+      "recipe": 500
+    },
+    "rows": 2500,
+    "schema_version": "functiongemma-tool-corpus-audit-v1",
+    "split_overlaps": {
+      "calibration:sealed": 0,
+      "train:calibration": 0,
+      "train:sealed": 0,
+      "train:validation": 0,
+      "validation:calibration": 0,
+      "validation:sealed": 0
+    },
+    "supported_proofs": 2000,
+    "tool_schema_variants": 1,
+    "unique_ids": 2500,
+    "unique_lineages": 2500,
+    "unsupported": 500
+  }
+}

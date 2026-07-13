@@ -1,0 +1,28 @@
+{
+  "counts": {
+    "calibration": 250,
+    "sealed": 250,
+    "train": 1750,
+    "validation": 250
+  },
+  "families": {
+    "calculator": 500,
+    "inventory": 500,
+    "logic": 500,
+    "none": 500,
+    "recipe": 500
+  },
+  "outside_training_fraction": 0.30000000000000004,
+  "rows": 2500,
+  "schema_version": "functiongemma-tool-corpus-v1",
+  "sealed_fraction": 0.1,
+  "sha256": {
+    "calibration": "fd88003a6d0b2d272a9ee94c2989994562c46efeafa5420368cd6a9e192d21bc",
+    "sealed": "b978733cbe5b861555ae16068b68278f9d80c74326a59f2f5254b55f92f5a7ab",
+    "train": "7bcedd73b9767dfb6aa5cb2d71d4091545462baf22ea1a40ddd6eb3ed0b06f89",
+    "validation": "e0f2c54465fce6ca69b800733fbd41374caea7108fbd6706024a352fc32427e7"
+  },
+  "tools_sha256": "4d0d728381814d57c5430d5a06f6edc37819f5290eef1be88d377664a21ccd56",
+  "unique_ids": 2500,
+  "unique_lineages": 2500
+}

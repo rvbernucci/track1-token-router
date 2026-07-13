@@ -1,0 +1,38 @@
+{
+  "schema_version": "dual-functiongemma-resource-gate-v1",
+  "passed": true,
+  "source_image": "ghcr.io/rvbernucci/track1-token-router:v3.8.2-e2b-contract",
+  "source_digest": "sha256:7ae875639a6b13c8ef84514646b1b6e501da4ef8efd448479615f015239313d9",
+  "limits": {
+    "memory_gib": 4,
+    "cpus": 2,
+    "pids": 256,
+    "network": "none"
+  },
+  "engines": [
+    "functiongemma-assessment-q8-duplicate",
+    "functiongemma-planner-q8-duplicate",
+    "gemma4-e2b-litert"
+  ],
+  "measurements": {
+    "cold_start_seconds": 3,
+    "ready_memory_mib": 454.6,
+    "peak_sampled_memory_mib": 1001.0,
+    "final_memory_mib": 986.8,
+    "calls": 75,
+    "failures": 0,
+    "oom_killed": false,
+    "restarts": 0,
+    "mean_latency_ms": {
+      "assessment": 425.06,
+      "planner": 424.29,
+      "e2b": 3207.29,
+      "all_calls": 1352.22
+    }
+  },
+  "gate": {
+    "maximum_peak_memory_mib": 3686.4,
+    "maximum_cold_start_seconds": 30,
+    "result": "pass"
+  }
+}

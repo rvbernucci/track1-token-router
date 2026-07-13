@@ -1,0 +1,32 @@
+{
+  "schema_version": "functiongemma-tool-planner-config-v1",
+  "model": {
+    "id": "google/functiongemma-270m-it",
+    "revision": "39eccb091651513a5dfb56892d3714c1b5b8276c"
+  },
+  "dataset": {
+    "root": "data/functiongemma-tool-planner-v1",
+    "seed": 20260712,
+    "max_length": 768
+  },
+  "qlora": {
+    "quantization": "nf4",
+    "double_quantization": true,
+    "compute_dtype": "bfloat16",
+    "rank": 16,
+    "alpha": 32,
+    "dropout": 0.05,
+    "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+    "learning_rate": 0.0002,
+    "batch_size": 2,
+    "gradient_accumulation_steps": 8,
+    "epochs": 2,
+    "warmup_ratio": 0.1,
+    "weight_decay": 0.01
+  },
+  "gates": {
+    "schema_validity": 0.99,
+    "supported_precision": 0.97,
+    "unsafe_false_positive_rate": 0.01
+  }
+}

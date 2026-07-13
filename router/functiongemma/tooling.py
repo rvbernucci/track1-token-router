@@ -151,7 +151,7 @@ class _FunctionGemmaValueParser:
             return self._parse_array()
         if self._peek("<escape>"):
             return self._parse_string()
-        return self._parse_integer()
+        return self._parse_number()
 
     def _parse_object(self) -> dict[str, Any]:
         self._consume("{")
@@ -196,16 +196,23 @@ class _FunctionGemmaValueParser:
         self.offset = end + len("<escape>")
         return value
 
-    def _parse_integer(self) -> int:
+    def _parse_number(self) -> int | float:
         start = self.offset
         if self._peek("-"):
             self.offset += 1
         while self.offset < len(self.text) and self.text[self.offset].isdigit():
             self.offset += 1
+        if self.offset < len(self.text) and self.text[self.offset] == ".":
+            self.offset += 1
+            decimal_start = self.offset
+            while self.offset < len(self.text) and self.text[self.offset].isdigit():
+                self.offset += 1
+            if self.offset == decimal_start:
+                raise ValueError(f"Invalid decimal function value at offset {start}.")
         token = self.text[start : self.offset]
         if not token or token == "-":
             raise ValueError(f"Unsupported function value at offset {start}.")
-        return int(token)
+        return float(token) if "." in token else int(token)
 
     def _parse_key(self) -> str:
         self._skip_space()
