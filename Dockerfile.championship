@@ -14,12 +14,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 FROM debian:bookworm-slim AS models
 
 ARG FUNCTIONGEMMA_URL=https://github.com/rvbernucci/track1-token-router/releases/download/model-assets-v1/functiongemma-scale789-q8_0.gguf
+ARG FUNCTIONGEMMA_PLANNER_URL=https://github.com/rvbernucci/track1-token-router/releases/download/model-assets-v1/functiongemma-tool-planner-q8_0.gguf
 ARG E2B_URL=https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/6664aee5fc114b486e2fec56a9f73c0146e79e74/gemma-4-E2B-it.litertlm?download=true
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl \
     && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /models/functiongemma /models/e2b \
+    && mkdir -p /models/functiongemma /models/functiongemma-planner /models/e2b \
     && curl -fL --retry 8 --retry-all-errors -o /models/functiongemma/model.gguf "$FUNCTIONGEMMA_URL" \
     && echo '74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77  /models/functiongemma/model.gguf' | sha256sum -c - \
+    && curl -fL --retry 8 --retry-all-errors -o /models/functiongemma-planner/model.gguf "$FUNCTIONGEMMA_PLANNER_URL" \
+    && echo 'ec412795782acd3ed836ac35e058099bfdb1c3218a1ee86aef32905377dbddaf  /models/functiongemma-planner/model.gguf' | sha256sum -c - \
     && curl -fL --retry 8 --retry-all-errors -o /models/e2b/model.litertlm "$E2B_URL" \
     && echo '181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c  /models/e2b/model.litertlm' | sha256sum -c -
 
@@ -38,6 +41,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     FUNCTIONGEMMA_TIMEOUT_S=5 \
     FUNCTIONGEMMA_CALIBRATION=/app/configs/functiongemma-scale789-q8-calibration.json \
     FUNCTIONGEMMA_CALIBRATION_SHA256=0078565ab90a6c93981e954d13daabdaa11a4535da9257eae03f3a034afcc1e1 \
+    FUNCTIONGEMMA_PLANNER_BASE_URL=http://127.0.0.1:8092/v1 \
+    FUNCTIONGEMMA_PLANNER_MODEL=functiongemma-planner \
+    FUNCTIONGEMMA_PLANNER_MAX_TOKENS=160 \
+    FUNCTIONGEMMA_PLANNER_TIMEOUT_S=8 \
+    DUAL_FUNCTIONGEMMA_POLICY=/app/configs/dual-functiongemma-policy-v1-promoted.json \
+    DUAL_FUNCTIONGEMMA_POLICY_SHA256=611dfac1494674e0a423ddda1ddc06ca01d3671afb2660519b5e97a328d97ff4 \
     E2B_BASE_URL=http://127.0.0.1:9379/v1 \
     E2B_MODEL=gemma4-e2b \
     E2B_MAX_TOKENS=96 \
@@ -75,6 +84,7 @@ COPY router ./router
 COPY configs ./configs
 COPY scripts/litert_cpu_server.py scripts/championship_entrypoint.sh ./scripts/
 COPY --from=models /models/functiongemma/model.gguf ./artifacts/functiongemma-scale789/functiongemma-scale789-q8_0.gguf
+COPY --from=models /models/functiongemma-planner/model.gguf ./artifacts/functiongemma-tool-planner/functiongemma-tool-planner-q8_0.gguf
 COPY --from=models /models/e2b/model.litertlm /opt/litert/models/gemma4-e2b/model.litertlm
 
 RUN pip install --no-cache-dir . \
@@ -82,6 +92,9 @@ RUN pip install --no-cache-dir . \
     && printf '%s  %s\n' \
       '74625dd27cf25d54018fa17328a1b1b43f1f09c179e1e4edfaeeffc0c05d9b77' \
       '/app/artifacts/functiongemma-scale789/functiongemma-scale789-q8_0.gguf' | sha256sum -c - \
+    && printf '%s  %s\n' \
+      'ec412795782acd3ed836ac35e058099bfdb1c3218a1ee86aef32905377dbddaf' \
+      '/app/artifacts/functiongemma-tool-planner/functiongemma-tool-planner-q8_0.gguf' | sha256sum -c - \
     && printf '%s  %s\n' \
       '181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c' \
       '/opt/litert/models/gemma4-e2b/model.litertlm' | sha256sum -c - \

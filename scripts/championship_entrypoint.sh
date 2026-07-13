@@ -2,6 +2,7 @@
 set -eu
 
 fg_pid=""
+planner_pid=""
 e2b_pid=""
 runtime_dir="${PROOFROUTE_RUNTIME_DIR:-/tmp/proofroute}"
 
@@ -13,6 +14,7 @@ mkdir -p "$XDG_CACHE_HOME" "$(dirname "$ROUTER_LOG_PATH")"
 
 cleanup() {
   [ -z "$fg_pid" ] || kill "$fg_pid" 2>/dev/null || true
+  [ -z "$planner_pid" ] || kill "$planner_pid" 2>/dev/null || true
   [ -z "$e2b_pid" ] || kill "$e2b_pid" 2>/dev/null || true
 }
 trap cleanup EXIT INT TERM
@@ -37,6 +39,7 @@ remote_only() {
   echo "local runtime unavailable; continuing with Fireworks: $reason" >&2
   cleanup
   fg_pid=""
+  planner_pid=""
   e2b_pid=""
   export ROUTER_MODE=fireworks
   exec router submit-track1
@@ -58,6 +61,18 @@ fi
   >"$runtime_dir/functiongemma-server.log" 2>&1 &
 fg_pid=$!
 
+/opt/llama/llama-server \
+  --model /app/artifacts/functiongemma-tool-planner/functiongemma-tool-planner-q8_0.gguf \
+  --alias functiongemma-planner \
+  --ctx-size 2048 \
+  --threads 2 \
+  --parallel 1 \
+  --host 127.0.0.1 \
+  --port 8092 \
+  --jinja \
+  >"$runtime_dir/functiongemma-planner-server.log" 2>&1 &
+planner_pid=$!
+
 python /app/scripts/litert_cpu_server.py \
   --host 127.0.0.1 \
   --port 9379 \
@@ -68,6 +83,8 @@ e2b_pid=$!
 
 wait_for_url "FunctionGemma" "http://127.0.0.1:8091/health" 30 \
   || remote_only "FunctionGemma startup failure"
+wait_for_url "FunctionGemma planner" "http://127.0.0.1:8092/health" 30 \
+  || remote_only "FunctionGemma planner startup failure"
 wait_for_url "Gemma E2B" "http://127.0.0.1:9379/v1/models" 30 \
   || remote_only "Gemma E2B startup failure"
 

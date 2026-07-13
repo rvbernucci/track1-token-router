@@ -24,8 +24,19 @@ class FullLocalImageGateTests(unittest.TestCase):
         content = Path("scripts/championship_entrypoint.sh").read_text(encoding="utf-8")
         self.assertIn("export ROUTER_MODE=fireworks", content)
         self.assertIn('remote_only "FunctionGemma startup failure"', content)
+        self.assertIn('remote_only "FunctionGemma planner startup failure"', content)
         self.assertIn('remote_only "Gemma E2B startup failure"', content)
         self.assertIn("exec router submit-track1", content)
+
+    def test_challenger_embeds_hash_pinned_independent_planner(self) -> None:
+        dockerfile = Path("Dockerfile.championship").read_text(encoding="utf-8")
+        entrypoint = Path("scripts/championship_entrypoint.sh").read_text(encoding="utf-8")
+        self.assertIn("functiongemma-tool-planner-q8_0.gguf", dockerfile)
+        self.assertIn("ec412795782acd3ed836ac35e058099bfdb1c3218a1ee86aef32905377dbddaf", dockerfile)
+        self.assertIn("dual-functiongemma-policy-v1-promoted.json", dockerfile)
+        self.assertIn("DUAL_FUNCTIONGEMMA_POLICY_SHA256=611dfac1494674e0a423ddda1ddc06ca01d3671afb2660519b5e97a328d97ff4", dockerfile)
+        self.assertIn("--port 8092", entrypoint)
+        self.assertIn("planner_pid", entrypoint)
 
     def test_harness_compatibility_gate_covers_hostile_runtime_conditions(self) -> None:
         content = Path("scripts/harness_compat_gate.sh").read_text(encoding="utf-8")

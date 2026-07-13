@@ -1,0 +1,23 @@
+{
+  "environment": "AMD Developer Cloud ROCm",
+  "model": "functiongemma-tool-planner-q8_0.gguf",
+  "model_sha256": "ec412795782acd3ed836ac35e058099bfdb1c3218a1ee86aef32905377dbddaf",
+  "parallel_slots": 8,
+  "tasks": 1750,
+  "complete_unique_tasks": 1750,
+  "schema_validity": 0.996,
+  "tool_accuracy": 0.996,
+  "arguments_exact_rate": 0.996,
+  "accepted": 1393,
+  "accepted_correct": 1393,
+  "supported_precision": 1.0,
+  "unsafe_false_positive_rate": 0.0,
+  "mean_latency_ms": 541.57,
+  "by_family": {
+    "calculator": {"tasks": 350, "accepted": 348, "final_correct": 348},
+    "inventory": {"tasks": 350, "accepted": 345, "final_correct": 345},
+    "logic": {"tasks": 350, "accepted": 350, "final_correct": 350},
+    "recipe": {"tasks": 350, "accepted": 350, "final_correct": 350},
+    "none": {"tasks": 350, "accepted": 0, "final_correct": 350}
+  }
+}
