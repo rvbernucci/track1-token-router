@@ -62,6 +62,9 @@ class ThreeRouteRunner:
 
     def run(self, task: TaskEnvelope) -> AnswerResult:
         started = monotonic()
+        set_fireworks_deadline = getattr(self.fireworks_runner, "set_task_deadline", None)
+        if callable(set_fireworks_deadline):
+            set_fireworks_deadline(started + 28.0)
         solver = solve_deterministic(task)
         if solver is not None:
             decision = EngineDecision(

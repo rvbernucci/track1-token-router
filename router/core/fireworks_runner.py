@@ -4,7 +4,7 @@ import json
 import math
 import re
 from pathlib import Path
-from time import perf_counter
+from time import monotonic
 from typing import Any
 
 from router.core.contracts import AnswerResult, TaskEnvelope, TokenUsage
@@ -34,6 +34,7 @@ from router.orchestration.solvers import solve_deterministic
 
 
 FIREWORKS_COMPLETION_POLICY_VERSION = "accuracy-first-contract-v5"
+DEFAULT_TASK_RESPONSE_DEADLINE_S = 28.0
 
 
 class FireworksDirectRunner:
@@ -70,6 +71,12 @@ class FireworksDirectRunner:
         self._intent_policy: FireworksIntentPolicy | None = None
         self._intent_policy_error: str | None = None
         self._unavailable_models: set[str] = set()
+        self._external_deadline_at: float | None = None
+
+    def set_task_deadline(self, deadline_at: float) -> None:
+        if deadline_at <= monotonic():
+            raise ValueError("Task deadline must be in the future.")
+        self._external_deadline_at = deadline_at
 
     def run(self, task: TaskEnvelope) -> AnswerResult:
         solver = solve_deterministic(task) if self.enable_deterministic_solvers else None
@@ -88,7 +95,12 @@ class FireworksDirectRunner:
             self._log(task, result, stage="deterministic_solver", solver=solver.to_dict())
             return result
 
-        started_at = perf_counter()
+        started_at = monotonic()
+        deadline_at = min(
+            started_at + DEFAULT_TASK_RESPONSE_DEADLINE_S,
+            self._external_deadline_at or float("inf"),
+        )
+        self._external_deadline_at = None
         selection, matrix_selection, intent_policy_selection, champion_selection, selected_model = self._selection_plan(task)
         request_options = _request_options_for_selection(selected_model, selection.tier, service_tier=self.service_tier)
         request_options_fallback: str | None = None
@@ -116,6 +128,9 @@ class FireworksDirectRunner:
                 first_model=selected_model,
                 unavailable_models=self._unavailable_models,
             ):
+                if monotonic() >= deadline_at:
+                    attempt_errors.append({"model": attempt_model, "error": "task response deadline exhausted"})
+                    break
                 selected_model = attempt_model
                 request_options = _request_options_for_selection(
                     selected_model,
@@ -130,6 +145,7 @@ class FireworksDirectRunner:
                         temperature=self.temperature,
                         max_tokens=request_max_tokens,
                         request_options=request_options,
+                        deadline_at=deadline_at,
                     )
                     total_usage = _add_usage(total_usage, response.usage)
                     response, retry_usage, retry_metadata = _retry_truncated_response(
@@ -141,6 +157,7 @@ class FireworksDirectRunner:
                         initial_max_tokens=request_max_tokens,
                         configured_max_tokens=self.max_tokens,
                         request_options=request_options,
+                        deadline_at=deadline_at,
                     )
                     total_usage = _add_usage(total_usage, retry_usage)
                     if retry_metadata:
@@ -178,6 +195,7 @@ class FireworksDirectRunner:
                         initial_max_tokens=request_max_tokens,
                         configured_max_tokens=self.max_tokens,
                         request_options={},
+                        deadline_at=deadline_at,
                     )
                     total_usage = _add_usage(total_usage, retry_usage)
                     if retry_metadata:
@@ -384,7 +402,7 @@ class FireworksDirectRunner:
 
 
 def _elapsed_ms(started_at: float) -> int:
-    return round((perf_counter() - started_at) * 1000)
+    return round((monotonic() - started_at) * 1000)
 
 
 def _add_usage(left: TokenUsage, right: TokenUsage) -> TokenUsage:
@@ -449,6 +467,7 @@ def _retry_truncated_response(
     initial_max_tokens: int,
     configured_max_tokens: int,
     request_options: dict[str, Any],
+    deadline_at: float | None = None,
 ) -> tuple[ModelResponse, TokenUsage, dict[str, object] | None]:
     if not _response_is_truncated(response, initial_max_tokens):
         return response, TokenUsage.empty(), None
@@ -468,6 +487,7 @@ def _retry_truncated_response(
             temperature=temperature,
             max_tokens=retry_cap,
             request_options=request_options,
+            deadline_at=deadline_at,
         )
     except _RequestOptionsFallback as fallback:
         retried = fallback.response
@@ -622,17 +642,32 @@ def _complete_with_optional_request_options(
     temperature: float,
     max_tokens: int,
     request_options: dict[str, object],
+    deadline_at: float | None = None,
 ) -> ModelResponse:
+    def complete(extra_body: dict[str, object] | None) -> ModelResponse:
+        original_timeout = getattr(client, "timeout_s", None)
+        if deadline_at is not None:
+            remaining = deadline_at - monotonic()
+            if remaining <= 0:
+                raise ModelClientError("task response deadline exhausted")
+            if isinstance(original_timeout, (int, float)):
+                client.timeout_s = min(float(original_timeout), max(0.05, remaining))
+        try:
+            return client.complete(
+                messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                extra_body=extra_body,
+            )
+        finally:
+            if isinstance(original_timeout, (int, float)):
+                client.timeout_s = original_timeout
+
     try:
-        return client.complete(
-            messages,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            extra_body=request_options or None,
-        )
+        return complete(request_options or None)
     except ModelClientError as exc:
         if request_options and _is_request_option_error(str(exc)):
-            response = client.complete(messages, temperature=temperature, max_tokens=max_tokens)
+            response = complete(None)
             raise _RequestOptionsFallback(response, str(exc)) from exc
         raise
 
@@ -654,7 +689,7 @@ def _is_unavailable_model_error(message: str) -> bool:
 
 def _is_timeout_error(message: str) -> bool:
     lowered = message.lower()
-    return "timed out" in lowered or "timeout" in lowered
+    return "timed out" in lowered or "timeout" in lowered or "deadline exhausted" in lowered
 
 
 class _RequestOptionsFallback(Exception):

@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from time import monotonic
 
 from router.core.contracts import TaskEnvelope, TokenUsage
 from router.core.fireworks import FireworksClient
@@ -41,6 +42,62 @@ class FireworksDirectRunnerTests(unittest.TestCase):
         self.assertEqual(usage.total, 50)
         self.assertEqual(server.requests[0]["payload"]["max_tokens"], 256)
         self.assertTrue(metadata["succeeded"])
+
+    def test_absolute_task_deadline_bounds_remote_request_and_restores_timeout(self) -> None:
+        with FakeOpenAIServer(response_text="too late", delay_s=0.2) as server:
+            client = FireworksClient(
+                base_url=server.url,
+                model="accounts/fireworks/models/minimax-m3",
+                api_key="test",
+                timeout_s=2.0,
+                max_retries=0,
+            )
+            runner = FireworksDirectRunner(
+                client,
+                allowed_models=["accounts/fireworks/models/minimax-m3"],
+                enable_deterministic_solvers=False,
+            )
+            runner.set_task_deadline(monotonic() + 0.05)
+            started = monotonic()
+
+            result = runner.run(TaskEnvelope(id="deadline", input_text="Explain the result."))
+            elapsed = monotonic() - started
+
+        self.assertEqual(result.route, "fireworks_error")
+        self.assertLess(elapsed, 0.18)
+        self.assertEqual(client.timeout_s, 2.0)
+        self.assertIn("timed out", result.metadata["fireworks_attempt_errors"][0]["error"].lower())
+
+    def test_truncation_retry_respects_exhausted_deadline(self) -> None:
+        initial = ModelResponse(
+            text="An incomplete answer",
+            usage=TokenUsage(prompt=10, completion=128, total=138),
+            raw={"choices": [{"finish_reason": "length"}]},
+        )
+        client = FireworksClient(
+            base_url="http://127.0.0.1:1/v1",
+            model="fake-fireworks",
+            api_key="test",
+            timeout_s=2.0,
+            max_retries=0,
+        )
+
+        response, usage, metadata = _retry_truncated_response(
+            client,
+            TaskEnvelope(id="retry", input_text="Explain the result."),
+            initial,
+            domain="current_factual",
+            temperature=0.0,
+            initial_max_tokens=128,
+            configured_max_tokens=640,
+            request_options={},
+            deadline_at=monotonic() - 1,
+        )
+
+        self.assertIs(response, initial)
+        self.assertEqual(usage.total, 0)
+        self.assertFalse(metadata["succeeded"])
+        self.assertEqual(client.timeout_s, 2.0)
 
     def test_429_503_and_malformed_json_fail_closed_with_one_answer(self) -> None:
         scenarios = (
