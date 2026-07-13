@@ -1,0 +1,49 @@
+{
+  "cuda": {
+    "available": true,
+    "device": "NVIDIA GeForce RTX 4060",
+    "memory_mib": 8187,
+    "runtime": "12.8",
+    "torch": "2.11.0+cu128"
+  },
+  "gates": {
+    "all_examples_fit_context": true,
+    "all_splits_present": true,
+    "cuda_available": true,
+    "unique_ids_and_prompts_across_splits": true
+  },
+  "max_length": 768,
+  "model": {
+    "id": "google/functiongemma-270m-it",
+    "revision": "39eccb091651513a5dfb56892d3714c1b5b8276c"
+  },
+  "passed": true,
+  "rows": {
+    "calibration": 250,
+    "sealed": 250,
+    "train": 1750,
+    "validation": 250
+  },
+  "schema_version": "functiongemma-tool-planner-preflight-v1",
+  "selection_forbidden_splits": [
+    "calibration",
+    "sealed"
+  ],
+  "split_sha256": {
+    "calibration": "fd88003a6d0b2d272a9ee94c2989994562c46efeafa5420368cd6a9e192d21bc",
+    "sealed": "b978733cbe5b861555ae16068b68278f9d80c74326a59f2f5254b55f92f5a7ab",
+    "train": "7bcedd73b9767dfb6aa5cb2d71d4091545462baf22ea1a40ddd6eb3ed0b06f89",
+    "validation": "e0f2c54465fce6ca69b800733fbd41374caea7108fbd6706024a352fc32427e7"
+  },
+  "token_lengths": {
+    "count": 2500,
+    "margin": 84,
+    "maximum": 684,
+    "minimum": 559
+  },
+  "tokenizer_source": "tokenizer",
+  "training_splits": [
+    "train",
+    "validation"
+  ]
+}

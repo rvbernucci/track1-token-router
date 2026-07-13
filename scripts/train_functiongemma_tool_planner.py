@@ -18,6 +18,7 @@ def main() -> int:
     parser.add_argument("--max-train-rows", type=int, default=0)
     parser.add_argument("--max-validation-rows", type=int, default=0)
     args = parser.parse_args()
+    _reject_sealed_training_path(args.data)
     config = json.loads(args.config.read_text())
     _validate_config(config)
 
@@ -128,6 +129,11 @@ def _validate_config(config: dict) -> None:
     revision = config.get("model", {}).get("revision", "")
     if len(revision) != 40 or any(char not in "0123456789abcdef" for char in revision):
         raise ValueError("An immutable base-model revision is required.")
+
+
+def _reject_sealed_training_path(data: Path) -> None:
+    if any(part.casefold() == "sealed" for part in data.parts):
+        raise ValueError("The sealed split cannot be used as a training data root.")
 
 
 if __name__ == "__main__":
